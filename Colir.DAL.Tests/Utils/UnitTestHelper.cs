@@ -1,11 +1,22 @@
 ﻿using DAL;
 using DAL.Entities;
 using DAL.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace Colir.DAL.Tests.Utils;
 
 public static class UnitTestHelper
 {
+    public static ColirDbContext CreateDbContext()
+    {
+        // Create database options (in-memory for unit testing)
+        var options = new DbContextOptionsBuilder<ColirDbContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .Options;
+        
+        return new ColirDbContext(options);
+    }
+    
     public static void SeedData(ColirDbContext context)
     {
         // Users

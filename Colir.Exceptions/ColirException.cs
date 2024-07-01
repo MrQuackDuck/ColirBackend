@@ -1,4 +1,4 @@
-﻿namespace DAL.Exceptions;
+﻿namespace Colir.Exceptions;
 
 /// <summary>
 /// Base exception in the Solution

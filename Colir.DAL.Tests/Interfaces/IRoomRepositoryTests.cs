@@ -4,14 +4,13 @@ public interface IRoomRepositoryTests
 {
     Task GetAllAsync_ReturnsAllRooms();
 
-    Task GetByIdAsync_ReturnsRoom_WhenFound();
-    Task GetByIdAsync_ThrowsNotFoundException_WhenRoomWasNotFound();
+    Task GetByIdAsync_ReturnsRoom_WhenFound(long id);
+    Task GetByIdAsync_ThrowsNotFoundException_WhenRoomWasNotFound(long id);
 
     Task AddAsync_AddsNewRoom();
-    Task AddAsync_ReturnsAddedRoom();
     Task AddAsync_AppliesJoinedUsersToRoom();
-    Task AddAsync_ThrowsArgumentException_WhenWrongExpiryDateWasProvided();
-    Task AddAsync_ThrowsArgumentException_WhenOwnerWasNotFound();
+    Task AddAsync_ThrowsRoomExpiredException_WhenWrongExpiryDateWasProvided();
+    Task AddAsync_ThrowsUserNotFoundException_WhenOwnerWasNotFound();
 
     Task Delete_DeletesRoom();
     Task Delete_DeletesAllRelatedAttachments();

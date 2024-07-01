@@ -1,6 +1,4 @@
-﻿using DAL.Exceptions;
-
-namespace Colir.BLL.Exceptions;
+﻿namespace Colir.Exceptions;
 
 public class RoomNotFoundException : NotFoundException
 {

@@ -1,4 +1,4 @@
-﻿namespace DAL.Exceptions;
+﻿namespace Colir.Exceptions;
 
 public class NotFoundException : ColirException
 {

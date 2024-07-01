@@ -1,9 +1,9 @@
 ﻿using Colir.DAL.Tests.Interfaces;
 using Colir.DAL.Tests.Utils;
+using Colir.Exceptions;
 using DAL;
 using DAL.Entities;
 using DAL.Repositories;
-using Microsoft.EntityFrameworkCore;
 
 namespace Colir.DAL.Tests.Tests;
 
@@ -15,13 +15,8 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     [SetUp]
     public void SetUp()
     {
-        // Create database options (in-memory for unit testing)
-        var options = new DbContextOptionsBuilder<ColirDbContext>()
-            .UseInMemoryDatabase(Guid.NewGuid().ToString())
-            .Options;
-        
         // Create database context
-        _dbContext = new ColirDbContext(options);
+        _dbContext = UnitTestHelper.CreateDbContext();
         
         // Initialize room repository
         _roomRepository = new RoomRepository(_dbContext);
@@ -29,7 +24,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         // Add entities
         UnitTestHelper.SeedData(_dbContext);
     }
-    
+
     [Test]
     public async Task GetAllAsync_ReturnsAllRooms()
     {
@@ -45,105 +40,275 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     }
 
     [Test]
-    public async Task GetByIdAsync_ReturnsRoom_WhenFound()
+    [TestCase(1)]
+    public async Task GetByIdAsync_ReturnsRoom_WhenFound(long id)
     {
-        throw new NotImplementedException();
+        // Arrange
+        Room expected = _dbContext.Rooms.First(r => r.Id == id);
+        
+        // Act
+        var result = await _roomRepository.GetByIdAsync(id);
+        
+        // Assert
+        Assert.NotNull(result);
+        Assert.That(result, Is.EqualTo(expected).Using(new RoomEqualityComparer()));
     }
 
     [Test]
-    public async Task GetByIdAsync_ThrowsNotFoundException_WhenRoomWasNotFound()
+    [TestCase(3)]
+    public async Task GetByIdAsync_ThrowsNotFoundException_WhenRoomWasNotFound(long id)
     {
-        throw new NotImplementedException();
+        // Act
+        AsyncTestDelegate act = async () => await _roomRepository.GetByIdAsync(id);
+        
+        // Assert
+        Assert.ThrowsAsync<NotFoundException>(act);
     }
 
     [Test]
     public async Task AddAsync_AddsNewRoom()
     {
-        throw new NotImplementedException();
-    }
+        // Arrange
+        var roomToAdd = new Room()
+        {
+            Guid = Guid.NewGuid().ToString(),
+            Name = "Room #3",
+            OwnerId = 1,
+            ExpiryDate = DateTime.Today.Add(new TimeSpan(1, 0, 0)),
+        };
 
-    [Test]
-    public async Task AddAsync_ReturnsAddedRoom()
-    {
-        throw new NotImplementedException();
+        // Act
+        await _roomRepository.AddAsync(roomToAdd);
+        _roomRepository.SaveChanges();
+        
+        // Assert
+        Assert.That(_dbContext.Rooms.Count() == 3);
     }
 
     [Test]
     public async Task AddAsync_AppliesJoinedUsersToRoom()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var users = _dbContext.Users.ToList();
+        
+        var roomToAdd = new Room()
+        {
+            Guid = Guid.NewGuid().ToString(),
+            Name = "Room #3",
+            OwnerId = 1,
+            ExpiryDate = DateTime.Today.Add(new TimeSpan(1, 0, 0)),
+            JoinedUsers = users,
+        };
+
+        // Act
+        await _roomRepository.AddAsync(roomToAdd);
+        _roomRepository.SaveChanges();
+
+        // Assert
+        var result = _dbContext.Rooms.First(r => r.Guid == roomToAdd.Guid);
+        Assert.NotNull(result.JoinedUsers);
+        Assert.That(result.JoinedUsers, Is.EqualTo(roomToAdd.JoinedUsers).Using(new UserEqualityComparer()));
     }
 
-    [Test]
-    public async Task AddAsync_ThrowsArgumentException_WhenWrongExpiryDateWasProvided()
+    public async Task AddAsync_ThrowsRoomExpiredException_WhenWrongExpiryDateWasProvided()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var roomToAdd = new Room()
+        {
+            Guid = Guid.NewGuid().ToString(),
+            Name = "Room #3",
+            OwnerId = 1,
+            ExpiryDate = new DateTime(1990, 1, 1),
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _roomRepository.AddAsync(roomToAdd);
+        _roomRepository.SaveChanges();
+
+        // Assert
+        Assert.ThrowsAsync<RoomExpiredException>(act);
     }
 
-    [Test]
-    public async Task AddAsync_ThrowsArgumentException_WhenOwnerWasNotFound()
+    public async Task AddAsync_ThrowsUserNotFoundException_WhenOwnerWasNotFound()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var roomToAdd = new Room()
+        {
+            Guid = Guid.NewGuid().ToString(),
+            Name = "Room #3",
+            OwnerId = 4,
+            ExpiryDate = DateTime.Today.Add(new TimeSpan(1, 0, 0)),
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _roomRepository.AddAsync(roomToAdd);
+        _roomRepository.SaveChanges();
+
+        // Assert
+        Assert.ThrowsAsync<UserNotFoundException>(act);
     }
 
     [Test]
     public async Task Delete_DeletesRoom()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var roomCount = _dbContext.Rooms.Count();
+        var roomToDelete = _dbContext.Rooms.First();
+        
+        // Act
+        _roomRepository.Delete(roomToDelete);
+        _roomRepository.SaveChanges();
+
+        // Assert
+        // Ensure that room is now couldn't be found
+        var room = _dbContext.Rooms.FirstOrDefault(r => r.Id == roomToDelete.Id);
+        Assert.Null(room);
+        
+        // Ensure that room count was reduced
+        Assert.That(_dbContext.Rooms.Count() == (roomCount - 1));
     }
 
     [Test]
     public async Task Delete_DeletesAllRelatedAttachments()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var roomToDelete = _dbContext.Rooms.First();
+
+        // Act
+        _roomRepository.Delete(roomToDelete);
+        _roomRepository.SaveChanges();
+
+        // Assert
+        Assert.That(_dbContext.Attachments.Count() == 0);
     }
 
     [Test]
     public async Task Delete_DeletesAllRelatedMessages()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var roomToDelete = _dbContext.Rooms.First();
+
+        // Act
+        _roomRepository.Delete(roomToDelete);
+        _roomRepository.SaveChanges();
+
+        // Assert
+        Assert.That(_dbContext.Messages.Count() == 0);
     }
 
     [Test]
     public async Task Delete_DeletesAllRelatedReactions()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var roomToDelete = _dbContext.Rooms.First();
+
+        // Act
+        _roomRepository.Delete(roomToDelete);
+        _roomRepository.SaveChanges();
+
+        // Assert
+        Assert.That(_dbContext.Reactions.Count() == 0);
     }
 
     [Test]
     public async Task Delete_ThrowsNotFoundException_WhenRoomDoesNotExist()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var roomToDelete = new Room()
+        {
+            Id = 10,
+            Guid = Guid.NewGuid().ToString(),
+            Name = "Room #10",
+            ExpiryDate = DateTime.Now.Add(new TimeSpan(1, 0, 0)),
+            OwnerId = 1
+        };
+
+        // Act
+        TestDelegate act = () => _roomRepository.Delete(roomToDelete);
+
+        // Assert
+        Assert.Throws<NotFoundException>(act);
     }
 
     [Test]
     public async Task DeleteByIdAsync_DeletesRoom()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var roomCount = _dbContext.Rooms.Count();
+        var roomToDelete = _dbContext.Rooms.First();
+        
+        // Act
+        _roomRepository.Delete(roomToDelete);
+        _roomRepository.SaveChanges();
+
+        // Assert
+        // Ensure that room is now couldn't be found
+        var room = _dbContext.Rooms.FirstOrDefault(r => r.Id == roomToDelete.Id);
+        Assert.Null(room);
+        
+        // Ensure that room count was reduced
+        Assert.That(_dbContext.Rooms.Count() == (roomCount - 1));
     }
 
     [Test]
     public async Task DeleteByIdAsync_DeletesAllRelatedAttachments()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var roomCount = _dbContext.Rooms.Count();
+        var roomIdToDelete = _dbContext.Rooms.First().Id;
+        
+        // Act
+        await _roomRepository.DeleteByIdAsync(roomIdToDelete);
+        _roomRepository.SaveChanges();
+
+        // Assert
+        // Ensure that room is now couldn't be found
+        var room = _dbContext.Rooms.FirstOrDefault(r => r.Id == roomIdToDelete);
+        Assert.Null(room);
+        
+        // Ensure that room count was reduced
+        Assert.That(_dbContext.Rooms.Count() == (roomCount - 1));
     }
 
     [Test]
     public async Task DeleteByIdAsync_DeletesAllRelatedMessages()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var roomIdToDelete = _dbContext.Rooms.First().Id;
+
+        // Act
+        await _roomRepository.DeleteByIdAsync(roomIdToDelete);
+        _roomRepository.SaveChanges();
+
+        // Assert
+        Assert.That(_dbContext.Messages.Count() == 0);
     }
 
     [Test]
     public async Task DeleteByIdAsync_DeletesAllRelatedReactions()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var roomIdToDelete = _dbContext.Rooms.First().Id;
+
+        // Act
+        await _roomRepository.DeleteByIdAsync(roomIdToDelete);
+        _roomRepository.SaveChanges();
+
+        // Assert
+        Assert.That(_dbContext.Reactions.Count() == 0);
     }
 
     [Test]
     public async Task DeleteByIdAsync_ThrowsNotFoundException_WhenRoomWasNotFoundById()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var roomIdToDelete = 10;
+
+        // Act
+        AsyncTestDelegate act = async () => await _roomRepository.DeleteByIdAsync(roomIdToDelete);
+
+        // Assert
+        Assert.ThrowsAsync<NotFoundException>(act);
     }
 
     [Test]
@@ -167,12 +332,27 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     [Test]
     public async Task DeleteAllExpiredAsync_DeletesAllExpiredRooms()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var roomCount = _dbContext.Rooms.Count();
+        
+        // Act
+        await _roomRepository.DeleteAllExpiredAsync();
+
+        // Assert
+        var newRoomCount = _dbContext.Rooms.Count();
+        var expiredRoom = _roomRepository.GetByIdAsync(2);
+        Assert.Null(expiredRoom);
+        Assert.That(roomCount == newRoomCount);
     }
 
     [Test]
     public async Task DeleteAllExpiredAsync_ThrowsNotFoundException_WhenNoExpiredRoomsExist()
     {
-        throw new NotImplementedException();
+        // Act
+        await _roomRepository.DeleteAllExpiredAsync();
+        AsyncTestDelegate act = async () => await _roomRepository.DeleteAllExpiredAsync();
+        
+        // Assert
+        Assert.ThrowsAsync<NotFoundException>(act);
     }
 }
