@@ -1,0 +1,14 @@
+﻿namespace Colir.BLL.Models;
+
+public class MessageModel
+{
+    public long Id { get; set; }
+    public long RoomId { get; set; }
+    public long AuthorId { get; set; }
+    public DateTime PostDate { get; set; }
+    public DateTime? EditDate { get; set; }
+    public long? RepliedMessageId { get; set; }
+
+    public List<ReactionModel> Reactions { get; set; } = default!;
+    public List<AttachmentModel> Attachments { get; set; } = default!;
+}

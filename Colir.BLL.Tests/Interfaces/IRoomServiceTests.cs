@@ -1,0 +1,53 @@
+﻿namespace Colir.BLL.Tests.Interfaces;
+
+public interface IRoomServiceTests
+{
+	void GetRoomInfoAsync_ReturnsRoomInfo();
+	void GetRoomInfoAsync_ThrowsRoomExpiredException_WhenRoomExpired();
+	void GetRoomInfoAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
+	void GetRoomInfoAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInTheRoom();
+	void GetRoomInfoAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
+
+	void CreateAsync_CreatesRoom();
+	void CreateAsync_ReturnsRoomGuid();
+	void CreateAsync_ThrowsArgumentExcpetion_WhenWrongExpiryDateWasProvided();
+	void CreateAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
+
+	void RenameAsync_RenamesTheRoom();
+	void RenameAsync_ThrowsArgumentException_WhenNewNameIsTooLong();
+	void RenameAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
+	void RenameAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotOwnerOfRoom();
+	void RenameAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
+
+	void DeleteAsync_DeletesTheRoom();
+	void DeleteAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
+	void DeleteAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotOwnerOfRoom();
+	void DeleteAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
+
+	void GetLastTimeUserReadChatAsync_ReturnsLastTimeUserReadChat();
+	void GetLastTimeUserReadChatAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
+	void GetLastTimeUserReadChatAsync_ThrowsArgumentException_WhenIssuerIsNotInRoom();
+	void GetLastTimeUserReadChatAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
+
+	void UpdateLastTimeUserReadChatAsync_UpdatesLastTimeUserReadChat();
+	void UpdateLastTimeUserReadChatAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
+	void UpdateLastTimeUserReadChatAsync_ThrowsArgumentException_WhenIssuerIsNotInRoom();
+	void UpdateLastTimeUserReadChatAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
+
+	void JoinMemberAsync_JoinsUserToRoom();
+	void JoinMemberAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
+	void JoinMemberAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
+
+	void KickMemberAsync_KicksUserFromRoom();
+	void KickMemberAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
+	void KickMemberAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
+	void KickMemberAsync_ThrowsUserNotFoundException_WhenTargetWasNotFound();
+	void KickMemberAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
+	void KickMemberAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotOwnerOfRoom();
+
+	void ClearRoomAsync_ReturnsClearProcessObject();
+	void ClearRoomAsync_ClearProcessObjectHasFilesToDeletePropertyAboveZero();
+	void ClearRoomAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
+	void ClearRoomAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
+	void ClearRoomAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotOwnerOfRoom();
+}
