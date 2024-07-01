@@ -5,169 +5,181 @@ namespace Colir.BLL.Tests.Tests;
 public class MessageServiceTests : IMessageServiceTests
 {
     [Test]
-    public void GetLastMessagesAsync_ReturnsLastMessages()
+    public async Task GetLastMessagesAsync_ReturnsLastMessages()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetLastMessagesAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
+    public async Task GetLastMessagesAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetLastMessagesAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound()
+    public async Task GetLastMessagesAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetLastMessagesAsync_ThrowsArgumentExcpetion_WhenCountLessThanZero()
+    public async Task GetLastMessagesAsync_ThrowsArgumentExcpetion_WhenCountLessThanZero()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetLastMessagesAsync_ThrowsArgumentExcpetion_WhenSkipLessThanZero()
+    public async Task GetLastMessagesAsync_ThrowsArgumentExcpetion_WhenSkipLessThanZero()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetLastMessagesAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom()
+    public async Task GetLastMessagesAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void SendAsync_SendsMessage()
+    public async Task SendAsync_SendsMessage()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void SendAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
+    public async Task SendAsync_AddsToStatistics_WhenItsEnabled()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void SendAsync_ThrowsMessageNotFoundException_WhenNotExistingReplyMessageIdProvided()
+    public async Task SendAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void SendAsync_ThrowsAttachmentNotFoundException_WhenNotExistingAttachmentIdProvided()
+    public async Task SendAsync_ThrowsMessageNotFoundException_WhenNotExistingReplyMessageIdProvided()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void SendAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound()
+    public async Task SendAsync_ThrowsAttachmentNotFoundException_WhenNotExistingAttachmentIdProvided()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void SendAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom()
+    public async Task SendAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void EditAsync_EditsMessage()
+    public async Task SendAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void EditAsync_ThrowsMessageNotFoundException_WhenMessageWasNotFound()
+    public async Task EditAsync_EditsMessage()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void EditAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom()
+    public async Task EditAsync_ThrowsMessageNotFoundException_WhenMessageWasNotFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void EditAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotAuthorOfMessage()
+    public async Task EditAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Delete_DeletesMessage()
+    public async Task EditAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotAuthorOfMessage()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Delete_ThrowsMessageNotFoundException_WhenMessageWasNotFound()
+    public async Task Delete_DeletesMessage()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Delete_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom()
+    public async Task Delete_ThrowsMessageNotFoundException_WhenMessageWasNotFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Delete_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotAuthorOfMessage()
+    public async Task Delete_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AddReaction_AddsReaction()
+    public async Task Delete_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotAuthorOfMessage()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AddReaction_ThrowsMessageNotFoundException_WhenMessageWasNotFound()
+    public async Task AddReaction_AddsReaction()
+    {
+        throw new NotImplementedException();
+    }
+    
+    [Test]
+    public async Task AddReaction_AddsToStatistics_WhenItsEnabled()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AddReaction_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom()
+    public async Task AddReaction_ThrowsMessageNotFoundException_WhenMessageWasNotFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void RemoveReaction_RemovesReaction()
+    public async Task AddReaction_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void RemoveReaction_ThrowsMessageNotFoundException_WhenMessageWasNotFound()
+    public async Task RemoveReaction_RemovesReaction()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void RemoveReaction_ThrowsReactionNotFoundException_WhenReactionWasNotFound()
+    public async Task RemoveReaction_ThrowsMessageNotFoundException_WhenMessageWasNotFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void RemoveReaction_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom()
+    public async Task RemoveReaction_ThrowsReactionNotFoundException_WhenReactionWasNotFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void RemoveReaction_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotAuthorOfReaction()
+    public async Task RemoveReaction_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom()
+    {
+        throw new NotImplementedException();
+    }
+
+    [Test]
+    public async Task RemoveReaction_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotAuthorOfReaction()
     {
         throw new NotImplementedException();
     }

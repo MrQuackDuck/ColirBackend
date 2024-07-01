@@ -2,29 +2,29 @@
 
 public interface IUserSettingsRepositoryTests
 {
-    void GetAllAsync_ReturnsAllUsersSettings();
+    Task GetAllAsync_ReturnsAllUsersSettings();
 
-    void GetByUserHexIdAsync_ReturnsUserSettings();
-    void GetByUserHexIdAsync_ThrowsNotFoundException_WhenUserWasNotFound();
-    void GetByUserHexIdAsync_ThrowsArgumentException_WhenHexFormatIsNotCorrect();
+    Task GetByUserHexIdAsync_ReturnsUserSettings();
+    Task GetByUserHexIdAsync_ThrowsNotFoundException_WhenUserWasNotFound();
+    Task GetByUserHexIdAsync_ThrowsArgumentException_WhenHexFormatIsNotCorrect();
 
-    void GetByIdAsync_ReturnsUserSettings_WhenFound();
-    void GetByIdAsync_ThrowsNotFoundException_WhenUserSettingsWasNotFound();
+    Task GetByIdAsync_ReturnsUserSettings_WhenFound();
+    Task GetByIdAsync_ThrowsNotFoundException_WhenUserSettingsWasNotFound();
 
-    void AddAsync_AddsNewUserSettings();
-    void AddAsync_ReturnsAddedUserSettings();
-    void AddAsync_ThrowsArgumentException_WhenUserSettingsAlreadyExist();
-    void AddAsync_ThrowsNotFoundException_WhenUserWasNotFound();
+    Task AddAsync_AddsNewUserSettings();
+    Task AddAsync_ReturnsAddedUserSettings();
+    Task AddAsync_ThrowsArgumentException_WhenUserSettingsAlreadyExist();
+    Task AddAsync_ThrowsNotFoundException_WhenUserWasNotFound();
 
-    void Delete_DeletesUserSettings();
-    void Delete_ThrowsNotFoundException_WhenUserSettingsDoesNotExist();
+    Task Delete_DeletesUserSettings();
+    Task Delete_ThrowsNotFoundException_WhenUserSettingsDoesNotExist();
 
-    void DeleteByIdAsync_DeletesUserSettings();
-    void Delete_ThrowsNotFoundException_WhenUserSettingsWereNotFoundById();
+    Task DeleteByIdAsync_DeletesUserSettings();
+    Task Delete_ThrowsNotFoundException_WhenUserSettingsWereNotFoundById();
 
-    void Update_UpdatesUserSettings();
-    void Update_ThrowsArgumentException_WhenProvidedAnotherUserId();
-    void Update_ThrowsNotFoundException_WhenUserSettingsDoNotExist();
+    Task Update_UpdatesUserSettings();
+    Task Update_ThrowsArgumentException_WhenProvidedAnotherUserId();
+    Task Update_ThrowsNotFoundException_WhenUserSettingsDoNotExist();
 
-    void SaveChanges_SavesChanges();
+    Task SaveChanges_SavesChanges();
 }

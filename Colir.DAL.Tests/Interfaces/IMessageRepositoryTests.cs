@@ -2,44 +2,44 @@
 
 public interface IMessageRepositoryTests
 {
-    void GetAllAsync_ReturnsAllMessages();
+    Task GetAllAsync_ReturnsAllMessages();
 
-    void GetLastMessages_ReturnsLastMessages();
-    void GetLastMessages_ReturnsLastMessagesWithAttachments();
-    void GetLastMessages_ReturnsLastMessagesWithReactions();
-    void GetLastMessages_ThrowsNotFoundException_WhenRoomWasNotFound();
-    void GetLastMessages_ThrowsArgumentExcpetion_WhenCountLessThanZero();
-    void GetLastMessages_ThrowsArgumentExcpetion_WhenSkipLessThanZero();
-    void GetLastMessages_ThrowsRoomExpiredException_WhenRoomExpired();
+    Task GetLastMessages_ReturnsLastMessages();
+    Task GetLastMessages_ReturnsLastMessagesWithAttachments();
+    Task GetLastMessages_ReturnsLastMessagesWithReactions();
+    Task GetLastMessages_ThrowsNotFoundException_WhenRoomWasNotFound();
+    Task GetLastMessages_ThrowsArgumentExcpetion_WhenCountLessThanZero();
+    Task GetLastMessages_ThrowsArgumentExcpetion_WhenSkipLessThanZero();
+    Task GetLastMessages_ThrowsRoomExpiredException_WhenRoomExpired();
 
-    void GetByIdAsync_ReturnsMessage_WhenFound();
-    void GetByIdAsync_ThrowsNotFoundException_WhenMessageWasNotFound();
+    Task GetByIdAsync_ReturnsMessage_WhenFound();
+    Task GetByIdAsync_ThrowsNotFoundException_WhenMessageWasNotFound();
 
-    void AddAsync_AddsNewMessage();
-    void AddAsync_ReturnsAddedMessage();
-    void AddAsync_AppliesAttachmentsToMessage();
-    void AddAsync_AppliesReactionsToMessage();
-    void AddAsync_ThrowsNotFoundException_WhenAuthorWasNotFound();
-    void AddAsync_ThrowsNotFoundException_WhenRoomWasNotFound();
-    void AddAsync_ThrowsNotFoundException_WhenRepliedMessageWasNotFound();
-    void AddAsync_ThrowsRoomExpiredException_WhenRoomExpired();
+    Task AddAsync_AddsNewMessage();
+    Task AddAsync_ReturnsAddedMessage();
+    Task AddAsync_AppliesAttachmentsToMessage();
+    Task AddAsync_AppliesReactionsToMessage();
+    Task AddAsync_ThrowsNotFoundException_WhenAuthorWasNotFound();
+    Task AddAsync_ThrowsNotFoundException_WhenRoomWasNotFound();
+    Task AddAsync_ThrowsNotFoundException_WhenRepliedMessageWasNotFound();
+    Task AddAsync_ThrowsRoomExpiredException_WhenRoomExpired();
 
-    void Delete_DeletesMessage();
-    void Delete_DeletesAllRelatedReactions();
-    void Delete_DeletesAllRelatedAttachments();
-    void Delete_NotDeletesAnyOtherMessages();
-    void Delete_ThrowsNotFoundException_WhenMessageDoesNotExist();
-    void Delete_ThrowsRoomExpiredException_WhenRoomExpired();
+    Task Delete_DeletesMessage();
+    Task Delete_DeletesAllRelatedReactions();
+    Task Delete_DeletesAllRelatedAttachments();
+    Task Delete_NotDeletesAnyOtherMessages();
+    Task Delete_ThrowsNotFoundException_WhenMessageDoesNotExist();
+    Task Delete_ThrowsRoomExpiredException_WhenRoomExpired();
 
-    void DeleteByIdAsync_DeletesMessage();
-    void DeleteByIdAsync_DeletesAllRelatedReactions();
-    void DeleteByIdAsync_DeletesAllRelatedAttachments();
-    void DeleteByIdAsync_ThrowsNotFoundException_WhenMessageWasNotFoundById();
-    void DeleteByIdAsync_ThrowsRoomExpiredException_WhenRoomExpired();
+    Task DeleteByIdAsync_DeletesMessage();
+    Task DeleteByIdAsync_DeletesAllRelatedReactions();
+    Task DeleteByIdAsync_DeletesAllRelatedAttachments();
+    Task DeleteByIdAsync_ThrowsNotFoundException_WhenMessageWasNotFoundById();
+    Task DeleteByIdAsync_ThrowsRoomExpiredException_WhenRoomExpired();
 
-    void Update_UpdatesMessage();
-    void Update_ThrowsNotFoundException_WhenMessageDoesNotExist();
-    void Update_ThrowsRoomExpiredException_WhenRoomExpired();
+    Task Update_UpdatesMessage();
+    Task Update_ThrowsNotFoundException_WhenMessageDoesNotExist();
+    Task Update_ThrowsRoomExpiredException_WhenRoomExpired();
 
-    void SaveChanges_SavesChanges();
+    Task SaveChanges_SavesChanges();
 }

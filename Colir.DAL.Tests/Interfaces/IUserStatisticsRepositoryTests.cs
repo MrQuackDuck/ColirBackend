@@ -2,29 +2,29 @@
 
 public interface IUserStatisticsRepositoryTests
 {
-    void GetAllAsync_ReturnsAllUsersStatistics();
+    Task GetAllAsync_ReturnsAllUsersStatistics();
 
-    void GetByUserHexIdAsync_ReturnsUserStatistics();
-    void GetByUserHexIdAsync_ThrowsNotFoundException_WhenUserWasNotFound();
-    void GetByUserHexIdAsync_ThrowsArgumentException_WhenHexFormatIsNotCorrect();
+    Task GetByUserHexIdAsync_ReturnsUserStatistics();
+    Task GetByUserHexIdAsync_ThrowsNotFoundException_WhenUserWasNotFound();
+    Task GetByUserHexIdAsync_ThrowsArgumentException_WhenHexFormatIsNotCorrect();
 
-    void GetByIdAsync_ReturnsUserStatistics_WhenFound();
-    void GetByIdAsync_ThrowsNotFoundException_WhenUserStatisticsWasNotFound();
+    Task GetByIdAsync_ReturnsUserStatistics_WhenFound();
+    Task GetByIdAsync_ThrowsNotFoundException_WhenUserStatisticsWasNotFound();
 
-    void AddAsync_AddsNewUserStatistics();
-    void AddAsync_ReturnsAddedUserStatistics();
-    void AddAsync_ThrowsArgumentException_WhenUserStatisticsAlreadyExist();
-    void AddAsync_ThrowsNotFoundException_WhenUserWasNotFound();
+    Task AddAsync_AddsNewUserStatistics();
+    Task AddAsync_ReturnsAddedUserStatistics();
+    Task AddAsync_ThrowsArgumentException_WhenUserStatisticsAlreadyExist();
+    Task AddAsync_ThrowsNotFoundException_WhenUserWasNotFound();
 
-    void Delete_DeletesUserStatistics();
-    void Delete_ThrowsNotFoundException_WhenUserStatisticsDoesNotExist();
+    Task Delete_DeletesUserStatistics();
+    Task Delete_ThrowsNotFoundException_WhenUserStatisticsDoesNotExist();
 
-    void DeleteByIdAsync_DeletesUserStatistics();
-    void Delete_ThrowsNotFoundException_WhenUserStatisticsWasNotFoundById();
+    Task DeleteByIdAsync_DeletesUserStatistics();
+    Task Delete_ThrowsNotFoundException_WhenUserStatisticsWasNotFoundById();
 
-    void Update_UpdatesUserStatistics();
-    void Update_ThrowsArgumentException_WhenProvidedAnotherUserId();
-    void Update_ThrowsNotFoundException_WhenUserStatisticsDoesNotExist();
+    Task Update_UpdatesUserStatistics();
+    Task Update_ThrowsArgumentException_WhenProvidedAnotherUserId();
+    Task Update_ThrowsNotFoundException_WhenUserStatisticsDoesNotExist();
 
-    void SaveChanges_SavesChanges();
+    Task SaveChanges_SavesChanges();
 }

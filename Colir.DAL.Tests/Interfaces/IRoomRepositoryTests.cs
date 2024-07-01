@@ -2,34 +2,34 @@
 
 public interface IRoomRepositoryTests
 {
-    void GetAllAsync_ReturnsAllRooms();
+    Task GetAllAsync_ReturnsAllRooms();
 
-    void GetByIdAsync_ReturnsRoom_WhenFound();
-    void GetByIdAsync_ThrowsNotFoundException_WhenRoomWasNotFound();
+    Task GetByIdAsync_ReturnsRoom_WhenFound();
+    Task GetByIdAsync_ThrowsNotFoundException_WhenRoomWasNotFound();
 
-    void AddAsync_AddsNewRoom();
-    void AddAsync_ReturnsAddedRoom();
-    void AddAsync_AppliesJoinedUsersToRoom();
-    void AddAsync_ThrowsArgumentException_WhenWrongExpiryDateWasProvided();
-    void AddAsync_ThrowsArgumentException_WhenOwnerWasNotFound();
+    Task AddAsync_AddsNewRoom();
+    Task AddAsync_ReturnsAddedRoom();
+    Task AddAsync_AppliesJoinedUsersToRoom();
+    Task AddAsync_ThrowsArgumentException_WhenWrongExpiryDateWasProvided();
+    Task AddAsync_ThrowsArgumentException_WhenOwnerWasNotFound();
 
-    void Delete_DeletesRoom();
-    void Delete_DeletesAllRelatedAttachments();
-    void Delete_DeletesAllRelatedMessages();
-    void Delete_DeletesAllRelatedReactions();
-    void Delete_ThrowsNotFoundException_WhenRoomDoesNotExist();
+    Task Delete_DeletesRoom();
+    Task Delete_DeletesAllRelatedAttachments();
+    Task Delete_DeletesAllRelatedMessages();
+    Task Delete_DeletesAllRelatedReactions();
+    Task Delete_ThrowsNotFoundException_WhenRoomDoesNotExist();
 
-    void DeleteByIdAsync_DeletesRoom();
-    void DeleteByIdAsync_DeletesAllRelatedAttachments();
-    void DeleteByIdAsync_DeletesAllRelatedMessages();
-    void DeleteByIdAsync_DeletesAllRelatedReactions();
-    void DeleteByIdAsync_ThrowsNotFoundException_WhenRoomWasNotFoundById();
+    Task DeleteByIdAsync_DeletesRoom();
+    Task DeleteByIdAsync_DeletesAllRelatedAttachments();
+    Task DeleteByIdAsync_DeletesAllRelatedMessages();
+    Task DeleteByIdAsync_DeletesAllRelatedReactions();
+    Task DeleteByIdAsync_ThrowsNotFoundException_WhenRoomWasNotFoundById();
 
-    void Update_UpdatesRoom();
-    void Update_ThrowsNotFoundException_WhenRoomDoesNotExist();
+    Task Update_UpdatesRoom();
+    Task Update_ThrowsNotFoundException_WhenRoomDoesNotExist();
 
-    void SaveChanges_SavesChanges();
+    Task SaveChanges_SavesChanges();
 
-    void DeleteAllExpiredAsync_DeletesAllExpiredRooms();
-    void DeleteAllExpiredAsync_ThrowsNotFoundException_WhenNoExpiredRoomsExist();
+    Task DeleteAllExpiredAsync_DeletesAllExpiredRooms();
+    Task DeleteAllExpiredAsync_ThrowsNotFoundException_WhenNoExpiredRoomsExist();
 }

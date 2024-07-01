@@ -2,21 +2,21 @@
 
 public interface IUserServiceTests
 {
-    void AuthorizeWithGitHubAsync_CreatesUser();
-    void AuthorizeWithGitHubAsync_ReturnsCorrectData();
-    void AuthorizeWithGitHubAsync_ThrowsArgumentException_WhenHexIsNotUnique();
-    void AuthorizeWithGitHubAsync_ThrowsArgumentException_WhenAuthTypeIsNotGithub();
+    Task AuthorizeWithGitHubAsync_CreatesUser();
+    Task AuthorizeWithGitHubAsync_ReturnsCorrectData();
+    Task AuthorizeWithGitHubAsync_ThrowsArgumentException_WhenHexIsNotUnique();
+    Task AuthorizeWithGitHubAsync_ThrowsArgumentException_WhenAuthTypeIsNotGithub();
 
-    void AuthorizeAsAnnoymousAsync_CreatesUser();
-    void AuthorizeAsAnnoymousAsync_ReturnsCorrectData();
+    Task AuthorizeAsAnnoymousAsync_CreatesUser();
+    Task AuthorizeAsAnnoymousAsync_ReturnsCorrectData();
 
-    void ChangeUsernameAsync_ChangesUsername();
-    void ChangeUsernameAsync_ThrowsArgumentException_WhenNewUsernameTooShort();
-    void ChangeUsernameAsync_ThrowsArgumentException_WhenNewUsernameTooLong();
+    Task ChangeUsernameAsync_ChangesUsername();
+    Task ChangeUsernameAsync_ThrowsArgumentException_WhenNewUsernameTooShort();
+    Task ChangeUsernameAsync_ThrowsArgumentException_WhenNewUsernameTooLong();
 
-    void ChangeSettingsAsync_UpdatesSettings();
-    void ChangeSettingsAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
+    Task ChangeSettingsAsync_UpdatesSettings();
+    Task ChangeSettingsAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
 
-    void DeleteAccount_DeletesAccount();
-    void DeleteAccount_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
+    Task DeleteAccount_DeletesAccount();
+    Task DeleteAccount_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
 }

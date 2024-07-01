@@ -2,34 +2,34 @@
 
 public interface ILastTimeUserReadChatRepositoryTests
 {
-    void GetAllAsync_ReturnsAllTimesUsersReadChats();
+    Task GetAllAsync_ReturnsAllTimesUsersReadChats();
 
-    void GetAsync_ReturnsEntity();
-    void GetAsync_ThrowsNotFoundException_WhenEntityWasNotFound();
-    void GetAsync_ThrowsNotFoundException_WhenUserWasNotFound();
-    void GetAsync_ThrowsNotFoundException_WhenRoomWasNotFound();
+    Task GetAsync_ReturnsEntity();
+    Task GetAsync_ThrowsNotFoundException_WhenEntityWasNotFound();
+    Task GetAsync_ThrowsNotFoundException_WhenUserWasNotFound();
+    Task GetAsync_ThrowsNotFoundException_WhenRoomWasNotFound();
 
-    void GetByIdAsync_ReturnsEntity_WhenFound();
-    void GetByIdAsync_ThrowsNotFoundException_WhenEntityWasNotFound();
+    Task GetByIdAsync_ReturnsEntity_WhenFound();
+    Task GetByIdAsync_ThrowsNotFoundException_WhenEntityWasNotFound();
 
-    void AddAsync_AddsNewEntity();
-    void AddAsync_ReturnsAddedEntity();
-    void AddAsync_ThrowsInvalidOperationException_WhenEntryWithSameUserIdAndRoomIdAlreadyExists();
-    void AddAsync_ThrowsNotFoundException_WhenUserWasNotFound();
-    void AddAsync_ThrowsNotFoundException_WhenRoomWasNotFound();
-    void AddAsync_ThrowsRoomExpiredException_WhenRoomExpired();
+    Task AddAsync_AddsNewEntity();
+    Task AddAsync_ReturnsAddedEntity();
+    Task AddAsync_ThrowsInvalidOperationException_WhenEntryWithSameUserIdAndRoomIdAlreadyExists();
+    Task AddAsync_ThrowsNotFoundException_WhenUserWasNotFound();
+    Task AddAsync_ThrowsNotFoundException_WhenRoomWasNotFound();
+    Task AddAsync_ThrowsRoomExpiredException_WhenRoomExpired();
 
-    void Delete_DeletesEntity();
-    void Delete_ThrowsNotFoundException_WhenEntityDoesNotExist();
+    Task Delete_DeletesEntity();
+    Task Delete_ThrowsNotFoundException_WhenEntityDoesNotExist();
 
-    void DeleteByIdAsync_DeletesEntity();
-    void Delete_ThrowsNotFoundException_WhenEntityWasNotFoundById();
+    Task DeleteByIdAsync_DeletesEntity();
+    Task Delete_ThrowsNotFoundException_WhenEntityWasNotFoundById();
 
-    void Update_UpdatesEntity();
-    void Update_ThrowsArgumentException_WhenProvidedAnotherUserId();
-    void Update_ThrowsArgumentException_WhenProvidedAnotherRoomId();
-    void Update_ThrowsNotFoundException_WhenEntityDoesNotExist();
-    void Update_ThrowsRoomExpiredException_WhenRoomExpired();
+    Task Update_UpdatesEntity();
+    Task Update_ThrowsArgumentException_WhenProvidedAnotherUserId();
+    Task Update_ThrowsArgumentException_WhenProvidedAnotherRoomId();
+    Task Update_ThrowsNotFoundException_WhenEntityDoesNotExist();
+    Task Update_ThrowsRoomExpiredException_WhenRoomExpired();
 
-    void SaveChanges_SavesChanges();
+    Task SaveChanges_SavesChanges();
 }

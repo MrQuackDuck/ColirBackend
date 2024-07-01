@@ -5,109 +5,109 @@ namespace Colir.DAL.Tests.Tests;
 public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
 {
     [Test]
-    public void GetAllAsync_ReturnsAllUsersStatistics()
+    public async Task GetAllAsync_ReturnsAllUsersStatistics()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetByUserHexIdAsync_ReturnsUserStatistics()
+    public async Task GetByUserHexIdAsync_ReturnsUserStatistics()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetByUserHexIdAsync_ThrowsNotFoundException_WhenUserWasNotFound()
+    public async Task GetByUserHexIdAsync_ThrowsNotFoundException_WhenUserWasNotFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetByUserHexIdAsync_ThrowsArgumentException_WhenHexFormatIsNotCorrect()
+    public async Task GetByUserHexIdAsync_ThrowsArgumentException_WhenHexFormatIsNotCorrect()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetByIdAsync_ReturnsUserStatistics_WhenFound()
+    public async Task GetByIdAsync_ReturnsUserStatistics_WhenFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetByIdAsync_ThrowsNotFoundException_WhenUserStatisticsWasNotFound()
+    public async Task GetByIdAsync_ThrowsNotFoundException_WhenUserStatisticsWasNotFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AddAsync_AddsNewUserStatistics()
+    public async Task AddAsync_AddsNewUserStatistics()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AddAsync_ReturnsAddedUserStatistics()
+    public async Task AddAsync_ReturnsAddedUserStatistics()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AddAsync_ThrowsArgumentException_WhenUserStatisticsAlreadyExist()
+    public async Task AddAsync_ThrowsArgumentException_WhenUserStatisticsAlreadyExist()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AddAsync_ThrowsNotFoundException_WhenUserWasNotFound()
+    public async Task AddAsync_ThrowsNotFoundException_WhenUserWasNotFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Delete_DeletesUserStatistics()
+    public async Task Delete_DeletesUserStatistics()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Delete_ThrowsNotFoundException_WhenUserStatisticsDoesNotExist()
+    public async Task Delete_ThrowsNotFoundException_WhenUserStatisticsDoesNotExist()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void DeleteByIdAsync_DeletesUserStatistics()
+    public async Task DeleteByIdAsync_DeletesUserStatistics()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Delete_ThrowsNotFoundException_WhenUserStatisticsWasNotFoundById()
+    public async Task Delete_ThrowsNotFoundException_WhenUserStatisticsWasNotFoundById()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Update_UpdatesUserStatistics()
+    public async Task Update_UpdatesUserStatistics()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Update_ThrowsArgumentException_WhenProvidedAnotherUserId()
+    public async Task Update_ThrowsArgumentException_WhenProvidedAnotherUserId()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Update_ThrowsNotFoundException_WhenUserStatisticsDoesNotExist()
+    public async Task Update_ThrowsNotFoundException_WhenUserStatisticsDoesNotExist()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void SaveChanges_SavesChanges()
+    public async Task SaveChanges_SavesChanges()
     {
         throw new NotImplementedException();
     }

@@ -2,10 +2,10 @@
 
 public interface IHexColorGeneratorTests
 {
-    void GetUniqueHexColor_ReturnsUniqueHex();
-    void GetUniqueHexColor_ReturnsHexInValidFormat();
+    Task GetUniqueHexColor_ReturnsUniqueHex();
+    Task GetUniqueHexColor_ReturnsHexInValidFormat();
 
-    void GetUniqueHexColorsList_ReturnsCorrectAmountOfUniqueHexs();
-    void GetUniqueHexColorsList_ReturnsHexsInValidFormat();
-    void GetUniqueHexColorsList_ThrowsArgumentOutOfRangeException_WhenCountIsBelowZero();
+    Task GetUniqueHexColorsList_ReturnsCorrectAmountOfUniqueHexs();
+    Task GetUniqueHexColorsList_ReturnsHexsInValidFormat();
+    Task GetUniqueHexColorsList_ThrowsArgumentOutOfRangeException_WhenCountIsBelowZero();
 }

@@ -5,139 +5,139 @@ namespace Colir.DAL.Tests.Tests;
 public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatRepositoryTests
 {
     [Test]
-    public void GetAllAsync_ReturnsAllTimesUsersReadChats()
+    public async Task GetAllAsync_ReturnsAllTimesUsersReadChats()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetAsync_ReturnsEntity()
+    public async Task GetAsync_ReturnsEntity()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetAsync_ThrowsNotFoundException_WhenEntityWasNotFound()
+    public async Task GetAsync_ThrowsNotFoundException_WhenEntityWasNotFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetAsync_ThrowsNotFoundException_WhenUserWasNotFound()
+    public async Task GetAsync_ThrowsNotFoundException_WhenUserWasNotFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetAsync_ThrowsNotFoundException_WhenRoomWasNotFound()
+    public async Task GetAsync_ThrowsNotFoundException_WhenRoomWasNotFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetByIdAsync_ReturnsEntity_WhenFound()
+    public async Task GetByIdAsync_ReturnsEntity_WhenFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetByIdAsync_ThrowsNotFoundException_WhenEntityWasNotFound()
+    public async Task GetByIdAsync_ThrowsNotFoundException_WhenEntityWasNotFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AddAsync_AddsNewEntity()
+    public async Task AddAsync_AddsNewEntity()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AddAsync_ReturnsAddedEntity()
+    public async Task AddAsync_ReturnsAddedEntity()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AddAsync_ThrowsInvalidOperationException_WhenEntryWithSameUserIdAndRoomIdAlreadyExists()
+    public async Task AddAsync_ThrowsInvalidOperationException_WhenEntryWithSameUserIdAndRoomIdAlreadyExists()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AddAsync_ThrowsNotFoundException_WhenUserWasNotFound()
+    public async Task AddAsync_ThrowsNotFoundException_WhenUserWasNotFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AddAsync_ThrowsNotFoundException_WhenRoomWasNotFound()
+    public async Task AddAsync_ThrowsNotFoundException_WhenRoomWasNotFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AddAsync_ThrowsRoomExpiredException_WhenRoomExpired()
+    public async Task AddAsync_ThrowsRoomExpiredException_WhenRoomExpired()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Delete_DeletesEntity()
+    public async Task Delete_DeletesEntity()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Delete_ThrowsNotFoundException_WhenEntityDoesNotExist()
+    public async Task Delete_ThrowsNotFoundException_WhenEntityDoesNotExist()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void DeleteByIdAsync_DeletesEntity()
+    public async Task DeleteByIdAsync_DeletesEntity()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Delete_ThrowsNotFoundException_WhenEntityWasNotFoundById()
+    public async Task Delete_ThrowsNotFoundException_WhenEntityWasNotFoundById()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Update_UpdatesEntity()
+    public async Task Update_UpdatesEntity()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Update_ThrowsArgumentException_WhenProvidedAnotherUserId()
+    public async Task Update_ThrowsArgumentException_WhenProvidedAnotherUserId()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Update_ThrowsArgumentException_WhenProvidedAnotherRoomId()
+    public async Task Update_ThrowsArgumentException_WhenProvidedAnotherRoomId()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Update_ThrowsNotFoundException_WhenEntityDoesNotExist()
+    public async Task Update_ThrowsNotFoundException_WhenEntityDoesNotExist()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Update_ThrowsRoomExpiredException_WhenRoomExpired()
+    public async Task Update_ThrowsRoomExpiredException_WhenRoomExpired()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void SaveChanges_SavesChanges()
+    public async Task SaveChanges_SavesChanges()
     {
         throw new NotImplementedException();
     }

@@ -5,79 +5,79 @@ namespace Colir.BLL.Tests.Tests;
 public class UserServiceTests : IUserServiceTests
 {
     [Test]
-    public void AuthorizeWithGitHubAsync_CreatesUser()
+    public async Task AuthorizeWithGitHubAsync_CreatesUser()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AuthorizeWithGitHubAsync_ReturnsCorrectData()
+    public async Task AuthorizeWithGitHubAsync_ReturnsCorrectData()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AuthorizeWithGitHubAsync_ThrowsArgumentException_WhenHexIsNotUnique()
+    public async Task AuthorizeWithGitHubAsync_ThrowsArgumentException_WhenHexIsNotUnique()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AuthorizeWithGitHubAsync_ThrowsArgumentException_WhenAuthTypeIsNotGithub()
+    public async Task AuthorizeWithGitHubAsync_ThrowsArgumentException_WhenAuthTypeIsNotGithub()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AuthorizeAsAnnoymousAsync_CreatesUser()
+    public async Task AuthorizeAsAnnoymousAsync_CreatesUser()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AuthorizeAsAnnoymousAsync_ReturnsCorrectData()
+    public async Task AuthorizeAsAnnoymousAsync_ReturnsCorrectData()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void ChangeUsernameAsync_ChangesUsername()
+    public async Task ChangeUsernameAsync_ChangesUsername()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void ChangeUsernameAsync_ThrowsArgumentException_WhenNewUsernameTooShort()
+    public async Task ChangeUsernameAsync_ThrowsArgumentException_WhenNewUsernameTooShort()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void ChangeUsernameAsync_ThrowsArgumentException_WhenNewUsernameTooLong()
+    public async Task ChangeUsernameAsync_ThrowsArgumentException_WhenNewUsernameTooLong()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void ChangeSettingsAsync_UpdatesSettings()
+    public async Task ChangeSettingsAsync_UpdatesSettings()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void ChangeSettingsAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
+    public async Task ChangeSettingsAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void DeleteAccount_DeletesAccount()
+    public async Task DeleteAccount_DeletesAccount()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void DeleteAccount_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
+    public async Task DeleteAccount_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
     {
         throw new NotImplementedException();
     }

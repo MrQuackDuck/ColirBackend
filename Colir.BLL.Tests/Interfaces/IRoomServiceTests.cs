@@ -2,52 +2,54 @@
 
 public interface IRoomServiceTests
 {
-	void GetRoomInfoAsync_ReturnsRoomInfo();
-	void GetRoomInfoAsync_ThrowsRoomExpiredException_WhenRoomExpired();
-	void GetRoomInfoAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
-	void GetRoomInfoAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInTheRoom();
-	void GetRoomInfoAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
+	Task GetRoomInfoAsync_ReturnsRoomInfo();
+	Task GetRoomInfoAsync_ThrowsRoomExpiredException_WhenRoomExpired();
+	Task GetRoomInfoAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
+	Task GetRoomInfoAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInTheRoom();
+	Task GetRoomInfoAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
 
-	void CreateAsync_CreatesRoom();
-	void CreateAsync_ReturnsRoomGuid();
-	void CreateAsync_ThrowsArgumentExcpetion_WhenWrongExpiryDateWasProvided();
-	void CreateAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
+	Task CreateAsync_CreatesRoom();
+	Task CreateAsync_ReturnsRoomGuid();
+	Task CreateAsync_AddsToStatistics_WhenItsEnabled();
+	Task CreateAsync_ThrowsArgumentExcpetion_WhenWrongExpiryDateWasProvided();
+	Task CreateAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
 
-	void RenameAsync_RenamesTheRoom();
-	void RenameAsync_ThrowsArgumentException_WhenNewNameIsTooLong();
-	void RenameAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
-	void RenameAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotOwnerOfRoom();
-	void RenameAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
+	Task RenameAsync_RenamesTheRoom();
+	Task RenameAsync_ThrowsArgumentException_WhenNewNameIsTooLong();
+	Task RenameAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
+	Task RenameAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotOwnerOfRoom();
+	Task RenameAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
 
-	void DeleteAsync_DeletesTheRoom();
-	void DeleteAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
-	void DeleteAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotOwnerOfRoom();
-	void DeleteAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
+	Task DeleteAsync_DeletesTheRoom();
+	Task DeleteAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
+	Task DeleteAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotOwnerOfRoom();
+	Task DeleteAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
 
-	void GetLastTimeUserReadChatAsync_ReturnsLastTimeUserReadChat();
-	void GetLastTimeUserReadChatAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
-	void GetLastTimeUserReadChatAsync_ThrowsArgumentException_WhenIssuerIsNotInRoom();
-	void GetLastTimeUserReadChatAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
+	Task GetLastTimeUserReadChatAsync_ReturnsLastTimeUserReadChat();
+	Task GetLastTimeUserReadChatAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
+	Task GetLastTimeUserReadChatAsync_ThrowsArgumentException_WhenIssuerIsNotInRoom();
+	Task GetLastTimeUserReadChatAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
 
-	void UpdateLastTimeUserReadChatAsync_UpdatesLastTimeUserReadChat();
-	void UpdateLastTimeUserReadChatAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
-	void UpdateLastTimeUserReadChatAsync_ThrowsArgumentException_WhenIssuerIsNotInRoom();
-	void UpdateLastTimeUserReadChatAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
+	Task UpdateLastTimeUserReadChatAsync_UpdatesLastTimeUserReadChat();
+	Task UpdateLastTimeUserReadChatAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
+	Task UpdateLastTimeUserReadChatAsync_ThrowsArgumentException_WhenIssuerIsNotInRoom();
+	Task UpdateLastTimeUserReadChatAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
 
-	void JoinMemberAsync_JoinsUserToRoom();
-	void JoinMemberAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
-	void JoinMemberAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
+	Task JoinMemberAsync_JoinsUserToRoom();
+	Task JoinMemberAsync_AddsToStatistics_WhenItsEnabled();
+	Task JoinMemberAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
+	Task JoinMemberAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
 
-	void KickMemberAsync_KicksUserFromRoom();
-	void KickMemberAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
-	void KickMemberAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
-	void KickMemberAsync_ThrowsUserNotFoundException_WhenTargetWasNotFound();
-	void KickMemberAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
-	void KickMemberAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotOwnerOfRoom();
+	Task KickMemberAsync_KicksUserFromRoom();
+	Task KickMemberAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
+	Task KickMemberAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
+	Task KickMemberAsync_ThrowsUserNotFoundException_WhenTargetWasNotFound();
+	Task KickMemberAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
+	Task KickMemberAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotOwnerOfRoom();
 
-	void ClearRoomAsync_ReturnsClearProcessObject();
-	void ClearRoomAsync_ClearProcessObjectHasFilesToDeletePropertyAboveZero();
-	void ClearRoomAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
-	void ClearRoomAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
-	void ClearRoomAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotOwnerOfRoom();
+	Task ClearRoomAsync_ReturnsClearProcessObject();
+	Task ClearRoomAsync_ClearProcessObjectHasFilesToDeletePropertyAboveZero();
+	Task ClearRoomAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
+	Task ClearRoomAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
+	Task ClearRoomAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotOwnerOfRoom();
 }

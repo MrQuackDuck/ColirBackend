@@ -2,8 +2,8 @@
 
 public interface IAttachmentServiceTests
 {
-    void UploadAttachment_UploadsAttachment();
-    void UploadAttachment_AttachemtnHasTheSameSize();
-    void UploadAttachment_AttachmentIsAccesibleByPath();
-    void UploadAttachment_ThrowsRoomNotFoundException_WhenRoomNotFound();
+    Task UploadAttachment_UploadsAttachment();
+    Task UploadAttachment_AttachemtnHasTheSameSize();
+    Task UploadAttachment_AttachmentIsAccesibleByPath();
+    Task UploadAttachment_ThrowsRoomNotFoundException_WhenRoomNotFound();
 }

@@ -14,7 +14,7 @@ public class RoomRepository : IRoomRepository
 
     public async Task<IEnumerable<Room>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        return _dbContext.Rooms.ToList();
     }
 
     public async Task<Room> GetByIdAsync(long id)

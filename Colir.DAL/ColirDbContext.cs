@@ -15,4 +15,15 @@ public class ColirDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<UserSettings> UserSettings { get; set; }
     public DbSet<UserStatistics> UserStatistics { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Room>()
+            .HasOne<User>(nameof(Room.Owner));
+
+        modelBuilder.Entity<Room>()
+            .HasMany(r => r.JoinedUsers)
+            .WithMany(u => u.JoinedRooms)
+            .UsingEntity<UserToRoom>();
+    }
 }

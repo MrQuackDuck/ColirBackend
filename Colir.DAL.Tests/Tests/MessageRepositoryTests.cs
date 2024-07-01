@@ -5,199 +5,199 @@ namespace Colir.DAL.Tests.Tests;
 public class MessageRepositoryTests : IMessageRepositoryTests
 {
     [Test]
-    public void GetAllAsync_ReturnsAllMessages()
+    public async Task GetAllAsync_ReturnsAllMessages()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetLastMessages_ReturnsLastMessages()
+    public async Task GetLastMessages_ReturnsLastMessages()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetLastMessages_ReturnsLastMessagesWithAttachments()
+    public async Task GetLastMessages_ReturnsLastMessagesWithAttachments()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetLastMessages_ReturnsLastMessagesWithReactions()
+    public async Task GetLastMessages_ReturnsLastMessagesWithReactions()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetLastMessages_ThrowsNotFoundException_WhenRoomWasNotFound()
+    public async Task GetLastMessages_ThrowsNotFoundException_WhenRoomWasNotFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetLastMessages_ThrowsArgumentExcpetion_WhenCountLessThanZero()
+    public async Task GetLastMessages_ThrowsArgumentExcpetion_WhenCountLessThanZero()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetLastMessages_ThrowsArgumentExcpetion_WhenSkipLessThanZero()
+    public async Task GetLastMessages_ThrowsArgumentExcpetion_WhenSkipLessThanZero()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetLastMessages_ThrowsRoomExpiredException_WhenRoomExpired()
+    public async Task GetLastMessages_ThrowsRoomExpiredException_WhenRoomExpired()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetByIdAsync_ReturnsMessage_WhenFound()
+    public async Task GetByIdAsync_ReturnsMessage_WhenFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetByIdAsync_ThrowsNotFoundException_WhenMessageWasNotFound()
+    public async Task GetByIdAsync_ThrowsNotFoundException_WhenMessageWasNotFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AddAsync_AddsNewMessage()
+    public async Task AddAsync_AddsNewMessage()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AddAsync_ReturnsAddedMessage()
+    public async Task AddAsync_ReturnsAddedMessage()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AddAsync_AppliesAttachmentsToMessage()
+    public async Task AddAsync_AppliesAttachmentsToMessage()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AddAsync_AppliesReactionsToMessage()
+    public async Task AddAsync_AppliesReactionsToMessage()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AddAsync_ThrowsNotFoundException_WhenAuthorWasNotFound()
+    public async Task AddAsync_ThrowsNotFoundException_WhenAuthorWasNotFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AddAsync_ThrowsNotFoundException_WhenRoomWasNotFound()
+    public async Task AddAsync_ThrowsNotFoundException_WhenRoomWasNotFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AddAsync_ThrowsNotFoundException_WhenRepliedMessageWasNotFound()
+    public async Task AddAsync_ThrowsNotFoundException_WhenRepliedMessageWasNotFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AddAsync_ThrowsRoomExpiredException_WhenRoomExpired()
+    public async Task AddAsync_ThrowsRoomExpiredException_WhenRoomExpired()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Delete_DeletesMessage()
+    public async Task Delete_DeletesMessage()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Delete_DeletesAllRelatedReactions()
+    public async Task Delete_DeletesAllRelatedReactions()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Delete_DeletesAllRelatedAttachments()
+    public async Task Delete_DeletesAllRelatedAttachments()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Delete_NotDeletesAnyOtherMessages()
+    public async Task Delete_NotDeletesAnyOtherMessages()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Delete_ThrowsNotFoundException_WhenMessageDoesNotExist()
+    public async Task Delete_ThrowsNotFoundException_WhenMessageDoesNotExist()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Delete_ThrowsRoomExpiredException_WhenRoomExpired()
+    public async Task Delete_ThrowsRoomExpiredException_WhenRoomExpired()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void DeleteByIdAsync_DeletesMessage()
+    public async Task DeleteByIdAsync_DeletesMessage()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void DeleteByIdAsync_DeletesAllRelatedReactions()
+    public async Task DeleteByIdAsync_DeletesAllRelatedReactions()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void DeleteByIdAsync_DeletesAllRelatedAttachments()
+    public async Task DeleteByIdAsync_DeletesAllRelatedAttachments()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void DeleteByIdAsync_ThrowsNotFoundException_WhenMessageWasNotFoundById()
+    public async Task DeleteByIdAsync_ThrowsNotFoundException_WhenMessageWasNotFoundById()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void DeleteByIdAsync_ThrowsRoomExpiredException_WhenRoomExpired()
+    public async Task DeleteByIdAsync_ThrowsRoomExpiredException_WhenRoomExpired()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Update_UpdatesMessage()
+    public async Task Update_UpdatesMessage()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Update_ThrowsNotFoundException_WhenMessageDoesNotExist()
+    public async Task Update_ThrowsNotFoundException_WhenMessageDoesNotExist()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Update_ThrowsRoomExpiredException_WhenRoomExpired()
+    public async Task Update_ThrowsRoomExpiredException_WhenRoomExpired()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void SaveChanges_SavesChanges()
+    public async Task SaveChanges_SavesChanges()
     {
         throw new NotImplementedException();
     }

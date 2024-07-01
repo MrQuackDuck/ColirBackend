@@ -2,28 +2,28 @@
 
 public interface IReactionRepositoryTests
 {
-    void GetAllAsync_ReturnsAllReactions();
+    Task GetAllAsync_ReturnsAllReactions();
 
-    void GetByIdAsync_ReturnsRoom_WhenFound();
-    void GetByIdAsync_ThrowsNotFoundException_WhenRoomWasNotFound();
+    Task GetByIdAsync_ReturnsRoom_WhenFound();
+    Task GetByIdAsync_ThrowsNotFoundException_WhenRoomWasNotFound();
 
-    void GetReactionsOnMessage_ReturnsAllReactionsOnMessage();
-    void GetReactionsOnMessage_ThrowsNotFoundException_WhenMessageWasNotFound();
+    Task GetReactionsOnMessage_ReturnsAllReactionsOnMessage();
+    Task GetReactionsOnMessage_ThrowsNotFoundException_WhenMessageWasNotFound();
 
-    void AddAsync_AddsNewRoom();
-    void AddAsync_ReturnsAddedRoom();
-    void AddAsync_AppliesJoinedUsersToRoom();
-    void AddAsync_ThrowsArgumentException_WhenAuthorWasNotFound();
-    void AddAsync_ThrowsArgumentException_WhenMessageWasNotFound();
+    Task AddAsync_AddsNewRoom();
+    Task AddAsync_ReturnsAddedRoom();
+    Task AddAsync_AppliesJoinedUsersToRoom();
+    Task AddAsync_ThrowsArgumentException_WhenAuthorWasNotFound();
+    Task AddAsync_ThrowsArgumentException_WhenMessageWasNotFound();
 
-    void Delete_DeletesRoom();
-    void Delete_ThrowsNotFoundException_WhenRoomDoesNotExist();
+    Task Delete_DeletesRoom();
+    Task Delete_ThrowsNotFoundException_WhenRoomDoesNotExist();
 
-    void DeleteByIdAsync_DeletesRoom();
-    void Delete_ThrowsNotFoundException_WhenRoomWasNotFoundById();
+    Task DeleteByIdAsync_DeletesRoom();
+    Task Delete_ThrowsNotFoundException_WhenRoomWasNotFoundById();
 
-    void Update_UpdatesRoom();
-    void Update_ThrowsNotFoundException_WhenRoomDoesNotExist();
+    Task Update_UpdatesRoom();
+    Task Update_ThrowsNotFoundException_WhenRoomDoesNotExist();
 
-    void SaveChanges_SavesChanges();
+    Task SaveChanges_SavesChanges();
 }

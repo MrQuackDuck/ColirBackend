@@ -2,37 +2,39 @@
 
 public interface IMessageServiceTests
 {
-	void GetLastMessagesAsync_ReturnsLastMessages();
-	void GetLastMessagesAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
-    void GetLastMessagesAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
-    void GetLastMessagesAsync_ThrowsArgumentExcpetion_WhenCountLessThanZero();
-    void GetLastMessagesAsync_ThrowsArgumentExcpetion_WhenSkipLessThanZero();
-	void GetLastMessagesAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
+	Task GetLastMessagesAsync_ReturnsLastMessages();
+	Task GetLastMessagesAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
+    Task GetLastMessagesAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
+    Task GetLastMessagesAsync_ThrowsArgumentExcpetion_WhenCountLessThanZero();
+    Task GetLastMessagesAsync_ThrowsArgumentExcpetion_WhenSkipLessThanZero();
+	Task GetLastMessagesAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
 
-    void SendAsync_SendsMessage();
-	void SendAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
-    void SendAsync_ThrowsMessageNotFoundException_WhenNotExistingReplyMessageIdProvided();
-    void SendAsync_ThrowsAttachmentNotFoundException_WhenNotExistingAttachmentIdProvided();
-    void SendAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
-	void SendAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
+    Task SendAsync_SendsMessage();
+    Task SendAsync_AddsToStatistics_WhenItsEnabled();
+	Task SendAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
+    Task SendAsync_ThrowsMessageNotFoundException_WhenNotExistingReplyMessageIdProvided();
+    Task SendAsync_ThrowsAttachmentNotFoundException_WhenNotExistingAttachmentIdProvided();
+    Task SendAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
+	Task SendAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
 
-	void EditAsync_EditsMessage();
-    void EditAsync_ThrowsMessageNotFoundException_WhenMessageWasNotFound();
-	void EditAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
-	void EditAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotAuthorOfMessage();
+	Task EditAsync_EditsMessage();
+    Task EditAsync_ThrowsMessageNotFoundException_WhenMessageWasNotFound();
+	Task EditAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
+	Task EditAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotAuthorOfMessage();
 
-	void Delete_DeletesMessage();
-    void Delete_ThrowsMessageNotFoundException_WhenMessageWasNotFound();
-	void Delete_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
-	void Delete_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotAuthorOfMessage();
+	Task Delete_DeletesMessage();
+    Task Delete_ThrowsMessageNotFoundException_WhenMessageWasNotFound();
+	Task Delete_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
+	Task Delete_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotAuthorOfMessage();
 
-	void AddReaction_AddsReaction();
-	void AddReaction_ThrowsMessageNotFoundException_WhenMessageWasNotFound();
-	void AddReaction_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
+	Task AddReaction_AddsReaction();
+	Task AddReaction_AddsToStatistics_WhenItsEnabled();
+	Task AddReaction_ThrowsMessageNotFoundException_WhenMessageWasNotFound();
+	Task AddReaction_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
 
-	void RemoveReaction_RemovesReaction();
-	void RemoveReaction_ThrowsMessageNotFoundException_WhenMessageWasNotFound();
-	void RemoveReaction_ThrowsReactionNotFoundException_WhenReactionWasNotFound();
-	void RemoveReaction_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
-	void RemoveReaction_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotAuthorOfReaction();
+	Task RemoveReaction_RemovesReaction();
+	Task RemoveReaction_ThrowsMessageNotFoundException_WhenMessageWasNotFound();
+	Task RemoveReaction_ThrowsReactionNotFoundException_WhenReactionWasNotFound();
+	Task RemoveReaction_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
+	Task RemoveReaction_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotAuthorOfReaction();
 }

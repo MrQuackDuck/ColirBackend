@@ -5,109 +5,109 @@ namespace Colir.DAL.Tests.Tests;
 public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
 {
     [Test]
-    public void GetAllAsync_ReturnsAllUsersSettings()
+    public async Task GetAllAsync_ReturnsAllUsersSettings()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetByUserHexIdAsync_ReturnsUserSettings()
+    public async Task GetByUserHexIdAsync_ReturnsUserSettings()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetByUserHexIdAsync_ThrowsNotFoundException_WhenUserWasNotFound()
+    public async Task GetByUserHexIdAsync_ThrowsNotFoundException_WhenUserWasNotFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetByUserHexIdAsync_ThrowsArgumentException_WhenHexFormatIsNotCorrect()
+    public async Task GetByUserHexIdAsync_ThrowsArgumentException_WhenHexFormatIsNotCorrect()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetByIdAsync_ReturnsUserSettings_WhenFound()
+    public async Task GetByIdAsync_ReturnsUserSettings_WhenFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void GetByIdAsync_ThrowsNotFoundException_WhenUserSettingsWasNotFound()
+    public async Task GetByIdAsync_ThrowsNotFoundException_WhenUserSettingsWasNotFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AddAsync_AddsNewUserSettings()
+    public async Task AddAsync_AddsNewUserSettings()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AddAsync_ReturnsAddedUserSettings()
+    public async Task AddAsync_ReturnsAddedUserSettings()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AddAsync_ThrowsArgumentException_WhenUserSettingsAlreadyExist()
+    public async Task AddAsync_ThrowsArgumentException_WhenUserSettingsAlreadyExist()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void AddAsync_ThrowsNotFoundException_WhenUserWasNotFound()
+    public async Task AddAsync_ThrowsNotFoundException_WhenUserWasNotFound()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Delete_DeletesUserSettings()
+    public async Task Delete_DeletesUserSettings()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Delete_ThrowsNotFoundException_WhenUserSettingsDoesNotExist()
+    public async Task Delete_ThrowsNotFoundException_WhenUserSettingsDoesNotExist()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void DeleteByIdAsync_DeletesUserSettings()
+    public async Task DeleteByIdAsync_DeletesUserSettings()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Delete_ThrowsNotFoundException_WhenUserSettingsWereNotFoundById()
+    public async Task Delete_ThrowsNotFoundException_WhenUserSettingsWereNotFoundById()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Update_UpdatesUserSettings()
+    public async Task Update_UpdatesUserSettings()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Update_ThrowsArgumentException_WhenProvidedAnotherUserId()
+    public async Task Update_ThrowsArgumentException_WhenProvidedAnotherUserId()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void Update_ThrowsNotFoundException_WhenUserSettingsDoNotExist()
+    public async Task Update_ThrowsNotFoundException_WhenUserSettingsDoNotExist()
     {
         throw new NotImplementedException();
     }
 
     [Test]
-    public void SaveChanges_SavesChanges()
+    public async Task SaveChanges_SavesChanges()
     {
         throw new NotImplementedException();
     }
