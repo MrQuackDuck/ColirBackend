@@ -99,10 +99,4 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
     {
         throw new NotImplementedException();
     }
-
-    [Test]
-    public async Task SaveChanges_SavesChanges()
-    {
-        throw new NotImplementedException();
-    }
 }

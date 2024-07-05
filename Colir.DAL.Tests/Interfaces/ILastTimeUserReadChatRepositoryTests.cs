@@ -30,6 +30,4 @@ public interface ILastTimeUserReadChatRepositoryTests
     Task Update_ThrowsArgumentException_WhenProvidedAnotherRoomId();
     Task Update_ThrowsNotFoundException_WhenEntityDoesNotExist();
     Task Update_ThrowsRoomExpiredException_WhenRoomExpired();
-
-    Task SaveChanges_SavesChanges();
 }

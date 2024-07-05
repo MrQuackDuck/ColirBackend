@@ -324,12 +324,6 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     }
 
     [Test]
-    public async Task SaveChanges_SavesChanges()
-    {
-        throw new NotImplementedException();
-    }
-
-    [Test]
     public async Task DeleteAllExpiredAsync_DeletesAllExpiredRooms()
     {
         // Arrange

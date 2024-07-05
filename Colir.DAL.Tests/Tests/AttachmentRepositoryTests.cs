@@ -87,10 +87,4 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
     {
         throw new NotImplementedException();
     }
-
-    [Test]
-    public async Task SaveChanges_SavesChanges()
-    {
-        throw new NotImplementedException();
-    }
 }

@@ -21,6 +21,4 @@ public interface IAttachmentRepositoryTests
 
     Task Update_UpdatesAttachment();
     Task Update_ThrowsNotFoundException_WhenAttachmentDoesNotExist();
-
-    Task SaveChanges_SavesChanges();
 }

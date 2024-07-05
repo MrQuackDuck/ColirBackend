@@ -105,10 +105,4 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
     {
         throw new NotImplementedException();
     }
-
-    [Test]
-    public async Task SaveChanges_SavesChanges()
-    {
-        throw new NotImplementedException();
-    }
 }

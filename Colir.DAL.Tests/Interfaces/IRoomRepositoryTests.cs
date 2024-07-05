@@ -27,8 +27,6 @@ public interface IRoomRepositoryTests
     Task Update_UpdatesRoom();
     Task Update_ThrowsNotFoundException_WhenRoomDoesNotExist();
 
-    Task SaveChanges_SavesChanges();
-
     Task DeleteAllExpiredAsync_DeletesAllExpiredRooms();
     Task DeleteAllExpiredAsync_ThrowsNotFoundException_WhenNoExpiredRoomsExist();
 }

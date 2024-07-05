@@ -33,6 +33,4 @@ public interface IUserRepositoryTests
 
     Task Update_UpdatesUser();
     Task Update_ThrowsNotFoundException_WhenUserDoesNotExist();
-
-    Task SaveChanges_SavesChanges();
 }

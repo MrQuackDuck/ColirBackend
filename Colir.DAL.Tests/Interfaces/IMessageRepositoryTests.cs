@@ -40,6 +40,4 @@ public interface IMessageRepositoryTests
     Task Update_UpdatesMessage();
     Task Update_ThrowsNotFoundException_WhenMessageDoesNotExist();
     Task Update_ThrowsRoomExpiredException_WhenRoomExpired();
-
-    Task SaveChanges_SavesChanges();
 }

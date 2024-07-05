@@ -25,6 +25,4 @@ public interface IUserStatisticsRepositoryTests
     Task Update_UpdatesUserStatistics();
     Task Update_ThrowsArgumentException_WhenProvidedAnotherUserId();
     Task Update_ThrowsNotFoundException_WhenUserStatisticsDoesNotExist();
-
-    Task SaveChanges_SavesChanges();
 }

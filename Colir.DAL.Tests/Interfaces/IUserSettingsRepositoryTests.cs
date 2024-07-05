@@ -25,6 +25,4 @@ public interface IUserSettingsRepositoryTests
     Task Update_UpdatesUserSettings();
     Task Update_ThrowsArgumentException_WhenProvidedAnotherUserId();
     Task Update_ThrowsNotFoundException_WhenUserSettingsDoNotExist();
-
-    Task SaveChanges_SavesChanges();
 }
