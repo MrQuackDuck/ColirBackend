@@ -47,6 +47,11 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
         throw new NotImplementedException();
     }
 
+    public Task SaveChangesAsync()
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<LastTimeUserReadChat> GetAsync(long userId, long roomId)
     {
         throw new NotImplementedException();

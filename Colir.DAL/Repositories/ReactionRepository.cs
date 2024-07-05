@@ -47,6 +47,11 @@ public class ReactionRepository : IReactionRepository
         throw new NotImplementedException();
     }
 
+    public Task SaveChangesAsync()
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<List<Reaction>> GetReactionsOnMessage(long messageId)
     {
         throw new NotImplementedException();

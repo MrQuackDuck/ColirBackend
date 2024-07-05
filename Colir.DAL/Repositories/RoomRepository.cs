@@ -47,6 +47,11 @@ public class RoomRepository : IRoomRepository
         throw new NotImplementedException();
     }
 
+    public Task SaveChangesAsync()
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task DeleteAllExpiredAsync()
     {
         throw new NotImplementedException();

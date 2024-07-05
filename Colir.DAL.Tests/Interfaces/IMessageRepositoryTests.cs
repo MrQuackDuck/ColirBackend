@@ -16,7 +16,6 @@ public interface IMessageRepositoryTests
     Task GetByIdAsync_ThrowsNotFoundException_WhenMessageWasNotFound();
 
     Task AddAsync_AddsNewMessage();
-    Task AddAsync_ReturnsAddedMessage();
     Task AddAsync_AppliesAttachmentsToMessage();
     Task AddAsync_AppliesReactionsToMessage();
     Task AddAsync_ThrowsNotFoundException_WhenAuthorWasNotFound();

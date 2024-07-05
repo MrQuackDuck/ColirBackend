@@ -47,6 +47,11 @@ public class UserSettingsRepository : IUserSettingsRepository
         throw new NotImplementedException();
     }
 
+    public Task SaveChangesAsync()
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<UserSettings> GetByUserHexIdAsync(string hexId)
     {
         throw new NotImplementedException();

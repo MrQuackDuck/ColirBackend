@@ -314,13 +314,52 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     [Test]
     public async Task Update_UpdatesRoom()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var newExpiryDate = DateTime.Now.Add(new TimeSpan(2, 0, 0));
+        var newOwnerId = 2;
+        
+        var room = new Room
+        {
+            Id = 1,
+            Guid = Guid.NewGuid().ToString(),
+            Name = "Room #1",
+            ExpiryDate = newExpiryDate,
+            OwnerId = newOwnerId,
+        };
+
+        // Act
+        _roomRepository.Update(room);
+        _roomRepository.SaveChanges();
+
+        // Assert
+        Assert.That(room, Is.EqualTo(new Room()
+        {
+            Id = 1,
+            Guid = Guid.NewGuid().ToString(),
+            Name = "Room #1",
+            ExpiryDate = newExpiryDate,
+            OwnerId = newOwnerId,
+        }).Using(new RoomEqualityComparer()));
     }
 
     [Test]
     public async Task Update_ThrowsNotFoundException_WhenRoomDoesNotExist()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var nonExistingRoom = new Room
+        {
+            Id = 4,
+            Guid = Guid.NewGuid().ToString(),
+            Name = "Room #69",
+            ExpiryDate = DateTime.Now.Add(new TimeSpan(2, 0, 0)),
+            OwnerId = 1,
+        };
+
+        // Act
+        TestDelegate act = () => _roomRepository.Update(nonExistingRoom);
+
+        // Assert
+        Assert.Throws<NotFoundException>(act);
     }
 
     [Test]

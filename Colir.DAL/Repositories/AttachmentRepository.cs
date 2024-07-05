@@ -47,4 +47,9 @@ public class AttachmentRepository : IAttachmentRepository
     {
         throw new NotImplementedException();
     }
+
+    public Task SaveChangesAsync()
+    {
+        throw new NotImplementedException();
+    }
 }

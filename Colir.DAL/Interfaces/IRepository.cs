@@ -9,4 +9,5 @@ public interface IRepository<TEntity>
     Task DeleteByIdAsync(long id);
     void Update(TEntity entity);
     void SaveChanges();
+    Task SaveChangesAsync();
 }

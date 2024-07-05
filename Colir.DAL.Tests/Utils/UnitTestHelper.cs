@@ -42,7 +42,7 @@ public static class UnitTestHelper
         var defaultRoom = new Room
         {
             Id = 1,
-            Guid = Guid.NewGuid().ToString(),
+            Guid = "cbaa8673-ea8b-43f8-b4cc-b8b0797b620e",
             Name = "Room #1",
             ExpiryDate = DateTime.Now.Add(new TimeSpan(1, 0, 0)),
             OwnerId = 1, // "First User"
@@ -52,15 +52,27 @@ public static class UnitTestHelper
         var expiredRoom = new Room
         {
             Id = 2,
-            Guid = Guid.NewGuid().ToString(),
+            Guid = "12ffb712-aca7-416f-b899-8f9aaac6770f",
             Name = "Room #2",
             ExpiryDate = new DateTime(2000, 1, 1),
-            OwnerId = 1, // "First User",
+            OwnerId = 1, // "First User"
             JoinedUsers = new List<User>() { user1, user2 },
         };
         
         context.Rooms.AddRange(defaultRoom, expiredRoom);
 
+        // Attachments
+        var attachment1 = new Attachment
+        {
+            Id = 1,
+            Filename = "file.zip",
+            Path = "/tests/file.zip",
+            AttachmentType = AttachmentType.File,
+            SizeInKb = 4,
+        };
+        
+        context.Attachments.Add(attachment1);
+        
         // Messages
         var message1 = new Message
         {
@@ -69,6 +81,7 @@ public static class UnitTestHelper
             PostDate = DateTime.Now,
             RoomId = defaultRoom.Id, // "Room #1"
             AuthorId = user1.Id, // "First User"
+            Attachments = new List<Attachment>() { attachment1 },
         };
 
         var message2 = new Message
@@ -87,24 +100,12 @@ public static class UnitTestHelper
         var reaction1 = new Reaction
         {
             Id = 1,
-            Symbol = ":)",
+            Symbol = "🤣",
             AuthorId = user1.Id, // "First User"
             MessageId = message1.Id, // "Message in Room #1"
         };
         
         context.Reactions.Add(reaction1);
-
-        // Attachments
-        var attachment1 = new Attachment
-        {
-            Id = 1,
-            Filename = "file.zip",
-            Path = "/tests/file.zip",
-            AttachmentType = AttachmentType.File,
-            SizeInKb = 4,
-        };
-
-        context.Attachments.Add(attachment1);
 
         // Last time users read chats
         var lastTimeFirstUserReadChat = new LastTimeUserReadChat

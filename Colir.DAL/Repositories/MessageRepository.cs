@@ -47,6 +47,11 @@ public class MessageRepository : IMessageRepository
         throw new NotImplementedException();
     }
 
+    public Task SaveChangesAsync()
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<List<Message>> GetLastMessages(string roomGuid, int count, int skip)
     {
         throw new NotImplementedException();

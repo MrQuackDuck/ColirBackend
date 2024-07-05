@@ -47,6 +47,11 @@ public class UserRepository : IUserRepository
         throw new NotImplementedException();
     }
 
+    public Task SaveChangesAsync()
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<User> GetByHexIdAsync(string hexId)
     {
         throw new NotImplementedException();
