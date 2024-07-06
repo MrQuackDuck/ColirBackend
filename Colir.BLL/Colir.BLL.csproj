@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <NoWarn>1998</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Folder Include="RequestModels\" />
+      <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Colir.DAL\Colir.DAL.csproj" />
+      <ProjectReference Include="..\Colir.Exceptions\Colir.Exceptions.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.6" />
+      <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.6.2" />
+      <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen.ConventionalRouting" Version="4.3.0" />
+    </ItemGroup>
+
+</Project>

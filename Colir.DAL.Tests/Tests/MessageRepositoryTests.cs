@@ -155,13 +155,44 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     [Test]
     public async Task AddAsync_AddsNewMessage()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var messageToAdd = new Message()
+        {
+            Id = 3,
+            Content = "Message in Room #1",
+            PostDate = DateTime.Now,
+            RoomId = 1, // "Room #1"
+            AuthorId = 1, // "First User"
+        };
+
+        // Act
+        await _messageRepository.AddAsync(messageToAdd);
+        _messageRepository.SaveChanges();
+        
+        // Assert
+        Assert.That(_dbContext.Messages.Count() == 3);
     }
 
     [Test]
     public async Task AddAsync_AppliesAttachmentsToMessage()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var messageToAdd = new Message()
+        {
+            Id = 3,
+            Content = "Message in Room #1",
+            PostDate = DateTime.Now,
+            RoomId = 1, // "Room #1"
+            AuthorId = 1, // "First User"
+            Attachments = new List<Attachment> { }
+        };
+
+        // Act
+        await _messageRepository.AddAsync(messageToAdd);
+        _messageRepository.SaveChanges();
+        
+        // Assert
+        Assert.That(_dbContext.Messages.Count() == 3);
     }
 
     [Test]
