@@ -119,8 +119,9 @@ public static class UnitTestHelper
         var lastTimeFirstUserReadChat = new LastTimeUserReadChat
         {
             Id = 1,
-            RoomId = 1, // "Room #1"
-            UserId = 1, // "First User"
+            Room = defaultRoom, // "Room #1"
+            User = user1, // "First User"
+            Timestamp = DateTime.Now
         };
         
         context.LastTimeUserReadChats.Add(lastTimeFirstUserReadChat);
@@ -166,7 +167,7 @@ public static class UnitTestHelper
         };
         
         context.UserSettings.AddRange(firstUserSettings, secondUserSettings);
-
+        
         // Save changes
         context.SaveChanges();
     }

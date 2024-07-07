@@ -6,16 +6,16 @@ public interface ILastTimeUserReadChatRepositoryTests
 
     Task GetAsync_ReturnsEntity();
     Task GetAsync_ThrowsNotFoundException_WhenEntityWasNotFound();
-    Task GetAsync_ThrowsNotFoundException_WhenUserWasNotFound();
-    Task GetAsync_ThrowsNotFoundException_WhenRoomWasNotFound();
+    Task GetAsync_ThrowsUserNotFoundException_WhenUserWasNotFound();
+    Task GetAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
 
     Task GetByIdAsync_ReturnsEntity_WhenFound();
     Task GetByIdAsync_ThrowsNotFoundException_WhenEntityWasNotFound();
 
     Task AddAsync_AddsNewEntity();
-    Task AddAsync_ThrowsInvalidOperationException_WhenEntryWithSameUserIdAndRoomIdAlreadyExists();
-    Task AddAsync_ThrowsNotFoundException_WhenUserWasNotFound();
-    Task AddAsync_ThrowsNotFoundException_WhenRoomWasNotFound();
+    Task AddAsync_ThrowsInvalidColirOperationException_WhenEntryWithSameUserIdAndRoomIdAlreadyExists();
+    Task AddAsync_ThrowsUserNotFoundException_WhenUserWasNotFound();
+    Task AddAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
     Task AddAsync_ThrowsRoomExpiredException_WhenRoomExpired();
 
     Task Delete_DeletesEntity();
