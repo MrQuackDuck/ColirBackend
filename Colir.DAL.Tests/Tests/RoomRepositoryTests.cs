@@ -24,6 +24,13 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         // Add entities
         UnitTestHelper.SeedData(_dbContext);
     }
+    
+    [TearDown]
+    public void CleanUp()
+    {
+        _dbContext.Database.EnsureDeleted();
+        _dbContext.Dispose();
+    }
 
     [Test]
     public async Task GetAllAsync_ReturnsAllRooms()

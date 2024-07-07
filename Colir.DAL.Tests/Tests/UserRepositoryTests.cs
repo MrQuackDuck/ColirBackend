@@ -20,6 +20,13 @@ public class UserRepositoryTests : IUserRepositoryTests
         _userRepository = new UserRepository(_dbContext);
         UnitTestHelper.SeedData(_dbContext);
     }
+    
+    [TearDown]
+    public void CleanUp()
+    {
+        _dbContext.Database.EnsureDeleted();
+        _dbContext.Dispose();
+    }
 
     [Test]
     public async Task GetAllAsync_ReturnsAllUsers()
@@ -65,7 +72,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         var hexId = "#000001";
         User expected = new User
         {
-            Id = 2,
+            Id = 4,
             Username = "TestUser",
             HexId = hexId,
             JoinedRooms = new List<Room>()
@@ -107,7 +114,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         // Arrange
         var userToAdd = new User()
         {
-            Id = 2,
+            Id = 4,
             Username = "NewUser",
             HexId = "#123456",
             JoinedRooms = new List<Room>()
@@ -118,7 +125,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         _userRepository.SaveChanges();
 
         // Assert
-        Assert.That(_dbContext.Users.Count() == 2);
+        Assert.That(_dbContext.Users.Count() == 4);
     }
     
     [Test]
@@ -127,7 +134,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         // Arrange
         var userToAdd = new User()
         {
-            Id = 2,
+            Id = 4,
             Username = "NewUser",
             HexId = "#123456",
             JoinedRooms = new List<Room>()
@@ -138,7 +145,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         _userRepository.SaveChanges();
 
         // Assert
-        Assert.That(_dbContext.UserSettings.Count() == 1);
+        Assert.That(_dbContext.UserSettings.Count() == 3);
     }
 
     [Test]
@@ -147,7 +154,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         // Arrange
         var userToAdd = new User()
         {
-            Id = 2,
+            Id = 4,
             Username = "NewUser",
             HexId = "#123456",
             JoinedRooms = new List<Room>()
@@ -158,7 +165,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         _userRepository.SaveChanges();
 
         // Assert
-        Assert.That(_dbContext.UserStatistics.Count() == 1);
+        Assert.That(_dbContext.UserStatistics.Count() == 3);
     }
 
     [Test]
@@ -167,7 +174,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         // Arrange
         var userToAdd = new User()
         {
-            Id = 2,
+            Id = 4,
             Username = "NewUser",
             HexId = "#123456",
             JoinedRooms = new List<Room>
@@ -189,22 +196,11 @@ public class UserRepositoryTests : IUserRepositoryTests
     public async Task AddAsync_ThrowsArgumentException_WhenHexAlreadyExists()
     {
         // Arrange
-        var existingUser = new User()
-        {
-            Id = 1,
-            Username = "ExistingUser",
-            HexId = "#123456",
-            JoinedRooms = new List<Room>()
-        };
-
-        _dbContext.Users.Add(existingUser);
-        _dbContext.SaveChanges();
-
         var userToAdd = new User()
         {
-            Id = 2,
+            Id = 4,
             Username = "NewUser",
-            HexId = "#123456",
+            HexId = "#FFFFFF",
             JoinedRooms = new List<Room>()
         };
 
@@ -221,7 +217,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         // Arrange
         var userToAdd = new User()
         {
-            Id = 2,
+            Id = 4,
             Username = "NewUser",
             HexId = "invalid_hex",
             JoinedRooms = new List<Room>()
@@ -240,7 +236,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         // Arrange
         var userToAdd = new User()
         {
-            Id = 2,
+            Id = 4,
             Username = "N",
             HexId = "#123456",
             JoinedRooms = new List<Room>()
@@ -259,7 +255,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         // Arrange
         var userToAdd = new User()
         {
-            Id = 2,
+            Id = 4,
             Username = new string('a', 51),
             HexId = "#123456",
             JoinedRooms = new List<Room>()
@@ -278,7 +274,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         // Arrange
         var userToAdd = new User()
         {
-            Id = 2,
+            Id = 4,
             Username = "NewUser",
             HexId = "#123456",
             JoinedRooms = new List<Room>
@@ -300,12 +296,12 @@ public class UserRepositoryTests : IUserRepositoryTests
         // Arrange
         var userToAdd = new User()
         {
-            Id = 2,
+            Id = 4,
             Username = "NewUser",
             HexId = "#123456",
             JoinedRooms = new List<Room>
             {
-                new Room { Id = 1, ExpiryDate = DateTime.UtcNow.AddDays(-1) }
+                new Room { ExpiryDate = DateTime.UtcNow.AddDays(-1) }
             }
         };
 
@@ -327,7 +323,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         _userRepository.SaveChanges();
 
         // Assert
-        Assert.That(_dbContext.Users.Count() == 0);
+        Assert.That(_dbContext.Users.Count() == 2);
     }
 
     public async Task Delete_DeletesUserSettings()
@@ -380,7 +376,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         _userRepository.SaveChanges();
 
         // Assert
-        Assert.That(_dbContext.Users.Count() == 0);
+        Assert.That(_dbContext.Users.Count() == 2);
     }
 
     public async Task DeleteByIdAsync_DeletesUserSettings()

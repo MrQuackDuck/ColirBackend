@@ -35,8 +35,16 @@ public static class UnitTestHelper
             Username = "Second User",
             AuthType = UserAuthType.Anonymous,
         };
+        
+        var user3 = new User
+        {
+            Id = 3,
+            HexId = "#F4CA16",
+            Username = "Third User",
+            AuthType = UserAuthType.Anonymous,
+        };
 
-        context.Users.AddRange(user1, user2);
+        context.Users.AddRange(user1, user2, user3);
 
         // Rooms
         var defaultRoom = new Room

@@ -5,7 +5,7 @@ public interface IUserSettingsRepositoryTests
     Task GetAllAsync_ReturnsAllUsersSettings();
 
     Task GetByUserHexIdAsync_ReturnsUserSettings();
-    Task GetByUserHexIdAsync_ThrowsNotFoundException_WhenUserWasNotFound();
+    Task GetByUserHexIdAsync_ThrowsUserNotFoundException_WhenUserWasNotFound();
     Task GetByUserHexIdAsync_ThrowsArgumentException_WhenHexFormatIsNotCorrect();
 
     Task GetByIdAsync_ReturnsUserSettings_WhenFound();
@@ -13,7 +13,7 @@ public interface IUserSettingsRepositoryTests
 
     Task AddAsync_AddsNewUserSettings();
     Task AddAsync_ThrowsArgumentException_WhenUserSettingsAlreadyExist();
-    Task AddAsync_ThrowsNotFoundException_WhenUserWasNotFound();
+    Task AddAsync_ThrowsUserNotFoundException_WhenUserWasNotFound();
 
     Task Delete_DeletesUserSettings();
     Task Delete_ThrowsNotFoundException_WhenUserSettingsDoesNotExist();
