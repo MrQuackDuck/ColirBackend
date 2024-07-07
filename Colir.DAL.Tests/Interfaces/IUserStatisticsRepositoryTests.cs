@@ -5,7 +5,7 @@ public interface IUserStatisticsRepositoryTests
     Task GetAllAsync_ReturnsAllUsersStatistics();
 
     Task GetByUserHexIdAsync_ReturnsUserStatistics();
-    Task GetByUserHexIdAsync_ThrowsNotFoundException_WhenUserWasNotFound();
+    Task GetByUserHexIdAsync_ThrowsUserNotFoundException_WhenUserWasNotFound();
     Task GetByUserHexIdAsync_ThrowsArgumentException_WhenHexFormatIsNotCorrect();
 
     Task GetByIdAsync_ReturnsUserStatistics_WhenFound();
@@ -13,13 +13,13 @@ public interface IUserStatisticsRepositoryTests
 
     Task AddAsync_AddsNewUserStatistics();
     Task AddAsync_ThrowsArgumentException_WhenUserStatisticsAlreadyExist();
-    Task AddAsync_ThrowsNotFoundException_WhenUserWasNotFound();
+    Task AddAsync_ThrowsUserNotFoundException_WhenUserWasNotFound();
 
     Task Delete_DeletesUserStatistics();
     Task Delete_ThrowsNotFoundException_WhenUserStatisticsDoesNotExist();
 
     Task DeleteByIdAsync_DeletesUserStatistics();
-    Task Delete_ThrowsNotFoundException_WhenUserStatisticsWasNotFoundById();
+    Task DeleteByIdAsync_ThrowsNotFoundException_WhenUserStatisticsWasNotFoundById();
 
     Task Update_UpdatesUserStatistics();
     Task Update_ThrowsArgumentException_WhenProvidedAnotherUserId();

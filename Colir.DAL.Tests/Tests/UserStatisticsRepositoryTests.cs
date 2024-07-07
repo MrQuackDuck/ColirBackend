@@ -1,102 +1,263 @@
 ﻿using Colir.DAL.Tests.Interfaces;
+using Colir.DAL.Tests.Utils;
+using Colir.Exceptions;
+using DAL;
+using DAL.Entities;
+using DAL.Repositories;
 
 namespace Colir.DAL.Tests.Tests;
 
 public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
 {
+    private ColirDbContext _dbContext = default!;
+    private UserStatisticsRepository _userStatisticsRepository = default!;
+    
+    [SetUp]
+    public void SetUp()
+    {
+        _dbContext = UnitTestHelper.CreateDbContext();
+        _userStatisticsRepository = new UserStatisticsRepository(_dbContext);
+        UnitTestHelper.SeedData(_dbContext);
+    }
+
+    [TearDown]
+    public void CleanUp()
+    {
+        _dbContext.Database.EnsureDeleted();
+        _dbContext.Dispose();
+    }
+    
     [Test]
     public async Task GetAllAsync_ReturnsAllUsersStatistics()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var exptected = _dbContext.UserStatistics.ToList();
+
+        // Act
+        var result = await _userStatisticsRepository.GetAllAsync();
+
+        // Assert
+        Assert.That(result, Is.EqualTo(exptected).Using(new UserStatisticsEqualityComparer()));
     }
 
     [Test]
     public async Task GetByUserHexIdAsync_ReturnsUserStatistics()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var exptected = _dbContext.UserStatistics.First(u => u.UserId == 1);
+
+        // Act
+        var result = await _userStatisticsRepository.GetByUserHexIdAsync("#FFFFFF");
+
+        // Assert
+        Assert.That(result, Is.EqualTo(exptected).Using(new UserStatisticsEqualityComparer()));
     }
 
     [Test]
-    public async Task GetByUserHexIdAsync_ThrowsNotFoundException_WhenUserWasNotFound()
+    public async Task GetByUserHexIdAsync_ThrowsUserNotFoundException_WhenUserWasNotFound()
     {
-        throw new NotImplementedException();
+        // Act
+        AsyncTestDelegate act = async () => await _userStatisticsRepository.GetByUserHexIdAsync("#404040");
+
+        // Assert
+        Assert.ThrowsAsync<UserNotFoundException>(act);
     }
 
     [Test]
     public async Task GetByUserHexIdAsync_ThrowsArgumentException_WhenHexFormatIsNotCorrect()
     {
-        throw new NotImplementedException();
+        // Act
+        AsyncTestDelegate act = async () => await _userStatisticsRepository.GetByUserHexIdAsync("404040");
+
+        // Assert
+        Assert.ThrowsAsync<ArgumentException>(act);
     }
 
     [Test]
     public async Task GetByIdAsync_ReturnsUserStatistics_WhenFound()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var expected = _dbContext.UserStatistics.First(us => us.Id == 1);
+
+        // Act
+        var result = await _userStatisticsRepository.GetByIdAsync(1);
+
+        // Assert
+        Assert.That(result, Is.EqualTo(expected).Using(new UserStatisticsEqualityComparer()));
     }
 
     [Test]
     public async Task GetByIdAsync_ThrowsNotFoundException_WhenUserStatisticsWasNotFound()
     {
-        throw new NotImplementedException();
+        // Act
+        AsyncTestDelegate act = async () => await _userStatisticsRepository.GetByIdAsync(404);
+
+        // Assert
+        Assert.ThrowsAsync<NotFoundException>(act);
     }
 
     [Test]
     public async Task AddAsync_AddsNewUserStatistics()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var statisticsToAdd = new UserStatistics
+        {
+            UserId = 3, // "Third User"
+            SecondsSpentInVoice = 0,
+            ReactionsSet = 1,
+            MessagesSent = 2,
+            RoomsJoined = 2,
+            RoomsCreated = 2,
+        };
+
+        // Act
+        await _userStatisticsRepository.AddAsync(statisticsToAdd);
+
+        // Assert
+        Assert.That(_dbContext.UserStatistics.Count() == 3);
     }
 
     [Test]
     public async Task AddAsync_ThrowsArgumentException_WhenUserStatisticsAlreadyExist()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var statisticsToAdd = new UserStatistics
+        {
+            UserId = 3, // "Third User"
+            SecondsSpentInVoice = 0,
+            ReactionsSet = 1,
+            MessagesSent = 2,
+            RoomsJoined = 2,
+            RoomsCreated = 2,
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _userStatisticsRepository.AddAsync(statisticsToAdd);
+
+        // Assert
+        Assert.ThrowsAsync<ArgumentException>(act);
     }
 
     [Test]
-    public async Task AddAsync_ThrowsNotFoundException_WhenUserWasNotFound()
+    public async Task AddAsync_ThrowsUserNotFoundException_WhenUserWasNotFound()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var statisticsToAdd = new UserStatistics
+        {
+            UserId = 404,
+            SecondsSpentInVoice = 0,
+            ReactionsSet = 1,
+            MessagesSent = 2,
+            RoomsJoined = 2,
+            RoomsCreated = 2,
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _userStatisticsRepository.AddAsync(statisticsToAdd);
+
+        // Assert
+        Assert.ThrowsAsync<UserNotFoundException>(act);
     }
 
     [Test]
     public async Task Delete_DeletesUserStatistics()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var statisticsToDelete = _dbContext.UserStatistics.First();
+
+        // Act
+        _userStatisticsRepository.Delete(statisticsToDelete);
+
+        // Assert
+        Assert.That(_dbContext.UserStatistics.Count() == 1);
     }
 
     [Test]
     public async Task Delete_ThrowsNotFoundException_WhenUserStatisticsDoesNotExist()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var statisticsToAdd = new UserStatistics
+        {
+            Id = 404,
+            UserId = 1,
+            SecondsSpentInVoice = 0,
+            ReactionsSet = 1,
+            MessagesSent = 2,
+            RoomsJoined = 2,
+            RoomsCreated = 2,
+        };
+
+        // Act
+        TestDelegate act = () => _userStatisticsRepository.Delete(statisticsToAdd);
+
+        // Assert
+        Assert.Throws<NotFoundException>(act);
     }
 
     [Test]
     public async Task DeleteByIdAsync_DeletesUserStatistics()
     {
-        throw new NotImplementedException();
+        // Act
+        await _userStatisticsRepository.DeleteByIdAsync(1);
+
+        // Assert
+        Assert.That(_dbContext.UserStatistics.Count() == 1);
     }
 
     [Test]
-    public async Task Delete_ThrowsNotFoundException_WhenUserStatisticsWasNotFoundById()
+    public async Task DeleteByIdAsync_ThrowsNotFoundException_WhenUserStatisticsWasNotFoundById()
     {
-        throw new NotImplementedException();
+        // Act
+        AsyncTestDelegate act = async () => await _userStatisticsRepository.DeleteByIdAsync(404);
+
+        // Assert
+        Assert.ThrowsAsync<NotFoundException>(act);
     }
 
     [Test]
     public async Task Update_UpdatesUserStatistics()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var statsToUpdate = _dbContext.UserStatistics.First();
+        statsToUpdate.ReactionsSet = 50;
+
+        // Act
+        _userStatisticsRepository.Update(statsToUpdate);
+
+        // Assert
+        Assert.That(_dbContext.UserStatistics.First().ReactionsSet == 50);
     }
 
     [Test]
     public async Task Update_ThrowsArgumentException_WhenProvidedAnotherUserId()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var statsToUpdate = _dbContext.UserStatistics.First();
+        statsToUpdate.UserId = 3;
+
+        // Act
+        TestDelegate act = () => _userStatisticsRepository.Update(statsToUpdate);
+
+        // Assert
+        Assert.Throws<ArgumentException>(act);
     }
 
     [Test]
     public async Task Update_ThrowsNotFoundException_WhenUserStatisticsDoesNotExist()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var statsToUpdate = new UserStatistics
+        {
+            Id = 404,
+            UserId = 1, // "First User",
+            MessagesSent = 10,
+            RoomsCreated = 5,
+        };
+        
+        // Act
+        TestDelegate act = () => _userStatisticsRepository.Update(statsToUpdate);
+        
+        // Assert
+        Assert.Throws<NotFoundException>(act);
     }
 }
