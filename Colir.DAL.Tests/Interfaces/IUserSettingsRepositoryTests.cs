@@ -12,7 +12,6 @@ public interface IUserSettingsRepositoryTests
     Task GetByIdAsync_ThrowsNotFoundException_WhenUserSettingsWasNotFound();
 
     Task AddAsync_AddsNewUserSettings();
-    Task AddAsync_ReturnsAddedUserSettings();
     Task AddAsync_ThrowsArgumentException_WhenUserSettingsAlreadyExist();
     Task AddAsync_ThrowsNotFoundException_WhenUserWasNotFound();
 

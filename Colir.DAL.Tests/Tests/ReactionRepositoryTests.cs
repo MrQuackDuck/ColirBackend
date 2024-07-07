@@ -1,102 +1,237 @@
 ﻿using Colir.DAL.Tests.Interfaces;
+using Colir.DAL.Tests.Utils;
+using Colir.Exceptions;
+using DAL;
+using DAL.Entities;
+using DAL.Repositories;
 
 namespace Colir.DAL.Tests.Tests;
 
 public class ReactionRepositoryTests : IReactionRepositoryTests
 {
+    private ColirDbContext _dbContext = default!;
+    private ReactionRepository _reactionRepository = default!;
+
+    [SetUp]
+    public void SetUp()
+    {
+        _dbContext = UnitTestHelper.CreateDbContext();
+        _reactionRepository = new ReactionRepository(_dbContext);
+        UnitTestHelper.SeedData(_dbContext);
+    }
+    
+    [TearDown]
+    public void CleanUp()
+    {
+        _dbContext.Database.EnsureDeleted();
+        _dbContext.Dispose();
+    }
+
     [Test]
     public async Task GetAllAsync_ReturnsAllReactions()
     {
-        throw new NotImplementedException();
+        // Arrange
+        List<Reaction> expected = _dbContext.Reactions.ToList();
+
+        // Act
+        var result = await _reactionRepository.GetAllAsync();
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.That(result, Is.EqualTo(expected).Using(new ReactionEqualityComparer()));
     }
 
     [Test]
-    public async Task GetByIdAsync_ReturnsRoom_WhenFound()
+    public async Task GetByIdAsync_ReturnsReaction_WhenFound()
     {
-        throw new NotImplementedException();
+        // Arrange
+        Reaction expected = _dbContext.Reactions.First(r => r.Id == 1);
+
+        // Act
+        var result = await _reactionRepository.GetByIdAsync(1);
+
+        // Assert
+        Assert.That(result, Is.EqualTo(expected).Using(new ReactionEqualityComparer()));
     }
 
     [Test]
-    public async Task GetByIdAsync_ThrowsNotFoundException_WhenRoomWasNotFound()
+    public async Task GetByIdAsync_ThrowsNotFoundException_WhenReactionWasNotFound()
     {
-        throw new NotImplementedException();
+        // Act
+        AsyncTestDelegate act = async () => await _reactionRepository.GetByIdAsync(100);
+
+        // Assert
+        Assert.ThrowsAsync<NotFoundException>(act);
     }
 
     [Test]
     public async Task GetReactionsOnMessage_ReturnsAllReactionsOnMessage()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var expectedReactions = new List<Reaction> { _dbContext.Reactions.FirstOrDefault(r => r.MessageId == 1)! };
+
+        // Act
+        var result = await _reactionRepository.GetReactionsOnMessage(1);
+
+        // Assert
+        Assert.That(result, Is.EqualTo(expectedReactions).Using(new ReactionEqualityComparer()));
     }
 
     [Test]
     public async Task GetReactionsOnMessage_ThrowsNotFoundException_WhenMessageWasNotFound()
     {
-        throw new NotImplementedException();
+        // Act
+        AsyncTestDelegate act = async () => await _reactionRepository.GetReactionsOnMessage(100);
+
+        // Assert
+        Assert.ThrowsAsync<NotFoundException>(act);
     }
 
     [Test]
-    public async Task AddAsync_AddsNewRoom()
+    public async Task AddAsync_AddsNewReaction()
     {
-        throw new NotImplementedException();
-    }
+        // Arrange
+        var reactionToAdd = new Reaction()
+        {
+            Id = 2,
+            Symbol = "😊",
+            AuthorId = 1,
+            MessageId = 1
+        };
 
-    [Test]
-    public async Task AddAsync_ReturnsAddedRoom()
-    {
-        throw new NotImplementedException();
-    }
+        // Act
+        await _reactionRepository.AddAsync(reactionToAdd);
+        _reactionRepository.SaveChanges();
 
-    [Test]
-    public async Task AddAsync_AppliesJoinedUsersToRoom()
-    {
-        throw new NotImplementedException();
+        // Assert
+        Assert.That(_dbContext.Reactions.Count() == 2);
     }
 
     [Test]
     public async Task AddAsync_ThrowsArgumentException_WhenAuthorWasNotFound()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var reactionToAdd = new Reaction()
+        {
+            Id = 2,
+            Symbol = "😊",
+            AuthorId = 404,
+            MessageId = 1
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _reactionRepository.AddAsync(reactionToAdd);
+
+        // Assert
+        Assert.ThrowsAsync<ArgumentException>(act);
     }
 
     [Test]
     public async Task AddAsync_ThrowsArgumentException_WhenMessageWasNotFound()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var reactionToAdd = new Reaction()
+        {
+            Id = 2,
+            Symbol = "😊",
+            AuthorId = 1,
+            MessageId = 404
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _reactionRepository.AddAsync(reactionToAdd);
+
+        // Assert
+        Assert.ThrowsAsync<ArgumentException>(act);
     }
 
     [Test]
-    public async Task Delete_DeletesRoom()
+    public async Task Delete_DeletesReaction()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var reactionToDelete = _dbContext.Reactions.First();
+
+        // Act
+        _reactionRepository.Delete(reactionToDelete);
+        _reactionRepository.SaveChanges();
+
+        // Assert
+        Assert.That(_dbContext.Reactions.Count() == 0);
     }
 
     [Test]
-    public async Task Delete_ThrowsNotFoundException_WhenRoomDoesNotExist()
+    public async Task Delete_ThrowsNotFoundException_WhenReactionDoesNotExist()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var reactionToDelete = new Reaction() { Id = 404 };
+
+        // Act
+        TestDelegate act = () => _reactionRepository.Delete(reactionToDelete);
+
+        // Assert
+        Assert.Throws<NotFoundException>(act);
     }
 
     [Test]
-    public async Task DeleteByIdAsync_DeletesRoom()
+    public async Task DeleteByIdAsync_DeletesReaction()
     {
-        throw new NotImplementedException();
+        // Act
+        await _reactionRepository.DeleteByIdAsync(1);
+        _reactionRepository.SaveChanges();
+
+        // Assert
+        Assert.That(_dbContext.Reactions.Count() == 0);
     }
 
     [Test]
-    public async Task Delete_ThrowsNotFoundException_WhenRoomWasNotFoundById()
+    public async Task Delete_ThrowsNotFoundException_WhenReactionWasNotFoundById()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var reactionToDelete = new Reaction() { Id = 404, Symbol = "😎" };
+
+        // Act
+        TestDelegate act = () => _reactionRepository.Delete(reactionToDelete);
+
+        // Assert
+        Assert.Throws<NotFoundException>(act);
     }
 
     [Test]
-    public async Task Update_UpdatesRoom()
+    public async Task DeleteByIdAsync_ThrowsNotFoundException_WhenReactionWasNotFoundById()
     {
-        throw new NotImplementedException();
+        // Act
+        AsyncTestDelegate act = async () => await _reactionRepository.DeleteByIdAsync(404);
+
+        // Assert
+        Assert.ThrowsAsync<NotFoundException>(act);
     }
 
     [Test]
-    public async Task Update_ThrowsNotFoundException_WhenRoomDoesNotExist()
+    public async Task Update_UpdatesReaction()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var reactionToUpdate = _dbContext.Reactions.First();
+        reactionToUpdate.Symbol = "😎";
+
+        // Act
+        _reactionRepository.Update(reactionToUpdate);
+        _reactionRepository.SaveChanges();
+        var updatedReaction = _dbContext.Reactions.First(r => r.Id == reactionToUpdate.Id);
+
+        // Assert
+        Assert.That(updatedReaction.Symbol, Is.EqualTo("😎"));
+    }
+
+    [Test]
+    public async Task Update_ThrowsNotFoundException_WhenReactionDoesNotExist()
+    {
+        // Arrange
+        var reactionToUpdate = new Reaction() { Id = 404, Symbol = "😎" };
+
+        // Act
+        TestDelegate act = () => _reactionRepository.Update(reactionToUpdate);
+
+        // Assert
+        Assert.Throws<NotFoundException>(act);
     }
 }

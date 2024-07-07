@@ -53,12 +53,6 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
     }
 
     [Test]
-    public async Task AddAsync_ReturnsAddedEntity()
-    {
-        throw new NotImplementedException();
-    }
-
-    [Test]
     public async Task AddAsync_ThrowsInvalidOperationException_WhenEntryWithSameUserIdAndRoomIdAlreadyExists()
     {
         throw new NotImplementedException();

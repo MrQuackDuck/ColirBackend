@@ -29,12 +29,6 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
     }
 
     [Test]
-    public async Task AddAsync_ReturnsAddedAttachment()
-    {
-        throw new NotImplementedException();
-    }
-
-    [Test]
     public async Task AddAsync_ThrowsNotFoundException_WhenMessageWasNotFound()
     {
         throw new NotImplementedException();

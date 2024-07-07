@@ -12,7 +12,6 @@ public interface IUserStatisticsRepositoryTests
     Task GetByIdAsync_ThrowsNotFoundException_WhenUserStatisticsWasNotFound();
 
     Task AddAsync_AddsNewUserStatistics();
-    Task AddAsync_ReturnsAddedUserStatistics();
     Task AddAsync_ThrowsArgumentException_WhenUserStatisticsAlreadyExist();
     Task AddAsync_ThrowsNotFoundException_WhenUserWasNotFound();
 

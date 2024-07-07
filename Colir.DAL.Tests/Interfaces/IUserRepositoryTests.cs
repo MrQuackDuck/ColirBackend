@@ -12,7 +12,6 @@ public interface IUserRepositoryTests
     Task GetByHexIdAsync_ThrowsArgumentException_WhenHexFormatIsNotCorrect();
 
     Task AddAsync_AddsNewUser();
-    Task AddAsync_ReturnsAddedUser();
     Task AddAsync_CreatesUserSettings();
     Task AddAsync_CreatesUserStatistics();
     Task AddAsync_AppliesJoinedRoomsToUser();
@@ -24,11 +23,13 @@ public interface IUserRepositoryTests
     Task AddAsync_ThrowsRoomExpiredException_WhenOneOfJoinedRoomsIsExpired();
 
     Task Delete_DeletesUser();
-    Task AddAsync_DeletesUserSettings();
-    Task AddAsync_DeletesUserStatistics();
+    Task Delete_DeletesUserSettings();
+    Task Delete_DeletesUserStatistics();
     Task Delete_ThrowsNotFoundException_WhenUserDoesNotExist();
 
     Task DeleteByIdAsync_DeletesUser();
+    Task DeleteByIdAsync_DeletesUserSettings();
+    Task DeleteByIdAsync_DeletesUserStatistics();
     Task Delete_ThrowsNotFoundException_WhenUserWasNotFoundById();
 
     Task Update_UpdatesUser();

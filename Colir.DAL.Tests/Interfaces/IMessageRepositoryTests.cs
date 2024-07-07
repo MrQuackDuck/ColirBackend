@@ -18,9 +18,9 @@ public interface IMessageRepositoryTests
     Task AddAsync_AddsNewMessage();
     Task AddAsync_AppliesAttachmentsToMessage();
     Task AddAsync_AppliesReactionsToMessage();
-    Task AddAsync_ThrowsNotFoundException_WhenAuthorWasNotFound();
-    Task AddAsync_ThrowsNotFoundException_WhenRoomWasNotFound();
-    Task AddAsync_ThrowsNotFoundException_WhenRepliedMessageWasNotFound();
+    Task AddAsync_ThrowsUserNotFoundException_WhenAuthorWasNotFound();
+    Task AddAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
+    Task AddAsync_ThrowsMessageNotFoundException_WhenRepliedMessageWasNotFound();
     Task AddAsync_ThrowsRoomExpiredException_WhenRoomExpired();
 
     Task Delete_DeletesMessage();

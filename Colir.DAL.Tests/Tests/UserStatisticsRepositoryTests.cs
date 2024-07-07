@@ -47,12 +47,6 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
     }
 
     [Test]
-    public async Task AddAsync_ReturnsAddedUserStatistics()
-    {
-        throw new NotImplementedException();
-    }
-
-    [Test]
     public async Task AddAsync_ThrowsArgumentException_WhenUserStatisticsAlreadyExist()
     {
         throw new NotImplementedException();

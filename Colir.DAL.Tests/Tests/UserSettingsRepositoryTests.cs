@@ -47,12 +47,6 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
     }
 
     [Test]
-    public async Task AddAsync_ReturnsAddedUserSettings()
-    {
-        throw new NotImplementedException();
-    }
-
-    [Test]
     public async Task AddAsync_ThrowsArgumentException_WhenUserSettingsAlreadyExist()
     {
         throw new NotImplementedException();
