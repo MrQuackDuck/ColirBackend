@@ -51,7 +51,14 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     public async Task GetLastMessages_ReturnsLastMessages()
     {
         // Arrange
-        var expectedMessages = new List<Message> { _dbContext.Messages.FirstOrDefault(message => message.Id == 1)! };
+        var expectedMessages = new List<Message> 
+        { 
+            _dbContext.Messages
+                .Include(nameof(Message.Author))
+                .Include(nameof(Message.Reactions))
+                .Include(nameof(Message.Attachments))
+                .FirstOrDefault(message => message.Id == 1)!
+        };
 
         // Act
         var result = await _messageRepository.GetLastMessages("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e", 1, 1);
@@ -67,6 +74,8 @@ public class MessageRepositoryTests : IMessageRepositoryTests
         var expectedMessages = new List<Message>
         {
             _dbContext.Messages
+                .Include(nameof(Message.Author))
+                .Include(nameof(Message.Reactions))
                 .Include(nameof(Message.Attachments))
                 .FirstOrDefault(message => message.Id == 1)!
         };
@@ -85,7 +94,9 @@ public class MessageRepositoryTests : IMessageRepositoryTests
         var expectedMessages = new List<Message>
         {
             _dbContext.Messages
+                .Include(nameof(Message.Author))
                 .Include(nameof(Message.Reactions))
+                .Include(nameof(Message.Attachments))
                 .FirstOrDefault(message => message.Id == 1)!
         };
 

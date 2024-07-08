@@ -1,11 +1,11 @@
-﻿using System.IO;
-using Colir.DAL.Tests.Interfaces;
+﻿using Colir.DAL.Tests.Interfaces;
 using Colir.DAL.Tests.Utils;
 using Colir.Exceptions;
 using DAL;
 using DAL.Entities;
 using DAL.Enums;
 using DAL.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace Colir.DAL.Tests.Tests;
 
@@ -38,7 +38,9 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
     public async Task GetAllAsync_ReturnsAllAttachments()
     {
         // Arrange
-        var expected = _dbContext.Attachments.ToList();
+        var expected = _dbContext.Attachments
+                                 .Include(nameof(Attachment.Message))
+                                 .ToList();
         
         // Act
         var result = await _attachmentRepository.GetAllAsync();
@@ -51,7 +53,9 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
     public async Task GetByIdAsync_ReturnsAttachment_WhenFound()
     {
         // Arrange
-        var expected = _dbContext.Attachments.First(a => a.Id == 1);
+        var expected = _dbContext.Attachments
+                                 .Include(nameof(Attachment.Message))
+                                 .First(a => a.Id == 1);
 
         // Act
         var result = await _attachmentRepository.GetByIdAsync(1);

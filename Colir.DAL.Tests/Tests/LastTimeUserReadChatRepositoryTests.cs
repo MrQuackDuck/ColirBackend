@@ -4,6 +4,7 @@ using Colir.Exceptions;
 using DAL;
 using DAL.Entities;
 using DAL.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace Colir.DAL.Tests.Tests;
 
@@ -36,7 +37,10 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
     public async Task GetAllAsync_ReturnsAllTimesUsersReadChats()
     {
         // Arrange
-        List<LastTimeUserReadChat> expected = _dbContext.LastTimeUserReadChats.ToList();
+        List<LastTimeUserReadChat> expected = _dbContext.LastTimeUserReadChats
+                                                        .Include(nameof(LastTimeUserReadChat.Room))
+                                                        .Include(nameof(LastTimeUserReadChat.User))        
+                                                        .ToList();
         
         // Act
         var result = await _lastTimeUserReadChatRepository.GetAllAsync();
@@ -49,7 +53,10 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
     public async Task GetAsync_ReturnsEntity()
     {
         // Arrange
-        var expected = _dbContext.LastTimeUserReadChats.First(l => l.UserId == 1 && l.RoomId == 1);
+        var expected = _dbContext.LastTimeUserReadChats
+                                 .Include(nameof(LastTimeUserReadChat.Room))
+                                 .Include(nameof(LastTimeUserReadChat.User))
+                                 .First(l => l.UserId == 1 && l.RoomId == 1);
         
         // Act
         var result = await _lastTimeUserReadChatRepository.GetAsync(1, 1);
@@ -92,7 +99,10 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
     public async Task GetByIdAsync_ReturnsEntity_WhenFound()
     {
         // Arrange
-        var expected = _dbContext.LastTimeUserReadChats.First(l => l.Id == 1);
+        var expected = _dbContext.LastTimeUserReadChats
+                                 .Include(nameof(LastTimeUserReadChat.Room))
+                                 .Include(nameof(LastTimeUserReadChat.User))
+                                 .First(l => l.Id == 1);
         
         // Act
         var result = await _lastTimeUserReadChatRepository.GetByIdAsync(1);

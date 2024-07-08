@@ -4,6 +4,7 @@ using Colir.Exceptions;
 using DAL;
 using DAL.Entities;
 using DAL.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace Colir.DAL.Tests.Tests;
 
@@ -31,7 +32,9 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
     public async Task GetAllAsync_ReturnsAllUsersSettings()
     {
         // Arrange
-        List<UserSettings> expected = _dbContext.UserSettings.ToList();
+        List<UserSettings> expected = _dbContext.UserSettings
+                                                .Include(nameof(UserSettings.User))
+                                                .ToList();
 
         // Act
         var result = await _userSettingsRepository.GetAllAsync();
@@ -45,7 +48,9 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
     public async Task GetByUserHexIdAsync_ReturnsUserSettings()
     {
         // Arrange
-        UserSettings expected = _dbContext.UserSettings.First(us => us.Id == 1);
+        UserSettings expected = _dbContext.UserSettings
+                                           .Include(nameof(UserSettings.User))
+                                           .First(us => us.Id == 1);
         
         // Act
         var result = await _userSettingsRepository.GetByUserHexIdAsync("#FFFFFF");
@@ -78,7 +83,9 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
     public async Task GetByIdAsync_ReturnsUserSettings_WhenFound()
     {
         // Arrange
-        UserSettings expected = _dbContext.UserSettings.First(us => us.Id == 1);
+        UserSettings expected = _dbContext.UserSettings
+                                                .Include(nameof(UserSettings.User))
+                                                .First(us => us.Id == 1);
         
         // Act
         var result = await _userSettingsRepository.GetByIdAsync(1);

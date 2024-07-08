@@ -4,6 +4,7 @@ using Colir.Exceptions;
 using DAL;
 using DAL.Entities;
 using DAL.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace Colir.DAL.Tests.Tests;
 
@@ -36,7 +37,10 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     public async Task GetAllAsync_ReturnsAllRooms()
     {
         // Arrange
-        List<Room> expected = _dbContext.Rooms.ToList();
+        List<Room> expected = _dbContext.Rooms
+                                        .Include(nameof(Room.Owner))
+                                        .Include(nameof(Room.JoinedUsers))
+                                        .ToList();
 
         // Act
         var result = await _roomRepository.GetAllAsync();
@@ -51,7 +55,10 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     public async Task GetByIdAsync_ReturnsRoom_WhenFound(long id)
     {
         // Arrange
-        Room expected = _dbContext.Rooms.First(r => r.Id == id);
+        Room expected = _dbContext.Rooms
+                                  .Include(nameof(Room.Owner))
+                                  .Include(nameof(Room.JoinedUsers))
+                                  .First(r => r.Id == id);
         
         // Act
         var result = await _roomRepository.GetByIdAsync(id);

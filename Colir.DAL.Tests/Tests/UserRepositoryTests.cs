@@ -32,7 +32,11 @@ public class UserRepositoryTests : IUserRepositoryTests
     public async Task GetAllAsync_ReturnsAllUsers()
     {
         // Arrange
-        List<User> expected = _dbContext.Users.ToList();
+        List<User> expected = _dbContext.Users
+                                        .Include(nameof(User.UserStatistics))
+                                        .Include(nameof(User.UserSettings))
+                                        .Include(nameof(User.JoinedRooms))
+                                        .ToList();
 
         // Act
         var result = await _userRepository.GetAllAsync();
@@ -46,7 +50,11 @@ public class UserRepositoryTests : IUserRepositoryTests
     public async Task GetByIdAsync_ReturnsUser_WhenFound()
     {
         // Arrange
-        User expected = _dbContext.Users.First(u => u.Id == 1);
+        User expected = _dbContext.Users
+                                        .Include(nameof(User.UserStatistics))
+                                        .Include(nameof(User.UserSettings))
+                                        .Include(nameof(User.JoinedRooms))
+                                        .First(u => u.Id == 1);
 
         // Act
         var result = await _userRepository.GetByIdAsync(1);
@@ -69,20 +77,14 @@ public class UserRepositoryTests : IUserRepositoryTests
     public async Task GetByHexIdAsync_ReturnsUser_WhenFound()
     {
         // Arrange
-        var hexId = "#000001";
-        User expected = new User
-        {
-            Id = 4,
-            Username = "TestUser",
-            HexId = hexId,
-            JoinedRooms = new List<Room>()
-        };
-
-        _dbContext.Users.Add(expected);
-        _dbContext.SaveChanges();
+        User expected = _dbContext.Users
+                                        .Include(nameof(User.UserStatistics))
+                                        .Include(nameof(User.UserSettings))
+                                        .Include(nameof(User.JoinedRooms))
+                                        .First(u => u.Id == 1);
 
         // Act
-        var result = await _userRepository.GetByHexIdAsync(hexId);
+        var result = await _userRepository.GetByHexIdAsync("#FFFFFF");
 
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new UserEqualityComparer()));
@@ -92,7 +94,7 @@ public class UserRepositoryTests : IUserRepositoryTests
     public async Task GetByHexIdAsync_ThrowsNotFoundException_WhenUserWasNotFound()
     {
         // Act
-        AsyncTestDelegate act = async () => await _userRepository.GetByHexIdAsync("#FFFFFF");
+        AsyncTestDelegate act = async () => await _userRepository.GetByHexIdAsync("#404000");
 
         // Assert
         Assert.ThrowsAsync<NotFoundException>(act);
@@ -102,7 +104,7 @@ public class UserRepositoryTests : IUserRepositoryTests
     public async Task GetByHexIdAsync_ThrowsArgumentException_WhenHexFormatIsNotCorrect()
     {
         // Act
-        AsyncTestDelegate act = async () => await _userRepository.GetByHexIdAsync("invalid_hex_format");
+        AsyncTestDelegate act = async () => await _userRepository.GetByHexIdAsync("Invalid HEX");
 
         // Assert
         Assert.ThrowsAsync<ArgumentException>(act);
@@ -426,15 +428,29 @@ public class UserRepositoryTests : IUserRepositoryTests
     }
 
     [Test]
+    public async Task Update_ThrowsArgumentException_WhenExistingHexIdProvided()
+    {
+        // Arrange
+        var userToUpdate = _dbContext.Users.First(u => u.Id == 1);
+
+        // Act
+        userToUpdate.HexId = "#FFFFFF";
+        TestDelegate act = () => _userRepository.Update(userToUpdate);
+
+        // Assert
+        Assert.Throws<ArgumentException>(act);   
+    }
+
+    [Test]
     public async Task Update_ThrowsNotFoundException_WhenUserDoesNotExist()
     {
         // Arrange
         var userToUpdate = new User() { Id = 404, Username = "UpdatedUser" };
 
         // Act
-        AsyncTestDelegate act = async () => _userRepository.Update(userToUpdate);
+        TestDelegate act = () => _userRepository.Update(userToUpdate);
 
         // Assert
-        Assert.ThrowsAsync<NotFoundException>(act);
+        Assert.Throws<NotFoundException>(act);
     }
 }

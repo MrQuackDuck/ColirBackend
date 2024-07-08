@@ -4,6 +4,7 @@ using Colir.Exceptions;
 using DAL;
 using DAL.Entities;
 using DAL.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace Colir.DAL.Tests.Tests;
 
@@ -31,7 +32,10 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
     public async Task GetAllAsync_ReturnsAllReactions()
     {
         // Arrange
-        List<Reaction> expected = _dbContext.Reactions.ToList();
+        List<Reaction> expected = _dbContext.Reactions
+                                  .Include(nameof(Reaction.Author))
+                                  .Include(nameof(Reaction.Message))
+                                  .ToList();
 
         // Act
         var result = await _reactionRepository.GetAllAsync();
@@ -45,7 +49,10 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
     public async Task GetByIdAsync_ReturnsReaction_WhenFound()
     {
         // Arrange
-        Reaction expected = _dbContext.Reactions.First(r => r.Id == 1);
+        Reaction expected = _dbContext.Reactions
+                                      .Include(nameof(Reaction.Author))
+                                      .Include(nameof(Reaction.Message))
+                                      .First(r => r.Id == 1);
 
         // Act
         var result = await _reactionRepository.GetByIdAsync(1);
@@ -68,7 +75,10 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
     public async Task GetReactionsOnMessage_ReturnsAllReactionsOnMessage()
     {
         // Arrange
-        var expectedReactions = new List<Reaction> { _dbContext.Reactions.FirstOrDefault(r => r.MessageId == 1)! };
+        var expectedReactions = new List<Reaction>
+        { 
+            _dbContext.Reactions.Include(nameof(Reaction.Author)).FirstOrDefault(r => r.MessageId == 1)! 
+        };
 
         // Act
         var result = await _reactionRepository.GetReactionsOnMessage(1);

@@ -4,6 +4,7 @@ using Colir.Exceptions;
 using DAL;
 using DAL.Entities;
 using DAL.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace Colir.DAL.Tests.Tests;
 
@@ -31,7 +32,9 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
     public async Task GetAllAsync_ReturnsAllUsersStatistics()
     {
         // Arrange
-        var exptected = _dbContext.UserStatistics.ToList();
+        var exptected = _dbContext.UserStatistics
+                                  .Include(nameof(UserStatistics.User))
+                                  .ToList();
 
         // Act
         var result = await _userStatisticsRepository.GetAllAsync();
@@ -44,7 +47,9 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
     public async Task GetByUserHexIdAsync_ReturnsUserStatistics()
     {
         // Arrange
-        var exptected = _dbContext.UserStatistics.First(u => u.UserId == 1);
+        var exptected = _dbContext.UserStatistics
+                                  .Include(nameof(UserStatistics.User))
+                                  .First(u => u.UserId == 1);
 
         // Act
         var result = await _userStatisticsRepository.GetByUserHexIdAsync("#FFFFFF");
@@ -77,7 +82,9 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
     public async Task GetByIdAsync_ReturnsUserStatistics_WhenFound()
     {
         // Arrange
-        var expected = _dbContext.UserStatistics.First(us => us.Id == 1);
+        var expected = _dbContext.UserStatistics
+                                  .Include(nameof(UserStatistics.User))
+                                  .First(us => us.Id == 1);
 
         // Act
         var result = await _userStatisticsRepository.GetByIdAsync(1);
