@@ -8,14 +8,12 @@ public interface IAttachmentRepositoryTests
     Task GetByIdAsync_ThrowsNotFoundException_WhenAttachmentWasNotFound();
 
     Task AddAsync_AddsNewAttachment();
-    Task AddAsync_ThrowsNotFoundException_WhenMessageWasNotFound();
+    Task AddAsync_ThrowsMessageNotFoundException_WhenMessageWasNotFound();
 
     Task Delete_DeletesAttachment();
-    Task Delete_DeletesFile();
     Task Delete_ThrowsNotFoundException_WhenAttachmentDoesNotExist();
 
     Task DeleteByIdAsync_DeletesAttachment();
-    Task DeleteByIdAsync_DeletesFile();
     Task DeleteByIdAsync_ThrowsNotFoundException_WhenAttachmentWasNotFoundById();
 
     Task Update_UpdatesAttachment();
