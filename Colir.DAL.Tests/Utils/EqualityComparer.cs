@@ -1,10 +1,11 @@
-﻿using DAL.Entities;
+﻿using System.Diagnostics.CodeAnalysis;
+using DAL.Entities;
 
 namespace Colir.DAL.Tests.Utils;
 
 public class AttachmentEqualityComparer : IEqualityComparer<Attachment>
 {
-    public bool Equals(Attachment? x, Attachment? y)
+    public bool Equals([AllowNull] Attachment x, [AllowNull] Attachment y)
     {
         if (ReferenceEquals(x, y)) return true;
         if (ReferenceEquals(x, null)) return false;
@@ -21,7 +22,7 @@ public class AttachmentEqualityComparer : IEqualityComparer<Attachment>
 
 public class LastTimeUserReadChatEqualityComparer : IEqualityComparer<LastTimeUserReadChat>
 {
-    public bool Equals(LastTimeUserReadChat? x, LastTimeUserReadChat? y)
+    public bool Equals([AllowNull] LastTimeUserReadChat x, [AllowNull] LastTimeUserReadChat y)
     {
         if (ReferenceEquals(x, y)) return true;
         if (ReferenceEquals(x, null)) return false;
@@ -38,7 +39,7 @@ public class LastTimeUserReadChatEqualityComparer : IEqualityComparer<LastTimeUs
 
 public class MessageEqualityComparer : IEqualityComparer<Message>
 {
-    public bool Equals(Message? x, Message? y)
+    public bool Equals([AllowNull] Message x, [AllowNull] Message y)
     {
         if (ReferenceEquals(x, y)) return true;
         if (ReferenceEquals(x, null)) return false;
@@ -67,7 +68,7 @@ public class MessageEqualityComparer : IEqualityComparer<Message>
 
 public class ReactionEqualityComparer : IEqualityComparer<Reaction>
 {
-    public bool Equals(Reaction? x, Reaction? y)
+    public bool Equals([AllowNull] Reaction x, [AllowNull] Reaction y)
     {
         if (ReferenceEquals(x, y)) return true;
         if (ReferenceEquals(x, null)) return false;
@@ -84,7 +85,7 @@ public class ReactionEqualityComparer : IEqualityComparer<Reaction>
 
 public class RoomEqualityComparer : IEqualityComparer<Room>
 {
-    public bool Equals(Room? x, Room? y)
+    public bool Equals([AllowNull] Room x, [AllowNull] Room y)
     {
         if (ReferenceEquals(x, y)) return true;
         if (ReferenceEquals(x, null)) return false;
@@ -101,7 +102,7 @@ public class RoomEqualityComparer : IEqualityComparer<Room>
 
 public class UserEqualityComparer : IEqualityComparer<User>
 {
-    public bool Equals(User? x, User? y)
+    public bool Equals([AllowNull] User x, [AllowNull] User y)
     {
         if (ReferenceEquals(x, y)) return true;
         if (ReferenceEquals(x, null)) return false;
@@ -118,7 +119,7 @@ public class UserEqualityComparer : IEqualityComparer<User>
 
 public class UserSettingsEqualityComparer : IEqualityComparer<UserSettings>
 {
-    public bool Equals(UserSettings? x, UserSettings? y)
+    public bool Equals([AllowNull] UserSettings x, [AllowNull] UserSettings y)
     {
         if (ReferenceEquals(x, y)) return true;
         if (ReferenceEquals(x, null)) return false;
@@ -135,7 +136,7 @@ public class UserSettingsEqualityComparer : IEqualityComparer<UserSettings>
 
 public class UserStatisticsEqualityComparer : IEqualityComparer<UserStatistics>
 {
-    public bool Equals(UserStatistics? x, UserStatistics? y)
+    public bool Equals([AllowNull] UserStatistics x, [AllowNull] UserStatistics y)
     {
         if (ReferenceEquals(x, y)) return true;
         if (ReferenceEquals(x, null)) return false;

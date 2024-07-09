@@ -16,8 +16,13 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
     [SetUp]
     public void SetUp()
     {
+        // Create database context
         _dbContext = UnitTestHelper.CreateDbContext();
+        
+        // Initialize user settings repository
         _userSettingsRepository = new UserSettingsRepository(_dbContext);
+        
+        // Add entities
         UnitTestHelper.SeedData(_dbContext);
     }
     

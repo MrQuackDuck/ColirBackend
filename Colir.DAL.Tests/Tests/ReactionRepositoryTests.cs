@@ -16,8 +16,13 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
     [SetUp]
     public void SetUp()
     {
+        // Create database context
         _dbContext = UnitTestHelper.CreateDbContext();
+        
+        // Initialize reaction repository
         _reactionRepository = new ReactionRepository(_dbContext);
+        
+        // Add entities
         UnitTestHelper.SeedData(_dbContext);
     }
     

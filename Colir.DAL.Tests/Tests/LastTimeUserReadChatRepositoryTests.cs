@@ -19,7 +19,7 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
         // Create database context
         _dbContext = UnitTestHelper.CreateDbContext();
         
-        // Initialize room repository
+        // Initialize repository
         _lastTimeUserReadChatRepository = new LastTimeUserReadChatRepository(_dbContext);
         
         // Add entities

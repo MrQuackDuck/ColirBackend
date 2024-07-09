@@ -19,7 +19,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
         // Create database context
         _dbContext = UnitTestHelper.CreateDbContext();
 
-        // Initialize room repository
+        // Initialize message repository
         _messageRepository = new MessageRepository(_dbContext);
 
         // Add entities

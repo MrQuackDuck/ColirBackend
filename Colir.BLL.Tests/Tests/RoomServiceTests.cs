@@ -1,9 +1,36 @@
-﻿using Colir.BLL.Tests.Interfaces;
+﻿using Colir.BLL.Services;
+using Colir.BLL.Tests.Interfaces;
+using Colir.BLL.Tests.Utils;
+using DAL;
 
 namespace Colir.BLL.Tests.Tests;
 
 public class RoomServiceTests : IRoomServiceTests
 {
+    private ColirDbContext _dbContext;
+    private RoomService _roomService;
+    
+    [SetUp]
+    public void SetUp()
+    {
+        // Create database context
+        _dbContext = UnitTestHelper.CreateDbContext();
+        
+        // Initialize room service
+        var unitOfWork = new UnitOfWork(_dbContext);
+        _roomService = new RoomService(unitOfWork);
+        
+        // Add entities
+        UnitTestHelper.SeedData(_dbContext);
+    }
+    
+    [TearDown]
+    public void CleanUp()
+    {
+        _dbContext.Database.EnsureDeleted();
+        _dbContext.Dispose();
+    }
+    
     [Test]
     public async Task GetRoomInfoAsync_ReturnsRoomInfo()
     {

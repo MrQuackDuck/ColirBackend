@@ -20,7 +20,7 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
         // Create database context
         _dbContext = UnitTestHelper.CreateDbContext();
         
-        // Initialize room repository
+        // Initialize attachment repository
         _attachmentRepository = new AttachmentRepository(_dbContext);
         
         // Add entities
