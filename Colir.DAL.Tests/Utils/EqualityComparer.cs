@@ -11,12 +11,12 @@ public class AttachmentEqualityComparer : IEqualityComparer<Attachment>
         if (ReferenceEquals(x, null)) return false;
         if (ReferenceEquals(y, null)) return false;
         if (x.GetType() != y.GetType()) return false;
-        return x.AttachmentType == y.AttachmentType && x.Filename == y.Filename && x.Path == y.Path && x.SizeInKb == y.SizeInKb && x.MessageId == y.MessageId && Equals(x.Message, y.Message);
+        return x.AttachmentType == y.AttachmentType && x.Filename == y.Filename && x.Path == y.Path && x.SizeInKb == y.SizeInKb && x.MessageId == y.MessageId;
     }
 
     public int GetHashCode(Attachment obj)
     {
-        return HashCode.Combine((int)obj.AttachmentType, obj.Filename, obj.Path, obj.SizeInKb, obj.MessageId, obj.Message);
+        return HashCode.Combine((int)obj.AttachmentType, obj.Filename, obj.Path, obj.SizeInKb, obj.MessageId);
     }
 }
 
@@ -45,7 +45,7 @@ public class MessageEqualityComparer : IEqualityComparer<Message>
         if (ReferenceEquals(x, null)) return false;
         if (ReferenceEquals(y, null)) return false;
         if (x.GetType() != y.GetType()) return false;
-        return x.RoomId == y.RoomId && x.AuthorId == y.AuthorId && x.RepliedMessageId == y.RepliedMessageId && Equals(x.RepliedTo, y.RepliedTo) && x.Content == y.Content && x.PostDate.Equals(y.PostDate) && Nullable.Equals(x.EditDate, y.EditDate) && x.Room.Equals(y.Room) && x.Author.Equals(y.Author) && x.Attachments.Equals(y.Attachments) && x.Reactions.Equals(y.Reactions);
+        return x.RoomId == y.RoomId && x.AuthorId == y.AuthorId && x.RepliedMessageId == y.RepliedMessageId && x.Content == y.Content && x.PostDate.Equals(y.PostDate) && Nullable.Equals(x.EditDate, y.EditDate);
     }
 
     public int GetHashCode(Message obj)
@@ -58,10 +58,6 @@ public class MessageEqualityComparer : IEqualityComparer<Message>
         hashCode.Add(obj.Content);
         hashCode.Add(obj.PostDate);
         hashCode.Add(obj.EditDate);
-        hashCode.Add(obj.Room);
-        hashCode.Add(obj.Author);
-        hashCode.Add(obj.Attachments);
-        hashCode.Add(obj.Reactions);
         return hashCode.ToHashCode();
     }
 }
@@ -74,12 +70,12 @@ public class ReactionEqualityComparer : IEqualityComparer<Reaction>
         if (ReferenceEquals(x, null)) return false;
         if (ReferenceEquals(y, null)) return false;
         if (x.GetType() != y.GetType()) return false;
-        return x.Symbol == y.Symbol && x.AuthorId == y.AuthorId && x.MessageId == y.MessageId && Equals(x.Author, y.Author) && Equals(x.Message, y.Message);
+        return x.Symbol == y.Symbol && x.AuthorId == y.AuthorId && x.MessageId == y.MessageId;
     }
 
     public int GetHashCode(Reaction obj)
     {
-        return HashCode.Combine(obj.Symbol, obj.AuthorId, obj.MessageId, obj.Author, obj.Message);
+        return HashCode.Combine(obj.Symbol, obj.AuthorId, obj.MessageId);
     }
 }
 
@@ -91,12 +87,12 @@ public class RoomEqualityComparer : IEqualityComparer<Room>
         if (ReferenceEquals(x, null)) return false;
         if (ReferenceEquals(y, null)) return false;
         if (x.GetType() != y.GetType()) return false;
-        return Nullable.Equals(x.ExpiryDate, y.ExpiryDate) && x.OwnerId == y.OwnerId && x.Guid == y.Guid && x.Name == y.Name && Equals(x.Owner, y.Owner) && Equals(x.JoinedUsers, y.JoinedUsers);
+        return Nullable.Equals(x.ExpiryDate, y.ExpiryDate) && x.OwnerId == y.OwnerId && x.Guid == y.Guid && x.Name == y.Name;
     }
 
     public int GetHashCode(Room obj)
     {
-        return HashCode.Combine(obj.ExpiryDate, obj.OwnerId, obj.Guid, obj.Name, obj.Owner, obj.JoinedUsers);
+        return HashCode.Combine(obj.ExpiryDate, obj.OwnerId, obj.Guid, obj.Name);
     }
 }
 
@@ -108,12 +104,12 @@ public class UserEqualityComparer : IEqualityComparer<User>
         if (ReferenceEquals(x, null)) return false;
         if (ReferenceEquals(y, null)) return false;
         if (x.GetType() != y.GetType()) return false;
-        return x.HexId == y.HexId && x.GitHubId == y.GitHubId && x.Username == y.Username && x.AuthType == y.AuthType && x.UserSettingsId == y.UserSettingsId && Equals(x.UserSettings, y.UserSettings) && Equals(x.JoinedRooms, y.JoinedRooms);
+        return x.HexId == y.HexId && x.GitHubId == y.GitHubId && x.Username == y.Username && x.AuthType == y.AuthType && x.UserSettingsId == y.UserSettingsId;
     }
 
     public int GetHashCode(User obj)
     {
-        return HashCode.Combine(obj.HexId, obj.GitHubId, obj.Username, (int)obj.AuthType, obj.UserSettingsId, obj.UserSettings, obj.JoinedRooms);
+        return HashCode.Combine(obj.HexId, obj.GitHubId, obj.Username, (int)obj.AuthType, obj.UserSettingsId);
     }
 }
 
@@ -125,12 +121,12 @@ public class UserSettingsEqualityComparer : IEqualityComparer<UserSettings>
         if (ReferenceEquals(x, null)) return false;
         if (ReferenceEquals(y, null)) return false;
         if (x.GetType() != y.GetType()) return false;
-        return x.UserId == y.UserId && x.StatisticsEnabled == y.StatisticsEnabled && Equals(x.User, y.User);
+        return x.UserId == y.UserId && x.StatisticsEnabled == y.StatisticsEnabled;
     }
 
     public int GetHashCode(UserSettings obj)
     {
-        return HashCode.Combine(obj.UserId, obj.StatisticsEnabled, obj.User);
+        return HashCode.Combine(obj.UserId, obj.StatisticsEnabled);
     }
 }
 
@@ -142,11 +138,11 @@ public class UserStatisticsEqualityComparer : IEqualityComparer<UserStatistics>
         if (ReferenceEquals(x, null)) return false;
         if (ReferenceEquals(y, null)) return false;
         if (x.GetType() != y.GetType()) return false;
-        return x.UserId == y.UserId && x.SecondsSpentInVoice == y.SecondsSpentInVoice && x.ReactionsSet == y.ReactionsSet && x.MessagesSent == y.MessagesSent && x.RoomsJoined == y.RoomsJoined && x.RoomsCreated == y.RoomsCreated && Equals(x.User, y.User);
+        return x.UserId == y.UserId && x.SecondsSpentInVoice == y.SecondsSpentInVoice && x.ReactionsSet == y.ReactionsSet && x.MessagesSent == y.MessagesSent && x.RoomsJoined == y.RoomsJoined && x.RoomsCreated == y.RoomsCreated;
     }
 
     public int GetHashCode(UserStatistics obj)
     {
-        return HashCode.Combine(obj.UserId, obj.SecondsSpentInVoice, obj.ReactionsSet, obj.MessagesSent, obj.RoomsJoined, obj.RoomsCreated, obj.User);
+        return HashCode.Combine(obj.UserId, obj.SecondsSpentInVoice, obj.ReactionsSet, obj.MessagesSent, obj.RoomsJoined, obj.RoomsCreated);
     }
 }

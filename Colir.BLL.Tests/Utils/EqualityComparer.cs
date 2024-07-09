@@ -28,12 +28,12 @@ class MessageModelEqualityComparer : IEqualityComparer<MessageModel>
         if (ReferenceEquals(x, null)) return false;
         if (ReferenceEquals(y, null)) return false;
         if (x.GetType() != y.GetType()) return false;
-        return x.Id == y.Id && x.RoomId == y.RoomId && x.AuthorId == y.AuthorId && x.PostDate.Equals(y.PostDate) && Nullable.Equals(x.EditDate, y.EditDate) && x.RepliedMessageId == y.RepliedMessageId && x.Reactions.Equals(y.Reactions) && x.Attachments.Equals(y.Attachments);
+        return x.Id == y.Id && x.RoomId == y.RoomId && x.AuthorId == y.AuthorId && x.PostDate.Equals(y.PostDate) && Nullable.Equals(x.EditDate, y.EditDate) && x.RepliedMessageId == y.RepliedMessageId;
     }
 
     public int GetHashCode(MessageModel obj)
     {
-        return HashCode.Combine(obj.Id, obj.RoomId, obj.AuthorId, obj.PostDate, obj.EditDate, obj.RepliedMessageId, obj.Reactions, obj.Attachments);
+        return HashCode.Combine(obj.Id, obj.RoomId, obj.AuthorId, obj.PostDate, obj.EditDate, obj.RepliedMessageId);
     }
 }
 
@@ -62,12 +62,12 @@ class RoomModelEqualityComparer : IEqualityComparer<RoomModel>
         if (ReferenceEquals(x, null)) return false;
         if (ReferenceEquals(y, null)) return false;
         if (x.GetType() != y.GetType()) return false;
-        return x.Guid == y.Guid && x.Name == y.Name && Nullable.Equals(x.ExpiryDate, y.ExpiryDate) && x.Owner.Equals(y.Owner) && x.UsedMemoryInKb == y.UsedMemoryInKb && x.FreeMemoryInKb == y.FreeMemoryInKb && x.JoinedUsers.Equals(y.JoinedUsers);
+        return x.Guid == y.Guid && x.Name == y.Name && Nullable.Equals(x.ExpiryDate, y.ExpiryDate) && x.UsedMemoryInKb == y.UsedMemoryInKb && x.FreeMemoryInKb == y.FreeMemoryInKb;
     }
 
     public int GetHashCode(RoomModel obj)
     {
-        return HashCode.Combine(obj.Guid, obj.Name, obj.ExpiryDate, obj.Owner, obj.UsedMemoryInKb, obj.FreeMemoryInKb, obj.JoinedUsers);
+        return HashCode.Combine(obj.Guid, obj.Name, obj.ExpiryDate, obj.UsedMemoryInKb, obj.FreeMemoryInKb);
     }
 }
 
