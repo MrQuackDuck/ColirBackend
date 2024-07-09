@@ -212,13 +212,37 @@ public class RoomServiceTests : IRoomServiceTests
     [Test]
     public async Task CreateAsync_ThrowsArgumentExcpetion_WhenWrongExpiryDateWasProvided()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var request = new RequestToCreateRoom
+        {
+            IssuerId = 1,
+            Name = "Room #3",
+            ExpiryDate = new DateTime(1990, 1, 1)
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _roomService.CreateAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<ArgumentException>(act);
     }
 
     [Test]
     public async Task CreateAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var request = new RequestToCreateRoom
+        {
+            IssuerId = 404,
+            Name = "Room #3",
+            ExpiryDate = DateTime.Now
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _roomService.CreateAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<UserNotFoundException>(act);
     }
 
     [Test]
