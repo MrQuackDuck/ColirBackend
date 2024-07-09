@@ -12,13 +12,13 @@ public class Message : BaseEntity
     public DateTime? EditDate { get; set; }
 
     [ForeignKey(nameof(Room))]
-    public long? RoomId;
+    public long RoomId;
 
     [ForeignKey(nameof(Author))]
-    public long? AuthorId;
+    public long AuthorId;
 
     [ForeignKey(nameof(RepliedTo))]
-    public long? RepliedMessageId;
+    public long RepliedMessageId;
 
     public Room Room { get; set; } = default!;
     public User Author { get; set; } = default!;

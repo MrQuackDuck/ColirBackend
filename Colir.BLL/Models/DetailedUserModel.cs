@@ -8,5 +8,6 @@ public class DetailedUserModel
     public string HexId { get; set; } = default!;
     public string Username { get; set; } = default!;
     public UserAuthType AuthType { get; set; }
-    private UserSettingsModel UserSettingsModel { get; set; } = default!;
+    public UserSettingsModel UserSettingsModel { get; set; } = default!;
+    public UserStatisticsModel UserStatisticsModel { get; set; } = default!;
 }

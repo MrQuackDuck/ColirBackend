@@ -1,7 +1,11 @@
-﻿using Colir.BLL.Services;
+﻿using Colir.BLL.Models;
+using Colir.BLL.RequestModels.Room;
+using Colir.BLL.Services;
 using Colir.BLL.Tests.Interfaces;
 using Colir.BLL.Tests.Utils;
 using DAL;
+using DAL.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Moq;
 
@@ -38,7 +42,23 @@ public class RoomServiceTests : IRoomServiceTests
     [Test]
     public async Task GetRoomInfoAsync_ReturnsRoomInfo()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var request = new RequestToGetRoomInfo
+        {
+            IssuerId = 1,
+            RoomGuid = "cbaa8673-ea8b-43f8-b4cc-b8b0797b620e"
+        };
+
+        var expected = _dbContext.Rooms
+                                 .Include(nameof(Room.Owner))
+                                 .First(r => r.Guid == "cbaa8673-ea8b-43f8-b4cc-b8b0797b620e")
+                                 .ToRoomModel();
+        
+        // Act
+        var result = await _roomService.GetRoomInfoAsync(request);
+        
+        // Assert
+        Assert.That(result, Is.EqualTo(expected).Using(new RoomModelEqualityComparer()));
     }
 
     [Test]

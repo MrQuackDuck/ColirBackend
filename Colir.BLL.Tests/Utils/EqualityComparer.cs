@@ -62,12 +62,12 @@ class RoomModelEqualityComparer : IEqualityComparer<RoomModel>
         if (ReferenceEquals(x, null)) return false;
         if (ReferenceEquals(y, null)) return false;
         if (x.GetType() != y.GetType()) return false;
-        return x.Guid == y.Guid && x.Name == y.Name && Nullable.Equals(x.ExpiryDate, y.ExpiryDate) && x.UsedMemoryInKb == y.UsedMemoryInKb && x.FreeMemoryInKb == y.FreeMemoryInKb;
+        return x.Guid == y.Guid && x.Name == y.Name && Nullable.Equals(x.ExpiryDate, y.ExpiryDate);
     }
 
     public int GetHashCode(RoomModel obj)
     {
-        return HashCode.Combine(obj.Guid, obj.Name, obj.ExpiryDate, obj.UsedMemoryInKb, obj.FreeMemoryInKb);
+        return HashCode.Combine(obj.Guid, obj.Name, obj.ExpiryDate);
     }
 }
 
