@@ -141,7 +141,7 @@ public static class UnitTestHelper
         var secondUserStatistics = new UserStatistics
         {
             Id = 2,
-            UserId = 2, // "First User"
+            UserId = 2, // "Second User"
             SecondsSpentInVoice = 0,
             ReactionsSet = 0,
             MessagesSent = 0,
@@ -162,7 +162,7 @@ public static class UnitTestHelper
         var secondUserSettings = new UserSettings
         {
             Id = 2,
-            UserId = 1, // "Second User"
+            UserId = 2, // "Second User"
             StatisticsEnabled = false,
         };
         

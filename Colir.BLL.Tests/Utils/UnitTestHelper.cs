@@ -162,7 +162,7 @@ public static class UnitTestHelper
         var secondUserSettings = new UserSettings
         {
             Id = 2,
-            UserId = 1, // "Second User"
+            UserId = 2, // "Second User"
             StatisticsEnabled = false,
         };
         

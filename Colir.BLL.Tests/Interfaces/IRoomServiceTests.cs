@@ -37,6 +37,7 @@ public interface IRoomServiceTests
 
 	Task JoinMemberAsync_JoinsUserToRoom();
 	Task JoinMemberAsync_AddsToStatistics_WhenItsEnabled();
+	Task CreateAsync_NotAddsToStatistics_WhenItsNotEnabled();
 	Task JoinMemberAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
 	Task JoinMemberAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
 

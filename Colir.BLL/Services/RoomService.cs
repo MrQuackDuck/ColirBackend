@@ -8,10 +8,12 @@ namespace Colir.BLL.Services;
 public class RoomService : IRoomService
 {
     private IUnitOfWork _unitOfWork;
+    private IHexColorGenerator _hexGenerator;
     
-    public RoomService(IUnitOfWork unitOfWork)
+    public RoomService(IUnitOfWork unitOfWork, IHexColorGenerator hexGenerator)
     {
         _unitOfWork = unitOfWork;
+        _hexGenerator = hexGenerator;
     }
     
     public Task<RoomModel> GetRoomInfoAsync(RequestToGetRoomInfo request)
