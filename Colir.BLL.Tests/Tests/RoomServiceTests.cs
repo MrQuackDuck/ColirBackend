@@ -2,6 +2,8 @@
 using Colir.BLL.Tests.Interfaces;
 using Colir.BLL.Tests.Utils;
 using DAL;
+using Microsoft.Extensions.Configuration;
+using Moq;
 
 namespace Colir.BLL.Tests.Tests;
 
@@ -17,7 +19,9 @@ public class RoomServiceTests : IRoomServiceTests
         _dbContext = UnitTestHelper.CreateDbContext();
         
         // Initialize room service
-        var unitOfWork = new UnitOfWork(_dbContext);
+        var mock = new Mock<IConfiguration>();
+        
+        var unitOfWork = new UnitOfWork(_dbContext, mock.Object);
         _roomService = new RoomService(unitOfWork);
         
         // Add entities

@@ -6,6 +6,8 @@ using DAL;
 using DAL.Entities;
 using DAL.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Moq;
 
 namespace Colir.DAL.Tests.Tests;
 
@@ -21,8 +23,12 @@ public class UserRepositoryTests : IUserRepositoryTests
         // Create database context
         _dbContext = UnitTestHelper.CreateDbContext();
         
-        // Initialize user repository
-        _userRepository = new UserRepository(_dbContext);
+        // Initialize user repository with mocked config
+        var mock = new Mock<IConfiguration>();
+        mock.Setup(config => config["MinUsernameLength"]).Returns("2");
+        mock.Setup(config => config["MaxUsernameLength"]).Returns("50");
+        
+        _userRepository = new UserRepository(_dbContext, mock.Object);
         
         // Add entities
         UnitTestHelper.SeedData(_dbContext);

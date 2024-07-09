@@ -1,5 +1,6 @@
 ﻿using DAL.Interfaces;
 using DAL.Repositories;
+using Microsoft.Extensions.Configuration;
 
 namespace DAL;
 
@@ -15,10 +16,12 @@ public class UnitOfWork : IUnitOfWork
     private IUserStatisticsRepository _userStatisticsRepository;
     private IUserSettingsRepository _userSettingsRepository;
     private ILastTimeUserReadChatRepository _lastTimeUserReadChatRepository;
+    private IConfiguration _configuration;
 
-    public UnitOfWork(ColirDbContext dbContext)
+    public UnitOfWork(ColirDbContext dbContext, IConfiguration configuration)
     {
         _dbContext = dbContext;
+        _configuration = configuration;
     }
     
     public IAttachmentRepository AttachmentRepository
@@ -79,7 +82,7 @@ public class UnitOfWork : IUnitOfWork
         {
             if (this._userRepository == null)
             {
-                this._userRepository = new UserRepository(_dbContext);
+                this._userRepository = new UserRepository(_dbContext, _configuration);
             }
             
             return _userRepository;

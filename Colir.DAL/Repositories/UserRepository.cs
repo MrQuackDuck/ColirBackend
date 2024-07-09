@@ -1,15 +1,18 @@
 ﻿using DAL.Entities;
 using DAL.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace DAL.Repositories;
 
 public class UserRepository : IUserRepository
 {
-    private ColirDbContext _dbContext;
+    private readonly ColirDbContext _dbContext;
+    private readonly IConfiguration _configuration;
     
-    public UserRepository(ColirDbContext dbContext)
+    public UserRepository(ColirDbContext dbContext, IConfiguration configuration)
     {
         _dbContext = dbContext;
+        _configuration = configuration;
     }
 
     public async Task<IEnumerable<User>> GetAllAsync()
