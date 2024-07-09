@@ -5,8 +5,6 @@ public interface IMessageRepositoryTests
     Task GetAllAsync_ReturnsAllMessages();
 
     Task GetLastMessages_ReturnsLastMessages();
-    Task GetLastMessages_ReturnsLastMessagesWithAttachments();
-    Task GetLastMessages_ReturnsLastMessagesWithReactions();
     Task GetLastMessages_ThrowsNotFoundException_WhenRoomWasNotFound();
     Task GetLastMessages_ThrowsArgumentExcpetion_WhenCountLessThanZero();
     Task GetLastMessages_ThrowsArgumentExcpetion_WhenSkipLessThanZero();

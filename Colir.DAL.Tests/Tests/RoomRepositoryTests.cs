@@ -1,4 +1,5 @@
-﻿using Colir.DAL.Tests.Interfaces;
+﻿using System.Diagnostics.CodeAnalysis;
+using Colir.DAL.Tests.Interfaces;
 using Colir.DAL.Tests.Utils;
 using Colir.Exceptions;
 using DAL;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Colir.DAL.Tests.Tests;
 
+[SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
 public class RoomRepositoryTests : IRoomRepositoryTests
 {
     private ColirDbContext _dbContext = default!;
@@ -48,6 +50,12 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         // Assert
         Assert.NotNull(result);
         Assert.That(result, Is.EqualTo(expected).Using(new RoomEqualityComparer()));
+        
+        Assert.That(result.Select(r => r.Owner).OrderBy(r => r.Id),
+            Is.EqualTo(expected.Select(r => r.Owner).OrderBy(r => r.Id)).Using(new UserEqualityComparer()));
+        
+        Assert.That(result.SelectMany(r => r.JoinedUsers).OrderBy(r => r.Id),
+            Is.EqualTo(expected.SelectMany(r => r.JoinedUsers).OrderBy(r => r.Id)).Using(new UserEqualityComparer()));
     }
 
     [Test]
@@ -66,6 +74,8 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         // Assert
         Assert.NotNull(result);
         Assert.That(result, Is.EqualTo(expected).Using(new RoomEqualityComparer()));
+        Assert.That(result.Owner, Is.EqualTo(expected.Owner).Using(new UserEqualityComparer()));
+        Assert.That(result.JoinedUsers, Is.EqualTo(expected.JoinedUsers).Using(new UserEqualityComparer()));
     }
 
     [Test]

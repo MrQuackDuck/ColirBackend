@@ -1,4 +1,5 @@
-﻿using Colir.DAL.Tests.Interfaces;
+﻿using System.Diagnostics.CodeAnalysis;
+using Colir.DAL.Tests.Interfaces;
 using Colir.DAL.Tests.Utils;
 using Colir.Exceptions;
 using DAL;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Colir.DAL.Tests.Tests;
 
+[SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
 public class ReactionRepositoryTests : IReactionRepositoryTests
 {
     private ColirDbContext _dbContext = default!;
@@ -48,6 +50,12 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
         // Assert
         Assert.NotNull(result);
         Assert.That(result, Is.EqualTo(expected).Using(new ReactionEqualityComparer()));
+        
+        Assert.That(result.Select(r => r.Author).OrderBy(r => r.Id),
+            Is.EqualTo(expected.Select(r => r.Author).OrderBy(r => r.Id)).Using(new UserEqualityComparer()));
+        
+        Assert.That(result.Select(r => r.Message).OrderBy(r => r.Id),
+            Is.EqualTo(expected.Select(r => r.Message).OrderBy(r => r.Id)).Using(new MessageEqualityComparer()));
     }
 
     [Test]
@@ -64,6 +72,8 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
 
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new ReactionEqualityComparer()));
+        Assert.That(result.Author, Is.EqualTo(expected.Author).Using(new UserEqualityComparer()));
+        Assert.That(result.Message, Is.EqualTo(expected.Message).Using(new MessageEqualityComparer()));
     }
 
     [Test]
@@ -80,16 +90,25 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
     public async Task GetReactionsOnMessage_ReturnsAllReactionsOnMessage()
     {
         // Arrange
-        var expectedReactions = new List<Reaction>
+        var expected = new List<Reaction>
         { 
-            _dbContext.Reactions.Include(nameof(Reaction.Author)).FirstOrDefault(r => r.MessageId == 1)! 
+            _dbContext.Reactions
+                .Include(nameof(Reaction.Author))
+                .Include(nameof(Reaction.Message))
+                .FirstOrDefault(r => r.MessageId == 1)! 
         };
 
         // Act
         var result = await _reactionRepository.GetReactionsOnMessage(1);
 
         // Assert
-        Assert.That(result, Is.EqualTo(expectedReactions).Using(new ReactionEqualityComparer()));
+        Assert.That(result, Is.EqualTo(expected).Using(new ReactionEqualityComparer()));
+        
+        Assert.That(result.Select(r => r.Author).OrderBy(r => r.Id),
+            Is.EqualTo(expected.Select(r => r.Author).OrderBy(r => r.Id)).Using(new UserEqualityComparer()));
+        
+        Assert.That(result.Select(r => r.Message).OrderBy(r => r.Id),
+            Is.EqualTo(expected.Select(r => r.Message).OrderBy(r => r.Id)).Using(new MessageEqualityComparer()));
     }
 
     [Test]

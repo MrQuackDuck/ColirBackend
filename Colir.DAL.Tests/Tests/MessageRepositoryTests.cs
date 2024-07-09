@@ -1,4 +1,5 @@
-﻿using Colir.DAL.Tests.Interfaces;
+﻿using System.Diagnostics.CodeAnalysis;
+using Colir.DAL.Tests.Interfaces;
 using Colir.DAL.Tests.Utils;
 using Colir.Exceptions;
 using DAL;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Colir.DAL.Tests.Tests;
 
+[SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
 public class MessageRepositoryTests : IMessageRepositoryTests
 {
     private ColirDbContext _dbContext = default!;
@@ -37,7 +39,11 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     public async Task GetAllAsync_ReturnsAllMessages()
     {
         // Arrange
-        List<Message> expected = _dbContext.Messages.ToList();
+        List<Message> expected = _dbContext.Messages
+                                           .Include(nameof(Message.Author))
+                                           .Include(nameof(Message.Reactions))
+                                           .Include(nameof(Message.Attachments))
+                                           .ToList();
 
         // Act
         var result = await _messageRepository.GetAllAsync();
@@ -45,13 +51,22 @@ public class MessageRepositoryTests : IMessageRepositoryTests
         // Assert
         Assert.NotNull(result);
         Assert.That(result, Is.EqualTo(expected).Using(new MessageEqualityComparer()));
+        
+        Assert.That(result.Select(r => r.Author).OrderBy(r => r.Id),
+            Is.EqualTo(expected.Select(r => r.Author).OrderBy(r => r.Id)).Using(new UserEqualityComparer()));
+        
+        Assert.That(result.SelectMany(r => r.Reactions).OrderBy(r => r.Id),
+            Is.EqualTo(expected.SelectMany(r => r.Reactions).OrderBy(r => r.Id)).Using(new ReactionEqualityComparer()));
+        
+        Assert.That(result.SelectMany(r => r.Attachments).OrderBy(r => r.Id),
+            Is.EqualTo(expected.SelectMany(r => r.Attachments).OrderBy(r => r.Id)).Using(new AttachmentEqualityComparer()));
     }
 
     [Test]
     public async Task GetLastMessages_ReturnsLastMessages()
     {
         // Arrange
-        var expectedMessages = new List<Message> 
+        var expected = new List<Message> 
         { 
             _dbContext.Messages
                 .Include(nameof(Message.Author))
@@ -64,47 +79,16 @@ public class MessageRepositoryTests : IMessageRepositoryTests
         var result = await _messageRepository.GetLastMessages("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e", 1, 1);
 
         // Assert
-        Assert.That(result, Is.EqualTo(expectedMessages).Using(new MessageEqualityComparer()));
-    }
-
-    [Test]
-    public async Task GetLastMessages_ReturnsLastMessagesWithAttachments()
-    {
-        // Arrange
-        var expectedMessages = new List<Message>
-        {
-            _dbContext.Messages
-                .Include(nameof(Message.Author))
-                .Include(nameof(Message.Reactions))
-                .Include(nameof(Message.Attachments))
-                .FirstOrDefault(message => message.Id == 1)!
-        };
-
-        // Act
-        var result = await _messageRepository.GetLastMessages("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e", 1, 1);
-
-        // Assert
-        Assert.That(result, Is.EqualTo(expectedMessages).Using(new MessageEqualityComparer()));
-    }
-
-    [Test]
-    public async Task GetLastMessages_ReturnsLastMessagesWithReactions()
-    {
-        // Arrange
-        var expectedMessages = new List<Message>
-        {
-            _dbContext.Messages
-                .Include(nameof(Message.Author))
-                .Include(nameof(Message.Reactions))
-                .Include(nameof(Message.Attachments))
-                .FirstOrDefault(message => message.Id == 1)!
-        };
-
-        // Act
-        var result = await _messageRepository.GetLastMessages("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e", 1, 1);
-
-        // Assert
-        Assert.That(result, Is.EqualTo(expectedMessages).Using(new MessageEqualityComparer()));
+        Assert.That(result, Is.EqualTo(expected).Using(new MessageEqualityComparer()));
+                
+        Assert.That(result.Select(r => r.Author).OrderBy(r => r.Id),
+            Is.EqualTo(expected.Select(r => r.Author).OrderBy(r => r.Id)).Using(new UserEqualityComparer()));
+        
+        Assert.That(result.SelectMany(r => r.Reactions).OrderBy(r => r.Id),
+            Is.EqualTo(expected.SelectMany(r => r.Reactions).OrderBy(r => r.Id)).Using(new ReactionEqualityComparer()));
+        
+        Assert.That(result.SelectMany(r => r.Attachments).OrderBy(r => r.Id),
+            Is.EqualTo(expected.SelectMany(r => r.Attachments).OrderBy(r => r.Id)).Using(new AttachmentEqualityComparer()));
     }
 
     [Test]
@@ -155,13 +139,20 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     public async Task GetByIdAsync_ReturnsMessage_WhenFound()
     {
         // Arrange
-        Message expected = _dbContext.Messages.First(m => m.Id == 1);
+        Message expected = _dbContext.Messages
+                                     .Include(nameof(Message.Author))
+                                     .Include(nameof(Message.Reactions))
+                                     .Include(nameof(Message.Attachments))
+                                     .First(m => m.Id == 1);
 
         // Act
         var result = await _messageRepository.GetByIdAsync(1);
 
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new MessageEqualityComparer()));
+        Assert.That(result.Author, Is.EqualTo(expected.Author).Using(new UserEqualityComparer()));
+        Assert.That(result.Reactions, Is.EqualTo(expected.Reactions).Using(new ReactionEqualityComparer()));
+        Assert.That(result.Attachments, Is.EqualTo(expected.Attachments).Using(new AttachmentEqualityComparer()));
     }
 
     [Test]

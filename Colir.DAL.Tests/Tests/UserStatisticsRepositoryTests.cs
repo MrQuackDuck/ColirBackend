@@ -1,4 +1,5 @@
-﻿using Colir.DAL.Tests.Interfaces;
+﻿using System.Diagnostics.CodeAnalysis;
+using Colir.DAL.Tests.Interfaces;
 using Colir.DAL.Tests.Utils;
 using Colir.Exceptions;
 using DAL;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Colir.DAL.Tests.Tests;
 
+[SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
 public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
 {
     private ColirDbContext _dbContext = default!;
@@ -37,7 +39,7 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
     public async Task GetAllAsync_ReturnsAllUsersStatistics()
     {
         // Arrange
-        var exptected = _dbContext.UserStatistics
+        var expected = _dbContext.UserStatistics
                                   .Include(nameof(UserStatistics.User))
                                   .ToList();
 
@@ -45,14 +47,17 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
         var result = await _userStatisticsRepository.GetAllAsync();
 
         // Assert
-        Assert.That(result, Is.EqualTo(exptected).Using(new UserStatisticsEqualityComparer()));
+        Assert.That(result, Is.EqualTo(expected).Using(new UserStatisticsEqualityComparer()));
+        
+        Assert.That(result.Select(r => r.User).OrderBy(r => r.Id),
+            Is.EqualTo(expected.Select(r => r.User).OrderBy(r => r.Id)).Using(new UserEqualityComparer()));
     }
 
     [Test]
     public async Task GetByUserHexIdAsync_ReturnsUserStatistics()
     {
         // Arrange
-        var exptected = _dbContext.UserStatistics
+        var expected = _dbContext.UserStatistics
                                   .Include(nameof(UserStatistics.User))
                                   .First(u => u.UserId == 1);
 
@@ -60,7 +65,8 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
         var result = await _userStatisticsRepository.GetByUserHexIdAsync("#FFFFFF");
 
         // Assert
-        Assert.That(result, Is.EqualTo(exptected).Using(new UserStatisticsEqualityComparer()));
+        Assert.That(result, Is.EqualTo(expected).Using(new UserStatisticsEqualityComparer()));
+        Assert.That(result.User, Is.EqualTo(expected.User).Using(new UserEqualityComparer()));
     }
 
     [Test]
@@ -96,6 +102,7 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
 
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new UserStatisticsEqualityComparer()));
+        Assert.That(result.User, Is.EqualTo(expected.User).Using(new UserEqualityComparer()));
     }
 
     [Test]

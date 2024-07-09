@@ -1,4 +1,5 @@
-﻿using Colir.DAL.Tests.Interfaces;
+﻿using System.Diagnostics.CodeAnalysis;
+using Colir.DAL.Tests.Interfaces;
 using Colir.DAL.Tests.Utils;
 using Colir.Exceptions;
 using DAL;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Colir.DAL.Tests.Tests;
 
+[SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
 public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
 {
     private ColirDbContext _dbContext = default!;
@@ -47,6 +49,9 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
         // Assert
         Assert.NotNull(result);
         Assert.That(result, Is.EqualTo(expected).Using(new UserSettingsEqualityComparer()));
+        
+        Assert.That(result.Select(r => r.User).OrderBy(r => r.Id),
+            Is.EqualTo(expected.Select(r => r.User).OrderBy(r => r.Id)).Using(new UserEqualityComparer()));
     }
 
     [Test]
@@ -62,6 +67,7 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
         
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new UserSettingsEqualityComparer()));
+        Assert.That(result.User, Is.EqualTo(expected.User).Using(new UserEqualityComparer()));
     }
 
     [Test]
@@ -97,6 +103,7 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
         
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new UserSettingsEqualityComparer()));
+        Assert.That(result.User, Is.EqualTo(expected.User).Using(new UserEqualityComparer()));
     }
 
     [Test]

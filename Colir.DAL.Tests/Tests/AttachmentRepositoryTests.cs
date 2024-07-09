@@ -1,4 +1,5 @@
-﻿using Colir.DAL.Tests.Interfaces;
+﻿using System.Diagnostics.CodeAnalysis;
+using Colir.DAL.Tests.Interfaces;
 using Colir.DAL.Tests.Utils;
 using Colir.Exceptions;
 using DAL;
@@ -9,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Colir.DAL.Tests.Tests;
 
+[SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
 public class AttachmentRepositoryTests : IAttachmentRepositoryTests
 {
     private ColirDbContext _dbContext;
@@ -47,6 +49,10 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
         
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new AttachmentEqualityComparer()));
+        
+                
+        Assert.That(result.Select(r => r.Message).OrderBy(r => r.Id),
+            Is.EqualTo(expected.Select(r => r.Message).OrderBy(r => r.Id)).Using(new MessageEqualityComparer()));
     }
 
     [Test]
@@ -62,6 +68,7 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
 
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new AttachmentEqualityComparer()));
+        Assert.That(result.Message, Is.EqualTo(expected.Message).Using(new MessageEqualityComparer()));
     }
 
     [Test]

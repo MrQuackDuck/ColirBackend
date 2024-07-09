@@ -1,4 +1,5 @@
-﻿using Colir.DAL.Tests.Interfaces;
+﻿using System.Diagnostics.CodeAnalysis;
+using Colir.DAL.Tests.Interfaces;
 using Colir.DAL.Tests.Utils;
 using Colir.Exceptions;
 using DAL;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Colir.DAL.Tests.Tests;
 
+[SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
 public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatRepositoryTests
 {
     private ColirDbContext _dbContext = default!;
@@ -47,6 +49,12 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
         
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new LastTimeUserReadChatEqualityComparer()));
+        
+        Assert.That(result.Select(r => r.Room).OrderBy(r => r.Id),
+            Is.EqualTo(expected.Select(r => r.Room).OrderBy(r => r.Id)).Using(new RoomEqualityComparer()));
+        
+        Assert.That(result.Select(r => r.User).OrderBy(r => r.Id),
+            Is.EqualTo(expected.Select(r => r.User).OrderBy(r => r.Id)).Using(new UserEqualityComparer()));
     }
 
     [Test]
@@ -63,6 +71,8 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
         
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new LastTimeUserReadChatEqualityComparer()));
+        Assert.That(result.Room, Is.EqualTo(expected.Room).Using(new RoomEqualityComparer()));
+        Assert.That(result.User, Is.EqualTo(expected.User).Using(new UserEqualityComparer()));
     }
 
     [Test]
@@ -109,6 +119,8 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
         
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new LastTimeUserReadChatEqualityComparer()));
+        Assert.That(result.Room, Is.EqualTo(expected.Room).Using(new RoomEqualityComparer()));
+        Assert.That(result.User, Is.EqualTo(expected.User).Using(new UserEqualityComparer()));
     }
 
     [Test]

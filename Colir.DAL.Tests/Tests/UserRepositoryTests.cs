@@ -1,4 +1,5 @@
-﻿using Colir.DAL.Tests.Interfaces;
+﻿using System.Diagnostics.CodeAnalysis;
+using Colir.DAL.Tests.Interfaces;
 using Colir.DAL.Tests.Utils;
 using Colir.Exceptions;
 using DAL;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Colir.DAL.Tests.Tests;
 
+[SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
 public class UserRepositoryTests : IUserRepositoryTests
 {
     private ColirDbContext _dbContext = default!;
@@ -49,6 +51,15 @@ public class UserRepositoryTests : IUserRepositoryTests
         // Assert
         Assert.NotNull(result);
         Assert.That(result, Is.EqualTo(expected).Using(new UserEqualityComparer()));
+        
+        Assert.That(result.Select(r => r.UserStatistics).OrderBy(r => r.Id),
+            Is.EqualTo(expected.Select(r => r.UserStatistics).OrderBy(r => r.Id)).Using(new UserStatisticsEqualityComparer()));
+        
+        Assert.That(result.Select(r => r.UserSettings).OrderBy(r => r.Id),
+            Is.EqualTo(expected.Select(r => r.UserSettings).OrderBy(r => r.Id)).Using(new UserSettingsEqualityComparer()));
+        
+        Assert.That(result.SelectMany(r => r.JoinedRooms).OrderBy(r => r.Id),
+            Is.EqualTo(expected.SelectMany(r => r.JoinedRooms).OrderBy(r => r.Id)).Using(new RoomEqualityComparer()));
     }
 
     [Test]
@@ -66,6 +77,9 @@ public class UserRepositoryTests : IUserRepositoryTests
 
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new UserEqualityComparer()));
+        Assert.That(result.UserStatistics, Is.EqualTo(expected.UserStatistics).Using(new UserStatisticsEqualityComparer()));
+        Assert.That(result.UserSettings, Is.EqualTo(expected.UserSettings).Using(new UserSettingsEqualityComparer()));
+        Assert.That(result.JoinedRooms, Is.EqualTo(expected.JoinedRooms).Using(new RoomEqualityComparer()));
     }
 
     [Test]
@@ -93,6 +107,9 @@ public class UserRepositoryTests : IUserRepositoryTests
 
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new UserEqualityComparer()));
+        Assert.That(result.UserStatistics, Is.EqualTo(expected.UserStatistics).Using(new UserStatisticsEqualityComparer()));
+        Assert.That(result.UserSettings, Is.EqualTo(expected.UserSettings).Using(new UserSettingsEqualityComparer()));
+        Assert.That(result.JoinedRooms, Is.EqualTo(expected.JoinedRooms).Using(new RoomEqualityComparer()));
     }
 
     [Test]
