@@ -141,7 +141,7 @@ public static class UnitTestHelper
         var secondUserStatistics = new UserStatistics
         {
             Id = 2,
-            UserId = 2, // "First User"
+            UserId = 2, // "Second User"
             SecondsSpentInVoice = 0,
             ReactionsSet = 0,
             MessagesSent = 0,
@@ -149,7 +149,18 @@ public static class UnitTestHelper
             RoomsCreated = 0,
         };
         
-        context.UserStatistics.AddRange(firstUserStatistics, secondUserStatistics);
+        var thirdUserStatistics = new UserStatistics
+        {
+            Id = 3,
+            UserId = 3, // "Third User"
+            SecondsSpentInVoice = 0,
+            ReactionsSet = 0,
+            MessagesSent = 0,
+            RoomsJoined = 0,
+            RoomsCreated = 0,
+        };
+        
+        context.UserStatistics.AddRange(firstUserStatistics, secondUserStatistics, thirdUserStatistics);
 
         // User settings
         var firstUserSettings = new UserSettings

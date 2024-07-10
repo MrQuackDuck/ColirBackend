@@ -580,7 +580,7 @@ public class RoomServiceTests : IRoomServiceTests
     {
         // Arrange
         var room = _dbContext.Rooms.First(r => r.Id == 1);
-        var request = new RequestToJoinRoom()
+        var request = new RequestToJoinRoom
         {
             IssuerId = 3,
             RoomGuid = room.Guid
@@ -597,19 +597,56 @@ public class RoomServiceTests : IRoomServiceTests
     [Test]
     public async Task JoinMemberAsync_AddsToStatistics_WhenItsEnabled()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var statsBefore = _dbContext.UserStatistics.First(u => u.UserId == 3);
+        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var request = new RequestToJoinRoom
+        {
+            IssuerId = 3,
+            RoomGuid = room.Guid
+        };
+
+        // Act
+        await _roomService.JoinMemberAsync(request);
+
+        // Assert
+        var statsAfter = _dbContext.UserStatistics.First(s => s.UserId == 3);
+        Assert.That(statsAfter.RoomsJoined - statsBefore.RoomsJoined == 1);
     }
 
     [Test]
     public async Task JoinMemberAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var request = new RequestToJoinRoom
+        {
+            IssuerId = 1,
+            RoomGuid = "404"
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _roomService.JoinMemberAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<RoomNotFoundException>(act);
     }
 
     [Test]
     public async Task JoinMemberAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var request = new RequestToJoinRoom
+        {
+            IssuerId = 404,
+            RoomGuid = room.Guid
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _roomService.JoinMemberAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<UserNotFoundException>(act);
     }
 
     [Test]
