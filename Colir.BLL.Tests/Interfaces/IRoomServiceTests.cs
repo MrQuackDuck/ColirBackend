@@ -16,6 +16,7 @@ public interface IRoomServiceTests
 
 	Task RenameAsync_RenamesTheRoom();
 	Task RenameAsync_ThrowsArgumentException_WhenNewNameIsTooLong();
+	Task RenameAsync_ThrowsArgumentException_WhenNewNameIsTooShort();
 	Task RenameAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
 	Task RenameAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotOwnerOfRoom();
 	Task RenameAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
