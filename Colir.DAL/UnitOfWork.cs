@@ -43,7 +43,7 @@ public class UnitOfWork : IUnitOfWork
         {
             if (this._roomRepository == null)
             {
-                this._roomRepository = new RoomRepository(_dbContext);
+                this._roomRepository = new RoomRepository(_dbContext, _configuration);
             }
             
             return _roomRepository;

@@ -6,6 +6,8 @@ using DAL;
 using DAL.Entities;
 using DAL.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Moq;
 
 namespace Colir.DAL.Tests.Tests;
 
@@ -22,7 +24,11 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         _dbContext = UnitTestHelper.CreateDbContext();
         
         // Initialize room repository
-        _roomRepository = new RoomRepository(_dbContext);
+        var configMock = new Mock<IConfiguration>();
+        configMock.Setup(c => c["MinRoomNameLength"]).Returns("2");
+        configMock.Setup(c => c["MaxRoomNameLength"]).Returns("50");
+        
+        _roomRepository = new RoomRepository(_dbContext, configMock.Object);
         
         // Add entities
         UnitTestHelper.SeedData(_dbContext);
@@ -132,6 +138,42 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         var result = _dbContext.Rooms.First(r => r.Guid == roomToAdd.Guid);
         Assert.NotNull(result.JoinedUsers);
         Assert.That(result.JoinedUsers, Is.EqualTo(roomToAdd.JoinedUsers).Using(new UserEqualityComparer()));
+    }
+
+    public async Task AddAsync_ThrowsArgumentException_WhenNameTooLong()
+    {
+        // Arrange
+        var roomToAdd = new Room()
+        {
+            Guid = Guid.NewGuid().ToString(),
+            Name = new string('a', 51),
+            OwnerId = 1,
+            ExpiryDate = DateTime.Today.Add(new TimeSpan(1, 0, 0)),
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _roomRepository.AddAsync(roomToAdd);
+
+        // Assert
+        Assert.ThrowsAsync<ArgumentException>(act);
+    }
+
+    public async Task AddAsync_ThrowsArgumentException_WhenNameTooShort()
+    {
+        // Arrange
+        var roomToAdd = new Room()
+        {
+            Guid = Guid.NewGuid().ToString(),
+            Name = new string('a', 1),
+            OwnerId = 1,
+            ExpiryDate = DateTime.Today.Add(new TimeSpan(1, 0, 0)),
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _roomRepository.AddAsync(roomToAdd);
+
+        // Assert
+        Assert.ThrowsAsync<ArgumentException>(act);
     }
 
     public async Task AddAsync_ThrowsRoomExpiredException_WhenWrongExpiryDateWasProvided()
@@ -364,6 +406,32 @@ public class RoomRepositoryTests : IRoomRepositoryTests
             ExpiryDate = newExpiryDate,
             OwnerId = newOwnerId,
         }).Using(new RoomEqualityComparer()));
+    }
+
+    public async Task Update_ThrowsArgumentException_WhenNameTooLong()
+    {
+        // Arrange
+        var roomToUpdate = _dbContext.Rooms.First(r => r.Id == 1);
+        roomToUpdate.Name = new string('a', 51);
+
+        // Act
+        TestDelegate act = () => _roomRepository.Update(roomToUpdate);
+
+        // Assert
+        Assert.Throws<ArgumentException>(act);
+    }
+
+    public async Task Update_ThrowsArgumentException_WhenNameTooShort()
+    {
+        // Arrange
+        var roomToUpdate = _dbContext.Rooms.First(r => r.Id == 1);
+        roomToUpdate.Name = new string('a', 1);
+
+        // Act
+        TestDelegate act = () => _roomRepository.Update(roomToUpdate);
+
+        // Assert
+        Assert.Throws<ArgumentException>(act);
     }
 
     [Test]

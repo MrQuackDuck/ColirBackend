@@ -455,14 +455,40 @@ public class UserRepositoryTests : IUserRepositoryTests
         Assert.That(updatedUser.Username, Is.EqualTo("UpdatedUser"));
     }
 
+    public async Task Update_ThrowsArgumentException_WhenNameTooLong()
+    {
+        // Arrange
+        var userToUpdate = _dbContext.Users.First(u => u.Id == 1);
+        userToUpdate.Username = new string('a', 51);
+
+        // Act
+        TestDelegate act = () => _userRepository.Update(userToUpdate);
+
+        // Assert
+        Assert.Throws<ArgumentException>(act);   
+    }
+
+    public async Task Update_ThrowsArgumentException_WhenNameTooShort()
+    {
+        // Arrange
+        var userToUpdate = _dbContext.Users.First(u => u.Id == 1);
+        userToUpdate.Username = new string('a', 1);
+
+        // Act
+        TestDelegate act = () => _userRepository.Update(userToUpdate);
+
+        // Assert
+        Assert.Throws<ArgumentException>(act);   
+    }
+
     [Test]
     public async Task Update_ThrowsArgumentException_WhenExistingHexIdProvided()
     {
         // Arrange
         var userToUpdate = _dbContext.Users.First(u => u.Id == 1);
+        userToUpdate.HexId = "#FFFFFF";
 
         // Act
-        userToUpdate.HexId = "#FFFFFF";
         TestDelegate act = () => _userRepository.Update(userToUpdate);
 
         // Assert

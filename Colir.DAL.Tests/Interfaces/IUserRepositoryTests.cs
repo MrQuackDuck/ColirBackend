@@ -33,5 +33,7 @@ public interface IUserRepositoryTests
     Task Delete_ThrowsNotFoundException_WhenUserWasNotFoundById();
 
     Task Update_UpdatesUser();
+    Task Update_ThrowsArgumentException_WhenNameTooLong();
+    Task Update_ThrowsArgumentException_WhenNameTooShort();
     Task Update_ThrowsNotFoundException_WhenUserDoesNotExist();
 }

@@ -1,15 +1,18 @@
 ﻿using DAL.Entities;
 using DAL.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace DAL.Repositories;
 
 public class RoomRepository : IRoomRepository
 {
     private ColirDbContext _dbContext;
+    private IConfiguration _config;
     
-    public RoomRepository(ColirDbContext dbContext)
+    public RoomRepository(ColirDbContext dbContext, IConfiguration config)
     {
         _dbContext = dbContext;
+        _config = config;
     }
 
     public async Task<IEnumerable<Room>> GetAllAsync()

@@ -141,7 +141,7 @@ public class RoomServiceTests : IRoomServiceTests
         {
             IssuerId = 1,
             Name = "Room #3",
-            ExpiryDate = DateTime.Now
+            ExpiryDate = DateTime.Now.AddDays(1)
         };
 
         // Act
@@ -159,7 +159,7 @@ public class RoomServiceTests : IRoomServiceTests
         {
             IssuerId = 1,
             Name = "Room #3",
-            ExpiryDate = DateTime.Now
+            ExpiryDate = DateTime.Now.AddDays(1)
         };
 
         // Act
@@ -178,7 +178,7 @@ public class RoomServiceTests : IRoomServiceTests
         {
             IssuerId = 1,
             Name = "Room #3",
-            ExpiryDate = DateTime.Now
+            ExpiryDate = DateTime.Now.AddDays(1)
         };
 
         // Act
@@ -198,7 +198,7 @@ public class RoomServiceTests : IRoomServiceTests
         {
             IssuerId = 2,
             Name = "Room #3",
-            ExpiryDate = DateTime.Now
+            ExpiryDate = DateTime.Now.AddDays(1)
         };
 
         // Act
@@ -235,7 +235,7 @@ public class RoomServiceTests : IRoomServiceTests
         {
             IssuerId = 404,
             Name = "Room #3",
-            ExpiryDate = DateTime.Now
+            ExpiryDate = DateTime.Now.AddDays(1)
         };
 
         // Act
