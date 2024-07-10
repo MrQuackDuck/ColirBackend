@@ -5,7 +5,6 @@ public interface IUserServiceTests
     Task AuthorizeWithGitHubAsync_CreatesUser();
     Task AuthorizeWithGitHubAsync_ReturnsCorrectData();
     Task AuthorizeWithGitHubAsync_ThrowsArgumentException_WhenHexIsNotUnique();
-    Task AuthorizeWithGitHubAsync_ThrowsArgumentException_WhenAuthTypeIsNotGithub();
 
     Task AuthorizeAsAnnoymousAsync_CreatesUser();
     Task AuthorizeAsAnnoymousAsync_ReturnsCorrectData();

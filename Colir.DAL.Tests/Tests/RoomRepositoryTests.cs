@@ -140,6 +140,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         Assert.That(result.JoinedUsers, Is.EqualTo(roomToAdd.JoinedUsers).Using(new UserEqualityComparer()));
     }
 
+    [Test]
     public async Task AddAsync_ThrowsArgumentException_WhenNameTooLong()
     {
         // Arrange
@@ -158,6 +159,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         Assert.ThrowsAsync<ArgumentException>(act);
     }
 
+    [Test]
     public async Task AddAsync_ThrowsArgumentException_WhenNameTooShort()
     {
         // Arrange
@@ -176,6 +178,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         Assert.ThrowsAsync<ArgumentException>(act);
     }
 
+    [Test]
     public async Task AddAsync_ThrowsRoomExpiredException_WhenWrongExpiryDateWasProvided()
     {
         // Arrange
@@ -195,6 +198,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         Assert.ThrowsAsync<RoomExpiredException>(act);
     }
 
+    [Test]
     public async Task AddAsync_ThrowsUserNotFoundException_WhenOwnerWasNotFound()
     {
         // Arrange
@@ -408,6 +412,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         }).Using(new RoomEqualityComparer()));
     }
 
+    [Test]
     public async Task Update_ThrowsArgumentException_WhenNameTooLong()
     {
         // Arrange
@@ -421,6 +426,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         Assert.Throws<ArgumentException>(act);
     }
 
+    [Test]
     public async Task Update_ThrowsArgumentException_WhenNameTooShort()
     {
         // Arrange

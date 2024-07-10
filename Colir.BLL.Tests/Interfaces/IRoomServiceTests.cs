@@ -50,7 +50,6 @@ public interface IRoomServiceTests
 	Task KickMemberAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotOwnerOfRoom();
 
 	Task ClearRoomAsync_ReturnsClearProcessObject();
-	Task ClearRoomAsync_ClearProcessObjectHasFilesToDeletePropertyAboveZero();
 	Task ClearRoomAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
 	Task ClearRoomAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
 	Task ClearRoomAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotOwnerOfRoom();

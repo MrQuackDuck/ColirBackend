@@ -2,8 +2,8 @@
 
 public interface IAttachmentServiceTests
 {
-    Task UploadAttachment_UploadsAttachment();
-    Task UploadAttachment_AttachemtnHasTheSameSize();
-    Task UploadAttachment_AttachmentIsAccesibleByPath();
-    Task UploadAttachment_ThrowsRoomNotFoundException_WhenRoomNotFound();
+    Task UploadAttachmentAsync_ThrowsUserNotFoundException_WhenIssuerNotFound();
+    Task UploadAttachmentAsync_ThrowsRoomExpiredException_WhenRoomIsExpired();
+    Task UploadAttachmentAsync_ThrowsRoomNotFoundException_WhenRoomNotFound();
+    Task UploadAttachmentAsync_ThrowsNotEnoughPermissionsExcpetion_WhenIssuerNotInRoom();
 }

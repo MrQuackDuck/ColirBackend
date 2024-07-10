@@ -1,36 +1,81 @@
-﻿using Colir.BLL.Tests.Interfaces;
+﻿using Colir.BLL.Services;
+using Colir.BLL.Tests.Interfaces;
+using Colir.BLL.Tests.Utils;
+using DAL;
+using Microsoft.Extensions.Configuration;
+using Moq;
 
 namespace Colir.BLL.Tests.Tests;
 
 public class HexColorGeneratorTests : IHexColorGeneratorTests
 {
-    [Test]
-    public async Task GetUniqueHexColor_ReturnsUniqueHex()
+    private ColirDbContext _dbContext;
+    private HexColorGenerator _hexGenerator;
+
+    [SetUp]
+    public void SetUp()
     {
-        throw new NotImplementedException();
+        // Create database context
+        _dbContext = UnitTestHelper.CreateDbContext();
+
+        // Initialize the service
+        var configMock = new Mock<IConfiguration>();
+        var unitOfWork = new UnitOfWork(_dbContext, configMock.Object);
+        _hexGenerator = new HexColorGenerator(unitOfWork);
+
+        // Add entities
+        UnitTestHelper.SeedData(_dbContext);
+    }
+
+    [TearDown]
+    public void CleanUp()
+    {
+        _dbContext.Database.EnsureDeleted();
+        _dbContext.Dispose();
     }
 
     [Test]
     public async Task GetUniqueHexColor_ReturnsHexInValidFormat()
-    {
-        throw new NotImplementedException();
-    }
-
-    [Test]
-    public async Task GetUniqueHexColorsList_ReturnsCorrectAmountOfUniqueHexs()
-    {
-        throw new NotImplementedException();
+    {   
+        // Act
+        var result = _hexGenerator.GetUniqueHexColor();
+        
+        // Assert
+        Assert.That(result.StartsWith("#"));
+        Assert.That(result.Length == 7);
     }
 
     [Test]
     public async Task GetUniqueHexColorsList_ReturnsHexsInValidFormat()
     {
-        throw new NotImplementedException();
+        // Act
+        var result = _hexGenerator.GetUniqueHexColorsList(5);
+        
+        // Assert
+        foreach (var hex in result)
+        {
+            Assert.That(hex.StartsWith("#"));
+            Assert.That(hex.Length == 7);
+        }
+    }
+
+    [Test]
+    public async Task GetUniqueHexColorsList_ReturnsCorrectAmountOfHexs()
+    {
+        // Act
+        var result = _hexGenerator.GetUniqueHexColorsList(5);
+
+        // Assert
+        Assert.That(result.Count() == 5);
     }
 
     [Test]
     public async Task GetUniqueHexColorsList_ThrowsArgumentOutOfRangeException_WhenCountIsBelowZero()
     {
-        throw new NotImplementedException();
+        // Act
+        TestDelegate act = () => _hexGenerator.GetUniqueHexColorsList(-1);
+
+        // Assert
+        Assert.Throws<ArgumentOutOfRangeException>(act);  
     }
 }

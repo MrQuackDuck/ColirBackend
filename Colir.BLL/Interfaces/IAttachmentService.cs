@@ -5,5 +5,5 @@ namespace Colir.BLL.Interfaces;
 
 public interface IAttachmentService
 {
-    AttachmentModel UploadAttachment(RequestToUploadAttachment request);
+    Task<AttachmentModel> UploadAttachmentAsync(RequestToUploadAttachment request);
 }

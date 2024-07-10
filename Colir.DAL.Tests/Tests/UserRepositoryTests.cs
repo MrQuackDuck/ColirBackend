@@ -356,6 +356,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         Assert.That(_dbContext.Users.Count() == 2);
     }
 
+    [Test]
     public async Task Delete_DeletesUserSettings()
     {
         // Arrange
@@ -369,6 +370,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         Assert.That(_dbContext.UserSettings.Count() == 1);
     }
 
+    [Test]
     public async Task Delete_DeletesUserStatistics()
     {
         // Arrange
@@ -409,6 +411,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         Assert.That(_dbContext.Users.Count() == 2);
     }
 
+    [Test]
     public async Task DeleteByIdAsync_DeletesUserSettings()
     {
         // Act
@@ -419,6 +422,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         Assert.That(_dbContext.UserSettings.Count() == 1);
     }
 
+    [Test]
     public async Task DeleteByIdAsync_DeletesUserStatistics()
     {
         // Act
@@ -455,6 +459,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         Assert.That(updatedUser.Username, Is.EqualTo("UpdatedUser"));
     }
 
+    [Test]
     public async Task Update_ThrowsArgumentException_WhenNameTooLong()
     {
         // Arrange
@@ -468,6 +473,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         Assert.Throws<ArgumentException>(act);   
     }
 
+    [Test]
     public async Task Update_ThrowsArgumentException_WhenNameTooShort()
     {
         // Arrange

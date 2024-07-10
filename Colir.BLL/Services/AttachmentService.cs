@@ -14,7 +14,7 @@ public class AttachmentService : IAttachmentService
         _unitOfWork = unitOfWork;
     }
     
-    public AttachmentModel UploadAttachment(RequestToUploadAttachment request)
+    public async Task<AttachmentModel> UploadAttachmentAsync(RequestToUploadAttachment request)
     {
         throw new NotImplementedException();
     }
