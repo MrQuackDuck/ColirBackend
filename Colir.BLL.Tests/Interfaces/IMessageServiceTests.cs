@@ -38,7 +38,6 @@ public interface IMessageServiceTests
 	Task AddReaction_ThrowsRoomExpiredException_WhenRoomIsExpired();
 
 	Task RemoveReaction_RemovesReaction();
-	Task RemoveReaction_ThrowsMessageNotFoundException_WhenMessageWasNotFound();
 	Task RemoveReaction_ThrowsReactionNotFoundException_WhenReactionWasNotFound();
 	Task RemoveReaction_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
 	Task RemoveReaction_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotAuthorOfReaction();

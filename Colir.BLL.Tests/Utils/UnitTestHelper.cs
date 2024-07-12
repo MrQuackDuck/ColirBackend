@@ -126,7 +126,7 @@ public static class UnitTestHelper
             Content = "Another message in Room #1",
             PostDate = DateTime.Now,
             RoomId = expiredRoom.Id, // "Room #2 (expired)"
-            AuthorId = user1.Id, // "Second User"
+            AuthorId = user1.Id, // "First User"
         };
         
         context.Messages.AddRange(message1, message2, message3, message4, message5);
@@ -140,7 +140,23 @@ public static class UnitTestHelper
             MessageId = message1.Id, // "Message in Room #1"
         };
         
-        context.Reactions.Add(reaction1);
+        var reaction2 = new Reaction
+        {
+            Id = 2,
+            Symbol = "🙄",
+            AuthorId = user3.Id, // "Third User"
+            MessageId = message1.Id, // "Message in Room #1"
+        };
+        
+        var reaction3 = new Reaction
+        {
+            Id = 2,
+            Symbol = "🙄",
+            AuthorId = user3.Id, // "Third User"
+            MessageId = message5.Id, // "Message in Room #1"
+        };
+        
+        context.Reactions.AddRange(reaction1, reaction2, reaction3);
 
         // Last time users read chats
         var lastTimeFirstUserReadChat = new LastTimeUserReadChat

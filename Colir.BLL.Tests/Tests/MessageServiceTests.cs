@@ -527,66 +527,179 @@ public class MessageServiceTests : IMessageServiceTests
     [Test]
     public async Task AddReaction_AddsReaction()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var request = new RequestToAddReactionOnMessage
+        {
+            IssuerId = 1,
+            MessageId = 1,
+            Reaction = "😎"
+        };
+
+        // Act
+        await _messageService.AddReaction(request);
+
+        // Assert
+        var messageAfter = _dbContext.Messages.AsNoTracking().Include(nameof(Message.Reactions)).First(m => m.Id == 1);
+        Assert.That(messageAfter.Reactions.Count() == 1);
+        Assert.That(messageAfter.Reactions.First().Symbol == request.Reaction);
     }
     
     [Test]
     public async Task AddReaction_AddsToStatistics_WhenItsEnabled()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var statsBefore = _dbContext.UserStatistics.AsNoTracking().First(s => s.UserId == 1);
+        var request = new RequestToAddReactionOnMessage
+        {
+            IssuerId = 1,
+            MessageId = 1,
+            Reaction = "😎"
+        };
+        
+        // Act
+        await _messageService.AddReaction(request);
+        
+        // Assert
+        var statsAfter = _dbContext.UserStatistics.AsNoTracking().First(s => s.UserId == 1);
+        Assert.That(statsAfter.ReactionsSet - statsBefore.ReactionsSet == 1);
     }
 
     [Test]
     public async Task AddReaction_ThrowsMessageNotFoundException_WhenMessageWasNotFound()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var request = new RequestToAddReactionOnMessage
+        {
+            IssuerId = 1,
+            MessageId = 404,
+            Reaction = "😎"
+        };
+        
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.AddReaction(request);
+
+        // Assert
+        Assert.ThrowsAsync<MessageNotFoundException>(act);
     }
 
     [Test]
     public async Task AddReaction_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var request = new RequestToAddReactionOnMessage
+        {
+            IssuerId = 3,
+            MessageId = 1,
+            Reaction = "😎"
+        };
+        
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.AddReaction(request);
+
+        // Assert
+        Assert.ThrowsAsync<NotEnoughPermissionsException>(act);
     }
 
     [Test]
     public async Task AddReaction_ThrowsRoomExpiredException_WhenRoomIsExpired()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var request = new RequestToAddReactionOnMessage
+        {
+            IssuerId = 1,
+            MessageId = 5,
+            Reaction = "😎"
+        };
+        
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.AddReaction(request);
+
+        // Assert
+        Assert.ThrowsAsync<RoomExpiredException>(act);
     }
 
     [Test]
     public async Task RemoveReaction_RemovesReaction()
     {
-        throw new NotImplementedException();
-    }
+        // Arrange
+        var request = new RequestToRemoveReactionFromMessage
+        {
+            IssuerId = 1,
+            ReactionId = 1
+        };
 
-    [Test]
-    public async Task RemoveReaction_ThrowsMessageNotFoundException_WhenMessageWasNotFound()
-    {
-        throw new NotImplementedException();
+        // Act
+        await _messageService.RemoveReaction(request);
+
+        // Assert
+        Assert.That(_dbContext.Reactions.Count() == 2);
     }
 
     [Test]
     public async Task RemoveReaction_ThrowsReactionNotFoundException_WhenReactionWasNotFound()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var request = new RequestToRemoveReactionFromMessage
+        {
+            IssuerId = 1,
+            ReactionId = 404
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.RemoveReaction(request);
+
+        // Assert
+        Assert.ThrowsAsync<ReactionNotFoundException>(act);
     }
 
     [Test]
     public async Task RemoveReaction_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var request = new RequestToRemoveReactionFromMessage
+        {
+            IssuerId = 3,
+            ReactionId = 2
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.RemoveReaction(request);
+
+        // Assert
+        Assert.ThrowsAsync<NotEnoughPermissionsException>(act);
     }
 
     [Test]
     public async Task RemoveReaction_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotAuthorOfReaction()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var request = new RequestToRemoveReactionFromMessage
+        {
+            IssuerId = 2,
+            ReactionId = 1
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.RemoveReaction(request);
+
+        // Assert
+        Assert.ThrowsAsync<NotEnoughPermissionsException>(act);
     }
 
     [Test]
     public async Task RemoveReaction_ThrowsRoomExpiredException_WhenRoomIsExpired()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var request = new RequestToRemoveReactionFromMessage
+        {
+            IssuerId = 1,
+            ReactionId = 3
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.RemoveReaction(request);
+
+        // Assert
+        Assert.ThrowsAsync<RoomExpiredException>(act);
     }
 }
