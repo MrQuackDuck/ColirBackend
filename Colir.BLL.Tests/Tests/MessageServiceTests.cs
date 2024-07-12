@@ -207,7 +207,7 @@ public class MessageServiceTests : IMessageServiceTests
         var message = _dbContext.Messages
             .Include(nameof(Message.Attachments)).OrderByDescending(m => m.Id).First();
         
-        Assert.That(_dbContext.Messages.Count() == 5);
+        Assert.That(_dbContext.Messages.Count() == 6);
         Assert.That(message.Attachments.Count == 1);
         Assert.That(message.Attachments.First().Id == 1);
     }
@@ -351,61 +351,177 @@ public class MessageServiceTests : IMessageServiceTests
     [Test]
     public async Task EditAsync_EditsMessage()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var request = new RequestToEditMessage
+        {
+            IssuerId = 1,
+            MessageId = 1,
+            NewContent = "New content"
+        };
+
+        // Act
+        await _messageService.EditAsync(request);
+
+        // Assert
+        var messageAfter = _dbContext.Messages.AsNoTracking().First(m => m.Id == 1);
+        Assert.That(messageAfter.Content == request.NewContent);
     }
 
     [Test]
     public async Task EditAsync_ThrowsMessageNotFoundException_WhenMessageWasNotFound()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var request = new RequestToEditMessage
+        {
+            IssuerId = 1,
+            MessageId = 404,
+            NewContent = "New content"
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.EditAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<MessageNotFoundException>(act);
     }
 
     [Test]
     public async Task EditAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var request = new RequestToEditMessage
+        {
+            IssuerId = 3,
+            MessageId = 4,
+            NewContent = "New content"
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.EditAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<NotEnoughPermissionsException>(act);
     }
 
     [Test]
     public async Task EditAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotAuthorOfMessage()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var request = new RequestToEditMessage
+        {
+            IssuerId = 2,
+            MessageId = 1,
+            NewContent = "New content"
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.EditAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<NotEnoughPermissionsException>(act);
     }
 
     [Test]
     public async Task EditAsync_ThrowsRoomExpiredException_WhenRoomIsExpired()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var request = new RequestToEditMessage
+        {
+            IssuerId = 1,
+            MessageId = 5,
+            NewContent = "New content"
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.EditAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<RoomExpiredException>(act);
     }
 
     [Test]
     public async Task Delete_DeletesMessage()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var request = new RequestToDeleteMessage
+        {
+            IssuerId = 1,
+            MessageId = 1
+        };
+
+        // Act
+        _messageService.Delete(request);
+
+        // Assert
+        Assert.That(_dbContext.Messages.Count() == 4);
     }
 
     [Test]
     public async Task Delete_ThrowsMessageNotFoundException_WhenMessageWasNotFound()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var request = new RequestToDeleteMessage
+        {
+            IssuerId = 1,
+            MessageId = 404
+        };
+
+        // Act
+        TestDelegate act = () => _messageService.Delete(request);
+        
+        // Assert
+        Assert.Throws<MessageNotFoundException>(act);
     }
 
     [Test]
     public async Task Delete_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var request = new RequestToDeleteMessage
+        {
+            IssuerId = 3,
+            MessageId = 4
+        };
+
+        // Act
+        TestDelegate act = () => _messageService.Delete(request);
+        
+        // Assert
+        Assert.Throws<NotEnoughPermissionsException>(act);
     }
 
     [Test]
     public async Task Delete_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotAuthorOfMessage()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var request = new RequestToDeleteMessage
+        {
+            IssuerId = 1,
+            MessageId = 2
+        };
+
+        // Act
+        TestDelegate act = () => _messageService.Delete(request);
+        
+        // Assert
+        Assert.Throws<NotEnoughPermissionsException>(act);
     }
 
     [Test]
     public async Task Delete_ThrowsRoomExpiredException_WhenRoomIsExpired()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var request = new RequestToDeleteMessage
+        {
+            IssuerId = 1,
+            MessageId = 5
+        };
+
+        // Act
+        TestDelegate act = () => _messageService.Delete(request);
+        
+        // Assert
+        Assert.Throws<RoomExpiredException>(act);
     }
 
     [Test]

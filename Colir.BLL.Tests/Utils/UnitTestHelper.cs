@@ -98,7 +98,7 @@ public static class UnitTestHelper
             Content = "Reply to first message",
             PostDate = DateTime.Now,
             RoomId = defaultRoom.Id, // "Room #1"
-            AuthorId = user1.Id, // "First User"
+            AuthorId = user3.Id, // "Third User"
             RepliedMessageId = message1.Id, // "Message in Room #1"
         };
         
@@ -117,10 +117,19 @@ public static class UnitTestHelper
             Content = "Another message in Room #1",
             PostDate = DateTime.Now,
             RoomId = defaultRoom.Id, // "Room #1"
-            AuthorId = user2.Id, // "Second User"
+            AuthorId = user3.Id, // "Third   User"
         };
         
-        context.Messages.AddRange(message1, message2, message3, message4);
+        var message5 = new Message
+        {
+            Id = 5,
+            Content = "Another message in Room #1",
+            PostDate = DateTime.Now,
+            RoomId = expiredRoom.Id, // "Room #2 (expired)"
+            AuthorId = user1.Id, // "Second User"
+        };
+        
+        context.Messages.AddRange(message1, message2, message3, message4, message5);
 
         // Reactions
         var reaction1 = new Reaction
