@@ -54,7 +54,7 @@ public class UserServiceTests : IUserServiceTests
         };
 
         // Act
-        var result = await _userService.AuthorizeWithGitHubAsync(request);
+        await _userService.AuthorizeWithGitHubAsync(request);
 
         // Assert
         Assert.That(_dbContext.Users.Count() == 4);
@@ -108,7 +108,7 @@ public class UserServiceTests : IUserServiceTests
         };
 
         // Act
-        var result = await _userService.AuthorizeAsAnnoymousAsync(request);
+        await _userService.AuthorizeAsAnnoymousAsync(request);
 
         // Assert
         Assert.That(_dbContext.Users.Count() == 4);
