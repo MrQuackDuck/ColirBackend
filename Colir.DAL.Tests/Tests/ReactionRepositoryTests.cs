@@ -142,7 +142,7 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
     }
 
     [Test]
-    public async Task AddAsync_ThrowsArgumentException_WhenAuthorWasNotFound()
+    public async Task AddAsync_ThrowsUserNotFoundException_WhenAuthorWasNotFound()
     {
         // Arrange
         var reactionToAdd = new Reaction()
@@ -157,11 +157,11 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
         AsyncTestDelegate act = async () => await _reactionRepository.AddAsync(reactionToAdd);
 
         // Assert
-        Assert.ThrowsAsync<ArgumentException>(act);
+        Assert.ThrowsAsync<UserNotFoundException>(act);
     }
 
     [Test]
-    public async Task AddAsync_ThrowsArgumentException_WhenMessageWasNotFound()
+    public async Task AddAsync_ThrowsMessageNotFoundException_WhenMessageWasNotFound()
     {
         // Arrange
         var reactionToAdd = new Reaction()
@@ -176,7 +176,7 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
         AsyncTestDelegate act = async () => await _reactionRepository.AddAsync(reactionToAdd);
 
         // Assert
-        Assert.ThrowsAsync<ArgumentException>(act);
+        Assert.ThrowsAsync<MessageNotFoundException>(act);
     }
 
     [Test]

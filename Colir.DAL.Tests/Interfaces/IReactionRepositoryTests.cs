@@ -11,8 +11,8 @@ public interface IReactionRepositoryTests
     Task GetReactionsOnMessage_ThrowsNotFoundException_WhenMessageWasNotFound();
 
     Task AddAsync_AddsNewReaction();
-    Task AddAsync_ThrowsArgumentException_WhenAuthorWasNotFound();
-    Task AddAsync_ThrowsArgumentException_WhenMessageWasNotFound();
+    Task AddAsync_ThrowsUserNotFoundException_WhenAuthorWasNotFound();
+    Task AddAsync_ThrowsMessageNotFoundException_WhenMessageWasNotFound();
 
     Task Delete_DeletesReaction();
     Task Delete_ThrowsNotFoundException_WhenReactionDoesNotExist();

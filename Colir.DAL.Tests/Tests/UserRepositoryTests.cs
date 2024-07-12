@@ -261,7 +261,7 @@ public class UserRepositoryTests : IUserRepositoryTests
     }
 
     [Test]
-    public async Task AddAsync_ThrowsArgumentException_WhenUsernameTooShort()
+    public async Task AddAsync_ThrowsStringTooShortException_WhenUsernameTooShort()
     {
         // Arrange
         var userToAdd = new User()
@@ -276,11 +276,11 @@ public class UserRepositoryTests : IUserRepositoryTests
         AsyncTestDelegate act = async () => await _userRepository.AddAsync(userToAdd);
 
         // Assert
-        Assert.ThrowsAsync<ArgumentException>(act);
+        Assert.ThrowsAsync<StringTooShortException>(act);
     }
 
     [Test]
-    public async Task AddAsync_ThrowsArgumentException_WhenUsernameTooLong()
+    public async Task AddAsync_ThrowsStringTooLongException_WhenUsernameTooLong()
     {
         // Arrange
         var userToAdd = new User()
@@ -295,7 +295,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         AsyncTestDelegate act = async () => await _userRepository.AddAsync(userToAdd);
 
         // Assert
-        Assert.ThrowsAsync<ArgumentException>(act);
+        Assert.ThrowsAsync<StringTooLongException>(act);
     }
 
     [Test]
@@ -460,7 +460,7 @@ public class UserRepositoryTests : IUserRepositoryTests
     }
 
     [Test]
-    public async Task Update_ThrowsArgumentException_WhenNameTooLong()
+    public async Task Update_ThrowsStringTooLongException_WhenNameTooLong()
     {
         // Arrange
         var userToUpdate = _dbContext.Users.First(u => u.Id == 1);
@@ -470,11 +470,11 @@ public class UserRepositoryTests : IUserRepositoryTests
         TestDelegate act = () => _userRepository.Update(userToUpdate);
 
         // Assert
-        Assert.Throws<ArgumentException>(act);   
+        Assert.Throws<StringTooLongException>(act);   
     }
 
     [Test]
-    public async Task Update_ThrowsArgumentException_WhenNameTooShort()
+    public async Task Update_ThrowsStringTooShortException_WhenNameTooShort()
     {
         // Arrange
         var userToUpdate = _dbContext.Users.First(u => u.Id == 1);
@@ -484,7 +484,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         TestDelegate act = () => _userRepository.Update(userToUpdate);
 
         // Assert
-        Assert.Throws<ArgumentException>(act);   
+        Assert.Throws<StringTooShortException>(act);   
     }
 
     [Test]

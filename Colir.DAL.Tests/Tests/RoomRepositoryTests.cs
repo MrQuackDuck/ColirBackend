@@ -141,7 +141,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     }
 
     [Test]
-    public async Task AddAsync_ThrowsArgumentException_WhenNameTooLong()
+    public async Task AddAsync_ThrowsStringTooLongException_WhenNameTooLong()
     {
         // Arrange
         var roomToAdd = new Room()
@@ -156,11 +156,11 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         AsyncTestDelegate act = async () => await _roomRepository.AddAsync(roomToAdd);
 
         // Assert
-        Assert.ThrowsAsync<ArgumentException>(act);
+        Assert.ThrowsAsync<StringTooLongException>(act);
     }
 
     [Test]
-    public async Task AddAsync_ThrowsArgumentException_WhenNameTooShort()
+    public async Task AddAsync_ThrowsStringTooShortException_WhenNameTooShort()
     {
         // Arrange
         var roomToAdd = new Room()
@@ -175,7 +175,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         AsyncTestDelegate act = async () => await _roomRepository.AddAsync(roomToAdd);
 
         // Assert
-        Assert.ThrowsAsync<ArgumentException>(act);
+        Assert.ThrowsAsync<StringTooShortException>(act);
     }
 
     [Test]
@@ -413,7 +413,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     }
 
     [Test]
-    public async Task Update_ThrowsArgumentException_WhenNameTooLong()
+    public async Task Update_ThrowsStringTooLongException_WhenNameTooLong()
     {
         // Arrange
         var roomToUpdate = _dbContext.Rooms.First(r => r.Id == 1);
@@ -423,11 +423,11 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         TestDelegate act = () => _roomRepository.Update(roomToUpdate);
 
         // Assert
-        Assert.Throws<ArgumentException>(act);
+        Assert.Throws<StringTooLongException>(act);
     }
 
     [Test]
-    public async Task Update_ThrowsArgumentException_WhenNameTooShort()
+    public async Task Update_ThrowsStringTooShortException_WhenNameTooShort()
     {
         // Arrange
         var roomToUpdate = _dbContext.Rooms.First(r => r.Id == 1);
@@ -437,7 +437,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         TestDelegate act = () => _roomRepository.Update(roomToUpdate);
 
         // Assert
-        Assert.Throws<ArgumentException>(act);
+        Assert.Throws<StringTooShortException>(act);
     }
 
     [Test]

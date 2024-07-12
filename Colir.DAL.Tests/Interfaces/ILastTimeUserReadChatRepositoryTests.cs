@@ -13,7 +13,7 @@ public interface ILastTimeUserReadChatRepositoryTests
     Task GetByIdAsync_ThrowsNotFoundException_WhenEntityWasNotFound();
 
     Task AddAsync_AddsNewEntity();
-    Task AddAsync_ThrowsInvalidColirOperationException_WhenEntryWithSameUserIdAndRoomIdAlreadyExists();
+    Task AddAsync_ThrowsInvalidActionException_WhenEntryWithSameUserIdAndRoomIdAlreadyExists();
     Task AddAsync_ThrowsUserNotFoundException_WhenUserWasNotFound();
     Task AddAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
     Task AddAsync_ThrowsRoomExpiredException_WhenRoomExpired();

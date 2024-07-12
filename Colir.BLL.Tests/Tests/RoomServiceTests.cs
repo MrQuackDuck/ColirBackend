@@ -266,7 +266,7 @@ public class RoomServiceTests : IRoomServiceTests
     }
 
     [Test]
-    public async Task RenameAsync_ThrowsArgumentException_WhenNewNameIsTooLong()
+    public async Task RenameAsync_ThrowsStringTooLongException_WhenNewNameIsTooLong()
     {
         // Arrange
         var roomToRename = _dbContext.Rooms.First(r => r.Id == 1);
@@ -281,11 +281,11 @@ public class RoomServiceTests : IRoomServiceTests
         AsyncTestDelegate act = async () => await _roomService.RenameAsync(request);
 
         // Assert
-        Assert.ThrowsAsync<ArgumentException>(act);
+        Assert.ThrowsAsync<StringTooLongException>(act);
     }
 
     [Test]
-    public async Task RenameAsync_ThrowsArgumentException_WhenNewNameIsTooShort()
+    public async Task RenameAsync_ThrowsStringTooShortException_WhenNewNameIsTooShort()
     {
         // Arrange
         var roomToRename = _dbContext.Rooms.First(r => r.Id == 1);
@@ -300,7 +300,7 @@ public class RoomServiceTests : IRoomServiceTests
         AsyncTestDelegate act = async () => await _roomService.RenameAsync(request);
 
         // Assert
-        Assert.ThrowsAsync<ArgumentException>(act);
+        Assert.ThrowsAsync<StringTooShortException>(act);
     }
 
     [Test]

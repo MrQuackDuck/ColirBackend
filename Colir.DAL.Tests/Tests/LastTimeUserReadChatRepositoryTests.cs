@@ -152,7 +152,7 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
     }
 
     [Test]
-    public async Task AddAsync_ThrowsInvalidColirOperationException_WhenEntryWithSameUserIdAndRoomIdAlreadyExists()
+    public async Task AddAsync_ThrowsInvalidActionException_WhenEntryWithSameUserIdAndRoomIdAlreadyExists()
     {
         // Arrange
         var lastTimeUserReadChatToAdd = new LastTimeUserReadChat
@@ -166,7 +166,7 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
         AsyncTestDelegate act = async () => await _lastTimeUserReadChatRepository.AddAsync(lastTimeUserReadChatToAdd);
 
         // Assert
-        Assert.ThrowsAsync<InvalidColirOperationException>(act);
+        Assert.ThrowsAsync<InvalidActionException>(act);
     }
 
     [Test]

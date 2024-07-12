@@ -17,8 +17,8 @@ public interface IUserRepositoryTests
     Task AddAsync_AppliesJoinedRoomsToUser();
     Task AddAsync_ThrowsArgumentException_WhenHexAlreadyExists();
     Task AddAsync_ThrowsArgumentException_WhenHexFormatIsNotCorrect();
-    Task AddAsync_ThrowsArgumentException_WhenUsernameTooShort();
-    Task AddAsync_ThrowsArgumentException_WhenUsernameTooLong();
+    Task AddAsync_ThrowsStringTooShortException_WhenUsernameTooShort();
+    Task AddAsync_ThrowsStringTooLongException_WhenUsernameTooLong();
     Task AddAsync_ThrowsNotFound_WhenOneOfJoinedRoomsWasNotFound();
     Task AddAsync_ThrowsRoomExpiredException_WhenOneOfJoinedRoomsIsExpired();
 
@@ -33,7 +33,7 @@ public interface IUserRepositoryTests
     Task Delete_ThrowsNotFoundException_WhenUserWasNotFoundById();
 
     Task Update_UpdatesUser();
-    Task Update_ThrowsArgumentException_WhenNameTooLong();
-    Task Update_ThrowsArgumentException_WhenNameTooShort();
+    Task Update_ThrowsStringTooLongException_WhenNameTooLong();
+    Task Update_ThrowsStringTooShortException_WhenNameTooShort();
     Task Update_ThrowsNotFoundException_WhenUserDoesNotExist();
 }

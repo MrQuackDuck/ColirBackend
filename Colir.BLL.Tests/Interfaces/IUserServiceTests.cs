@@ -10,8 +10,8 @@ public interface IUserServiceTests
     Task AuthorizeAsAnnoymousAsync_ReturnsCorrectData();
 
     Task ChangeUsernameAsync_ChangesUsername();
-    Task ChangeUsernameAsync_ThrowsArgumentException_WhenNewUsernameTooShort();
-    Task ChangeUsernameAsync_ThrowsArgumentException_WhenNewUsernameTooLong();
+    Task ChangeUsernameAsync_StringTooShortException_WhenNewUsernameTooShort();
+    Task ChangeUsernameAsync_ThrowsStringTooLongException_WhenNewUsernameTooLong();
 
     Task ChangeSettingsAsync_UpdatesSettings();
     Task ChangeSettingsAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();

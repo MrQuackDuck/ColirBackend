@@ -9,8 +9,8 @@ public interface IRoomRepositoryTests
 
     Task AddAsync_AddsNewRoom();
     Task AddAsync_AppliesJoinedUsersToRoom();
-    Task AddAsync_ThrowsArgumentException_WhenNameTooLong();
-    Task AddAsync_ThrowsArgumentException_WhenNameTooShort();
+    Task AddAsync_ThrowsStringTooLongException_WhenNameTooLong();
+    Task AddAsync_ThrowsStringTooShortException_WhenNameTooShort();
     Task AddAsync_ThrowsRoomExpiredException_WhenWrongExpiryDateWasProvided();
     Task AddAsync_ThrowsUserNotFoundException_WhenOwnerWasNotFound();
 
@@ -27,8 +27,8 @@ public interface IRoomRepositoryTests
     Task DeleteByIdAsync_ThrowsNotFoundException_WhenRoomWasNotFoundById();
 
     Task Update_UpdatesRoom();
-    Task Update_ThrowsArgumentException_WhenNameTooLong();
-    Task Update_ThrowsArgumentException_WhenNameTooShort();
+    Task Update_ThrowsStringTooLongException_WhenNameTooLong();
+    Task Update_ThrowsStringTooShortException_WhenNameTooShort();
     Task Update_ThrowsNotFoundException_WhenRoomDoesNotExist();
     
     Task DeleteAllExpiredAsync_DeletesAllExpiredRooms();

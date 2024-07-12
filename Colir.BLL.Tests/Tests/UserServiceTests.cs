@@ -150,7 +150,7 @@ public class UserServiceTests : IUserServiceTests
     }
 
     [Test]
-    public async Task ChangeUsernameAsync_ThrowsArgumentException_WhenNewUsernameTooShort()
+    public async Task ChangeUsernameAsync_StringTooShortException_WhenNewUsernameTooShort()
     {
         // Arrange
         var request = new RequestToChangeUsername
@@ -163,11 +163,11 @@ public class UserServiceTests : IUserServiceTests
         AsyncTestDelegate act = async () => await _userService.ChangeUsernameAsync(request);
 
         // Assert
-        Assert.ThrowsAsync<ArgumentException>(act);
+        Assert.ThrowsAsync<StringTooShortException>(act);
     }
 
     [Test]
-    public async Task ChangeUsernameAsync_ThrowsArgumentException_WhenNewUsernameTooLong()
+    public async Task ChangeUsernameAsync_ThrowsStringTooLongException_WhenNewUsernameTooLong()
     {
         // Arrange
         var request = new RequestToChangeUsername
@@ -180,7 +180,7 @@ public class UserServiceTests : IUserServiceTests
         AsyncTestDelegate act = async () => await _userService.ChangeUsernameAsync(request);
 
         // Assert
-        Assert.ThrowsAsync<ArgumentException>(act);
+        Assert.ThrowsAsync<StringTooLongException>(act);
     }
 
     [Test]
