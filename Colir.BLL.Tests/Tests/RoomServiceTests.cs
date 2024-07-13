@@ -171,7 +171,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task CreateAsync_AddsToStatistics_WhenItsEnabled()
     {
         // Arrange
-        var statsBefore = _dbContext.UserStatistics.First(u => u.UserId == 1);
+        var statsBefore = _dbContext.UserStatistics.AsNoTracking().First(u => u.UserId == 1);
         var request = new RequestToCreateRoom
         {
             IssuerId = 1,
@@ -183,7 +183,7 @@ public class RoomServiceTests : IRoomServiceTests
         await _roomService.CreateAsync(request);
 
         // Assert
-        var statsAfter = _dbContext.UserStatistics.First(u => u.UserId == 1);
+        var statsAfter = _dbContext.UserStatistics.AsNoTracking().First(u => u.UserId == 1);
         Assert.That(statsAfter.RoomsCreated - statsBefore.RoomsCreated == 1);
     }
 
@@ -191,7 +191,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task CreateAsync_NotAddsToStatistics_WhenItsNotEnabled()
     {
         // Arrange
-        var statsBefore = _dbContext.UserStatistics.First(u => u.UserId == 1);
+        var statsBefore = _dbContext.UserStatistics.AsNoTracking().First(u => u.UserId == 1);
         var request = new RequestToCreateRoom
         {
             IssuerId = 2,
@@ -203,7 +203,7 @@ public class RoomServiceTests : IRoomServiceTests
         await _roomService.CreateAsync(request);
 
         // Assert
-        var statsAfter = _dbContext.UserStatistics.First(u => u.UserId == 1);
+        var statsAfter = _dbContext.UserStatistics.AsNoTracking().First(u => u.UserId == 1);
         Assert.That(statsAfter.RoomsCreated - statsBefore.RoomsCreated == 0);
     }
 
@@ -597,7 +597,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task JoinMemberAsync_AddsToStatistics_WhenItsEnabled()
     {
         // Arrange
-        var statsBefore = _dbContext.UserStatistics.First(u => u.UserId == 3);
+        var statsBefore = _dbContext.UserStatistics.AsNoTracking().First(u => u.UserId == 3);
         var room = _dbContext.Rooms.First(r => r.Id == 1);
         var request = new RequestToJoinRoom
         {
@@ -609,7 +609,7 @@ public class RoomServiceTests : IRoomServiceTests
         await _roomService.JoinMemberAsync(request);
 
         // Assert
-        var statsAfter = _dbContext.UserStatistics.First(s => s.UserId == 3);
+        var statsAfter = _dbContext.UserStatistics.AsNoTracking().First(s => s.UserId == 3);
         Assert.That(statsAfter.RoomsJoined - statsBefore.RoomsJoined == 1);
     }
 
