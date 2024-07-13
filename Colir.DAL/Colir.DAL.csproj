@@ -26,4 +26,8 @@
       <None Remove="obj\**" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Colir.Exceptions\Colir.Exceptions.csproj" />
+    </ItemGroup>
+
 </Project>

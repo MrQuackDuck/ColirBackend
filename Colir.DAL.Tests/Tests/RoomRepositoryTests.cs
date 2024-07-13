@@ -104,7 +104,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
             Guid = Guid.NewGuid().ToString(),
             Name = "Room #3",
             OwnerId = 1,
-            ExpiryDate = DateTime.Today.Add(new TimeSpan(1, 0, 0)),
+            ExpiryDate = DateTime.Now.Add(new TimeSpan(1, 0, 0)),
         };
 
         // Act
@@ -126,7 +126,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
             Guid = Guid.NewGuid().ToString(),
             Name = "Room #3",
             OwnerId = 1,
-            ExpiryDate = DateTime.Today.Add(new TimeSpan(1, 0, 0)),
+            ExpiryDate = DateTime.Now.Add(new TimeSpan(1, 0, 0)),
             JoinedUsers = users,
         };
 
@@ -149,7 +149,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
             Guid = Guid.NewGuid().ToString(),
             Name = new string('a', 51),
             OwnerId = 1,
-            ExpiryDate = DateTime.Today.Add(new TimeSpan(1, 0, 0)),
+            ExpiryDate = DateTime.Now.Add(new TimeSpan(1, 0, 0)),
         };
 
         // Act
@@ -168,7 +168,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
             Guid = Guid.NewGuid().ToString(),
             Name = new string('a', 1),
             OwnerId = 1,
-            ExpiryDate = DateTime.Today.Add(new TimeSpan(1, 0, 0)),
+            ExpiryDate = DateTime.Now.Add(new TimeSpan(1, 0, 0)),
         };
 
         // Act
@@ -207,7 +207,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
             Guid = Guid.NewGuid().ToString(),
             Name = "Room #3",
             OwnerId = 4,
-            ExpiryDate = DateTime.Today.Add(new TimeSpan(1, 0, 0)),
+            ExpiryDate = DateTime.Now.Add(new TimeSpan(1, 0, 0)),
         };
 
         // Act
@@ -387,11 +387,12 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         // Arrange
         var newExpiryDate = DateTime.Now.Add(new TimeSpan(2, 0, 0));
         var newOwnerId = 2;
-        
+
+        var guid = Guid.NewGuid().ToString();
         var room = new Room
         {
             Id = 1,
-            Guid = Guid.NewGuid().ToString(),
+            Guid = guid,
             Name = "Room #1",
             ExpiryDate = newExpiryDate,
             OwnerId = newOwnerId,
@@ -405,7 +406,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         Assert.That(room, Is.EqualTo(new Room()
         {
             Id = 1,
-            Guid = Guid.NewGuid().ToString(),
+            Guid = guid,
             Name = "Room #1",
             ExpiryDate = newExpiryDate,
             OwnerId = newOwnerId,
@@ -468,19 +469,23 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         
         // Act
         await _roomRepository.DeleteAllExpiredAsync();
+        _roomRepository.SaveChanges();
 
         // Assert
         var newRoomCount = _dbContext.Rooms.Count();
-        var expiredRoom = _roomRepository.GetByIdAsync(2);
+        var expiredRoom = _dbContext.Rooms.FirstOrDefault(r => r.Id == 2);
         Assert.Null(expiredRoom);
-        Assert.That(roomCount == newRoomCount);
+        Assert.That(roomCount != newRoomCount);
     }
 
     [Test]
     public async Task DeleteAllExpiredAsync_ThrowsNotFoundException_WhenNoExpiredRoomsExist()
     {
-        // Act
+        // Arrange
         await _roomRepository.DeleteAllExpiredAsync();
+        _roomRepository.SaveChanges();
+        
+        // Act
         AsyncTestDelegate act = async () => await _roomRepository.DeleteAllExpiredAsync();
         
         // Assert
