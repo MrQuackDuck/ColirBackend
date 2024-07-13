@@ -1,6 +1,4 @@
-﻿using DAL.Enums;
-
-namespace Colir.BLL.RequestModels.User;
+﻿namespace Colir.BLL.RequestModels.User;
 
 public class RequestToAuthorizeWithGitHub
 {
