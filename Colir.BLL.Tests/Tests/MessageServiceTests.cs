@@ -1,5 +1,4 @@
-﻿using Colir.BLL.Interfaces;
-using Colir.BLL.Models;
+﻿using Colir.BLL.Models;
 using Colir.BLL.RequestModels.Message;
 using Colir.BLL.Services;
 using Colir.BLL.Tests.Interfaces;
@@ -26,8 +25,6 @@ public class MessageServiceTests : IMessageServiceTests
 
         // Initialize the service
         var configMock = new Mock<IConfiguration>();
-        var hexGeneratorMock = new Mock<IHexColorGenerator>();
-        hexGeneratorMock.Setup(g => g.GetUniqueHexColor()).Returns("1051b310-ed1a-42ef-9435-fe840ec44009");
         var unitOfWork = new UnitOfWork(_dbContext, configMock.Object);
         _messageService = new MessageService(unitOfWork);
 

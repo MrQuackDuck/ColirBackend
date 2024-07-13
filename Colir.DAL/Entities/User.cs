@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using DAL.Enums;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,7 +8,8 @@ namespace DAL.Entities;
 [Index(nameof(HexId), IsUnique = true)]
 public class User : BaseEntity
 {
-    public string HexId { get; set; } = default!;
+    [Range(0, 16_777_216)]
+    public long HexId { get; set; }
     public int? GitHubId { get; set; }
     public string Username { get; set; } = default!;
     public UserAuthType AuthType { get; set; }

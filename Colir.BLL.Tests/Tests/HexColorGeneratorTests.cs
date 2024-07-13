@@ -41,8 +41,7 @@ public class HexColorGeneratorTests : IHexColorGeneratorTests
         var result = _hexGenerator.GetUniqueHexColor();
         
         // Assert
-        Assert.That(result.StartsWith("#"));
-        Assert.That(result.Length == 7);
+        Assert.That(result.ToString("x6").Length == 6);
     }
 
     [Test]
@@ -54,8 +53,7 @@ public class HexColorGeneratorTests : IHexColorGeneratorTests
         // Assert
         foreach (var hex in result)
         {
-            Assert.That(hex.StartsWith("#"));
-            Assert.That(hex.Length == 7);
+            Assert.That(hex.ToString("x6").Length == 6);
         }
     }
 

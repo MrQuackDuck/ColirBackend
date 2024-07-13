@@ -25,10 +25,8 @@ public class RoomServiceTests : IRoomServiceTests
 
         // Initialize the service
         var configMock = new Mock<IConfiguration>();
-        var hexGeneratorMock = new Mock<IHexColorGenerator>();
-        hexGeneratorMock.Setup(g => g.GetUniqueHexColor()).Returns("1051b310-ed1a-42ef-9435-fe840ec44009");
         var unitOfWork = new UnitOfWork(_dbContext, configMock.Object);
-        _roomService = new RoomService(unitOfWork, hexGeneratorMock.Object);
+        _roomService = new RoomService(unitOfWork);
 
         // Add entities
         UnitTestHelper.SeedData(_dbContext);
@@ -164,7 +162,7 @@ public class RoomServiceTests : IRoomServiceTests
         var result = await _roomService.CreateAsync(request);
 
         // Assert
-        Assert.That(result == "1051b310-ed1a-42ef-9435-fe840ec44009");
+        Assert.That(result.Length == 36);
     }
 
     [Test]

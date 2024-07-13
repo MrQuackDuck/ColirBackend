@@ -12,12 +12,12 @@ public class HexColorGenerator : IHexColorGenerator
         _unitOfWork = unitOfWork;
     }
     
-    public string GetUniqueHexColor()
+    public long GetUniqueHexColor()
     {
         throw new NotImplementedException();
     }
 
-    public List<string> GetUniqueHexColorsList(int count)
+    public List<long> GetUniqueHexColorsList(int count)
     {
         throw new NotImplementedException();
     }

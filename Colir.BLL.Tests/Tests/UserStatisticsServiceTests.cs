@@ -4,8 +4,6 @@ using Colir.BLL.Tests.Interfaces;
 using Colir.BLL.Tests.Utils;
 using Colir.Exceptions;
 using DAL;
-using DAL.Entities;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Moq;
 

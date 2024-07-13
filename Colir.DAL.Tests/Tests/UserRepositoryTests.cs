@@ -146,7 +146,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         {
             Id = 4,
             Username = "NewUser",
-            HexId = "#123456",
+            HexId = 0x123456,
             JoinedRooms = new List<Room>()
         };
 
@@ -166,7 +166,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         {
             Id = 4,
             Username = "NewUser",
-            HexId = "#123456",
+            HexId = 0x123456,
             JoinedRooms = new List<Room>()
         };
 
@@ -186,7 +186,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         {
             Id = 4,
             Username = "NewUser",
-            HexId = "#123456",
+            HexId = 0x123456,
             JoinedRooms = new List<Room>()
         };
 
@@ -206,7 +206,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         {
             Id = 4,
             Username = "NewUser",
-            HexId = "#123456",
+            HexId = 0x123456,
             JoinedRooms = new List<Room>
             {
                 _dbContext.Rooms.First()
@@ -230,7 +230,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         {
             Id = 4,
             Username = "NewUser",
-            HexId = "#FFFFFF",
+            HexId = 0xFFFFFF,
             JoinedRooms = new List<Room>()
         };
 
@@ -249,7 +249,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         {
             Id = 4,
             Username = "NewUser",
-            HexId = "invalid_hex",
+            HexId = 0xFFFFFFF,
             JoinedRooms = new List<Room>()
         };
 
@@ -268,7 +268,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         {
             Id = 4,
             Username = "N",
-            HexId = "#123456",
+            HexId = 0x123456,
             JoinedRooms = new List<Room>()
         };
 
@@ -287,7 +287,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         {
             Id = 4,
             Username = new string('a', 51),
-            HexId = "#123456",
+            HexId = 0x123456,
             JoinedRooms = new List<Room>()
         };
 
@@ -306,7 +306,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         {
             Id = 4,
             Username = "NewUser",
-            HexId = "#123456",
+            HexId = 0x123456,
             JoinedRooms = new List<Room>
             {
                 new Room { Id = 404 }
@@ -328,7 +328,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         {
             Id = 4,
             Username = "NewUser",
-            HexId = "#123456",
+            HexId = 0x123456,
             JoinedRooms = new List<Room>
             {
                 new Room { ExpiryDate = DateTime.UtcNow.AddDays(-1) }
@@ -492,7 +492,7 @@ public class UserRepositoryTests : IUserRepositoryTests
     {
         // Arrange
         var userToUpdate = _dbContext.Users.First(u => u.Id == 1);
-        userToUpdate.HexId = "#FFFFFF";
+        userToUpdate.HexId = 0xFFFFFF;
 
         // Act
         TestDelegate act = () => _userRepository.Update(userToUpdate);
