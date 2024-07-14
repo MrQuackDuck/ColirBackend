@@ -166,6 +166,12 @@ public static class UnitTestHelper
             StatisticsEnabled = false,
         };
         
+        user1.UserStatisticsId = firstUserStatistics.Id;
+        user1.UserSettingsId = firstUserSettings.Id;
+
+        user2.UserStatisticsId = secondUserStatistics.Id;
+        user2.UserSettingsId = secondUserSettings.Id;
+        
         context.UserSettings.AddRange(firstUserSettings, secondUserSettings);
         
         // Save changes

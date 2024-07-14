@@ -73,10 +73,10 @@ public class UserRepositoryTests : IUserRepositoryTests
     {
         // Arrange
         User expected = _dbContext.Users
-                                        .Include(nameof(User.UserStatistics))
-                                        .Include(nameof(User.UserSettings))
-                                        .Include(nameof(User.JoinedRooms))
-                                        .FirstOrDefault(u => u.Id == 1)!;
+            .Include(nameof(User.UserStatistics))
+            .Include(nameof(User.UserSettings))
+            .Include(nameof(User.JoinedRooms))
+            .First(u => u.Id == 1);
 
         // Act
         var result = await _userRepository.GetByIdAsync(1);
@@ -346,7 +346,11 @@ public class UserRepositoryTests : IUserRepositoryTests
     public async Task Delete_DeletesUser()
     {
         // Arrange
-        var userToDelete = _dbContext.Users.First();
+        var userToDelete = _dbContext.Users
+            .Include(nameof(User.UserStatistics))
+            .Include(nameof(User.UserSettings))
+            .Include(nameof(User.JoinedRooms))
+            .First();
 
         // Act
         _userRepository.Delete(userToDelete);
@@ -360,7 +364,11 @@ public class UserRepositoryTests : IUserRepositoryTests
     public async Task Delete_DeletesUserSettings()
     {
         // Arrange
-        var userToDelete = _dbContext.Users.First();
+        var userToDelete = _dbContext.Users
+            .Include(nameof(User.UserStatistics))
+            .Include(nameof(User.UserSettings))
+            .Include(nameof(User.JoinedRooms))
+            .First();
 
         // Act
         _userRepository.Delete(userToDelete);
@@ -491,7 +499,7 @@ public class UserRepositoryTests : IUserRepositoryTests
     public async Task Update_ThrowsArgumentException_WhenExistingHexIdProvided()
     {
         // Arrange
-        var userToUpdate = _dbContext.Users.First(u => u.Id == 1);
+        var userToUpdate = _dbContext.Users.AsNoTracking().First(u => u.Id == 2);
         userToUpdate.HexId = 0xFFFFFF;
 
         // Act

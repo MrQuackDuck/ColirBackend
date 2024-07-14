@@ -25,5 +25,15 @@ public class ColirDbContext : DbContext
             .HasMany(r => r.JoinedUsers)
             .WithMany(u => u.JoinedRooms)
             .UsingEntity<UserToRoom>();
+
+        modelBuilder.Entity<User>()
+            .HasOne(s => s.UserSettings)
+            .WithOne(s => s.User)
+            .IsRequired();
+        
+        modelBuilder.Entity<User>()
+            .HasOne(s => s.UserStatistics)
+            .WithOne(s => s.User)
+            .IsRequired();
     }
 }

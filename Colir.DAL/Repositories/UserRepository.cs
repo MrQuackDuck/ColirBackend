@@ -103,14 +103,18 @@ public class UserRepository : IUserRepository
         if (!_dbContext.Users.Any(u => u.Id == user.Id)) throw new NotFoundException();
         
         _dbContext.Users.Remove(user);
+        _dbContext.UserSettings.Remove(user.UserSettings);
+        _dbContext.UserStatistics.Remove(user.UserStatistics);
     }
 
     public async Task DeleteByIdAsync(long id)
     {
         try
         {
-            var target = await _dbContext.Users.FirstAsync(u => u.Id == id);
+            var target = await GetByIdAsync(id);
             _dbContext.Users.Remove(target);
+            _dbContext.UserSettings.Remove(target.UserSettings);
+            _dbContext.UserStatistics.Remove(target.UserStatistics);
         }
         catch (InvalidOperationException)
         {
@@ -120,7 +124,35 @@ public class UserRepository : IUserRepository
 
     public void Update(User user)
     {
-        throw new NotImplementedException();
+        var minUsernameLength = int.Parse(_config["MinUsernameLength"]!);
+
+        if (user.Username.Length < minUsernameLength)
+        {
+            throw new StringTooShortException();
+        }
+        
+        var maxUsernameLength = int.Parse(_config["MaxUsernameLength"]!);
+        
+        if (user.Username.Length > maxUsernameLength)
+        {
+            throw new StringTooLongException();
+        }
+        
+        var originalEntity = _dbContext.Users.FirstOrDefault(u => u.Id == user.Id);
+        
+        if (originalEntity == null)
+        {
+            throw new NotFoundException();
+        }
+        
+        // Check if a user with the same Hex ID exists
+        if (originalEntity.HexId != user.HexId && _dbContext.Users.Count(u => u.HexId == user.HexId) >= 1)
+        {
+            throw new ArgumentException("User with the same Hex ID exists already!");
+        }
+
+        _dbContext.Entry(originalEntity).State = EntityState.Detached;
+        _dbContext.Entry(user).State = EntityState.Modified;
     }
 
     public void SaveChanges()
