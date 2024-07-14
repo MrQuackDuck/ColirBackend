@@ -14,6 +14,9 @@ public class UserSettingsRepository : IUserSettingsRepository
         _dbContext = dbContext;
     }
     
+    /// <summary>
+    /// Gets all users' settings
+    /// </summary>
     public async Task<IEnumerable<UserSettings>> GetAllAsync()
     {
         return await _dbContext.UserSettings
@@ -21,6 +24,11 @@ public class UserSettingsRepository : IUserSettingsRepository
             .ToListAsync();
     }
 
+    /// <summary>
+    /// Gets user setinngs by its id
+    /// </summary>
+    /// <param name="id">Id of user settings</param>
+    /// <exception cref="NotFoundException">Thrown when not found by id</exception>
     public async Task<UserSettings> GetByIdAsync(long id)
     {
         try
@@ -35,6 +43,13 @@ public class UserSettingsRepository : IUserSettingsRepository
         }
     }
     
+    /// <summary>
+    /// Gets user settings by user's hex id
+    /// </summary>
+    /// <param name="hexId">Hex Id of the user</param>
+    /// <exception cref="ArgumentException">Thrown when invalid Hex Id provided</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the user wasn't found</exception>
+    /// <exception cref="NotFoundException">Thrown when user settings weren't found</exception>
     public async Task<UserSettings> GetByUserHexIdAsync(long hexId)
     {
         if (hexId < 0 || hexId > 16_777_216)
@@ -59,6 +74,12 @@ public class UserSettingsRepository : IUserSettingsRepository
         }
     }
 
+    /// <summary>
+    /// Adds user settings to DB
+    /// </summary>
+    /// <param name="settings">User settings to add</param>
+    /// <exception cref="ArgumentException">Thrown when settings for this user already exist</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the user wasn't found</exception>
     public async Task AddAsync(UserSettings settings)
     {
         if (await _dbContext.UserSettings.AnyAsync(s => s.UserId == settings.UserId))
@@ -74,6 +95,11 @@ public class UserSettingsRepository : IUserSettingsRepository
         await _dbContext.AddAsync(settings);
     }
 
+    /// <summary>
+    /// Deletes user settings
+    /// </summary>
+    /// <param name="settings">User settings to delete</param>
+    /// <exception cref="NotFoundException">Thrown when user settings weren't found</exception>
     public void Delete(UserSettings settings)
     {
         if (!_dbContext.UserSettings.Any(s => s.Id == settings.Id))
@@ -84,6 +110,11 @@ public class UserSettingsRepository : IUserSettingsRepository
         _dbContext.UserSettings.Remove(settings);
     }
 
+    /// <summary>
+    /// Deletes user settings by id
+    /// </summary>
+    /// <param name="id">Id of user settings to delete</param>
+    /// <exception cref="NotFoundException">Thrown when user settings weren't found</exception>
     public async Task DeleteByIdAsync(long id)
     {
         try
@@ -97,6 +128,12 @@ public class UserSettingsRepository : IUserSettingsRepository
         }
     }
 
+    /// <summary>
+    /// Updates user settings
+    /// </summary>
+    /// <param name="settings">User settings to update</param>
+    /// <exception cref="NotFoundException">Thrown when user settings weren't found</exception>
+    /// <exception cref="ArgumentException">Thrown when a client tries to update user settings with another user id</exception>
     public void Update(UserSettings settings)
     {
         var originalEntity = _dbContext.UserSettings.FirstOrDefault(s => s.Id == settings.Id);
@@ -109,18 +146,24 @@ public class UserSettingsRepository : IUserSettingsRepository
         // Check if another UserId provided
         if (originalEntity.UserId != settings.UserId)
         {
-            throw new ArgumentException("Settings with the same User ID exist already!");
+            throw new ArgumentException("You can't update settings with different user id!");
         }
 
         _dbContext.Entry(originalEntity).State = EntityState.Detached;
         _dbContext.Entry(settings).State = EntityState.Modified;
     }
 
+    /// <summary>
+    /// Saves the changes to DB
+    /// </summary>
     public void SaveChanges()
     {
         _dbContext.SaveChanges();
     }
 
+    /// <summary>
+    /// Saves the changes to DB asynchronously
+    /// </summary>
     public async Task SaveChangesAsync()
     {
         await _dbContext.SaveChangesAsync();
