@@ -76,7 +76,7 @@ public class UserRepositoryTests : IUserRepositoryTests
                                         .Include(nameof(User.UserStatistics))
                                         .Include(nameof(User.UserSettings))
                                         .Include(nameof(User.JoinedRooms))
-                                        .First(u => u.Id == 1);
+                                        .FirstOrDefault(u => u.Id == 1)!;
 
         // Act
         var result = await _userRepository.GetByIdAsync(1);
@@ -106,10 +106,10 @@ public class UserRepositoryTests : IUserRepositoryTests
                                         .Include(nameof(User.UserStatistics))
                                         .Include(nameof(User.UserSettings))
                                         .Include(nameof(User.JoinedRooms))
-                                        .First(u => u.Id == 1);
+                                        .FirstOrDefault(u => u.Id == 1)!;
 
         // Act
-        var result = await _userRepository.GetByHexIdAsync("#FFFFFF");
+        var result = await _userRepository.GetByHexIdAsync(0xFFFFFF);
 
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new UserEqualityComparer()));
@@ -122,7 +122,7 @@ public class UserRepositoryTests : IUserRepositoryTests
     public async Task GetByHexIdAsync_ThrowsNotFoundException_WhenUserWasNotFound()
     {
         // Act
-        AsyncTestDelegate act = async () => await _userRepository.GetByHexIdAsync("#404000");
+        AsyncTestDelegate act = async () => await _userRepository.GetByHexIdAsync(0x404000);
 
         // Assert
         Assert.ThrowsAsync<NotFoundException>(act);
@@ -132,7 +132,7 @@ public class UserRepositoryTests : IUserRepositoryTests
     public async Task GetByHexIdAsync_ThrowsArgumentException_WhenHexFormatIsNotCorrect()
     {
         // Act
-        AsyncTestDelegate act = async () => await _userRepository.GetByHexIdAsync("Invalid HEX");
+        AsyncTestDelegate act = async () => await _userRepository.GetByHexIdAsync(0xFFFFFFF);
 
         // Assert
         Assert.ThrowsAsync<ArgumentException>(act);
@@ -299,7 +299,7 @@ public class UserRepositoryTests : IUserRepositoryTests
     }
 
     [Test]
-    public async Task AddAsync_ThrowsNotFound_WhenOneOfJoinedRoomsWasNotFound()
+    public async Task AddAsync_ThrowsRoomNotFoundException_WhenOneOfJoinedRoomsWasNotFound()
     {
         // Arrange
         var userToAdd = new User()
@@ -317,7 +317,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         AsyncTestDelegate act = async () => await _userRepository.AddAsync(userToAdd);
 
         // Assert
-        Assert.ThrowsAsync<NotFoundException>(act);
+        Assert.ThrowsAsync<RoomNotFoundException>(act);
     }
 
     [Test]
@@ -434,7 +434,7 @@ public class UserRepositoryTests : IUserRepositoryTests
     }
 
     [Test]
-    public async Task Delete_ThrowsNotFoundException_WhenUserWasNotFoundById()
+    public async Task DeleteByIdAsync_ThrowsNotFoundException_WhenUserWasNotFoundById()
     {
         // Act
         AsyncTestDelegate act = async () => await _userRepository.DeleteByIdAsync(404);

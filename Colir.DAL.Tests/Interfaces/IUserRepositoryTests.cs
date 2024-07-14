@@ -19,7 +19,7 @@ public interface IUserRepositoryTests
     Task AddAsync_ThrowsArgumentException_WhenHexFormatIsNotCorrect();
     Task AddAsync_ThrowsStringTooShortException_WhenUsernameTooShort();
     Task AddAsync_ThrowsStringTooLongException_WhenUsernameTooLong();
-    Task AddAsync_ThrowsNotFound_WhenOneOfJoinedRoomsWasNotFound();
+    Task AddAsync_ThrowsRoomNotFoundException_WhenOneOfJoinedRoomsWasNotFound();
     Task AddAsync_ThrowsRoomExpiredException_WhenOneOfJoinedRoomsIsExpired();
 
     Task Delete_DeletesUser();
@@ -30,7 +30,7 @@ public interface IUserRepositoryTests
     Task DeleteByIdAsync_DeletesUser();
     Task DeleteByIdAsync_DeletesUserSettings();
     Task DeleteByIdAsync_DeletesUserStatistics();
-    Task Delete_ThrowsNotFoundException_WhenUserWasNotFoundById();
+    Task DeleteByIdAsync_ThrowsNotFoundException_WhenUserWasNotFoundById();
 
     Task Update_UpdatesUser();
     Task Update_ThrowsStringTooLongException_WhenNameTooLong();

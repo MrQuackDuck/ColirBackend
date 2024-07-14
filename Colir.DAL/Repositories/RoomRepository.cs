@@ -19,14 +19,20 @@ public class RoomRepository : IRoomRepository
 
     public async Task<IEnumerable<Room>> GetAllAsync()
     {
-        return _dbContext.Rooms.ToList();
+        return await _dbContext.Rooms
+            .Include(nameof(Room.Owner))
+            .Include(nameof(Room.JoinedUsers))
+            .ToListAsync();
     }
 
     public async Task<Room> GetByIdAsync(long id)
     {
         try
         {
-            return await _dbContext.Rooms.FirstAsync(r => r.Id == id);
+            return await _dbContext.Rooms
+                .Include(nameof(Room.Owner))
+                .Include(nameof(Room.JoinedUsers))
+                .FirstAsync(r => r.Id == id);
         }
         catch (InvalidOperationException)
         {

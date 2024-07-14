@@ -4,5 +4,5 @@ namespace DAL.Interfaces;
 
 public interface IUserRepository : IRepository<User>
 {
-    Task<User> GetByHexIdAsync(string hexId);
+    Task<User> GetByHexIdAsync(long hexId);
 }
