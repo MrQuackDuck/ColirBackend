@@ -23,7 +23,7 @@ public static class UnitTestHelper
         var user1 = new User
         {
             Id = 1,
-            HexId = "#FFFFFF",
+            HexId = 0xFFFFFF,
             Username = "First User",
             AuthType = UserAuthType.Anonymous,
         };
@@ -31,7 +31,7 @@ public static class UnitTestHelper
         var user2 = new User
         {
             Id = 2,
-            HexId = "#000000",
+            HexId = 0x000000,
             Username = "Second User",
             AuthType = UserAuthType.Anonymous,
         };
@@ -39,7 +39,7 @@ public static class UnitTestHelper
         var user3 = new User
         {
             Id = 3,
-            HexId = "#F4CA16",
+            HexId = 0xF4CA16,
             Username = "Third User",
             AuthType = UserAuthType.Anonymous,
         };
