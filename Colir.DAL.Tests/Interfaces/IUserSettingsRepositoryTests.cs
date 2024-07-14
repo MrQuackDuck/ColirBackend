@@ -19,7 +19,7 @@ public interface IUserSettingsRepositoryTests
     Task Delete_ThrowsNotFoundException_WhenUserSettingsDoesNotExist();
 
     Task DeleteByIdAsync_DeletesUserSettings();
-    Task Delete_ThrowsNotFoundException_WhenUserSettingsWereNotFoundById();
+    Task DeleteByIdAsync_ThrowsNotFoundException_WhenUserSettingsWereNotFoundById();
 
     Task Update_UpdatesUserSettings();
     Task Update_ThrowsArgumentException_WhenProvidedAnotherUserId();

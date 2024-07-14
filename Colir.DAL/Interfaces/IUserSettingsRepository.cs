@@ -4,5 +4,5 @@ namespace DAL.Interfaces;
 
 public interface IUserSettingsRepository : IRepository<UserSettings>
 {
-    Task<UserSettings> GetByUserHexIdAsync(string hexId);
+    Task<UserSettings> GetByUserHexIdAsync(long hexId);
 }

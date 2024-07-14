@@ -63,7 +63,7 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
                                            .First(us => us.Id == 1);
         
         // Act
-        var result = await _userSettingsRepository.GetByUserHexIdAsync("#FFFFFF");
+        var result = await _userSettingsRepository.GetByUserHexIdAsync(0xFFFFFF);
         
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new UserSettingsEqualityComparer()));
@@ -74,7 +74,7 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
     public async Task GetByUserHexIdAsync_ThrowsUserNotFoundException_WhenUserWasNotFound()
     {
         // Act
-        AsyncTestDelegate act = async () => await _userSettingsRepository.GetByUserHexIdAsync("#444444");
+        AsyncTestDelegate act = async () => await _userSettingsRepository.GetByUserHexIdAsync(0x444444);
 
         // Assert
         Assert.ThrowsAsync<UserNotFoundException>(act);
@@ -84,7 +84,7 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
     public async Task GetByUserHexIdAsync_ThrowsArgumentException_WhenHexFormatIsNotCorrect()
     {
         // Act
-        AsyncTestDelegate act = async () => await _userSettingsRepository.GetByUserHexIdAsync("Invalid HEX");
+        AsyncTestDelegate act = async () => await _userSettingsRepository.GetByUserHexIdAsync(0xFFFFFFF);
 
         // Assert
         Assert.ThrowsAsync<ArgumentException>(act);
@@ -129,6 +129,7 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
 
         // Act
         await _userSettingsRepository.AddAsync(userSettingsToAdd);
+        _userSettingsRepository.SaveChanges();
 
         // Assert
         Assert.That(_dbContext.UserSettings.Count() == 3);
@@ -178,6 +179,7 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
 
         // Act
         _userSettingsRepository.Delete(userSettingsToDelete);
+        _userSettingsRepository.SaveChanges();
 
         // Assert
         Assert.That(_dbContext.UserSettings.Count() == 1);
@@ -206,13 +208,14 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
     {
         // Act
         await _userSettingsRepository.DeleteByIdAsync(1);
+        _userSettingsRepository.SaveChanges();
 
         // Assert
         Assert.That(_dbContext.UserSettings.Count() == 1);
     }
 
     [Test]
-    public async Task Delete_ThrowsNotFoundException_WhenUserSettingsWereNotFoundById()
+    public async Task DeleteByIdAsync_ThrowsNotFoundException_WhenUserSettingsWereNotFoundById()
     {
         // Act
         AsyncTestDelegate act = async () => await _userSettingsRepository.DeleteByIdAsync(404);
@@ -225,7 +228,7 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
     public async Task Update_UpdatesUserSettings()
     {
         // Arrange
-        var userSettingsToUpdate = _dbContext.UserSettings.First();
+        var userSettingsToUpdate = _dbContext.UserSettings.AsNoTracking().First();
         userSettingsToUpdate.StatisticsEnabled = false;
 
         // Act
@@ -239,7 +242,7 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
     public async Task Update_ThrowsArgumentException_WhenProvidedAnotherUserId()
     {
         // Arrange
-        var userSettingsToUpdate = _dbContext.UserSettings.First();
+        var userSettingsToUpdate = _dbContext.UserSettings.AsNoTracking().First();
         userSettingsToUpdate.UserId = 3;
 
         // Act
