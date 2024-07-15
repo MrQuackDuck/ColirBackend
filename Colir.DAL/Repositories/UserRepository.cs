@@ -144,17 +144,10 @@ public class UserRepository : IUserRepository
     /// <exception cref="NotFoundException">Thrown when the user wasn't found by provided id in DB</exception>
     public async Task DeleteByIdAsync(long id)
     {
-        try
-        {
-            var target = await GetByIdAsync(id);
-            _dbContext.Users.Remove(target);
-            _dbContext.UserSettings.Remove(target.UserSettings);
-            _dbContext.UserStatistics.Remove(target.UserStatistics);
-        }
-        catch (InvalidOperationException)
-        {
-            throw new NotFoundException();
-        }
+        var target = await GetByIdAsync(id);
+        _dbContext.Users.Remove(target);
+        _dbContext.UserSettings.Remove(target.UserSettings);
+        _dbContext.UserStatistics.Remove(target.UserStatistics);
     }
 
     /// <summary>

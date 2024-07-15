@@ -102,7 +102,17 @@ public static class UnitTestHelper
             RepliedMessageId = message1.Id, // "Message in Room #1"
         };
         
-        context.Messages.AddRange(message1, message2);
+        var message3 = new Message
+        {
+            Id = 3,
+            Content = "Message in expired room",
+            PostDate = DateTime.Now,
+            RoomId = expiredRoom.Id, // "Room #2"
+            AuthorId = user1.Id, // "First User"
+            RepliedMessageId = message1.Id, // "Message in Room #1"
+        };
+        
+        context.Messages.AddRange(message1, message2, message3);
 
         // Reactions
         var reaction1 = new Reaction

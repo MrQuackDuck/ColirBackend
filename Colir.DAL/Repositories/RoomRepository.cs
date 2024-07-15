@@ -104,6 +104,7 @@ public class RoomRepository : IRoomRepository
         }
         
         _dbContext.Rooms.Remove(room);
+        _dbContext.Messages.RemoveRange(_dbContext.Messages.Where(m => m.RoomId == room.Id));
     }
 
     /// <summary>
@@ -113,15 +114,8 @@ public class RoomRepository : IRoomRepository
     /// <exception cref="NotFoundException">Thrown when the room wasn't found by provided id in DB</exception>
     public async Task DeleteByIdAsync(long id)
     {
-        try
-        {
-            var target = await _dbContext.Rooms.FirstAsync(r => r.Id == id);
-            _dbContext.Rooms.Remove(target);
-        }
-        catch (InvalidOperationException)
-        {
-            throw new NotFoundException();
-        }
+        var target = await GetByIdAsync(id);
+        _dbContext.Rooms.Remove(target);
     }
 
     /// <summary>

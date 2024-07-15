@@ -62,7 +62,7 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
                                   .First(u => u.UserId == 1);
 
         // Act
-        var result = await _userStatisticsRepository.GetByUserHexIdAsync("#FFFFFF");
+        var result = await _userStatisticsRepository.GetByUserHexIdAsync(0xFFFFFF);
 
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new UserStatisticsEqualityComparer()));
@@ -73,7 +73,7 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
     public async Task GetByUserHexIdAsync_ThrowsUserNotFoundException_WhenUserWasNotFound()
     {
         // Act
-        AsyncTestDelegate act = async () => await _userStatisticsRepository.GetByUserHexIdAsync("#404040");
+        AsyncTestDelegate act = async () => await _userStatisticsRepository.GetByUserHexIdAsync(0x404040);
 
         // Assert
         Assert.ThrowsAsync<UserNotFoundException>(act);
@@ -83,7 +83,7 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
     public async Task GetByUserHexIdAsync_ThrowsArgumentException_WhenHexFormatIsNotCorrect()
     {
         // Act
-        AsyncTestDelegate act = async () => await _userStatisticsRepository.GetByUserHexIdAsync("404040");
+        AsyncTestDelegate act = async () => await _userStatisticsRepository.GetByUserHexIdAsync(0x4040404);
 
         // Assert
         Assert.ThrowsAsync<ArgumentException>(act);
@@ -131,6 +131,7 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
 
         // Act
         await _userStatisticsRepository.AddAsync(statisticsToAdd);
+        _userStatisticsRepository.SaveChanges();
 
         // Assert
         Assert.That(_dbContext.UserStatistics.Count() == 3);
@@ -142,7 +143,7 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
         // Arrange
         var statisticsToAdd = new UserStatistics
         {
-            UserId = 3, // "Third User"
+            UserId = 2, // "Second User"
             SecondsSpentInVoice = 0,
             ReactionsSet = 1,
             MessagesSent = 2,
@@ -186,6 +187,7 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
 
         // Act
         _userStatisticsRepository.Delete(statisticsToDelete);
+        _userStatisticsRepository.SaveChanges();
 
         // Assert
         Assert.That(_dbContext.UserStatistics.Count() == 1);
@@ -218,6 +220,7 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
     {
         // Act
         await _userStatisticsRepository.DeleteByIdAsync(1);
+        _userStatisticsRepository.SaveChanges();
 
         // Assert
         Assert.That(_dbContext.UserStatistics.Count() == 1);
@@ -237,7 +240,7 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
     public async Task Update_UpdatesUserStatistics()
     {
         // Arrange
-        var statsToUpdate = _dbContext.UserStatistics.First();
+        var statsToUpdate = _dbContext.UserStatistics.AsNoTracking().First();
         statsToUpdate.ReactionsSet = 50;
 
         // Act
@@ -251,7 +254,7 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
     public async Task Update_ThrowsArgumentException_WhenProvidedAnotherUserId()
     {
         // Arrange
-        var statsToUpdate = _dbContext.UserStatistics.First();
+        var statsToUpdate = _dbContext.UserStatistics.AsNoTracking().First();
         statsToUpdate.UserId = 3;
 
         // Act

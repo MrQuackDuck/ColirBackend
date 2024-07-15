@@ -18,11 +18,11 @@ public class Message : BaseEntity
     public long AuthorId { get; set; }
 
     [ForeignKey(nameof(RepliedTo))]
-    public long RepliedMessageId { get; set; }
+    public long? RepliedMessageId { get; set; }
 
     public Room Room { get; set; } = default!;
     public User Author { get; set; } = default!;
-    public Message? RepliedTo;
+    public Message? RepliedTo { get; set; }
     public List<Attachment> Attachments { get; set; } = default!;
     public List<Reaction> Reactions { get; set; } = default!;
 }

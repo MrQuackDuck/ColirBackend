@@ -263,7 +263,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         _roomRepository.SaveChanges();
 
         // Assert
-        Assert.That(_dbContext.Messages.Count() == 0);
+        Assert.That(_dbContext.Messages.Count() == 1);
     }
 
     [Test]
@@ -351,7 +351,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         _roomRepository.SaveChanges();
 
         // Assert
-        Assert.That(_dbContext.Messages.Count() == 0);
+        Assert.That(_dbContext.Messages.Count() == 1);
     }
 
     [Test]

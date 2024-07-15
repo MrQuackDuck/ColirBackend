@@ -112,13 +112,13 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
     }
 
     [Test]
-    public async Task GetReactionsOnMessage_ThrowsNotFoundException_WhenMessageWasNotFound()
+    public async Task GetReactionsOnMessage_ThrowsMessageNotFoundException_WhenMessageWasNotFound()
     {
         // Act
         AsyncTestDelegate act = async () => await _reactionRepository.GetReactionsOnMessage(100);
 
         // Assert
-        Assert.ThrowsAsync<NotFoundException>(act);
+        Assert.ThrowsAsync<MessageNotFoundException>(act);
     }
 
     [Test]

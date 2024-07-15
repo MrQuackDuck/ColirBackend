@@ -72,11 +72,11 @@ public class MessageRepositoryTests : IMessageRepositoryTests
                 .Include(nameof(Message.Author))
                 .Include(nameof(Message.Reactions))
                 .Include(nameof(Message.Attachments))
-                .FirstOrDefault(message => message.Id == 1)!
+                .FirstOrDefault(message => message.Id == 2)!
         };
 
         // Act
-        var result = await _messageRepository.GetLastMessages("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e", 1, 1);
+        var result = await _messageRepository.GetLastMessages("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e", 1, 0);
 
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new MessageEqualityComparer()));
@@ -171,7 +171,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
         // Arrange
         var messageToAdd = new Message()
         {
-            Id = 3,
+            Id = 4,
             Content = "Message in Room #1",
             PostDate = DateTime.Now,
             RoomId = 1, // "Room #1"
@@ -183,7 +183,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
         _messageRepository.SaveChanges();
 
         // Assert
-        Assert.That(_dbContext.Messages.Count() == 3);
+        Assert.That(_dbContext.Messages.Count() == 4);
     }
 
     [Test]
@@ -192,7 +192,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
         // Arrange
         var messageToAdd = new Message()
         {
-            Id = 3,
+            Id = 4,
             Content = "Message in Room #1",
             PostDate = DateTime.Now,
             RoomId = 1, // "Room #1"
@@ -215,7 +215,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
         _messageRepository.SaveChanges();
 
         // Assert
-        Assert.That(_dbContext.Messages.Count() == 3);
+        Assert.That(_dbContext.Messages.Count() == 4);
         Assert.That(_dbContext.Attachments.Count() == 2);
     }
 
@@ -225,7 +225,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
         // Arrange
         var messageToAdd = new Message()
         {
-            Id = 3,
+            Id = 4,
             Content = "Message in Room #1",
             PostDate = DateTime.Now,
             RoomId = 1, // "Room #1"
@@ -247,7 +247,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
         _messageRepository.SaveChanges();
 
         // Assert
-        Assert.That(_dbContext.Messages.Count() == 3);
+        Assert.That(_dbContext.Messages.Count() == 4);
         Assert.That(_dbContext.Reactions.Count() == 2);
     }
 
@@ -343,7 +343,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
         _messageRepository.SaveChanges();
 
         // Assert
-        Assert.That(_dbContext.Messages.Count() == 1);
+        Assert.That(_dbContext.Messages.Count() == 2);
     }
 
     [Test]
@@ -422,7 +422,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
         _messageRepository.SaveChanges();
 
         // Assert
-        Assert.That(_dbContext.Messages.Count() == 1);
+        Assert.That(_dbContext.Messages.Count() == 2);
     }
 
     [Test]

@@ -117,15 +117,8 @@ public class UserSettingsRepository : IUserSettingsRepository
     /// <exception cref="NotFoundException">Thrown when user settings weren't found</exception>
     public async Task DeleteByIdAsync(long id)
     {
-        try
-        {
-            var target = _dbContext.UserSettings.First(s => s.Id == id);
-            _dbContext.UserSettings.Remove(target);
-        }
-        catch (InvalidOperationException)
-        {
-            throw new NotFoundException();
-        }
+        var target = await GetByIdAsync(id);
+        _dbContext.UserSettings.Remove(target);
     }
 
     /// <summary>

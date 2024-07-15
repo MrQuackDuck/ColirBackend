@@ -4,5 +4,5 @@ namespace DAL.Interfaces;
 
 public interface IUserStatisticsRepository : IRepository<UserStatistics>
 {
-    Task<UserStatistics> GetByUserHexIdAsync(string hexId);
+    Task<UserStatistics> GetByUserHexIdAsync(long hexId);
 }

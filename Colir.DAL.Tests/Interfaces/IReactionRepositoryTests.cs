@@ -8,7 +8,7 @@ public interface IReactionRepositoryTests
     Task GetByIdAsync_ThrowsNotFoundException_WhenReactionWasNotFound();
 
     Task GetReactionsOnMessage_ReturnsAllReactionsOnMessage();
-    Task GetReactionsOnMessage_ThrowsNotFoundException_WhenMessageWasNotFound();
+    Task GetReactionsOnMessage_ThrowsMessageNotFoundException_WhenMessageWasNotFound();
 
     Task AddAsync_AddsNewReaction();
     Task AddAsync_ThrowsUserNotFoundException_WhenAuthorWasNotFound();
