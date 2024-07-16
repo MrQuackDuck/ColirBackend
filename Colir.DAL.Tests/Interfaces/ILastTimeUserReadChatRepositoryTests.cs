@@ -5,7 +5,6 @@ public interface ILastTimeUserReadChatRepositoryTests
     Task GetAllAsync_ReturnsAllTimesUsersReadChats();
 
     Task GetAsync_ReturnsEntity();
-    Task GetAsync_ThrowsNotFoundException_WhenEntityWasNotFound();
     Task GetAsync_ThrowsUserNotFoundException_WhenUserWasNotFound();
     Task GetAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
 

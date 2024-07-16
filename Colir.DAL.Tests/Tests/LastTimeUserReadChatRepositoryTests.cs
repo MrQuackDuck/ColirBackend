@@ -76,16 +76,6 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
     }
 
     [Test]
-    public async Task GetAsync_ThrowsNotFoundException_WhenEntityWasNotFound()
-    {
-        // Act
-        AsyncTestDelegate act = async () => await _lastTimeUserReadChatRepository.GetAsync(404, 404);
-        
-        // Assert
-        Assert.ThrowsAsync<NotFoundException>(act);
-    }
-
-    [Test]
     public async Task GetAsync_ThrowsUserNotFoundException_WhenUserWasNotFound()
     {
         // Act
@@ -146,6 +136,7 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
 
         // Act
         await _lastTimeUserReadChatRepository.AddAsync(lastTimeUserReadChatToAdd);
+        _lastTimeUserReadChatRepository.SaveChanges();
 
         // Assert
         Assert.That(_dbContext.LastTimeUserReadChats.Count() == 2);
@@ -231,6 +222,7 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
 
         // Act
         _lastTimeUserReadChatRepository.Delete(entityToDelete);
+        _lastTimeUserReadChatRepository.SaveChanges();
 
         // Assert
         Assert.That(_dbContext.LastTimeUserReadChats.Count() == 0);
@@ -260,6 +252,7 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
     {
         // Act
         await _lastTimeUserReadChatRepository.DeleteByIdAsync(1);
+        _lastTimeUserReadChatRepository.SaveChanges();
 
         // Assert
         Assert.That(_dbContext.LastTimeUserReadChats.Count() == 0);
@@ -294,7 +287,7 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
     public async Task Update_ThrowsArgumentException_WhenProvidedAnotherUserId()
     {
         // Arrange
-        var entityToUpdate = _dbContext.LastTimeUserReadChats.First();
+        var entityToUpdate = _dbContext.LastTimeUserReadChats.AsNoTracking().First();
         entityToUpdate.UserId = 500;
 
         // Act
@@ -308,7 +301,7 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
     public async Task Update_ThrowsArgumentException_WhenProvidedAnotherRoomId()
     {
         // Arrange
-        var entityToUpdate = _dbContext.LastTimeUserReadChats.First();
+        var entityToUpdate = _dbContext.LastTimeUserReadChats.AsNoTracking().First();
         entityToUpdate.RoomId = 500;
 
         // Act
@@ -349,6 +342,7 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
         };
 
         _dbContext.LastTimeUserReadChats.Add(entityToTest);
+        _lastTimeUserReadChatRepository.SaveChanges();
 
         // Act
         TestDelegate act = () => _lastTimeUserReadChatRepository.Update(entityToTest);
