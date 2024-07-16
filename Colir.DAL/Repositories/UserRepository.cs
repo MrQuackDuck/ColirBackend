@@ -23,7 +23,6 @@ public class UserRepository : IUserRepository
     public async Task<IEnumerable<User>> GetAllAsync()
     {
         return await _dbContext.Users
-            .AsNoTracking()
             .Include(nameof(User.UserStatistics))
             .Include(nameof(User.UserSettings))
             .Include(nameof(User.JoinedRooms))
@@ -38,7 +37,6 @@ public class UserRepository : IUserRepository
     public async Task<User> GetByIdAsync(long id)
     {
         return await _dbContext.Users
-            .AsNoTracking()
             .Include(nameof(User.UserStatistics))
             .Include(nameof(User.UserSettings))
             .Include(nameof(User.JoinedRooms))
@@ -59,7 +57,6 @@ public class UserRepository : IUserRepository
         }
         
         return await _dbContext.Users
-            .AsNoTracking()
             .Include(nameof(User.UserStatistics))
             .Include(nameof(User.UserSettings))
             .Include(nameof(User.JoinedRooms))

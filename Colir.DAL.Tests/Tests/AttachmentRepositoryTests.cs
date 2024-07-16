@@ -4,7 +4,6 @@ using Colir.DAL.Tests.Utils;
 using Colir.Exceptions;
 using DAL;
 using DAL.Entities;
-using DAL.Enums;
 using DAL.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -90,7 +89,6 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
             Id = 2,
             Filename = "newFile.zip",
             Path = "/tests/newFile.zip",
-            AttachmentType = AttachmentType.File,
             SizeInKb = 100,
             MessageId = 2, // Message: "Reply to first message"
         };
@@ -111,7 +109,6 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
             Id = 2,
             Filename = "newFile.zip",
             Path = "/tests/newFile.zip",
-            AttachmentType = AttachmentType.File,
             SizeInKb = 100,
             MessageId = 2, // Message: "Reply to first message"
         };
@@ -145,7 +142,6 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
             Id = 404,
             Filename = "newFile.zip",
             Path = "/tests/newFile.zip",
-            AttachmentType = AttachmentType.File,
             SizeInKb = 100,
             MessageId = 2, // Message: "Reply to first message"
         };
@@ -200,7 +196,6 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
             Id = 404,
             Filename = "newFile.zip",
             Path = "/tests/newFile.zip",
-            AttachmentType = AttachmentType.File,
             SizeInKb = 100,
             MessageId = 2, // Message: "Reply to first message"
         };
