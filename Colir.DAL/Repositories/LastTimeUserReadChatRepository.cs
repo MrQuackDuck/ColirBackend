@@ -20,6 +20,7 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
     public async Task<IEnumerable<LastTimeUserReadChat>> GetAllAsync()
     {
         return await _dbContext.LastTimeUserReadChats
+            .AsNoTracking()
             .Include(nameof(LastTimeUserReadChat.Room))
             .Include(nameof(LastTimeUserReadChat.User))
             .ToListAsync();
@@ -45,6 +46,7 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
         }
         
         return await _dbContext.LastTimeUserReadChats
+            .AsNoTracking()
             .Include(nameof(LastTimeUserReadChat.Room))
             .Include(nameof(LastTimeUserReadChat.User))
             .FirstAsync(l => l.RoomId == roomId && l.UserId == userId);
@@ -61,6 +63,7 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
         try
         {
             return await _dbContext.LastTimeUserReadChats
+                .AsNoTracking()
                 .Include(nameof(LastTimeUserReadChat.Room))
                 .Include(nameof(LastTimeUserReadChat.User))
                 .FirstAsync(l => l.Id == id);

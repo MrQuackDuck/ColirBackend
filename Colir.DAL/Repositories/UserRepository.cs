@@ -23,6 +23,7 @@ public class UserRepository : IUserRepository
     public async Task<IEnumerable<User>> GetAllAsync()
     {
         return await _dbContext.Users
+            .AsNoTracking()
             .Include(nameof(User.UserStatistics))
             .Include(nameof(User.UserSettings))
             .Include(nameof(User.JoinedRooms))
@@ -37,6 +38,7 @@ public class UserRepository : IUserRepository
     public async Task<User> GetByIdAsync(long id)
     {
         return await _dbContext.Users
+            .AsNoTracking()
             .Include(nameof(User.UserStatistics))
             .Include(nameof(User.UserSettings))
             .Include(nameof(User.JoinedRooms))
@@ -57,6 +59,7 @@ public class UserRepository : IUserRepository
         }
         
         return await _dbContext.Users
+            .AsNoTracking()
             .Include(nameof(User.UserStatistics))
             .Include(nameof(User.UserSettings))
             .Include(nameof(User.JoinedRooms))
@@ -73,7 +76,7 @@ public class UserRepository : IUserRepository
     /// <exception cref="StringTooShortException">Thrown when username is too short</exception>
     /// <exception cref="StringTooLongException">Thrown when username is too long</exception>
     /// <exception cref="RoomExpiredException">Thrown when one of JoinedRooms is expired</exception>
-    /// <exception cref="RoomNotFoundException"Thrown when one of JoinedRooms wasn't found></exception>
+    /// <exception cref="RoomNotFoundException">Thrown when one of JoinedRooms wasn't found></exception>
     public async Task AddAsync(User user)
     {
         if (user.HexId < 0 || user.HexId > 16_777_216)

@@ -23,6 +23,7 @@ public class RoomRepository : IRoomRepository
     public async Task<IEnumerable<Room>> GetAllAsync()
     {
         return await _dbContext.Rooms
+            .AsNoTracking()
             .Include(nameof(Room.Owner))
             .Include(nameof(Room.JoinedUsers))
             .ToListAsync();
@@ -38,6 +39,7 @@ public class RoomRepository : IRoomRepository
         try
         {
             return await _dbContext.Rooms
+                .AsNoTracking()
                 .Include(nameof(Room.Owner))
                 .Include(nameof(Room.JoinedUsers))
                 .FirstAsync(r => r.Id == id);

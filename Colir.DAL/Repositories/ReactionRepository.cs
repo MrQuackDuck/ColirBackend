@@ -20,6 +20,7 @@ public class ReactionRepository : IReactionRepository
     public async Task<IEnumerable<Reaction>> GetAllAsync()
     {
         return await _dbContext.Reactions
+            .AsNoTracking()
             .Include(nameof(Reaction.Author))
             .Include(nameof(Reaction.Message))
             .ToListAsync();
@@ -35,6 +36,7 @@ public class ReactionRepository : IReactionRepository
         try
         {
             return await _dbContext.Reactions
+                .AsNoTracking()
                 .Include(nameof(Reaction.Author))
                 .Include(nameof(Reaction.Message))
                 .FirstAsync(r => r.Id == id);
@@ -58,6 +60,7 @@ public class ReactionRepository : IReactionRepository
         }
         
         return await _dbContext.Reactions
+            .AsNoTracking()
             .Include(nameof(Reaction.Author))
             .Include(nameof(Reaction.Message))
             .Where(r => r.MessageId == messageId)

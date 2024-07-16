@@ -20,6 +20,7 @@ public class MessageRepository : IMessageRepository
     public async Task<IEnumerable<Message>> GetAllAsync()
     {
         return await _dbContext.Messages
+            .AsNoTracking()
             .Include(nameof(Message.Room))
             .Include(nameof(Message.Author))
             .Include(nameof(Message.RepliedTo))
@@ -38,6 +39,7 @@ public class MessageRepository : IMessageRepository
         try
         {
             return await _dbContext.Messages
+                .AsNoTracking()
                 .Include(nameof(Message.Room))
                 .Include(nameof(Message.Author))
                 .Include(nameof(Message.RepliedTo))
@@ -85,6 +87,7 @@ public class MessageRepository : IMessageRepository
         }
         
         return await _dbContext.Messages
+            .AsNoTracking()
             .Include(nameof(Room))
             .Where(m => m.Room.Guid == roomGuid)
             .OrderByDescending(m => m.PostDate)

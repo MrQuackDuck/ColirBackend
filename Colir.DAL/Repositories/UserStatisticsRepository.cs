@@ -20,6 +20,7 @@ public class UserStatisticsRepository : IUserStatisticsRepository
     public async Task<IEnumerable<UserStatistics>> GetAllAsync()
     {
         return await _dbContext.UserStatistics
+            .AsNoTracking()
             .Include(nameof(UserStatistics.User))
             .ToListAsync();
     }
@@ -34,6 +35,7 @@ public class UserStatisticsRepository : IUserStatisticsRepository
         try
         {
             return await _dbContext.UserStatistics
+                .AsNoTracking()
                 .Include(nameof(UserStatistics.User))
                 .FirstAsync(s => s.Id == id);
         }
@@ -65,6 +67,7 @@ public class UserStatisticsRepository : IUserStatisticsRepository
         try
         {
             return await _dbContext.UserStatistics
+                .AsNoTracking()
                 .Include(nameof(UserSettings.User))
                 .FirstAsync(s => s.User.HexId == hexId);
         }
