@@ -1,5 +1,7 @@
-﻿using DAL.Entities;
+﻿using Colir.Exceptions;
+using DAL.Entities;
 using DAL.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Repositories;
 
@@ -12,43 +14,106 @@ public class AttachmentRepository : IAttachmentRepository
         _dbContext = dbContext;
     }
     
+    /// <summary>
+    /// Gets all attachments
+    /// </summary>
     public async Task<IEnumerable<Attachment>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        return await _dbContext.Attachments
+            .Include(nameof(Attachment.Message))
+            .ToListAsync();
     }
 
+    /// <summary>
+    /// Gets the attachment by id
+    /// </summary>
+    /// <param name="id">Id of attachment to get</param>
+    /// <exception cref="NotFoundException">Thrown when the attachment wasn't found</exception>
     public async Task<Attachment> GetByIdAsync(long id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            return await _dbContext.Attachments
+                .Include(nameof(Attachment.Message))
+                .FirstAsync(a => a.Id == id);
+        }
+        catch (InvalidOperationException)
+        {
+            throw new NotFoundException();
+        }
     }
 
-    public async Task AddAsync(Attachment entity)
+    /// <summary>
+    /// Adds the attachment to DB
+    /// </summary>
+    /// <param name="attachment">An attachment to add</param>
+    /// <exception cref="MessageNotFoundException">Thrown when message wasn't found</exception>
+    public async Task AddAsync(Attachment attachment)
     {
-        throw new NotImplementedException();
+        if (!await _dbContext.Messages.AnyAsync(m => m.Id == attachment.MessageId))
+        {
+            throw new MessageNotFoundException();
+        }
+        
+        await _dbContext.Attachments.AddAsync(attachment);
     }
 
-    public void Delete(Attachment entity)
+    /// <summary>
+    /// Deletes the attachment
+    /// </summary>
+    /// <param name="attachment">An attachment to delete</param>
+    /// <exception cref="NotFoundException">Thrown when the attachment wasn't found</exception>
+    public void Delete(Attachment attachment)
     {
-        throw new NotImplementedException();
+        if (!_dbContext.Attachments.Any(a => a.Id == attachment.Id))
+        {
+            throw new NotFoundException();
+        }
+        
+        _dbContext.Attachments.Remove(attachment);
     }
 
+    /// <summary>
+    /// Deletes the attachment by id
+    /// </summary>
+    /// <param name="id">Id of the attachment to delete</param>
     public async Task DeleteByIdAsync(long id)
     {
-        throw new NotImplementedException();
+        var target = await GetByIdAsync(id);
+        _dbContext.Attachments.Remove(target);
     }
 
-    public void Update(Attachment entity)
+    /// <summary>
+    /// Updates the attachment
+    /// </summary>
+    /// <param name="attachment">An attachment to update</param>
+    /// <exception cref="NotFoundException">Thrown when non-existing attachment provided</exception>
+    public void Update(Attachment attachment)
     {
-        throw new NotImplementedException();
+        var originalEntity = _dbContext.Attachments.Include(nameof(Attachment.Message)).FirstOrDefault(a => a.Id == attachment.Id);
+        
+        if (originalEntity == null)
+        {
+            throw new NotFoundException();
+        }
+
+        _dbContext.Entry(originalEntity).State = EntityState.Detached;
+        _dbContext.Entry(attachment).State = EntityState.Modified;
     }
 
+    /// <summary>
+    /// Saves the changes to DB
+    /// </summary>
     public void SaveChanges()
     {
-        throw new NotImplementedException();
+        _dbContext.SaveChanges();
     }
 
-    public Task SaveChangesAsync()
+    /// <summary>
+    /// Saves the changes to DB asynchronously
+    /// </summary>
+    public async Task SaveChangesAsync()
     {
-        throw new NotImplementedException();
+        await _dbContext.SaveChangesAsync();
     }
 }

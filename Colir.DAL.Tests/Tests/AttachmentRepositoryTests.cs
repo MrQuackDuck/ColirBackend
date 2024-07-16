@@ -95,6 +95,7 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
         
         // Act
         await _attachmentRepository.AddAsync(attachmentToAdd);
+        _attachmentRepository.SaveChanges();
         
         // Assert
         Assert.That(_dbContext.Attachments.Count() == 2);
@@ -110,7 +111,7 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
             Filename = "newFile.zip",
             Path = "/tests/newFile.zip",
             SizeInKb = 100,
-            MessageId = 2, // Message: "Reply to first message"
+            MessageId = 404,
         };
         
         // Act
@@ -128,6 +129,7 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
         
         // Act
         _attachmentRepository.Delete(attachmentToDelete);
+        _attachmentRepository.SaveChanges();
         
         // Assert
         Assert.That(_dbContext.Attachments.Count() == 0);
@@ -158,6 +160,7 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
     {
         // Act
         await _attachmentRepository.DeleteByIdAsync(1);
+        _attachmentRepository.SaveChanges();
         
         // Assert
         Assert.That(_dbContext.Attachments.Count() == 0);
@@ -182,6 +185,7 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
         // Act
         attachmentToUpdate.SizeInKb = 100;
         _attachmentRepository.Update(attachmentToUpdate);
+        _attachmentRepository.SaveChanges();
         
         // Assert
         Assert.That(_dbContext.Attachments.First().SizeInKb == 100);
