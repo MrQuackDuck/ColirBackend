@@ -20,6 +20,7 @@ public class UserStatisticsRepository : IUserStatisticsRepository
     public async Task<IEnumerable<UserStatistics>> GetAllAsync()
     {
         return await _dbContext.UserStatistics
+            .AsNoTracking()
             .Include(nameof(UserStatistics.User))
             .ToListAsync();
     }
@@ -34,6 +35,7 @@ public class UserStatisticsRepository : IUserStatisticsRepository
         try
         {
             return await _dbContext.UserStatistics
+                .AsNoTracking()
                 .Include(nameof(UserStatistics.User))
                 .FirstAsync(s => s.Id == id);
         }
@@ -65,6 +67,7 @@ public class UserStatisticsRepository : IUserStatisticsRepository
         try
         {
             return await _dbContext.UserStatistics
+                .AsNoTracking()
                 .Include(nameof(UserSettings.User))
                 .FirstAsync(s => s.User.HexId == hexId);
         }
@@ -102,12 +105,9 @@ public class UserStatisticsRepository : IUserStatisticsRepository
     /// <exception cref="NotFoundException">Thrown when user statistics wasn't found</exception>
     public void Delete(UserStatistics statistics)
     {
-        if (!_dbContext.UserStatistics.Any(s => s.Id == statistics.Id))
-        {
-            throw new NotFoundException();
-        }
+        var target = _dbContext.UserStatistics.FirstOrDefault(s => s.Id == statistics.Id) ?? throw new NotFoundException();
 
-        _dbContext.UserStatistics.Remove(statistics);
+        _dbContext.UserStatistics.Remove(target);
     }
 
     /// <summary>
@@ -117,7 +117,8 @@ public class UserStatisticsRepository : IUserStatisticsRepository
     /// <exception cref="NotFoundException">Thrown when user statistics weren't found</exception>
     public async Task DeleteByIdAsync(long id)
     {
-        var target = await GetByIdAsync(id);
+        var target = await _dbContext.UserStatistics.FirstOrDefaultAsync(s => s.Id == id) ?? throw new NotFoundException();
+
         _dbContext.UserStatistics.Remove(target);
     }
 

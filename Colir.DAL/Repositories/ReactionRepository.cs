@@ -20,6 +20,7 @@ public class ReactionRepository : IReactionRepository
     public async Task<IEnumerable<Reaction>> GetAllAsync()
     {
         return await _dbContext.Reactions
+            .AsNoTracking()
             .Include(nameof(Reaction.Author))
             .Include(nameof(Reaction.Message))
             .ToListAsync();
@@ -35,6 +36,7 @@ public class ReactionRepository : IReactionRepository
         try
         {
             return await _dbContext.Reactions
+                .AsNoTracking()
                 .Include(nameof(Reaction.Author))
                 .Include(nameof(Reaction.Message))
                 .FirstAsync(r => r.Id == id);
@@ -58,6 +60,7 @@ public class ReactionRepository : IReactionRepository
         }
         
         return await _dbContext.Reactions
+            .AsNoTracking()
             .Include(nameof(Reaction.Author))
             .Include(nameof(Reaction.Message))
             .Where(r => r.MessageId == messageId)
@@ -92,12 +95,8 @@ public class ReactionRepository : IReactionRepository
     /// <exception cref="NotFoundException">Thrown when the reaction wasn't found</exception>
     public void Delete(Reaction reaction)
     {
-        if (!_dbContext.Reactions.Any(r => r.Id == reaction.Id))
-        {
-            throw new NotFoundException();
-        }
-
-        _dbContext.Reactions.Remove(reaction);
+        var target = _dbContext.Reactions.FirstOrDefault(r => r.Id == reaction.Id) ?? throw new NotFoundException();
+        _dbContext.Reactions.Remove(target);
     }
 
     /// <summary>
@@ -107,7 +106,7 @@ public class ReactionRepository : IReactionRepository
     /// <exception cref="NotFoundException">Thrown when the reaction wasn't found</exception>
     public async Task DeleteByIdAsync(long id)
     {
-        var target = await GetByIdAsync(id);
+        var target = await _dbContext.Reactions.FirstOrDefaultAsync(r => r.Id == id) ?? throw new NotFoundException();
         _dbContext.Reactions.Remove(target);
     }
 

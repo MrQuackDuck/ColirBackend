@@ -20,6 +20,7 @@ public class MessageRepository : IMessageRepository
     public async Task<IEnumerable<Message>> GetAllAsync()
     {
         return await _dbContext.Messages
+            .AsNoTracking()
             .Include(nameof(Message.Room))
             .Include(nameof(Message.Author))
             .Include(nameof(Message.RepliedTo))
@@ -38,6 +39,7 @@ public class MessageRepository : IMessageRepository
         try
         {
             return await _dbContext.Messages
+                .AsNoTracking()
                 .Include(nameof(Message.Room))
                 .Include(nameof(Message.Author))
                 .Include(nameof(Message.RepliedTo))
@@ -85,7 +87,12 @@ public class MessageRepository : IMessageRepository
         }
         
         return await _dbContext.Messages
-            .Include(nameof(Room))
+            .AsNoTracking()
+            .Include(nameof(Message.Room))
+            .Include(nameof(Message.Author))
+            .Include(nameof(Message.RepliedTo))
+            .Include(nameof(Message.Attachments))
+            .Include(nameof(Message.Reactions))
             .Where(m => m.Room.Guid == roomGuid)
             .OrderByDescending(m => m.PostDate)
             .Skip(skip)
@@ -135,22 +142,12 @@ public class MessageRepository : IMessageRepository
     /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found</exception>
     public void Delete(Message message)
     {
-        if (!_dbContext.Messages.Any(m => m.Id == message.Id))
-        {
-            throw new NotFoundException();
-        }
+        var target = _dbContext.Messages.FirstOrDefault(m => m.Id == message.Id) ?? throw new NotFoundException();
         
-        try
-        {
-            var room = _dbContext.Rooms.First(r => r.Id == message.RoomId);
-            if (room.ExpiryDate < DateTime.Now) throw new RoomExpiredException();
-        }
-        catch (InvalidOperationException)
-        {
-            throw new RoomNotFoundException();
-        }
+        var room = _dbContext.Rooms.First(r => r.Id == target.RoomId) ?? throw new RoomNotFoundException();;
+        if (room.ExpiryDate < DateTime.Now) throw new RoomExpiredException();
         
-        _dbContext.Messages.Remove(message);
+        _dbContext.Messages.Remove(target);
     }
 
     /// <summary>

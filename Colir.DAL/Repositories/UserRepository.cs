@@ -23,6 +23,7 @@ public class UserRepository : IUserRepository
     public async Task<IEnumerable<User>> GetAllAsync()
     {
         return await _dbContext.Users
+            .AsNoTracking()
             .Include(nameof(User.UserStatistics))
             .Include(nameof(User.UserSettings))
             .Include(nameof(User.JoinedRooms))
@@ -37,6 +38,7 @@ public class UserRepository : IUserRepository
     public async Task<User> GetByIdAsync(long id)
     {
         return await _dbContext.Users
+            .AsNoTracking()
             .Include(nameof(User.UserStatistics))
             .Include(nameof(User.UserSettings))
             .Include(nameof(User.JoinedRooms))
@@ -57,6 +59,7 @@ public class UserRepository : IUserRepository
         }
         
         return await _dbContext.Users
+            .AsNoTracking()
             .Include(nameof(User.UserStatistics))
             .Include(nameof(User.UserSettings))
             .Include(nameof(User.JoinedRooms))
@@ -130,11 +133,14 @@ public class UserRepository : IUserRepository
     /// <exception cref="NotFoundException">Thrown when the user wasn't found in DB</exception>
     public void Delete(User user)
     {
-        if (!_dbContext.Users.Any(u => u.Id == user.Id)) throw new NotFoundException();
+        var target = _dbContext.Users
+            .Include(nameof(User.UserStatistics))
+            .Include(nameof(User.UserSettings))
+            .FirstOrDefault(u => u.Id == user.Id) ?? throw new NotFoundException();
         
-        _dbContext.Users.Remove(user);
-        _dbContext.UserSettings.Remove(user.UserSettings);
-        _dbContext.UserStatistics.Remove(user.UserStatistics);
+        _dbContext.Users.Remove(target);
+        _dbContext.UserSettings.Remove(target.UserSettings);
+        _dbContext.UserStatistics.Remove(target.UserStatistics);
     }
     
     /// <summary>
@@ -144,7 +150,11 @@ public class UserRepository : IUserRepository
     /// <exception cref="NotFoundException">Thrown when the user wasn't found by provided id in DB</exception>
     public async Task DeleteByIdAsync(long id)
     {
-        var target = await GetByIdAsync(id);
+        var target = await _dbContext.Users
+            .Include(nameof(User.UserStatistics))
+            .Include(nameof(User.UserSettings))
+            .FirstOrDefaultAsync(u => u.Id == id) ?? throw new NotFoundException();
+        
         _dbContext.Users.Remove(target);
         _dbContext.UserSettings.Remove(target.UserSettings);
         _dbContext.UserStatistics.Remove(target.UserStatistics);

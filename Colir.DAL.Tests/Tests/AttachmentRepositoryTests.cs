@@ -125,7 +125,7 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
     public async Task Delete_DeletesAttachment()
     {
         // Arrange
-        var attachmentToDelete = _dbContext.Attachments.First();
+        var attachmentToDelete = _dbContext.Attachments.AsNoTracking().First();
         
         // Act
         _attachmentRepository.Delete(attachmentToDelete);
@@ -180,7 +180,7 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
     public async Task Update_UpdatesAttachment()
     {
         // Arrange
-        var attachmentToUpdate = _dbContext.Attachments.First();
+        var attachmentToUpdate = _dbContext.Attachments.AsNoTracking().First();
         
         // Act
         attachmentToUpdate.SizeInKb = 100;

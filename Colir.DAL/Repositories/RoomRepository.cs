@@ -23,6 +23,7 @@ public class RoomRepository : IRoomRepository
     public async Task<IEnumerable<Room>> GetAllAsync()
     {
         return await _dbContext.Rooms
+            .AsNoTracking()
             .Include(nameof(Room.Owner))
             .Include(nameof(Room.JoinedUsers))
             .ToListAsync();
@@ -38,6 +39,7 @@ public class RoomRepository : IRoomRepository
         try
         {
             return await _dbContext.Rooms
+                .AsNoTracking()
                 .Include(nameof(Room.Owner))
                 .Include(nameof(Room.JoinedUsers))
                 .FirstAsync(r => r.Id == id);
@@ -97,13 +99,9 @@ public class RoomRepository : IRoomRepository
     /// <exception cref="NotFoundException">Thrown when the room wasn't found in DB</exception>
     public void Delete(Room room)
     {
-        // Check if room exists
-        if (_dbContext.Rooms.FirstOrDefault(r => r.Id == room.Id) is null)
-        {
-            throw new NotFoundException();
-        }
+        var target = _dbContext.Rooms.FirstOrDefault(r => r.Id == room.Id) ?? throw new NotFoundException();
         
-        _dbContext.Rooms.Remove(room);
+        _dbContext.Rooms.Remove(target);
         _dbContext.Messages.RemoveRange(_dbContext.Messages.Where(m => m.RoomId == room.Id));
     }
 
@@ -114,8 +112,10 @@ public class RoomRepository : IRoomRepository
     /// <exception cref="NotFoundException">Thrown when the room wasn't found by provided id in DB</exception>
     public async Task DeleteByIdAsync(long id)
     {
-        var target = await GetByIdAsync(id);
+        var target = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Id == id) ?? throw new NotFoundException();
+        
         _dbContext.Rooms.Remove(target);
+        _dbContext.Messages.RemoveRange(_dbContext.Messages.Where(m => m.RoomId == id));
     }
 
     /// <summary>

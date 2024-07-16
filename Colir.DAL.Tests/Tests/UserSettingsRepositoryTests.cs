@@ -175,7 +175,7 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
     public async Task Delete_DeletesUserSettings()
     {
         // Arrange
-        var userSettingsToDelete = _dbContext.UserSettings.First();
+        var userSettingsToDelete = _dbContext.UserSettings.AsNoTracking().First();
 
         // Act
         _userSettingsRepository.Delete(userSettingsToDelete);

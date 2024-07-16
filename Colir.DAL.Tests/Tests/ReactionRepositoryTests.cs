@@ -183,7 +183,7 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
     public async Task Delete_DeletesReaction()
     {
         // Arrange
-        var reactionToDelete = _dbContext.Reactions.First();
+        var reactionToDelete = _dbContext.Reactions.AsNoTracking().First();
 
         // Act
         _reactionRepository.Delete(reactionToDelete);
@@ -244,7 +244,7 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
     public async Task Update_UpdatesReaction()
     {
         // Arrange
-        var reactionToUpdate = _dbContext.Reactions.First();
+        var reactionToUpdate = _dbContext.Reactions.AsNoTracking().First();
         reactionToUpdate.Symbol = "😎";
 
         // Act

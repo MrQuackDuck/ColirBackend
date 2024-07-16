@@ -20,6 +20,7 @@ public class AttachmentRepository : IAttachmentRepository
     public async Task<IEnumerable<Attachment>> GetAllAsync()
     {
         return await _dbContext.Attachments
+            .AsNoTracking()
             .Include(nameof(Attachment.Message))
             .ToListAsync();
     }
@@ -34,6 +35,7 @@ public class AttachmentRepository : IAttachmentRepository
         try
         {
             return await _dbContext.Attachments
+                .AsNoTracking()
                 .Include(nameof(Attachment.Message))
                 .FirstAsync(a => a.Id == id);
         }
@@ -65,12 +67,15 @@ public class AttachmentRepository : IAttachmentRepository
     /// <exception cref="NotFoundException">Thrown when the attachment wasn't found</exception>
     public void Delete(Attachment attachment)
     {
-        if (!_dbContext.Attachments.Any(a => a.Id == attachment.Id))
+        try
+        {
+            var target = _dbContext.Attachments.First(a => a.Id == attachment.Id);
+            _dbContext.Attachments.Remove(target);
+        }
+        catch (InvalidOperationException)
         {
             throw new NotFoundException();
         }
-        
-        _dbContext.Attachments.Remove(attachment);
     }
 
     /// <summary>
@@ -79,8 +84,15 @@ public class AttachmentRepository : IAttachmentRepository
     /// <param name="id">Id of the attachment to delete</param>
     public async Task DeleteByIdAsync(long id)
     {
-        var target = await GetByIdAsync(id);
-        _dbContext.Attachments.Remove(target);
+        try
+        {
+            var target = await _dbContext.Attachments.FirstAsync(a => a.Id == id);
+            _dbContext.Attachments.Remove(target);
+        }
+        catch (InvalidOperationException)
+        {
+            throw new NotFoundException();
+        }
     }
 
     /// <summary>

@@ -218,7 +218,7 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
     public async Task Delete_DeletesEntity()
     {
         // Arrange
-        var entityToDelete = _dbContext.LastTimeUserReadChats.First();
+        var entityToDelete = _dbContext.LastTimeUserReadChats.AsNoTracking().First();
 
         // Act
         _lastTimeUserReadChatRepository.Delete(entityToDelete);
@@ -272,7 +272,7 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
     public async Task Update_UpdatesEntity()
     {
         // Arrange
-        var entityToUpdate = _dbContext.LastTimeUserReadChats.First();
+        var entityToUpdate = _dbContext.LastTimeUserReadChats.AsNoTracking().First();
         var newTimeStamp = DateTime.Now.Add(new TimeSpan(200));
         entityToUpdate.Timestamp = newTimeStamp;
 

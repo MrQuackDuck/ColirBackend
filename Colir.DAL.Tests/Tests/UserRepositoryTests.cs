@@ -346,11 +346,7 @@ public class UserRepositoryTests : IUserRepositoryTests
     public async Task Delete_DeletesUser()
     {
         // Arrange
-        var userToDelete = _dbContext.Users
-            .Include(nameof(User.UserStatistics))
-            .Include(nameof(User.UserSettings))
-            .Include(nameof(User.JoinedRooms))
-            .First();
+        var userToDelete = _dbContext.Users.AsNoTracking().First();
 
         // Act
         _userRepository.Delete(userToDelete);
@@ -364,11 +360,7 @@ public class UserRepositoryTests : IUserRepositoryTests
     public async Task Delete_DeletesUserSettings()
     {
         // Arrange
-        var userToDelete = _dbContext.Users
-            .Include(nameof(User.UserStatistics))
-            .Include(nameof(User.UserSettings))
-            .Include(nameof(User.JoinedRooms))
-            .First();
+        var userToDelete = _dbContext.Users.First();
 
         // Act
         _userRepository.Delete(userToDelete);
@@ -382,7 +374,7 @@ public class UserRepositoryTests : IUserRepositoryTests
     public async Task Delete_DeletesUserStatistics()
     {
         // Arrange
-        var userToDelete = _dbContext.Users.First();
+        var userToDelete = _dbContext.Users.AsNoTracking().First();
 
         // Act
         _userRepository.Delete(userToDelete);
@@ -455,7 +447,7 @@ public class UserRepositoryTests : IUserRepositoryTests
     public async Task Update_UpdatesUser()
     {
         // Arrange
-        var userToUpdate = _dbContext.Users.First();
+        var userToUpdate = _dbContext.Users.AsNoTracking().First();
         userToUpdate.Username = "UpdatedUser";
 
         // Act

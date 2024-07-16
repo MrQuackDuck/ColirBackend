@@ -183,7 +183,7 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
     public async Task Delete_DeletesUserStatistics()
     {
         // Arrange
-        var statisticsToDelete = _dbContext.UserStatistics.First();
+        var statisticsToDelete = _dbContext.UserStatistics.AsNoTracking().First();
 
         // Act
         _userStatisticsRepository.Delete(statisticsToDelete);

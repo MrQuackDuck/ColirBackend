@@ -223,7 +223,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     {
         // Arrange
         var roomCount = _dbContext.Rooms.Count();
-        var roomToDelete = _dbContext.Rooms.First();
+        var roomToDelete = _dbContext.Rooms.AsNoTracking().First();
         
         // Act
         _roomRepository.Delete(roomToDelete);
@@ -242,7 +242,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     public async Task Delete_DeletesAllRelatedAttachments()
     {
         // Arrange
-        var roomToDelete = _dbContext.Rooms.First();
+        var roomToDelete = _dbContext.Rooms.AsNoTracking().First();
 
         // Act
         _roomRepository.Delete(roomToDelete);
@@ -256,7 +256,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     public async Task Delete_DeletesAllRelatedMessages()
     {
         // Arrange
-        var roomToDelete = _dbContext.Rooms.First();
+        var roomToDelete = _dbContext.Rooms.AsNoTracking().First();
 
         // Act
         _roomRepository.Delete(roomToDelete);
@@ -417,7 +417,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     public async Task Update_ThrowsStringTooLongException_WhenNameTooLong()
     {
         // Arrange
-        var roomToUpdate = _dbContext.Rooms.First(r => r.Id == 1);
+        var roomToUpdate = _dbContext.Rooms.AsNoTracking().First(r => r.Id == 1);
         roomToUpdate.Name = new string('a', 51);
 
         // Act

@@ -20,6 +20,7 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
     public async Task<IEnumerable<LastTimeUserReadChat>> GetAllAsync()
     {
         return await _dbContext.LastTimeUserReadChats
+            .AsNoTracking()
             .Include(nameof(LastTimeUserReadChat.Room))
             .Include(nameof(LastTimeUserReadChat.User))
             .ToListAsync();
@@ -45,6 +46,7 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
         }
         
         return await _dbContext.LastTimeUserReadChats
+            .AsNoTracking()
             .Include(nameof(LastTimeUserReadChat.Room))
             .Include(nameof(LastTimeUserReadChat.User))
             .FirstAsync(l => l.RoomId == roomId && l.UserId == userId);
@@ -61,6 +63,7 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
         try
         {
             return await _dbContext.LastTimeUserReadChats
+                .AsNoTracking()
                 .Include(nameof(LastTimeUserReadChat.Room))
                 .Include(nameof(LastTimeUserReadChat.User))
                 .FirstAsync(l => l.Id == id);
@@ -112,12 +115,15 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
     /// <exception cref="NotFoundException">Thrown when the entity wasn't found</exception>
     public void Delete(LastTimeUserReadChat entity)
     {
-        if (!_dbContext.LastTimeUserReadChats.Any(l => l.Id == entity.Id))
+        try
+        {
+            var target = _dbContext.LastTimeUserReadChats.First(l => l.Id == entity.Id);
+            _dbContext.LastTimeUserReadChats.Remove(target);
+        }
+        catch (InvalidOperationException)
         {
             throw new NotFoundException();
         }
-        
-        _dbContext.LastTimeUserReadChats.Remove(entity);
     }
 
     /// <summary>
@@ -127,8 +133,15 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
     /// <exception cref="NotFoundException">Thrown when the entity wasn't found</exception>
     public async Task DeleteByIdAsync(long id)
     {
-        var target = await GetByIdAsync(id);
-        _dbContext.LastTimeUserReadChats.Remove(target);
+        try
+        {
+            var target = await _dbContext.LastTimeUserReadChats.FirstAsync(l => l.Id == id);
+            _dbContext.LastTimeUserReadChats.Remove(target);
+        }
+        catch (InvalidOperationException)
+        {
+            throw new NotFoundException();
+        }
     }
 
     /// <summary>

@@ -20,6 +20,7 @@ public class UserSettingsRepository : IUserSettingsRepository
     public async Task<IEnumerable<UserSettings>> GetAllAsync()
     {
         return await _dbContext.UserSettings
+            .AsNoTracking()
             .Include(nameof(UserSettings.User))
             .ToListAsync();
     }
@@ -34,6 +35,7 @@ public class UserSettingsRepository : IUserSettingsRepository
         try
         {
             return await _dbContext.UserSettings
+                .AsNoTracking()
                 .Include(nameof(UserSettings.User))
                 .FirstAsync(s => s.Id == id);
         }
@@ -65,6 +67,7 @@ public class UserSettingsRepository : IUserSettingsRepository
         try
         {
             return await _dbContext.UserSettings
+                .AsNoTracking()
                 .Include(nameof(UserSettings.User))
                 .FirstAsync(s => s.User.HexId == hexId);
         }
@@ -102,12 +105,9 @@ public class UserSettingsRepository : IUserSettingsRepository
     /// <exception cref="NotFoundException">Thrown when user settings weren't found</exception>
     public void Delete(UserSettings settings)
     {
-        if (!_dbContext.UserSettings.Any(s => s.Id == settings.Id))
-        {
-            throw new NotFoundException();
-        }
-
-        _dbContext.UserSettings.Remove(settings);
+        var target = _dbContext.UserSettings.FirstOrDefault(s => s.Id == settings.Id) ?? throw new NotFoundException();
+        
+        _dbContext.UserSettings.Remove(target);
     }
 
     /// <summary>
@@ -117,7 +117,8 @@ public class UserSettingsRepository : IUserSettingsRepository
     /// <exception cref="NotFoundException">Thrown when user settings weren't found</exception>
     public async Task DeleteByIdAsync(long id)
     {
-        var target = await GetByIdAsync(id);
+        var target = await _dbContext.UserSettings.FirstOrDefaultAsync(s => s.Id == id) ?? throw new NotFoundException();
+        
         _dbContext.UserSettings.Remove(target);
     }
 

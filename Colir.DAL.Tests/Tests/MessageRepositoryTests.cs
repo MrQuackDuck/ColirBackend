@@ -336,7 +336,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     public async Task Delete_DeletesMessage()
     {
         // Arrange
-        var messageToDelete = _dbContext.Messages.First(m => m.Id == 1);
+        var messageToDelete = _dbContext.Messages.AsNoTracking().First(m => m.Id == 1);
 
         // Act
         _messageRepository.Delete(messageToDelete);
@@ -350,7 +350,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     public async Task Delete_DeletesAllRelatedReactions()
     {
         // Arrange
-        var messageToDelete = _dbContext.Messages.First(m => m.Id == 1);
+        var messageToDelete = _dbContext.Messages.AsNoTracking().First(m => m.Id == 1);
 
         // Act
         _messageRepository.Delete(messageToDelete);
@@ -474,7 +474,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     public async Task Update_UpdatesMessage()
     {
         // Arrange
-        var messageToUpdate = _dbContext.Messages.First(m => m.Id == 1);
+        var messageToUpdate = _dbContext.Messages.AsNoTracking().First(m => m.Id == 1);
         messageToUpdate.Content = "Updated content";
 
         // Act
