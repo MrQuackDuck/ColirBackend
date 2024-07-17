@@ -25,6 +25,9 @@ public class RoomServiceTests : IRoomServiceTests
 
         // Initialize the service
         var configMock = new Mock<IConfiguration>();
+        configMock.Setup(c => c["MinRoomNameLength"]).Returns("2");
+        configMock.Setup(c => c["MaxRoomNameLength"]).Returns("50");
+        
         var unitOfWork = new UnitOfWork(_dbContext, configMock.Object);
         _roomService = new RoomService(unitOfWork, AutomapperProfile.InitializeAutoMapper().CreateMapper());
 

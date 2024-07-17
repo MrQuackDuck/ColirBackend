@@ -2,6 +2,7 @@
 using DAL.Entities;
 using DAL.Enums;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Colir.BLL.Tests.Utils;
 
@@ -12,6 +13,7 @@ public static class UnitTestHelper
         // Create database options (in-memory for unit testing)
         var options = new DbContextOptionsBuilder<ColirDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .ConfigureWarnings(config => config.Ignore(InMemoryEventId.TransactionIgnoredWarning))
             .Options;
         
         return new ColirDbContext(options);
@@ -26,6 +28,10 @@ public static class UnitTestHelper
             HexId = 0xFFFFFF,
             Username = "First User",
             AuthType = UserAuthType.Anonymous,
+            UserSettings = new UserSettings()
+            {
+                StatisticsEnabled = true
+            }
         };
 
         var user2 = new User

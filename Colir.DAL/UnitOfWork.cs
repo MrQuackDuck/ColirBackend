@@ -1,5 +1,6 @@
 ﻿using DAL.Interfaces;
 using DAL.Repositories;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 
 namespace DAL;
@@ -23,7 +24,12 @@ public class UnitOfWork : IUnitOfWork
         _dbContext = dbContext;
         _configuration = configuration;
     }
-    
+
+    /// <summary>
+    /// Begins new transaction in DB
+    /// </summary>
+    public IDbContextTransaction BeginTransaction() => _dbContext.Database.BeginTransaction();
+
     public IAttachmentRepository AttachmentRepository
     {
         get
@@ -131,5 +137,10 @@ public class UnitOfWork : IUnitOfWork
     public void SaveChanges()
     {
         _dbContext.SaveChanges();
+    }
+
+    public async Task SaveChangesAsync()
+    {
+        await _dbContext.SaveChangesAsync();
     }
 }
