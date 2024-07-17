@@ -7,34 +7,34 @@ namespace Colir.BLL.Services;
 
 public class UserService : IUserService
 {
-    private IUnitOfWork _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
     
     public UserService(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
     }
     
-    public Task<DetailedUserModel> AuthorizeWithGitHubAsync(RequestToAuthorizeWithGitHub request)
+    public async Task<DetailedUserModel> AuthorizeWithGitHubAsync(RequestToAuthorizeWithGitHub request)
     {
         throw new NotImplementedException();
     }
 
-    public Task<DetailedUserModel> AuthorizeAsAnnoymousAsync(RequestToAuthorizeAsAnnoymous request)
+    public async Task<DetailedUserModel> AuthorizeAsAnnoymousAsync(RequestToAuthorizeAsAnnoymous request)
     {
         throw new NotImplementedException();
     }
 
-    public Task<DetailedUserModel> ChangeUsernameAsync(RequestToChangeUsername request)
+    public async Task<DetailedUserModel> ChangeUsernameAsync(RequestToChangeUsername request)
     {
         throw new NotImplementedException();
     }
 
-    public Task ChangeSettingsAsync(RequestToChangeSettings request)
+    public async Task ChangeSettingsAsync(RequestToChangeSettings request)
     {
         throw new NotImplementedException();
     }
 
-    public Task DeleteAccount(RequestToDeleteAccount request)
+    public async Task DeleteAccount(RequestToDeleteAccount request)
     {
         throw new NotImplementedException();
     }

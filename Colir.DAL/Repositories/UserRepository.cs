@@ -1,4 +1,5 @@
 ﻿using Colir.Exceptions;
+using Colir.Exceptions.NotFound;
 using DAL.Entities;
 using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -42,7 +43,7 @@ public class UserRepository : IUserRepository
             .Include(nameof(User.UserStatistics))
             .Include(nameof(User.UserSettings))
             .Include(nameof(User.JoinedRooms))
-            .FirstOrDefaultAsync(u => u.Id == id) ?? throw new NotFoundException();
+            .FirstOrDefaultAsync(u => u.Id == id) ?? throw new UserNotFoundException();
     }
 
     /// <summary>
@@ -63,7 +64,7 @@ public class UserRepository : IUserRepository
             .Include(nameof(User.UserStatistics))
             .Include(nameof(User.UserSettings))
             .Include(nameof(User.JoinedRooms))
-            .FirstOrDefaultAsync(u => u.HexId == hexId) ?? throw new NotFoundException();
+            .FirstOrDefaultAsync(u => u.HexId == hexId) ?? throw new UserNotFoundException();
     }
 
     /// <summary>
@@ -136,7 +137,7 @@ public class UserRepository : IUserRepository
         var target = _dbContext.Users
             .Include(nameof(User.UserStatistics))
             .Include(nameof(User.UserSettings))
-            .FirstOrDefault(u => u.Id == user.Id) ?? throw new NotFoundException();
+            .FirstOrDefault(u => u.Id == user.Id) ?? throw new UserNotFoundException();
         
         _dbContext.Users.Remove(target);
         _dbContext.UserSettings.Remove(target.UserSettings);
@@ -153,7 +154,7 @@ public class UserRepository : IUserRepository
         var target = await _dbContext.Users
             .Include(nameof(User.UserStatistics))
             .Include(nameof(User.UserSettings))
-            .FirstOrDefaultAsync(u => u.Id == id) ?? throw new NotFoundException();
+            .FirstOrDefaultAsync(u => u.Id == id) ?? throw new UserNotFoundException();
         
         _dbContext.Users.Remove(target);
         _dbContext.UserSettings.Remove(target.UserSettings);
@@ -188,7 +189,7 @@ public class UserRepository : IUserRepository
         
         if (originalEntity == null)
         {
-            throw new NotFoundException();
+            throw new UserNotFoundException();
         }
         
         // Check if a user with the same Hex ID exists

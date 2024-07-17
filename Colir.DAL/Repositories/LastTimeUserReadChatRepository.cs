@@ -1,4 +1,5 @@
 ﻿using Colir.Exceptions;
+using Colir.Exceptions.NotFound;
 using DAL.Entities;
 using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -60,18 +61,11 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
     /// <exception cref="NotFoundException"></exception>
     public async Task<LastTimeUserReadChat> GetByIdAsync(long id)
     {
-        try
-        {
-            return await _dbContext.LastTimeUserReadChats
-                .AsNoTracking()
-                .Include(nameof(LastTimeUserReadChat.Room))
-                .Include(nameof(LastTimeUserReadChat.User))
-                .FirstAsync(l => l.Id == id);
-        }
-        catch (InvalidOperationException)
-        {
-            throw new NotFoundException();
-        }
+        return await _dbContext.LastTimeUserReadChats
+            .AsNoTracking()
+            .Include(nameof(LastTimeUserReadChat.Room))
+            .Include(nameof(LastTimeUserReadChat.User))
+            .FirstOrDefaultAsync(l => l.Id == id) ?? throw new NotFoundException();
     }
 
     /// <summary>
@@ -115,15 +109,8 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
     /// <exception cref="NotFoundException">Thrown when the entity wasn't found</exception>
     public void Delete(LastTimeUserReadChat entity)
     {
-        try
-        {
-            var target = _dbContext.LastTimeUserReadChats.First(l => l.Id == entity.Id);
-            _dbContext.LastTimeUserReadChats.Remove(target);
-        }
-        catch (InvalidOperationException)
-        {
-            throw new NotFoundException();
-        }
+        var target = _dbContext.LastTimeUserReadChats.FirstOrDefault(l => l.Id == entity.Id) ?? throw new NotFoundException();
+        _dbContext.LastTimeUserReadChats.Remove(target);
     }
 
     /// <summary>
@@ -133,15 +120,8 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
     /// <exception cref="NotFoundException">Thrown when the entity wasn't found</exception>
     public async Task DeleteByIdAsync(long id)
     {
-        try
-        {
-            var target = await _dbContext.LastTimeUserReadChats.FirstAsync(l => l.Id == id);
-            _dbContext.LastTimeUserReadChats.Remove(target);
-        }
-        catch (InvalidOperationException)
-        {
-            throw new NotFoundException();
-        }
+        var target = await _dbContext.LastTimeUserReadChats.FirstOrDefaultAsync(l => l.Id == id) ?? throw new NotFoundException();
+        _dbContext.LastTimeUserReadChats.Remove(target);
     }
 
     /// <summary>
@@ -155,13 +135,9 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
     public void Update(LastTimeUserReadChat entity)
     {
         var originalEntity = _dbContext.LastTimeUserReadChats
-            .Include(nameof(LastTimeUserReadChat.Room)).FirstOrDefault(l => l.Id == entity.Id);
-        
-        if (originalEntity == null)
-        {
-            throw new NotFoundException();
-        }
-        
+            .Include(nameof(LastTimeUserReadChat.Room))
+            .FirstOrDefault(l => l.Id == entity.Id) ?? throw new NotFoundException();
+
         // Check if another UserId provided
         if (originalEntity.UserId != entity.UserId)
         {

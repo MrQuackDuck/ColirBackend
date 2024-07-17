@@ -1,4 +1,5 @@
 ﻿using Colir.Exceptions;
+using Colir.Exceptions.NotFound;
 using DAL.Entities;
 using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -36,21 +37,14 @@ public class MessageRepository : IMessageRepository
     /// <exception cref="NotFoundException">Thrown when the message wasn't found by provided id</exception>
     public async Task<Message> GetByIdAsync(long id)
     {
-        try
-        {
-            return await _dbContext.Messages
-                .AsNoTracking()
-                .Include(nameof(Message.Room))
-                .Include(nameof(Message.Author))
-                .Include(nameof(Message.RepliedTo))
-                .Include(nameof(Message.Attachments))
-                .Include(nameof(Message.Reactions))
-                .FirstAsync(m => m.Id == id);
-        }
-        catch (InvalidOperationException)
-        {
-            throw new NotFoundException();
-        }
+        return await _dbContext.Messages
+            .AsNoTracking()
+            .Include(nameof(Message.Room))
+            .Include(nameof(Message.Author))
+            .Include(nameof(Message.RepliedTo))
+            .Include(nameof(Message.Attachments))
+            .Include(nameof(Message.Reactions))
+            .FirstOrDefaultAsync(m => m.Id == id) ?? throw new MessageNotFoundException();
     }
     
     /// <summary>
@@ -74,12 +68,7 @@ public class MessageRepository : IMessageRepository
             throw new ArgumentException("Skip count can't be less than zero!");
         }
 
-        var room = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Guid == roomGuid);
-
-        if (room is null)
-        {
-            throw new RoomNotFoundException();
-        }
+        var room = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Guid == roomGuid) ?? throw new RoomNotFoundException();
 
         if (room.ExpiryDate < DateTime.Now)
         {
@@ -115,15 +104,8 @@ public class MessageRepository : IMessageRepository
             throw new MessageNotFoundException();
         }
 
-        try
-        {
-            var room = await _dbContext.Rooms.FirstAsync(r => r.Id == message.RoomId);
-            if (room.ExpiryDate < DateTime.Now) throw new RoomExpiredException();
-        }
-        catch (InvalidOperationException)
-        {
-            throw new RoomNotFoundException();
-        }
+        var room = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Id == message.RoomId) ?? throw new RoomNotFoundException();
+        if (room.ExpiryDate < DateTime.Now) throw new RoomExpiredException();
         
         if (!await _dbContext.Users.AnyAsync(u => u.Id == message.AuthorId))
         {
@@ -142,9 +124,9 @@ public class MessageRepository : IMessageRepository
     /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found</exception>
     public void Delete(Message message)
     {
-        var target = _dbContext.Messages.FirstOrDefault(m => m.Id == message.Id) ?? throw new NotFoundException();
+        var target = _dbContext.Messages.FirstOrDefault(m => m.Id == message.Id) ?? throw new MessageNotFoundException();
         
-        var room = _dbContext.Rooms.First(r => r.Id == target.RoomId) ?? throw new RoomNotFoundException();;
+        var room = _dbContext.Rooms.First(r => r.Id == target.RoomId) ?? throw new RoomNotFoundException();
         if (room.ExpiryDate < DateTime.Now) throw new RoomExpiredException();
         
         _dbContext.Messages.Remove(target);
@@ -158,18 +140,15 @@ public class MessageRepository : IMessageRepository
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
     public async Task DeleteByIdAsync(long id)
     {
-        try
-        {
-            var target = await _dbContext.Messages.Include(nameof(Message.Room)).FirstAsync(m => m.Id == id);
-            if (target.Room.ExpiryDate < DateTime.Now) throw new RoomExpiredException();
-            _dbContext.Messages.Remove(target);
-            _dbContext.Attachments.RemoveRange(_dbContext.Attachments.Where(a => a.MessageId == id));
-            _dbContext.Reactions.RemoveRange(_dbContext.Reactions.Where(r => r.MessageId == id));
-        }
-        catch (InvalidOperationException)
-        {
-            throw new NotFoundException();
-        }
+        var target = await _dbContext.Messages
+            .Include(nameof(Message.Room))
+            .FirstOrDefaultAsync(m => m.Id == id) ?? throw new MessageNotFoundException();
+        
+        if (target.Room.ExpiryDate < DateTime.Now) throw new RoomExpiredException();
+        
+        _dbContext.Messages.Remove(target);
+        _dbContext.Attachments.RemoveRange(_dbContext.Attachments.Where(a => a.MessageId == id));
+        _dbContext.Reactions.RemoveRange(_dbContext.Reactions.Where(r => r.MessageId == id));
     }
 
     /// <summary>
@@ -184,7 +163,7 @@ public class MessageRepository : IMessageRepository
         
         if (originalEntity == null)
         {
-            throw new NotFoundException();
+            throw new MessageNotFoundException();
         }
         
         if (originalEntity.Room.ExpiryDate < DateTime.Now) throw new RoomExpiredException();

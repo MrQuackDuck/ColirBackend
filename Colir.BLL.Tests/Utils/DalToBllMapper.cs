@@ -1,6 +1,7 @@
-using Colir.BLL.Extensions;
 using Colir.BLL.Models;
 using DAL.Entities;
+
+namespace Colir.BLL.Tests.Utils;
 
 public static class DalToBllMapper
 {
@@ -18,8 +19,7 @@ public static class DalToBllMapper
     {
         return new UserModel
         {
-            Id = user.Id,
-            HexId = user.HexId.ToHexColor(),
+            HexId = user.HexId,
             Username = user.Username,
             AuthType = user.AuthType
         };
@@ -30,11 +30,11 @@ public static class DalToBllMapper
         return new DetailedUserModel
         {
             Id = user.Id,
-            HexId = user.HexId.ToHexColor(),
+            HexId = user.HexId,
             Username = user.Username,
             AuthType = user.AuthType,
-            UserSettingsModel = user.UserSettings.ToUserSettingsModel(),
-            UserStatisticsModel = user.UserStatistics.ToUserStatisticsModel()
+            UserSettings = user.UserSettings.ToUserSettingsModel(),
+            UserStatistics = user.UserStatistics.ToUserStatisticsModel()
         };
     }
 
@@ -44,7 +44,7 @@ public static class DalToBllMapper
         {
             Id = message.Id,
             RoomId = message.RoomId,
-            AuthorId = message.AuthorId,
+            AuthorHexId = message.Author.HexId,
             PostDate = message.PostDate,
             EditDate = message.EditDate,
             RepliedMessageId = message.RepliedMessageId,
@@ -59,7 +59,7 @@ public static class DalToBllMapper
         {
             Id = reaction.Id,
             Symbol = reaction.Symbol,
-            AuthorHexId = reaction.Author.HexId.ToHexColor()
+            AuthorHexId = reaction.Author.HexId
         };
     }
 

@@ -2,6 +2,7 @@
 using Colir.DAL.Tests.Interfaces;
 using Colir.DAL.Tests.Utils;
 using Colir.Exceptions;
+using Colir.Exceptions.NotFound;
 using DAL;
 using DAL.Entities;
 using DAL.Repositories;
@@ -92,7 +93,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     }
 
     [Test]
-    public async Task GetLastMessages_ThrowsNotFoundException_WhenRoomWasNotFound()
+    public async Task GetLastMessages_ThrowsMessageNotFoundException_WhenRoomWasNotFound()
     {
         // Act
         AsyncTestDelegate act = async () =>
@@ -156,13 +157,13 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     }
 
     [Test]
-    public async Task GetByIdAsync_ThrowsNotFoundException_WhenMessageWasNotFound()
+    public async Task GetByIdAsync_ThrowsMessageNotFoundException_WhenMessageWasNotFound()
     {
         // Act
         AsyncTestDelegate act = async () => await _messageRepository.GetByIdAsync(100);
 
         // Assert
-        Assert.ThrowsAsync<NotFoundException>(act);
+        Assert.ThrowsAsync<MessageNotFoundException>(act);
     }
 
     [Test]
@@ -389,7 +390,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     }
 
     [Test]
-    public async Task Delete_ThrowsNotFoundException_WhenMessageDoesNotExist()
+    public async Task Delete_ThrowsMessageNotFoundException_WhenMessageDoesNotExist()
     {
         // Arrange
         var messageToDelete = new Message { Id = 404 };
@@ -398,7 +399,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
         TestDelegate act = () => _messageRepository.Delete(messageToDelete);
 
         // Assert
-        Assert.Throws<NotFoundException>(act);
+        Assert.Throws<MessageNotFoundException>(act);
     }
 
     [Test]
@@ -448,13 +449,13 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     }
 
     [Test]
-    public async Task DeleteByIdAsync_ThrowsNotFoundException_WhenMessageWasNotFoundById()
+    public async Task DeleteByIdAsync_ThrowsMessageNotFoundException_WhenMessageWasNotFoundById()
     {
         // Act
         AsyncTestDelegate act = async () => await _messageRepository.DeleteByIdAsync(404);
 
         // Assert
-        Assert.ThrowsAsync<NotFoundException>(act);
+        Assert.ThrowsAsync<MessageNotFoundException>(act);
     }
 
     [Test]
@@ -487,7 +488,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     }
 
     [Test]
-    public async Task Update_ThrowsNotFoundException_WhenMessageDoesNotExist()
+    public async Task Update_ThrowsMessageNotFoundException_WhenMessageDoesNotExist()
     {
         // Arrange
         var messageToUpdate = new Message { Id = 404, Content = "Updated content" };
@@ -496,7 +497,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
         TestDelegate act = () => _messageRepository.Update(messageToUpdate);
 
         // Assert
-        Assert.Throws<NotFoundException>(act);
+        Assert.Throws<MessageNotFoundException>(act);
     }
 
     [Test]

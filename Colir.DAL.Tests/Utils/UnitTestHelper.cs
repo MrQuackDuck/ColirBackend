@@ -25,7 +25,7 @@ public static class UnitTestHelper
             Id = 1,
             HexId = 0xFFFFFF,
             Username = "First User",
-            AuthType = UserAuthType.Anonymous,
+            AuthType = UserAuthType.Anonymous
         };
 
         var user2 = new User
@@ -33,7 +33,7 @@ public static class UnitTestHelper
             Id = 2,
             HexId = 0x000000,
             Username = "Second User",
-            AuthType = UserAuthType.Anonymous,
+            AuthType = UserAuthType.Anonymous
         };
         
         var user3 = new User
@@ -134,54 +134,6 @@ public static class UnitTestHelper
         };
         
         context.LastTimeUserReadChats.Add(lastTimeFirstUserReadChat);
-
-        // User statistics
-        var firstUserStatistics = new UserStatistics
-        {
-            Id = 1,
-            UserId = 1, // "First User"
-            SecondsSpentInVoice = 0,
-            ReactionsSet = 1,
-            MessagesSent = 2,
-            RoomsJoined = 2,
-            RoomsCreated = 2,
-        };
-
-        var secondUserStatistics = new UserStatistics
-        {
-            Id = 2,
-            UserId = 2, // "Second User"
-            SecondsSpentInVoice = 0,
-            ReactionsSet = 0,
-            MessagesSent = 0,
-            RoomsJoined = 2,
-            RoomsCreated = 0,
-        };
-        
-        context.UserStatistics.AddRange(firstUserStatistics, secondUserStatistics);
-
-        // User settings
-        var firstUserSettings = new UserSettings
-        {
-            Id = 1,
-            UserId = 1, // "First User"
-            StatisticsEnabled = true,
-        };
-
-        var secondUserSettings = new UserSettings
-        {
-            Id = 2,
-            UserId = 2, // "Second User"
-            StatisticsEnabled = false,
-        };
-        
-        user1.UserStatisticsId = firstUserStatistics.Id;
-        user1.UserSettingsId = firstUserSettings.Id;
-
-        user2.UserStatisticsId = secondUserStatistics.Id;
-        user2.UserSettingsId = secondUserSettings.Id;
-        
-        context.UserSettings.AddRange(firstUserSettings, secondUserSettings);
         
         // Save changes
         context.SaveChanges();

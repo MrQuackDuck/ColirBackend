@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Colir.DAL.Tests.Interfaces;
 using Colir.DAL.Tests.Utils;
-using Colir.Exceptions;
+using Colir.Exceptions.NotFound;
 using DAL;
 using DAL.Entities;
 using DAL.Repositories;
@@ -119,6 +119,9 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
     public async Task AddAsync_AddsNewUserStatistics()
     {
         // Arrange
+        await _userStatisticsRepository.DeleteByIdAsync(3);
+        _userStatisticsRepository.SaveChanges();
+        
         var statisticsToAdd = new UserStatistics
         {
             UserId = 3, // "Third User"
@@ -190,7 +193,7 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
         _userStatisticsRepository.SaveChanges();
 
         // Assert
-        Assert.That(_dbContext.UserStatistics.Count() == 1);
+        Assert.That(_dbContext.UserStatistics.Count() == 2);
     }
 
     [Test]
@@ -223,7 +226,7 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
         _userStatisticsRepository.SaveChanges();
 
         // Assert
-        Assert.That(_dbContext.UserStatistics.Count() == 1);
+        Assert.That(_dbContext.UserStatistics.Count() == 2);
     }
 
     [Test]

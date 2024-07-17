@@ -1,4 +1,4 @@
-﻿using Colir.Exceptions;
+﻿using Colir.Exceptions.NotFound;
 using DAL.Entities;
 using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -33,18 +33,11 @@ public class ReactionRepository : IReactionRepository
     /// <exception cref="NotFoundException">Thrown when the reaction wasn't found by provided id</exception>
     public async Task<Reaction> GetByIdAsync(long id)
     {
-        try
-        {
-            return await _dbContext.Reactions
-                .AsNoTracking()
-                .Include(nameof(Reaction.Author))
-                .Include(nameof(Reaction.Message))
-                .FirstAsync(r => r.Id == id);
-        }
-        catch (InvalidOperationException)
-        {
-            throw new NotFoundException();
-        }
+        return await _dbContext.Reactions
+            .AsNoTracking()
+            .Include(nameof(Reaction.Author))
+            .Include(nameof(Reaction.Message))
+            .FirstOrDefaultAsync(r => r.Id == id) ?? throw new ReactionNotFoundException();
     }
     
     /// <summary>
@@ -95,7 +88,7 @@ public class ReactionRepository : IReactionRepository
     /// <exception cref="NotFoundException">Thrown when the reaction wasn't found</exception>
     public void Delete(Reaction reaction)
     {
-        var target = _dbContext.Reactions.FirstOrDefault(r => r.Id == reaction.Id) ?? throw new NotFoundException();
+        var target = _dbContext.Reactions.FirstOrDefault(r => r.Id == reaction.Id) ?? throw new ReactionNotFoundException();
         _dbContext.Reactions.Remove(target);
     }
 
@@ -106,7 +99,7 @@ public class ReactionRepository : IReactionRepository
     /// <exception cref="NotFoundException">Thrown when the reaction wasn't found</exception>
     public async Task DeleteByIdAsync(long id)
     {
-        var target = await _dbContext.Reactions.FirstOrDefaultAsync(r => r.Id == id) ?? throw new NotFoundException();
+        var target = await _dbContext.Reactions.FirstOrDefaultAsync(r => r.Id == id) ?? throw new ReactionNotFoundException();
         _dbContext.Reactions.Remove(target);
     }
 
@@ -121,7 +114,7 @@ public class ReactionRepository : IReactionRepository
         
         if (originalEntity == null)
         {
-            throw new NotFoundException();
+            throw new ReactionNotFoundException();
         }
         
         _dbContext.Entry(originalEntity).State = EntityState.Detached;

@@ -1,4 +1,5 @@
 ﻿using Colir.Exceptions;
+using Colir.Exceptions.NotFound;
 using DAL.Entities;
 using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -36,18 +37,20 @@ public class RoomRepository : IRoomRepository
     /// <exception cref="NotFoundException">Thrown when room wasn't found</exception>
     public async Task<Room> GetByIdAsync(long id)
     {
-        try
-        {
-            return await _dbContext.Rooms
-                .AsNoTracking()
-                .Include(nameof(Room.Owner))
-                .Include(nameof(Room.JoinedUsers))
-                .FirstAsync(r => r.Id == id);
-        }
-        catch (InvalidOperationException)
-        {
-            throw new NotFoundException();
-        }
+        return await _dbContext.Rooms
+            .AsNoTracking()
+            .Include(nameof(Room.Owner))
+            .Include(nameof(Room.JoinedUsers))
+            .FirstOrDefaultAsync(r => r.Id == id) ?? throw new RoomNotFoundException();
+    }
+    
+    public async Task<Room> GetByGuidAsync(string guid)
+    {
+        return await _dbContext.Rooms
+            .AsNoTracking()
+            .Include(nameof(Room.Owner))
+            .Include(nameof(Room.JoinedUsers))
+            .FirstOrDefaultAsync(r => r.Guid == guid) ?? throw new RoomNotFoundException();
     }
 
     /// <summary>
@@ -56,7 +59,7 @@ public class RoomRepository : IRoomRepository
     /// <param name="room">The room to add</param>
     /// <exception cref="RoomExpiredException">Thrown when room's expiry date is earlier than now</exception>
     /// <exception cref="StringTooShortException">Thrown when the name for the room it too short</exception>
-    /// <exception cref="StringTooLongException"Thrown when the name for the room it too long></exception>
+    /// <exception cref="StringTooLongException">Thrown when the name for the room it too long></exception>
     /// <exception cref="UserNotFoundException">Thrown when provided owner wasn't found by id</exception>
     public async Task AddAsync(Room room)
     {
@@ -99,7 +102,7 @@ public class RoomRepository : IRoomRepository
     /// <exception cref="NotFoundException">Thrown when the room wasn't found in DB</exception>
     public void Delete(Room room)
     {
-        var target = _dbContext.Rooms.FirstOrDefault(r => r.Id == room.Id) ?? throw new NotFoundException();
+        var target = _dbContext.Rooms.FirstOrDefault(r => r.Id == room.Id) ?? throw new RoomNotFoundException();
         
         _dbContext.Rooms.Remove(target);
         _dbContext.Messages.RemoveRange(_dbContext.Messages.Where(m => m.RoomId == room.Id));
@@ -112,7 +115,7 @@ public class RoomRepository : IRoomRepository
     /// <exception cref="NotFoundException">Thrown when the room wasn't found by provided id in DB</exception>
     public async Task DeleteByIdAsync(long id)
     {
-        var target = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Id == id) ?? throw new NotFoundException();
+        var target = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Id == id) ?? throw new RoomNotFoundException();
         
         _dbContext.Rooms.Remove(target);
         _dbContext.Messages.RemoveRange(_dbContext.Messages.Where(m => m.RoomId == id));
@@ -128,7 +131,7 @@ public class RoomRepository : IRoomRepository
 
         if (expiredRooms.Count() == 0)
         {
-            throw new NotFoundException();
+            throw new RoomNotFoundException();
         }
         
         _dbContext.RemoveRange(expiredRooms);
@@ -173,7 +176,7 @@ public class RoomRepository : IRoomRepository
         }
         else
         {
-            throw new NotFoundException();
+            throw new RoomNotFoundException();
         }
 
         _dbContext.Entry(room).State = EntityState.Modified;

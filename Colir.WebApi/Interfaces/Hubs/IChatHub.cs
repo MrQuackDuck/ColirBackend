@@ -7,10 +7,9 @@ public interface IChatHub
 {
     Task Connect(string roomGuid);
     Task<List<MessageModel>> GetMessages(GetLastMessagesModel model);
-    Task<MessageModel> SendMessage(SendMessageModel model); // - Clients will receive MessageModel object
+    Task<MessageModel> SendMessage(SendMessageModel model);
     Task<MessageModel> EditMessage(EditMessageModel model);
     Task DeleteMessage(DeleteMessageModel model);
     Task<MessageModel> AddReactionOnMessage(AddReactionOnMessageModel model);
     Task<MessageModel> RemoveReactionFromMessage(RemoveReactionFromMessageModel model);
-    Task<AttachmentModel> UploadAttachment(UploadAttachmentModel model);
 }

@@ -1,4 +1,4 @@
-﻿using Colir.Exceptions;
+﻿using Colir.Exceptions.NotFound;
 using DAL.Entities;
 using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -32,17 +32,10 @@ public class UserSettingsRepository : IUserSettingsRepository
     /// <exception cref="NotFoundException">Thrown when not found by id</exception>
     public async Task<UserSettings> GetByIdAsync(long id)
     {
-        try
-        {
-            return await _dbContext.UserSettings
-                .AsNoTracking()
-                .Include(nameof(UserSettings.User))
-                .FirstAsync(s => s.Id == id);
-        }
-        catch (InvalidOperationException)
-        {
-            throw new NotFoundException();
-        }
+        return await _dbContext.UserSettings
+            .AsNoTracking()
+            .Include(nameof(UserSettings.User))
+            .FirstOrDefaultAsync(s => s.Id == id) ?? throw new NotFoundException();
     }
     
     /// <summary>
@@ -64,17 +57,10 @@ public class UserSettingsRepository : IUserSettingsRepository
             throw new UserNotFoundException();
         }
         
-        try
-        {
-            return await _dbContext.UserSettings
-                .AsNoTracking()
-                .Include(nameof(UserSettings.User))
-                .FirstAsync(s => s.User.HexId == hexId);
-        }
-        catch (InvalidOperationException)
-        {
-            throw new NotFoundException();
-        }
+        return await _dbContext.UserSettings
+            .AsNoTracking()
+            .Include(nameof(UserSettings.User))
+            .FirstOrDefaultAsync(s => s.User.HexId == hexId) ?? throw new NotFoundException();
     }
 
     /// <summary>

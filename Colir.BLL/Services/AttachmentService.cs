@@ -7,7 +7,7 @@ namespace Colir.BLL.Services;
 
 public class AttachmentService : IAttachmentService
 {
-    private IUnitOfWork _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
     
     public AttachmentService(IUnitOfWork unitOfWork)
     {

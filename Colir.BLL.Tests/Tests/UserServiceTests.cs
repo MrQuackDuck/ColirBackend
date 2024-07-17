@@ -4,6 +4,7 @@ using Colir.BLL.Services;
 using Colir.BLL.Tests.Interfaces;
 using Colir.BLL.Tests.Utils;
 using Colir.Exceptions;
+using Colir.Exceptions.NotFound;
 using DAL;
 using DAL.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -49,7 +50,7 @@ public class UserServiceTests : IUserServiceTests
         var request = new RequestToAuthorizeWithGitHub
         {
             GitHubId = "0000",
-            HexId = "#FFABCD",
+            HexId = 0xFFABCD,
             Username = "My User"
         };
 
@@ -67,7 +68,7 @@ public class UserServiceTests : IUserServiceTests
         var request = new RequestToAuthorizeWithGitHub
         {
             GitHubId = "0000",
-            HexId = "#FFABCD",
+            HexId = 0xFFABCD,
             Username = "Fourth User"
         };
 
@@ -87,7 +88,7 @@ public class UserServiceTests : IUserServiceTests
         var request = new RequestToAuthorizeWithGitHub
         {
             GitHubId = "0000",
-            HexId = "#FFFFFF",
+            HexId = 0xFFFFFF,
             Username = "Fourth User"
         };
 

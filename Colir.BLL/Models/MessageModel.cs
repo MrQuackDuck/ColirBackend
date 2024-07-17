@@ -4,7 +4,7 @@ public class MessageModel
 {
     public long Id { get; set; }
     public long RoomId { get; set; }
-    public long AuthorId { get; set; }
+    public long AuthorHexId { get; set; }
     public DateTime PostDate { get; set; }
     public DateTime? EditDate { get; set; }
     public long? RepliedMessageId { get; set; }

@@ -1,5 +1,5 @@
 namespace Colir.Exceptions;
 
-public class StringTooShortException : NotFoundException
+public class StringTooShortException : ColirException
 {
 }

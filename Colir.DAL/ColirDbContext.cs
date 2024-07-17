@@ -29,11 +29,13 @@ public class ColirDbContext : DbContext
         modelBuilder.Entity<User>()
             .HasOne(s => s.UserSettings)
             .WithOne(s => s.User)
+            .HasForeignKey<UserSettings>(us => us.UserId)
             .IsRequired();
         
         modelBuilder.Entity<User>()
             .HasOne(s => s.UserStatistics)
             .WithOne(s => s.User)
+            .HasForeignKey<UserStatistics>(us => us.UserId)
             .IsRequired();
     }
 }

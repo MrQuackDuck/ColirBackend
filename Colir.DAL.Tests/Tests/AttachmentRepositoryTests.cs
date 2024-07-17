@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Colir.DAL.Tests.Interfaces;
 using Colir.DAL.Tests.Utils;
-using Colir.Exceptions;
+using Colir.Exceptions.NotFound;
 using DAL;
 using DAL.Entities;
 using DAL.Repositories;
@@ -71,7 +71,7 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
     }
 
     [Test]
-    public async Task GetByIdAsync_ThrowsNotFoundException_WhenAttachmentWasNotFound()
+    public async Task GetByIdAsync_ThrowsAttachmentNotFoundException_WhenAttachmentWasNotFound()
     {
         // Act
         AsyncTestDelegate act = async () => await _attachmentRepository.GetByIdAsync(404);
@@ -136,7 +136,7 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
     }
 
     [Test]
-    public async Task Delete_ThrowsNotFoundException_WhenAttachmentDoesNotExist()
+    public async Task Delete_ThrowsAttachmentNotFoundException_WhenAttachmentDoesNotExist()
     {
         // Arrange
         var attachmentToDelete = new Attachment
@@ -152,7 +152,7 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
         TestDelegate act = () => _attachmentRepository.Delete(attachmentToDelete);
         
         // Assert
-        Assert.Throws<NotFoundException>(act);
+        Assert.Throws<AttachmentNotFoundException>(act);
     }
 
     [Test]
@@ -167,13 +167,13 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
     }
 
     [Test]
-    public async Task DeleteByIdAsync_ThrowsNotFoundException_WhenAttachmentWasNotFoundById()
+    public async Task DeleteByIdAsync_ThrowsAttachmentNotFoundException_WhenAttachmentWasNotFoundById()
     {
         // Act
         AsyncTestDelegate act = async () => await _attachmentRepository.DeleteByIdAsync(404);
         
         // Assert
-        Assert.ThrowsAsync<NotFoundException>(act);
+        Assert.ThrowsAsync<AttachmentNotFoundException>(act);
     }
 
     [Test]
@@ -192,7 +192,7 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
     }
 
     [Test]
-    public async Task Update_ThrowsNotFoundException_WhenAttachmentDoesNotExist()
+    public async Task Update_ThrowsAttachmentNotFoundException_WhenAttachmentDoesNotExist()
     {
         // Arrange
         var attachmentToUpdate = new Attachment
@@ -208,6 +208,6 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
         TestDelegate act = () => _attachmentRepository.Update(attachmentToUpdate);
         
         // Assert
-        Assert.Throws<NotFoundException>(act);
+        Assert.Throws<AttachmentNotFoundException>(act);
     }
 }

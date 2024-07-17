@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Colir.DAL.Tests.Interfaces;
 using Colir.DAL.Tests.Utils;
-using Colir.Exceptions;
+using Colir.Exceptions.NotFound;
 using DAL;
 using DAL.Entities;
 using DAL.Repositories;
@@ -120,9 +120,11 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
     public async Task AddAsync_AddsNewUserSettings()
     {
         // Arrange
+        await _userSettingsRepository.DeleteByIdAsync(3);
+        _userSettingsRepository.SaveChanges();
+        
         var userSettingsToAdd = new UserSettings
         {
-            Id = 3,
             UserId = 3,
             StatisticsEnabled = true
         };
@@ -182,7 +184,7 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
         _userSettingsRepository.SaveChanges();
 
         // Assert
-        Assert.That(_dbContext.UserSettings.Count() == 1);
+        Assert.That(_dbContext.UserSettings.Count() == 2);
     }
 
     [Test]
@@ -211,7 +213,7 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
         _userSettingsRepository.SaveChanges();
 
         // Assert
-        Assert.That(_dbContext.UserSettings.Count() == 1);
+        Assert.That(_dbContext.UserSettings.Count() == 2);
     }
 
     [Test]

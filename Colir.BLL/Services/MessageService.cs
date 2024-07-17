@@ -7,24 +7,24 @@ namespace Colir.BLL.Services;
 
 public class MessageService : IMessageService
 {
-    private IUnitOfWork _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
     
     public MessageService(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
     }
     
-    public Task<List<MessageModel>> GetLastMessagesAsync(RequestToGetLastMessages request)
+    public async Task<List<MessageModel>> GetLastMessagesAsync(RequestToGetLastMessages request)
     {
         throw new NotImplementedException();
     }
 
-    public Task<MessageModel> SendAsync(RequestToSendMessage request)
+    public async Task<MessageModel> SendAsync(RequestToSendMessage request)
     {
         throw new NotImplementedException();
     }
 
-    public Task<MessageModel> EditAsync(RequestToEditMessage request)
+    public async Task<MessageModel> EditAsync(RequestToEditMessage request)
     {
         throw new NotImplementedException();
     }
@@ -34,12 +34,12 @@ public class MessageService : IMessageService
         throw new NotImplementedException();
     }
 
-    public Task<MessageModel> AddReaction(RequestToAddReactionOnMessage request)
+    public async Task<MessageModel> AddReaction(RequestToAddReactionOnMessage request)
     {
         throw new NotImplementedException();
     }
 
-    public Task<MessageModel> RemoveReaction(RequestToRemoveReactionFromMessage request)
+    public async Task<MessageModel> RemoveReaction(RequestToRemoveReactionFromMessage request)
     {
         throw new NotImplementedException();
     }

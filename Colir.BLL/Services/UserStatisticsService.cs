@@ -7,14 +7,14 @@ namespace Colir.BLL.Services;
 
 public class UserStatisticsService : IUserStatisticsService
 {
-    private IUnitOfWork _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
     
     public UserStatisticsService(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
     }
     
-    public Task<UserStatisticsModel> GetStatisticsAsync(RequestToGetStatistics request)
+    public async Task<UserStatisticsModel> GetStatisticsAsync(RequestToGetStatistics request)
     {
         throw new NotImplementedException();
     }

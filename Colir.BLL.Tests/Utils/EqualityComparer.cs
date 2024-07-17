@@ -28,12 +28,12 @@ class MessageModelEqualityComparer : IEqualityComparer<MessageModel>
         if (ReferenceEquals(x, null)) return false;
         if (ReferenceEquals(y, null)) return false;
         if (x.GetType() != y.GetType()) return false;
-        return x.Id == y.Id && x.RoomId == y.RoomId && x.AuthorId == y.AuthorId && x.PostDate.Equals(y.PostDate) && Nullable.Equals(x.EditDate, y.EditDate) && x.RepliedMessageId == y.RepliedMessageId;
+        return x.Id == y.Id && x.RoomId == y.RoomId && x.AuthorHexId == y.AuthorHexId && x.PostDate.Equals(y.PostDate) && Nullable.Equals(x.EditDate, y.EditDate) && x.RepliedMessageId == y.RepliedMessageId;
     }
 
     public int GetHashCode(MessageModel obj)
     {
-        return HashCode.Combine(obj.Id, obj.RoomId, obj.AuthorId, obj.PostDate, obj.EditDate, obj.RepliedMessageId);
+        return HashCode.Combine(obj.Id, obj.RoomId, obj.AuthorHexId, obj.PostDate, obj.EditDate, obj.RepliedMessageId);
     }
 }
 
@@ -79,12 +79,12 @@ class UserModelEqualityComparer : IEqualityComparer<UserModel>
         if (ReferenceEquals(x, null)) return false;
         if (ReferenceEquals(y, null)) return false;
         if (x.GetType() != y.GetType()) return false;
-        return x.Id == y.Id && x.HexId == y.HexId && x.Username == y.Username && x.AuthType == y.AuthType;
+        return x.HexId == y.HexId && x.HexId == y.HexId && x.Username == y.Username && x.AuthType == y.AuthType;
     }
 
     public int GetHashCode(UserModel obj)
     {
-        return HashCode.Combine(obj.Id, obj.HexId, obj.Username, (int)obj.AuthType);
+        return HashCode.Combine(obj.HexId, obj.HexId, obj.Username, (int)obj.AuthType);
     }
 }
 

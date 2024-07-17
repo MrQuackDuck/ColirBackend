@@ -20,7 +20,7 @@ public class User : BaseEntity
     [ForeignKey(nameof(UserSettings))]
     public long UserSettingsId { get; set; }
 
-    public UserStatistics UserStatistics { get; set; } = default!;
-    public UserSettings UserSettings { get; set; } = default!;
+    public UserStatistics UserStatistics { get; set; } = new UserStatistics();
+    public UserSettings UserSettings { get; set; } = new UserSettings();
     public ICollection<Room> JoinedRooms { get; set; } = default!;
 }

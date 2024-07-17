@@ -2,6 +2,7 @@
 using Colir.DAL.Tests.Interfaces;
 using Colir.DAL.Tests.Utils;
 using Colir.Exceptions;
+using Colir.Exceptions.NotFound;
 using DAL;
 using DAL.Entities;
 using DAL.Repositories;
@@ -89,13 +90,13 @@ public class UserRepositoryTests : IUserRepositoryTests
     }
 
     [Test]
-    public async Task GetByIdAsync_ThrowsNotFoundException_WhenUserWasNotFound()
+    public async Task GetByIdAsync_ThrowsUserNotFoundException_WhenUserWasNotFound()
     {
         // Act
         AsyncTestDelegate act = async () => await _userRepository.GetByIdAsync(100);
 
         // Assert
-        Assert.ThrowsAsync<NotFoundException>(act);
+        Assert.ThrowsAsync<UserNotFoundException>(act);
     }
 
     [Test]
@@ -119,13 +120,13 @@ public class UserRepositoryTests : IUserRepositoryTests
     }
 
     [Test]
-    public async Task GetByHexIdAsync_ThrowsNotFoundException_WhenUserWasNotFound()
+    public async Task GetByHexIdAsync_ThrowsUserNotFoundException_WhenUserWasNotFound()
     {
         // Act
         AsyncTestDelegate act = async () => await _userRepository.GetByHexIdAsync(0x404000);
 
         // Assert
-        Assert.ThrowsAsync<NotFoundException>(act);
+        Assert.ThrowsAsync<UserNotFoundException>(act);
     }
 
     [Test]
@@ -175,7 +176,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         _userRepository.SaveChanges();
 
         // Assert
-        Assert.That(_dbContext.UserSettings.Count() == 3);
+        Assert.That(_dbContext.UserSettings.Count() == 4);
     }
 
     [Test]
@@ -195,7 +196,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         _userRepository.SaveChanges();
 
         // Assert
-        Assert.That(_dbContext.UserStatistics.Count() == 3);
+        Assert.That(_dbContext.UserStatistics.Count() == 4);
     }
 
     [Test]
@@ -367,7 +368,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         _userRepository.SaveChanges();
 
         // Assert
-        Assert.That(_dbContext.UserSettings.Count() == 1);
+        Assert.That(_dbContext.UserSettings.Count() == 2);
     }
 
     [Test]
@@ -381,11 +382,11 @@ public class UserRepositoryTests : IUserRepositoryTests
         _userRepository.SaveChanges();
 
         // Assert
-        Assert.That(_dbContext.UserStatistics.Count() == 1);
+        Assert.That(_dbContext.UserStatistics.Count() == 2);
     }
 
     [Test]
-    public async Task Delete_ThrowsNotFoundException_WhenUserDoesNotExist()
+    public async Task Delete_ThrowsUserNotFoundException_WhenUserDoesNotExist()
     {
         // Arrange
         var userToDelete = new User() { Id = 404 };
@@ -394,7 +395,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         AsyncTestDelegate act = async () => _userRepository.Delete(userToDelete);
 
         // Assert
-        Assert.ThrowsAsync<NotFoundException>(act);
+        Assert.ThrowsAsync<UserNotFoundException>(act);
     }
 
     [Test]
@@ -419,7 +420,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         _userRepository.SaveChanges();
 
         // Assert
-        Assert.That(_dbContext.UserSettings.Count() == 1);
+        Assert.That(_dbContext.UserSettings.Count() == 2);
     }
 
     [Test]
@@ -430,17 +431,17 @@ public class UserRepositoryTests : IUserRepositoryTests
         _userRepository.SaveChanges();
 
         // Assert
-        Assert.That(_dbContext.UserStatistics.Count() == 1);
+        Assert.That(_dbContext.UserStatistics.Count() == 2);
     }
 
     [Test]
-    public async Task DeleteByIdAsync_ThrowsNotFoundException_WhenUserWasNotFoundById()
+    public async Task DeleteByIdAsync_ThrowsUserNotFoundException_WhenUserWasNotFoundById()
     {
         // Act
         AsyncTestDelegate act = async () => await _userRepository.DeleteByIdAsync(404);
 
         // Assert
-        Assert.ThrowsAsync<NotFoundException>(act);
+        Assert.ThrowsAsync<UserNotFoundException>(act);
     }
 
     [Test]
@@ -502,7 +503,7 @@ public class UserRepositoryTests : IUserRepositoryTests
     }
 
     [Test]
-    public async Task Update_ThrowsNotFoundException_WhenUserDoesNotExist()
+    public async Task Update_ThrowsUserNotFoundException_WhenUserDoesNotExist()
     {
         // Arrange
         var userToUpdate = new User() { Id = 404, Username = "UpdatedUser" };
@@ -511,6 +512,6 @@ public class UserRepositoryTests : IUserRepositoryTests
         TestDelegate act = () => _userRepository.Update(userToUpdate);
 
         // Assert
-        Assert.Throws<NotFoundException>(act);
+        Assert.Throws<UserNotFoundException>(act);
     }
 }

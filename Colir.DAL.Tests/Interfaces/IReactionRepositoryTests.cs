@@ -5,7 +5,7 @@ public interface IReactionRepositoryTests
     Task GetAllAsync_ReturnsAllReactions();
 
     Task GetByIdAsync_ReturnsReaction_WhenFound();
-    Task GetByIdAsync_ThrowsNotFoundException_WhenReactionWasNotFound();
+    Task GetByIdAsync_ThrowsReactionNotFoundException_WhenReactionWasNotFound();
 
     Task GetReactionsOnMessage_ReturnsAllReactionsOnMessage();
     Task GetReactionsOnMessage_ThrowsMessageNotFoundException_WhenMessageWasNotFound();
@@ -15,11 +15,11 @@ public interface IReactionRepositoryTests
     Task AddAsync_ThrowsMessageNotFoundException_WhenMessageWasNotFound();
 
     Task Delete_DeletesReaction();
-    Task Delete_ThrowsNotFoundException_WhenReactionDoesNotExist();
+    Task Delete_ThrowsReactionNotFoundException_WhenReactionDoesNotExist();
 
     Task DeleteByIdAsync_DeletesReaction();
-    Task Delete_ThrowsNotFoundException_WhenReactionWasNotFoundById();
+    Task Delete_ThrowsReactionNotFoundException_WhenReactionWasNotFoundById();
 
     Task Update_UpdatesReaction();
-    Task Update_ThrowsNotFoundException_WhenReactionDoesNotExist();
+    Task Update_ThrowsReactionNotFoundException_WhenReactionDoesNotExist();
 }

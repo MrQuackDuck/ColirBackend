@@ -5,7 +5,7 @@ public interface IRoomRepositoryTests
     Task GetAllAsync_ReturnsAllRooms();
 
     Task GetByIdAsync_ReturnsRoom_WhenFound(long id);
-    Task GetByIdAsync_ThrowsNotFoundException_WhenRoomWasNotFound(long id);
+    Task GetByIdAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound(long id);
 
     Task AddAsync_AddsNewRoom();
     Task AddAsync_AppliesJoinedUsersToRoom();
@@ -18,19 +18,19 @@ public interface IRoomRepositoryTests
     Task Delete_DeletesAllRelatedAttachments();
     Task Delete_DeletesAllRelatedMessages();
     Task Delete_DeletesAllRelatedReactions();
-    Task Delete_ThrowsNotFoundException_WhenRoomDoesNotExist();
+    Task Delete_ThrowsRoomNotFoundException_WhenRoomDoesNotExist();
 
     Task DeleteByIdAsync_DeletesRoom();
     Task DeleteByIdAsync_DeletesAllRelatedAttachments();
     Task DeleteByIdAsync_DeletesAllRelatedMessages();
     Task DeleteByIdAsync_DeletesAllRelatedReactions();
-    Task DeleteByIdAsync_ThrowsNotFoundException_WhenRoomWasNotFoundById();
+    Task DeleteByIdAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFoundById();
 
     Task Update_UpdatesRoom();
     Task Update_ThrowsStringTooLongException_WhenNameTooLong();
     Task Update_ThrowsStringTooShortException_WhenNameTooShort();
-    Task Update_ThrowsNotFoundException_WhenRoomDoesNotExist();
+    Task Update_ThrowsRoomNotFoundException_WhenRoomDoesNotExist();
     
     Task DeleteAllExpiredAsync_DeletesAllExpiredRooms();
-    Task DeleteAllExpiredAsync_ThrowsNotFoundException_WhenNoExpiredRoomsExist();
+    Task DeleteAllExpiredAsync_ThrowsRoomNotFoundException_WhenNoExpiredRoomsExist();
 }

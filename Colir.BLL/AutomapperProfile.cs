@@ -1,0 +1,41 @@
+﻿using AutoMapper;
+using Colir.BLL.Models;
+using DAL.Entities;
+
+namespace Colir.BLL;
+
+public class AutomapperProfile : Profile
+{
+    public AutomapperProfile()
+    {
+        CreateMap<Attachment, AttachmentModel>();
+
+        CreateMap<User, UserModel>();
+
+        CreateMap<User, DetailedUserModel>();
+
+        CreateMap<Message, MessageModel>()
+            .ForMember(dest => dest.AuthorHexId,
+                opt => opt.MapFrom(src => src.Author.HexId));
+
+        CreateMap<Reaction, ReactionModel>()
+            .ForMember(dest => dest.AuthorHexId,
+            opt => opt.MapFrom(src => src.Author.HexId));
+        
+        CreateMap<Room, RoomModel>();
+        
+        CreateMap<UserSettings, UserSettingsModel>();
+
+        CreateMap<UserStatistics, UserStatisticsModel>();
+    }
+
+    public static MapperConfiguration InitializeAutoMapper()
+    {
+        MapperConfiguration config = new MapperConfiguration(cfg =>
+        {
+            cfg.AddProfile(new AutomapperProfile());
+        });
+
+        return config;
+    }
+}

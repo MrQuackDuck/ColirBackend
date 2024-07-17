@@ -1,4 +1,4 @@
-﻿using Colir.Exceptions;
+﻿using Colir.Exceptions.NotFound;
 using DAL.Entities;
 using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -32,17 +32,10 @@ public class UserStatisticsRepository : IUserStatisticsRepository
     /// <exception cref="NotFoundException">Thrown when not found by id</exception>
     public async Task<UserStatistics> GetByIdAsync(long id)
     {
-        try
-        {
-            return await _dbContext.UserStatistics
-                .AsNoTracking()
-                .Include(nameof(UserStatistics.User))
-                .FirstAsync(s => s.Id == id);
-        }
-        catch (InvalidOperationException)
-        {
-            throw new NotFoundException();
-        }
+        return await _dbContext.UserStatistics
+            .AsNoTracking()
+            .Include(nameof(UserStatistics.User))
+            .FirstOrDefaultAsync(s => s.Id == id) ?? throw new NotFoundException();
     }
     
     /// <summary>
@@ -64,17 +57,10 @@ public class UserStatisticsRepository : IUserStatisticsRepository
             throw new UserNotFoundException();
         }
         
-        try
-        {
-            return await _dbContext.UserStatistics
-                .AsNoTracking()
-                .Include(nameof(UserSettings.User))
-                .FirstAsync(s => s.User.HexId == hexId);
-        }
-        catch (InvalidOperationException)
-        {
-            throw new NotFoundException();
-        }
+        return await _dbContext.UserStatistics
+            .AsNoTracking()
+            .Include(nameof(UserSettings.User))
+            .FirstOrDefaultAsync(s => s.User.HexId == hexId) ?? throw new NotFoundException();
     }
 
     /// <summary>
@@ -85,7 +71,7 @@ public class UserStatisticsRepository : IUserStatisticsRepository
     /// <exception cref="UserNotFoundException">Thrown when the user wasn't found</exception>
     public async Task AddAsync(UserStatistics statistics)
     {
-        if (await _dbContext.UserSettings.AnyAsync(s => s.UserId == statistics.UserId))
+        if (await _dbContext.UserStatistics.AnyAsync(s => s.UserId == statistics.UserId))
         {
             throw new ArgumentException();
         }

@@ -5,7 +5,7 @@ namespace Colir.BLL.Services;
 
 public class HexColorGenerator : IHexColorGenerator
 {
-    private IUnitOfWork _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
     
     public HexColorGenerator(IUnitOfWork unitOfWork)
     {

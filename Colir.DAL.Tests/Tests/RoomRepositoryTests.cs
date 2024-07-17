@@ -2,6 +2,7 @@
 using Colir.DAL.Tests.Interfaces;
 using Colir.DAL.Tests.Utils;
 using Colir.Exceptions;
+using Colir.Exceptions.NotFound;
 using DAL;
 using DAL.Entities;
 using DAL.Repositories;
@@ -85,14 +86,45 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     }
 
     [Test]
-    [TestCase(3)]
-    public async Task GetByIdAsync_ThrowsNotFoundException_WhenRoomWasNotFound(long id)
+    [TestCase(404)]
+    public async Task GetByIdAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound(long id)
     {
         // Act
         AsyncTestDelegate act = async () => await _roomRepository.GetByIdAsync(id);
         
         // Assert
-        Assert.ThrowsAsync<NotFoundException>(act);
+        Assert.ThrowsAsync<RoomNotFoundException>(act);
+    }
+    
+    [Test]
+    [TestCase("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e")]
+    public async Task GetByGuidAsync_ReturnsRoom_WhenFound(string guid)
+    {
+        // Arrange
+        Room expected = _dbContext.Rooms
+            .Include(nameof(Room.Owner))
+            .Include(nameof(Room.JoinedUsers))
+            .First(r => r.Guid == guid);
+        
+        // Act
+        var result = await _roomRepository.GetByGuidAsync(guid);
+        
+        // Assert
+        Assert.NotNull(result);
+        Assert.That(result, Is.EqualTo(expected).Using(new RoomEqualityComparer()));
+        Assert.That(result.Owner, Is.EqualTo(expected.Owner).Using(new UserEqualityComparer()));
+        Assert.That(result.JoinedUsers, Is.EqualTo(expected.JoinedUsers).Using(new UserEqualityComparer()));
+    }
+    
+    [Test]
+    [TestCase("404")]
+    public async Task GetByGuidAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound(string guid)
+    {
+        // Act
+        AsyncTestDelegate act = async () => await _roomRepository.GetByGuidAsync(guid);
+        
+        // Assert
+        Assert.ThrowsAsync<RoomNotFoundException>(act);
     }
 
     [Test]
@@ -281,7 +313,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     }
 
     [Test]
-    public async Task Delete_ThrowsNotFoundException_WhenRoomDoesNotExist()
+    public async Task Delete_ThrowsRoomNotFoundException_WhenRoomDoesNotExist()
     {
         // Arrange
         var roomToDelete = new Room()
@@ -297,7 +329,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         TestDelegate act = () => _roomRepository.Delete(roomToDelete);
 
         // Assert
-        Assert.Throws<NotFoundException>(act);
+        Assert.Throws<RoomNotFoundException>(act);
     }
 
     [Test]
@@ -369,7 +401,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     }
 
     [Test]
-    public async Task DeleteByIdAsync_ThrowsNotFoundException_WhenRoomWasNotFoundById()
+    public async Task DeleteByIdAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFoundById()
     {
         // Arrange
         var roomIdToDelete = 10;
@@ -378,7 +410,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         AsyncTestDelegate act = async () => await _roomRepository.DeleteByIdAsync(roomIdToDelete);
 
         // Assert
-        Assert.ThrowsAsync<NotFoundException>(act);
+        Assert.ThrowsAsync<RoomNotFoundException>(act);
     }
 
     [Test]
@@ -442,7 +474,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     }
 
     [Test]
-    public async Task Update_ThrowsNotFoundException_WhenRoomDoesNotExist()
+    public async Task Update_ThrowsRoomNotFoundException_WhenRoomDoesNotExist()
     {
         // Arrange
         var nonExistingRoom = new Room
@@ -458,7 +490,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         TestDelegate act = () => _roomRepository.Update(nonExistingRoom);
 
         // Assert
-        Assert.Throws<NotFoundException>(act);
+        Assert.Throws<RoomNotFoundException>(act);
     }
 
     [Test]
@@ -479,7 +511,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     }
 
     [Test]
-    public async Task DeleteAllExpiredAsync_ThrowsNotFoundException_WhenNoExpiredRoomsExist()
+    public async Task DeleteAllExpiredAsync_ThrowsRoomNotFoundException_WhenNoExpiredRoomsExist()
     {
         // Arrange
         await _roomRepository.DeleteAllExpiredAsync();
@@ -489,6 +521,6 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         AsyncTestDelegate act = async () => await _roomRepository.DeleteAllExpiredAsync();
         
         // Assert
-        Assert.ThrowsAsync<NotFoundException>(act);
+        Assert.ThrowsAsync<RoomNotFoundException>(act);
     }
 }

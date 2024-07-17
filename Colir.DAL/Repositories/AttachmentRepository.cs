@@ -1,4 +1,4 @@
-﻿using Colir.Exceptions;
+﻿using Colir.Exceptions.NotFound;
 using DAL.Entities;
 using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -32,17 +32,10 @@ public class AttachmentRepository : IAttachmentRepository
     /// <exception cref="NotFoundException">Thrown when the attachment wasn't found</exception>
     public async Task<Attachment> GetByIdAsync(long id)
     {
-        try
-        {
-            return await _dbContext.Attachments
-                .AsNoTracking()
-                .Include(nameof(Attachment.Message))
-                .FirstAsync(a => a.Id == id);
-        }
-        catch (InvalidOperationException)
-        {
-            throw new NotFoundException();
-        }
+        return await _dbContext.Attachments
+            .AsNoTracking()
+            .Include(nameof(Attachment.Message))
+            .FirstOrDefaultAsync(a => a.Id == id) ?? throw new NotFoundException();
     }
 
     /// <summary>
@@ -67,15 +60,8 @@ public class AttachmentRepository : IAttachmentRepository
     /// <exception cref="NotFoundException">Thrown when the attachment wasn't found</exception>
     public void Delete(Attachment attachment)
     {
-        try
-        {
-            var target = _dbContext.Attachments.First(a => a.Id == attachment.Id);
-            _dbContext.Attachments.Remove(target);
-        }
-        catch (InvalidOperationException)
-        {
-            throw new NotFoundException();
-        }
+        var target = _dbContext.Attachments.FirstOrDefault(a => a.Id == attachment.Id) ?? throw new AttachmentNotFoundException();
+        _dbContext.Attachments.Remove(target);
     }
 
     /// <summary>
@@ -84,15 +70,8 @@ public class AttachmentRepository : IAttachmentRepository
     /// <param name="id">Id of the attachment to delete</param>
     public async Task DeleteByIdAsync(long id)
     {
-        try
-        {
-            var target = await _dbContext.Attachments.FirstAsync(a => a.Id == id);
-            _dbContext.Attachments.Remove(target);
-        }
-        catch (InvalidOperationException)
-        {
-            throw new NotFoundException();
-        }
+        var target = await _dbContext.Attachments.FirstOrDefaultAsync(a => a.Id == id) ?? throw new AttachmentNotFoundException();
+        _dbContext.Attachments.Remove(target);
     }
 
     /// <summary>
@@ -102,12 +81,10 @@ public class AttachmentRepository : IAttachmentRepository
     /// <exception cref="NotFoundException">Thrown when non-existing attachment provided</exception>
     public void Update(Attachment attachment)
     {
-        var originalEntity = _dbContext.Attachments.Include(nameof(Attachment.Message)).FirstOrDefault(a => a.Id == attachment.Id);
-        
-        if (originalEntity == null)
-        {
-            throw new NotFoundException();
-        }
+        var originalEntity = _dbContext.Attachments
+                                 .Include(nameof(Attachment.Message))
+                                 .FirstOrDefault(a => a.Id == attachment.Id)
+                             ?? throw new AttachmentNotFoundException();
 
         _dbContext.Entry(originalEntity).State = EntityState.Detached;
         _dbContext.Entry(attachment).State = EntityState.Modified;

@@ -3,6 +3,7 @@ using Colir.BLL.Services;
 using Colir.BLL.Tests.Interfaces;
 using Colir.BLL.Tests.Utils;
 using Colir.Exceptions;
+using Colir.Exceptions.NotFound;
 using DAL;
 using DAL.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -25,7 +26,7 @@ public class RoomServiceTests : IRoomServiceTests
         // Initialize the service
         var configMock = new Mock<IConfiguration>();
         var unitOfWork = new UnitOfWork(_dbContext, configMock.Object);
-        _roomService = new RoomService(unitOfWork);
+        _roomService = new RoomService(unitOfWork, AutomapperProfile.InitializeAutoMapper().CreateMapper());
 
         // Add entities
         UnitTestHelper.SeedData(_dbContext);
