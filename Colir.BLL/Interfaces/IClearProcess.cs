@@ -3,7 +3,7 @@
 public interface IClearProcess
 {
     public event Action FileDeleted;
-    public int FilesToDelete { get; }
+    public int FilesToDeleteCount { get; }
 
     void Start();
 }
