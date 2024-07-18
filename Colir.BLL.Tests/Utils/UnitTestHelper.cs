@@ -48,6 +48,10 @@ public static class UnitTestHelper
             HexId = 0xF4CA16,
             Username = "Third User",
             AuthType = UserAuthType.Anonymous,
+            UserSettings = new UserSettings()
+            {
+                StatisticsEnabled = true
+            }
         };
 
         context.Users.AddRange(user1, user2, user3);

@@ -28,12 +28,12 @@ public interface IRoomServiceTests
 
 	Task GetLastTimeUserReadChatAsync_ReturnsLastTimeUserReadChat();
 	Task GetLastTimeUserReadChatAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
-	Task GetLastTimeUserReadChatAsync_ThrowsArgumentException_WhenIssuerIsNotInRoom();
+	Task GetLastTimeUserReadChatAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
 	Task GetLastTimeUserReadChatAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
 
 	Task UpdateLastTimeUserReadChatAsync_UpdatesLastTimeUserReadChat();
 	Task UpdateLastTimeUserReadChatAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
-	Task UpdateLastTimeUserReadChatAsync_ThrowsArgumentException_WhenIssuerIsNotInRoom();
+	Task UpdateLastTimeUserReadChatAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
 	Task UpdateLastTimeUserReadChatAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
 
 	Task JoinMemberAsync_JoinsUserToRoom();
@@ -49,7 +49,7 @@ public interface IRoomServiceTests
 	Task KickMemberAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
 	Task KickMemberAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotOwnerOfRoom();
 
-	Task ClearRoomAsync_ReturnsClearProcessObject();
+	Task ClearRoomAsync_ReturnsIRoomCleanerObject();
 	Task ClearRoomAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
 	Task ClearRoomAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
 	Task ClearRoomAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotOwnerOfRoom();

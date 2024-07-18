@@ -169,16 +169,26 @@ public class RoomRepository : IRoomRepository
             throw new StringTooLongException();
         }
 
-        var originalEntity = _dbContext.Rooms.FirstOrDefault(r => r.Id == room.Id);
-        if (originalEntity != null)
-        {
-            _dbContext.Entry(originalEntity).State = EntityState.Detached;
-        }
-        else
-        {
-            throw new RoomNotFoundException();
-        }
+        var originalEntity = _dbContext.Rooms
+            .Include(nameof(Room.JoinedUsers))
+            .FirstOrDefault(r => r.Id == room.Id) ?? throw new RoomNotFoundException();
 
+        // Check if joined users list is changed to delete users who are no longer in the room
+        if (room.JoinedUsers != null)
+        {
+            for (int i = 0; i < originalEntity.JoinedUsers.Count; i++)
+            {
+                var user = originalEntity.JoinedUsers[i];
+            
+                if (!room.JoinedUsers.Any(u => u.Id == user.Id))
+                {
+                    originalEntity.JoinedUsers.Remove(user);
+                    i--;
+                }
+            }   
+        }
+        
+        _dbContext.Entry(originalEntity).State = EntityState.Detached;
         _dbContext.Entry(room).State = EntityState.Modified;
     }
 

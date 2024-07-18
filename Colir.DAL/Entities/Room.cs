@@ -13,8 +13,8 @@ public class Room : BaseEntity
     public DateTime? ExpiryDate { get; set; }
 
     [ForeignKey(nameof(Owner))]
-    public long OwnerId { get; set; } = default!;
+    public long OwnerId { get; set; }
 
-    public User Owner { get; set; } = default!;
-    public ICollection<User> JoinedUsers { get; set; } = default!;
+    public User Owner { get; set; }
+    public IList<User> JoinedUsers { get; set; } = default!;
 }

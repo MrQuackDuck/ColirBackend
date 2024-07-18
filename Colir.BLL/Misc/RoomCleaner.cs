@@ -6,14 +6,14 @@ namespace Colir.BLL.Misc;
 /// Represents the room cleaning process
 /// Each time a file deleted, the "FileDeleted" event is trigerred
 /// </summary>
-public class ClearProcess : IClearProcess
+public class RoomCleaner : IRoomCleaner
 {
     public int FilesToDeleteCount { get; }
     public event Action? FileDeleted;
 
     private List<string> filesToDelete;
     
-    public ClearProcess(string directoryPath)
+    public RoomCleaner(string directoryPath)
     {
         filesToDelete = Directory.GetFiles(directoryPath).ToList();
         FilesToDeleteCount = filesToDelete.Count;

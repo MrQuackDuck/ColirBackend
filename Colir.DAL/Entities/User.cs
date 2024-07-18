@@ -22,5 +22,5 @@ public class User : BaseEntity
 
     public UserStatistics UserStatistics { get; set; } = new UserStatistics();
     public UserSettings UserSettings { get; set; } = new UserSettings();
-    public ICollection<Room> JoinedRooms { get; set; } = default!;
+    public IList<Room> JoinedRooms { get; set; } = default!;
 }

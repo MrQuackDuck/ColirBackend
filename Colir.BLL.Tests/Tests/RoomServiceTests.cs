@@ -1,4 +1,5 @@
-﻿using Colir.BLL.RequestModels.Room;
+﻿using Colir.BLL.Interfaces;
+using Colir.BLL.RequestModels.Room;
 using Colir.BLL.Services;
 using Colir.BLL.Tests.Interfaces;
 using Colir.BLL.Tests.Utils;
@@ -27,9 +28,20 @@ public class RoomServiceTests : IRoomServiceTests
         var configMock = new Mock<IConfiguration>();
         configMock.Setup(c => c["MinRoomNameLength"]).Returns("2");
         configMock.Setup(c => c["MaxRoomNameLength"]).Returns("50");
+        configMock.Setup(config => config["MinUsernameLength"]).Returns("2");
+        configMock.Setup(config => config["MaxUsernameLength"]).Returns("50");
+
+        var clearProcessMock = new Mock<IRoomCleaner>();
+        
+        var clearProcessFactoryMock = new Mock<IClearProcessFactory>();
+        clearProcessFactoryMock.Setup(factory => factory.GetClearProcessForRoom("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e"))
+            .Returns(clearProcessMock.Object);
         
         var unitOfWork = new UnitOfWork(_dbContext, configMock.Object);
-        _roomService = new RoomService(unitOfWork, AutomapperProfile.InitializeAutoMapper().CreateMapper());
+
+        var mapper = AutomapperProfile.InitializeAutoMapper().CreateMapper();
+        
+        _roomService = new RoomService(unitOfWork, mapper, clearProcessFactoryMock.Object);
 
         // Add entities
         UnitTestHelper.SeedData(_dbContext);
@@ -347,7 +359,7 @@ public class RoomServiceTests : IRoomServiceTests
         var roomToRename = _dbContext.Rooms.First(r => r.Id == 1);
         var request = new RequestToRenameRoom
         {
-            IssuerId = 2,
+            IssuerId = 404,
             RoomGuid = roomToRename.Guid,
             NewName = "New name"
         };
@@ -356,7 +368,7 @@ public class RoomServiceTests : IRoomServiceTests
         AsyncTestDelegate act = async () => await _roomService.RenameAsync(request);
 
         // Assert
-        Assert.ThrowsAsync<NotEnoughPermissionsException>(act);
+        Assert.ThrowsAsync<UserNotFoundException>(act);
     }
 
     [Test]
@@ -427,7 +439,7 @@ public class RoomServiceTests : IRoomServiceTests
         AsyncTestDelegate act = async () => await _roomService.DeleteAsync(request);
 
         // Assert
-        Assert.ThrowsAsync<NotFoundException>(act);
+        Assert.ThrowsAsync<UserNotFoundException>(act);
     }
 
     [Test]
@@ -467,7 +479,7 @@ public class RoomServiceTests : IRoomServiceTests
     }
 
     [Test]
-    public async Task GetLastTimeUserReadChatAsync_ThrowsArgumentException_WhenIssuerIsNotInRoom()
+    public async Task GetLastTimeUserReadChatAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom()
     {
         // Arrange
         var room = _dbContext.Rooms.First(r => r.Id == 1);
@@ -481,7 +493,7 @@ public class RoomServiceTests : IRoomServiceTests
         AsyncTestDelegate act = async () => await _roomService.GetLastTimeUserReadChatAsync(request);
 
         // Assert
-        Assert.ThrowsAsync<ArgumentException>(act);
+        Assert.ThrowsAsync<NotEnoughPermissionsException>(act);
     }
 
     [Test]
@@ -499,7 +511,7 @@ public class RoomServiceTests : IRoomServiceTests
         AsyncTestDelegate act = async () => await _roomService.GetLastTimeUserReadChatAsync(request);
 
         // Assert
-        Assert.ThrowsAsync<NotFoundException>(act);
+        Assert.ThrowsAsync<UserNotFoundException>(act);
     }
 
     [Test]
@@ -540,7 +552,7 @@ public class RoomServiceTests : IRoomServiceTests
     }
 
     [Test]
-    public async Task UpdateLastTimeUserReadChatAsync_ThrowsArgumentException_WhenIssuerIsNotInRoom()
+    public async Task UpdateLastTimeUserReadChatAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom()
     {
         // Arrange
         var room = _dbContext.Rooms.First(r => r.Id == 1);
@@ -554,7 +566,7 @@ public class RoomServiceTests : IRoomServiceTests
         AsyncTestDelegate act = async () => await _roomService.UpdateLastTimeUserReadChatAsync(request);
 
         // Assert
-        Assert.ThrowsAsync<ArgumentException>(act);
+        Assert.ThrowsAsync<NotEnoughPermissionsException>(act);
     }
 
     [Test]
@@ -579,7 +591,11 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task JoinMemberAsync_JoinsUserToRoom()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = _dbContext.Rooms
+            .AsNoTracking()
+            .Include(nameof(Room.JoinedUsers))
+            .First(r => r.Id == 1);
+        
         var request = new RequestToJoinRoom
         {
             IssuerId = 3,
@@ -590,7 +606,11 @@ public class RoomServiceTests : IRoomServiceTests
         await _roomService.JoinMemberAsync(request);
 
         // Assert
-        var roomAfter = _dbContext.Rooms.Include(nameof(Room.JoinedUsers)).First(r => r.Id == 1);
+        var roomAfter = _dbContext.Rooms
+            .AsNoTracking()
+            .Include(nameof(Room.JoinedUsers))
+            .First(r => r.Id == 1);
+        
         Assert.That(roomAfter.JoinedUsers.Count() == 3);
     }
 
@@ -653,20 +673,34 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task KickMemberAsync_KicksUserFromRoom()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = _dbContext.Rooms
+            .AsNoTracking()
+            .Include(nameof(Room.JoinedUsers))
+            .First(r => r.Id == 1);
+        
         var request = new RequestToKickMember
         {
             IssuerId = 1,
             RoomGuid = room.Guid,
-            TargetHexId = "#000000"
+            TargetHexId = 0x000000
         };
 
         // Act
         await _roomService.KickMemberAsync(request);
 
         // Assert
-        var roomAfter = _dbContext.Rooms.Include(nameof(Room.JoinedUsers)).First(r => r.Id == 1);
+        var roomAfter = _dbContext.Rooms
+            .AsNoTracking()
+            .Include(nameof(Room.JoinedUsers))
+            .First(r => r.Id == 1);
+
+        var kickedUser = _dbContext.Users
+            .AsNoTracking()
+            .Include(nameof(User.JoinedRooms))
+            .First(u => u.HexId == 0x000000);
+        
         Assert.That(roomAfter.JoinedUsers.Count == 1);
+        Assert.That(kickedUser.JoinedRooms.Count == 1);
     }
 
     [Test]
@@ -677,7 +711,7 @@ public class RoomServiceTests : IRoomServiceTests
         {
             IssuerId = 1,
             RoomGuid = "404",
-            TargetHexId = "#000000"
+            TargetHexId = 0x000000
         };
 
         // Act
@@ -696,7 +730,7 @@ public class RoomServiceTests : IRoomServiceTests
         {
             IssuerId = 404,
             RoomGuid = room.Guid,
-            TargetHexId = "#000000"
+            TargetHexId = 0x000000
         };
 
         // Act
@@ -715,7 +749,7 @@ public class RoomServiceTests : IRoomServiceTests
         {
             IssuerId = 1,
             RoomGuid = room.Guid,
-            TargetHexId = "#404040"
+            TargetHexId = 0x404040
         };
 
         // Act
@@ -734,7 +768,7 @@ public class RoomServiceTests : IRoomServiceTests
         {
             IssuerId = 3,
             RoomGuid = room.Guid,
-            TargetHexId = "#000000"
+            TargetHexId = 0x000000
         };
 
         // Act
@@ -753,7 +787,7 @@ public class RoomServiceTests : IRoomServiceTests
         {
             IssuerId = 2,
             RoomGuid = room.Guid,
-            TargetHexId = "#000000"
+            TargetHexId = 0x000000
         };
 
         // Act
@@ -764,10 +798,10 @@ public class RoomServiceTests : IRoomServiceTests
     }
 
     [Test]
-    public async Task ClearRoomAsync_ReturnsClearProcessObject()
+    public async Task ClearRoomAsync_ReturnsIRoomCleanerObject()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = _dbContext.Rooms.First(r => r.Guid == "cbaa8673-ea8b-43f8-b4cc-b8b0797b620e");
         var request = new RequestToClearRoom
         {
             IssuerId = 1,
@@ -831,6 +865,6 @@ public class RoomServiceTests : IRoomServiceTests
         AsyncTestDelegate act = async () => await _roomService.ClearRoom(request);
 
         // Assert
-        Assert.ThrowsAsync<UserNotFoundException>(act);
+        Assert.ThrowsAsync<NotEnoughPermissionsException>(act);
     }
 }

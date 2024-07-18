@@ -1,6 +1,6 @@
 ﻿namespace Colir.BLL.Interfaces;
 
-public interface IClearProcess
+public interface IRoomCleaner
 {
     public event Action FileDeleted;
     public int FilesToDeleteCount { get; }

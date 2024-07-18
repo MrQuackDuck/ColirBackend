@@ -185,17 +185,29 @@ public class UserRepository : IUserRepository
             throw new StringTooLongException();
         }
         
-        var originalEntity = _dbContext.Users.FirstOrDefault(u => u.Id == user.Id);
-        
-        if (originalEntity == null)
-        {
-            throw new UserNotFoundException();
-        }
-        
+        var originalEntity = _dbContext.Users
+            .Include(nameof(User.JoinedRooms))
+            .FirstOrDefault(u => u.Id == user.Id) ?? throw new UserNotFoundException();
+
         // Check if a user with the same Hex ID exists
         if (originalEntity.HexId != user.HexId && _dbContext.Users.Count(u => u.HexId == user.HexId) >= 1)
         {
             throw new ArgumentException("User with the same Hex ID exists already!");
+        }
+        
+        // Check if joined rooms list is changed to delete rooms where user is not present at
+        if (user.JoinedRooms != null)
+        {
+            for (int i = 0; i < originalEntity.JoinedRooms.Count; i++)
+            {
+                var room = originalEntity.JoinedRooms[i];
+            
+                if (!user.JoinedRooms.Any(r => r.Id == room.Id))
+                {
+                    originalEntity.JoinedRooms.Remove(room);
+                    i--;
+                }
+            }   
         }
 
         _dbContext.Entry(originalEntity).State = EntityState.Detached;
