@@ -34,7 +34,7 @@ public class MessageRepository : IMessageRepository
     /// Gets the message by id
     /// </summary>
     /// <param name="id">Id of message to get</param>
-    /// <exception cref="NotFoundException">Thrown when the message wasn't found by provided id</exception>
+    /// <exception cref="MessageNotFoundException">Thrown when the message wasn't found by provided id</exception>
     public async Task<Message> GetByIdAsync(long id)
     {
         return await _dbContext.Messages
@@ -119,7 +119,7 @@ public class MessageRepository : IMessageRepository
     /// Deletes the message
     /// </summary>
     /// <param name="message">Message to delete</param>
-    /// <exception cref="NotFoundException">Thrown when the message wasn't found</exception>
+    /// <exception cref="MessageNotFoundException">Thrown when the message wasn't found</exception>
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
     /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found</exception>
     public void Delete(Message message)
@@ -155,7 +155,7 @@ public class MessageRepository : IMessageRepository
     /// Updates the message
     /// </summary>
     /// <param name="message">The message to update</param>
-    /// <exception cref="NotFoundException">Thrown when the message wasn't found</exception>
+    /// <exception cref="MessageNotFoundException">Thrown when the message wasn't found</exception>
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
     public void Update(Message message)
     {

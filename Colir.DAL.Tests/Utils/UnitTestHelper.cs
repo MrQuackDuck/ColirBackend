@@ -25,6 +25,7 @@ public static class UnitTestHelper
             Id = 1,
             HexId = 0xFFFFFF,
             Username = "First User",
+            GitHubId = "2024",
             AuthType = UserAuthType.Anonymous
         };
 

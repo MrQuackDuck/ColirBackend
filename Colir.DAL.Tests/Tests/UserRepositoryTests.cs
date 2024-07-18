@@ -140,6 +140,56 @@ public class UserRepositoryTests : IUserRepositoryTests
     }
 
     [Test]
+    public async Task GetByGitHubIdAsync_ReturnsUser_WhenFound()
+    {
+        // Arrange
+        User expected = _dbContext.Users
+            .Include(nameof(User.UserStatistics))
+            .Include(nameof(User.UserSettings))
+            .Include(nameof(User.JoinedRooms))
+            .FirstOrDefault(u => u.Id == 1)!;
+
+        // Act
+        var result = await _userRepository.GetByGithudIdAsync("2024");
+
+        // Assert
+        Assert.That(result, Is.EqualTo(expected).Using(new UserEqualityComparer()));
+        Assert.That(result.UserStatistics, Is.EqualTo(expected.UserStatistics).Using(new UserStatisticsEqualityComparer()));
+        Assert.That(result.UserSettings, Is.EqualTo(expected.UserSettings).Using(new UserSettingsEqualityComparer()));
+        Assert.That(result.JoinedRooms, Is.EqualTo(expected.JoinedRooms).Using(new RoomEqualityComparer()));
+    }
+
+    [Test]
+    public async Task GetByGitHubIdAsync_ThrowsUserNotFoundException_WhenUserWasNotFound()
+    {
+        // Act
+        AsyncTestDelegate act = async () => await _userRepository.GetByGithudIdAsync("404");
+
+        // Assert
+        Assert.ThrowsAsync<UserNotFoundException>(act);
+    }
+
+    [Test]
+    public async Task Exists_ReturnsTrue_WhenExists()
+    {
+        // Act
+        var result = await _userRepository.Exists(0xFFFFFF);
+
+        // Assert
+        Assert.That(result);
+    }
+
+    [Test]
+    public async Task Exists_ReturnsFalse_WhenDoesNotExist()
+    {
+        // Act
+        var result = await _userRepository.Exists(0x404040);
+
+        // Assert
+        Assert.That(!result);
+    }
+
+    [Test]
     public async Task AddAsync_AddsNewUser()
     {
         // Arrange

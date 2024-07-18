@@ -24,9 +24,11 @@ public class AutomapperProfile : Profile
         
         CreateMap<Room, RoomModel>();
         
-        CreateMap<UserSettings, UserSettingsModel>();
+        CreateMap<UserSettings, UserSettingsModel>()
+            .ReverseMap();
 
-        CreateMap<UserStatistics, UserStatisticsModel>();
+        CreateMap<UserStatistics, UserStatisticsModel>()
+            .ReverseMap();
     }
 
     public static MapperConfiguration InitializeAutoMapper()

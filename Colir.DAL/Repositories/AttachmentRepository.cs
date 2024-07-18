@@ -78,7 +78,7 @@ public class AttachmentRepository : IAttachmentRepository
     /// Updates the attachment
     /// </summary>
     /// <param name="attachment">An attachment to update</param>
-    /// <exception cref="NotFoundException">Thrown when non-existing attachment provided</exception>
+    /// <exception cref="AttachmentNotFoundException">Thrown when non-existing attachment provided</exception>
     public void Update(Attachment attachment)
     {
         var originalEntity = _dbContext.Attachments

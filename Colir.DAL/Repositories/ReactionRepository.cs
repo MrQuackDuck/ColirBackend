@@ -30,7 +30,7 @@ public class ReactionRepository : IReactionRepository
     /// Gets the reaction by id
     /// </summary>
     /// <param name="id">Id of reaction to get</param>
-    /// <exception cref="NotFoundException">Thrown when the reaction wasn't found by provided id</exception>
+    /// <exception cref="ReactionNotFoundException">Thrown when the reaction wasn't found by provided id</exception>
     public async Task<Reaction> GetByIdAsync(long id)
     {
         return await _dbContext.Reactions
@@ -85,7 +85,7 @@ public class ReactionRepository : IReactionRepository
     /// Deletes the reaction
     /// </summary>
     /// <param name="reaction">The reaction to delete</param>
-    /// <exception cref="NotFoundException">Thrown when the reaction wasn't found</exception>
+    /// <exception cref="ReactionNotFoundException">Thrown when the reaction wasn't found</exception>
     public void Delete(Reaction reaction)
     {
         var target = _dbContext.Reactions.FirstOrDefault(r => r.Id == reaction.Id) ?? throw new ReactionNotFoundException();
@@ -96,7 +96,7 @@ public class ReactionRepository : IReactionRepository
     /// Deletes the reaction by id
     /// </summary>
     /// <param name="id">Id of the reaction to delete</param>
-    /// <exception cref="NotFoundException">Thrown when the reaction wasn't found</exception>
+    /// <exception cref="ReactionNotFoundException">Thrown when the reaction wasn't found</exception>
     public async Task DeleteByIdAsync(long id)
     {
         var target = await _dbContext.Reactions.FirstOrDefaultAsync(r => r.Id == id) ?? throw new ReactionNotFoundException();
@@ -107,7 +107,7 @@ public class ReactionRepository : IReactionRepository
     /// Updates the raection
     /// </summary>
     /// <param name="reaction">The reaction to update</param>
-    /// <exception cref="NotFoundException">Thrown when the reaction wasn't found</exception>
+    /// <exception cref="ReactionNotFoundException">Thrown when the reaction wasn't found</exception>
     public void Update(Reaction reaction)
     {
         var originalEntity = _dbContext.Reactions.FirstOrDefault(r => r.Id == reaction.Id);

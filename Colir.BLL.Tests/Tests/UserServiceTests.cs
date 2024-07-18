@@ -1,4 +1,5 @@
-﻿using Colir.BLL.Models;
+﻿using Colir.BLL.Interfaces;
+using Colir.BLL.Models;
 using Colir.BLL.RequestModels.User;
 using Colir.BLL.Services;
 using Colir.BLL.Tests.Interfaces;
@@ -30,7 +31,12 @@ public class UserServiceTests : IUserServiceTests
         configMock.Setup(config => config["MaxUsernameLength"]).Returns("50");
 
         var unitOfWork = new UnitOfWork(_dbContext, configMock.Object);
-        _userService = new UserService(unitOfWork);
+        var mapper = AutomapperProfile.InitializeAutoMapper().CreateMapper();
+
+        var hexGeneratorMock = new Mock<IHexColorGenerator>();
+        hexGeneratorMock.Setup(h => h.GetUniqueHexColor()).Returns(0x123456);
+        
+        _userService = new UserService(unitOfWork, mapper, hexGeneratorMock.Object);
 
         // Add entities
         UnitTestHelper.SeedData(_dbContext);
@@ -234,7 +240,7 @@ public class UserServiceTests : IUserServiceTests
 
         // Assert
         var userCountAfter = _dbContext.Users.Count();
-        Assert.That(userCountAfter - userCountBefore == 1);
+        Assert.That(userCountBefore - userCountAfter == 1);
     }
 
     [Test]
@@ -250,6 +256,6 @@ public class UserServiceTests : IUserServiceTests
         AsyncTestDelegate act = async () => await _userService.DeleteAccount(request);
 
         // Assert
-        Assert.ThrowsAsync<NotFoundException>(act);
+        Assert.ThrowsAsync<UserNotFoundException>(act);
     }
 }

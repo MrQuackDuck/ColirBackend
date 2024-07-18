@@ -5,13 +5,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Entities;
 
+#nullable enable
+
 [Index(nameof(HexId), IsUnique = true)]
 public class User : BaseEntity
 {
     [Range(0, 16_777_216)]
     public long HexId { get; set; }
-    public int? GitHubId { get; set; }
+    
+    [MaxLength(256)]
+    public string? GitHubId { get; set; }
+    
+    [MaxLength(256)]
     public string Username { get; set; } = default!;
+    
     public UserAuthType AuthType { get; set; }
 
     [ForeignKey(nameof(UserStatisticsId))]
@@ -22,5 +29,5 @@ public class User : BaseEntity
 
     public UserStatistics UserStatistics { get; set; } = new UserStatistics();
     public UserSettings UserSettings { get; set; } = new UserSettings();
-    public IList<Room> JoinedRooms { get; set; } = default!;
+    public IList<Room> JoinedRooms { get; set; } = new List<Room>();
 }

@@ -16,5 +16,5 @@ public class Room : BaseEntity
     public long OwnerId { get; set; }
 
     public User Owner { get; set; }
-    public IList<User> JoinedUsers { get; set; } = default!;
+    public IList<User> JoinedUsers { get; set; } = new List<User>();
 }
