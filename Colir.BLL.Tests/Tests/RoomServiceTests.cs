@@ -31,17 +31,17 @@ public class RoomServiceTests : IRoomServiceTests
         configMock.Setup(config => config["MinUsernameLength"]).Returns("2");
         configMock.Setup(config => config["MaxUsernameLength"]).Returns("50");
 
-        var clearProcessMock = new Mock<IRoomCleaner>();
+        var roomCleanerMock = new Mock<IRoomCleaner>();
         
-        var clearProcessFactoryMock = new Mock<IClearProcessFactory>();
-        clearProcessFactoryMock.Setup(factory => factory.GetClearProcessForRoom("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e"))
-            .Returns(clearProcessMock.Object);
+        var roomCleanerFactoryMock = new Mock<IRoomCleanerFactory>();
+        roomCleanerFactoryMock.Setup(factory => factory.GetRoomCleaner("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e"))
+            .Returns(roomCleanerMock.Object);
         
         var unitOfWork = new UnitOfWork(_dbContext, configMock.Object);
 
         var mapper = AutomapperProfile.InitializeAutoMapper().CreateMapper();
         
-        _roomService = new RoomService(unitOfWork, mapper, clearProcessFactoryMock.Object);
+        _roomService = new RoomService(unitOfWork, mapper, roomCleanerFactoryMock.Object);
 
         // Add entities
         UnitTestHelper.SeedData(_dbContext);

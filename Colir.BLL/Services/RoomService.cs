@@ -13,13 +13,13 @@ public class RoomService : IRoomService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
-    private readonly IClearProcessFactory _clearProcessFactory;
+    private readonly IRoomCleanerFactory _roomCleanerFactory;
     
-    public RoomService(IUnitOfWork unitOfWork, IMapper mapper, IClearProcessFactory clearProcessFactory)
+    public RoomService(IUnitOfWork unitOfWork, IMapper mapper, IRoomCleanerFactory roomCleanerFactory)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
-        _clearProcessFactory = clearProcessFactory;
+        _roomCleanerFactory = roomCleanerFactory;
     }
     
     /// <summary>
@@ -258,6 +258,6 @@ public class RoomService : IRoomService
             throw new NotEnoughPermissionsException();
         }
 
-        return _clearProcessFactory.GetClearProcessForRoom(request.RoomGuid);
+        return _roomCleanerFactory.GetRoomCleaner(request.RoomGuid);
     }
 }

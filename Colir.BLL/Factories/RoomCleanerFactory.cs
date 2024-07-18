@@ -4,11 +4,11 @@ using Colir.BLL.Misc;
 namespace Colir.BLL.Factories;
 
 /// <summary>
-/// Factory to get IClearProcess instance
+/// Factory to get IRoomCleaner instance
 /// </summary>
-public class ClearProcessFactory : IClearProcessFactory
+public class RoomCleanerFactory : IRoomCleanerFactory
 {
-    public IRoomCleaner GetClearProcessForRoom(string directoryPath)
+    public IRoomCleaner GetRoomCleaner(string directoryPath)
     {
         return new RoomCleaner(directoryPath);
     }
