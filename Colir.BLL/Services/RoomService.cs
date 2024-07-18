@@ -43,7 +43,7 @@ public class RoomService : IRoomService
     }
 
     /// <summary>
-    /// Creates new room
+    /// Creates a new room
     /// </summary>
     /// <returns>Guid of created room</returns>
     public async Task<string> CreateAsync(RequestToCreateRoom request)
@@ -78,15 +78,45 @@ public class RoomService : IRoomService
 
         return roomToCreate.Guid;
     }
-
+    
+    /// <summary>
+    /// Renames the room
+    /// </summary>
     public async Task RenameAsync(RequestToRenameRoom request)
     {
-        throw new NotImplementedException();
+        var transaction = _unitOfWork.BeginTransaction();
+        
+        // Check if the issuer exists (otherwise, an exception will be thrown)
+        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
+        
+        var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
+        room.Name = request.NewName;
+        _unitOfWork.RoomRepository.Update(room);
+        await _unitOfWork.SaveChangesAsync();
+
+        await transaction.CommitAsync();
     }
 
+    /// <summary>
+    /// Deletes the room
+    /// </summary>
+    /// <exception cref="NotEnoughPermissionsException">Thrown when the issuer is not the owner of the room</exception>
     public async Task DeleteAsync(RequestToDeleteRoom request)
     {
-        throw new NotImplementedException();
+        var transaction = _unitOfWork.BeginTransaction();
+        
+        var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
+        
+        // Check if the issuer's is not the owner of the room
+        if (request.IssuerId != room.OwnerId)
+        {
+            throw new NotEnoughPermissionsException();
+        }
+        
+        _unitOfWork.RoomRepository.Delete(room);
+        await _unitOfWork.SaveChangesAsync();
+        
+        await transaction.CommitAsync();
     }
 
     public async Task<DateTime> GetLastTimeUserReadChatAsync(RequestToGetLastTimeUserReadChat request)
