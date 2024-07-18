@@ -23,7 +23,8 @@ public class UserStatisticsServiceTests : IUserStatisticsServiceTests
         // Initialize the service
         var configMock = new Mock<IConfiguration>();
         var unitOfWork = new UnitOfWork(_dbContext, configMock.Object);
-        _userStatisticsService = new UserStatisticsService(unitOfWork);
+        var mapper = AutomapperProfile.InitializeAutoMapper().CreateMapper();
+        _userStatisticsService = new UserStatisticsService(unitOfWork, mapper);
 
         // Add entities
         UnitTestHelper.SeedData(_dbContext);
@@ -59,7 +60,7 @@ public class UserStatisticsServiceTests : IUserStatisticsServiceTests
         // Arrange
         var request = new RequestToGetStatistics
         {
-            IssuerId = 1
+            IssuerId = 404
         };
 
         // Act
