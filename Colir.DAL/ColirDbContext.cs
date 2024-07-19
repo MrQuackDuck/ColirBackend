@@ -25,7 +25,7 @@ public class ColirDbContext : DbContext
             .HasMany(r => r.JoinedUsers)
             .WithMany(u => u.JoinedRooms)
             .UsingEntity<UserToRoom>();
-
+        
         modelBuilder.Entity<User>()
             .HasOne(s => s.UserSettings)
             .WithOne(s => s.User)
@@ -36,6 +36,18 @@ public class ColirDbContext : DbContext
             .HasOne(s => s.UserStatistics)
             .WithOne(s => s.User)
             .HasForeignKey<UserStatistics>(us => us.UserId)
+            .IsRequired();
+        
+        modelBuilder.Entity<Message>()
+            .HasMany(s => s.Attachments)
+            .WithOne(s => s.Message)
+            .HasForeignKey(a => a.MessageId)
+            .IsRequired();
+        
+        modelBuilder.Entity<Message>()
+            .HasMany(s => s.Reactions)
+            .WithOne(s => s.Message)
+            .HasForeignKey(r => r.MessageId)
             .IsRequired();
     }
 }

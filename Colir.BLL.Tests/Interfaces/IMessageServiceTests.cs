@@ -7,7 +7,7 @@ public interface IMessageServiceTests
 	Task GetLastMessagesAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
 	Task GetLastMessagesAsync_ThrowsArgumentExcpetion_WhenCountLessThanZero();
 	Task GetLastMessagesAsync_ThrowsArgumentExcpetion_WhenSkipLessThanZero();
-	Task GetLastMessagesAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
+	Task GetLastMessagesAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom();
 	Task GetLastMessagesAsync_ThrowsRoomExpiredException_WhenRoomIsExpired();
 
 	Task SendAsync_SendsMessage();
@@ -16,30 +16,30 @@ public interface IMessageServiceTests
 	Task SendAsync_ThrowsMessageNotFoundException_WhenNotExistingReplyMessageIdProvided();
 	Task SendAsync_ThrowsAttachmentNotFoundException_WhenNotExistingAttachmentIdProvided();
 	Task SendAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
-	Task SendAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
+	Task SendAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom();
 	Task SendAsync_ThrowsRoomExpiredException_WhenRoomIsExpired();
 
 	Task EditAsync_EditsMessage();
 	Task EditAsync_ThrowsMessageNotFoundException_WhenMessageWasNotFound();
-	Task EditAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
+	Task EditAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom();
 	Task EditAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotAuthorOfMessage();
 	Task EditAsync_ThrowsRoomExpiredException_WhenRoomIsExpired();
 
 	Task Delete_DeletesMessage();
 	Task Delete_ThrowsMessageNotFoundException_WhenMessageWasNotFound();
-	Task Delete_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
+	Task Delete_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom();
 	Task Delete_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotAuthorOfMessage();
 	Task Delete_ThrowsRoomExpiredException_WhenRoomIsExpired();
 
 	Task AddReaction_AddsReaction();
 	Task AddReaction_AddsToStatistics_WhenItsEnabled();
 	Task AddReaction_ThrowsMessageNotFoundException_WhenMessageWasNotFound();
-	Task AddReaction_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
+	Task AddReaction_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom();
 	Task AddReaction_ThrowsRoomExpiredException_WhenRoomIsExpired();
 
 	Task RemoveReaction_RemovesReaction();
 	Task RemoveReaction_ThrowsReactionNotFoundException_WhenReactionWasNotFound();
-	Task RemoveReaction_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
+	Task RemoveReaction_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom();
 	Task RemoveReaction_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotAuthorOfReaction();
 	Task RemoveReaction_ThrowsRoomExpiredException_WhenRoomIsExpired();
 }

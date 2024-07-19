@@ -3,6 +3,7 @@ using Colir.BLL.Interfaces;
 using Colir.BLL.Models;
 using Colir.BLL.RequestModels.Room;
 using Colir.Exceptions;
+using Colir.Exceptions.NotEnoughPermissions;
 using Colir.Exceptions.NotFound;
 using DAL.Entities;
 using DAL.Interfaces;
@@ -26,7 +27,7 @@ public class RoomService : IRoomService
     /// Gets the info about the room
     /// </summary>
     /// <exception cref="RoomExpiredException">Thrown when specified room is expired</exception>
-    /// <exception cref="NotEnoughPermissionsException">Thrown when the issuer is not in the room he is trying to get info</exception>
+    /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room he is trying to get info</exception>
     // TODO: Return real amount of occupied/free room storage
     public async Task<RoomModel> GetRoomInfoAsync(RequestToGetRoomInfo request)
     {
@@ -39,7 +40,7 @@ public class RoomService : IRoomService
         // Check if the issuer's in the room
         if (!room.JoinedUsers.Any(u => u.Id == request.IssuerId))
         {
-            throw new NotEnoughPermissionsException();
+            throw new IssuerNotInRoomException();
         }
         
         return _mapper.Map<RoomModel>(room);
@@ -128,7 +129,7 @@ public class RoomService : IRoomService
     /// <summary>
     /// Gets the last time when user read the chat
     /// </summary>
-    /// <exception cref="NotEnoughPermissionsException">Thrown when the issuer is not in the room</exception>
+    /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
     public async Task<DateTime> GetLastTimeUserReadChatAsync(RequestToGetLastTimeUserReadChat request)
     {
         // Check if the issuer exists (otherwise, an exception will be thrown)
@@ -139,7 +140,7 @@ public class RoomService : IRoomService
         // Check if the issuer's in the room
         if (!room.JoinedUsers.Any(u => u.Id == request.IssuerId))
         {
-            throw new NotEnoughPermissionsException();
+            throw new IssuerNotInRoomException();
         }
         
         var result = await _unitOfWork.LastTimeUserReadChatRepository.GetAsync(request.IssuerId, room.Id);
@@ -149,7 +150,7 @@ public class RoomService : IRoomService
     /// <summary>
     /// Updates the last time user read the chat
     /// </summary>
-    /// <exception cref="NotEnoughPermissionsException">Thrown when issuer is not in the room</exception>
+    /// <exception cref="IssuerNotInRoomException">Thrown when issuer is not in the room</exception>
     public async Task UpdateLastTimeUserReadChatAsync(RequestToUpdateLastTimeUserReadChat request)
     {
         // Check if the issuer exists (otherwise, an exception will be thrown)
@@ -160,7 +161,7 @@ public class RoomService : IRoomService
         // Check if the issuer's in the room
         if (!room.JoinedUsers.Any(u => u.Id == request.IssuerId))
         {
-            throw new NotEnoughPermissionsException();
+            throw new IssuerNotInRoomException();
         }
         
         var transaction = _unitOfWork.BeginTransaction();
@@ -219,6 +220,7 @@ public class RoomService : IRoomService
     /// Kicks the user from the room
     /// </summary>
     /// <exception cref="NotEnoughPermissionsException">Thrown when user is not the owner of the room</exception>
+    /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
     public async Task KickMemberAsync(RequestToKickMember request)
     {
         var transaction = _unitOfWork.BeginTransaction();
@@ -226,6 +228,13 @@ public class RoomService : IRoomService
         var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
         var issuer = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
         
+        // Check if the issuer's in the room
+        if (!room.JoinedUsers.Any(u => u.Id == request.IssuerId))
+        {
+            throw new IssuerNotInRoomException();
+        }
+        
+        // Check if the user is the owner of the room
         if (room.OwnerId != issuer.Id)
         {
             throw new NotEnoughPermissionsException();

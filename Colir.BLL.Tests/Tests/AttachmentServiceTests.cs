@@ -3,6 +3,7 @@ using Colir.BLL.Services;
 using Colir.BLL.Tests.Interfaces;
 using Colir.BLL.Tests.Utils;
 using Colir.Exceptions;
+using Colir.Exceptions.NotEnoughPermissions;
 using Colir.Exceptions.NotFound;
 using DAL;
 using Microsoft.Extensions.Configuration;
@@ -91,7 +92,7 @@ public class AttachmentServiceTests : IAttachmentServiceTests
     }
 
     [Test]
-    public async Task UploadAttachmentAsync_ThrowsNotEnoughPermissionsExcpetion_WhenIssuerNotInRoom()
+    public async Task UploadAttachmentAsync_ThrowsIssuerNotInRoomExceptionException_WhenIssuerNotInRoom()
     {
         // Arrange
         var room = _dbContext.Rooms.First(r => r.Id == 1);
@@ -105,6 +106,6 @@ public class AttachmentServiceTests : IAttachmentServiceTests
         AsyncTestDelegate act = async () => await _attachmentService.UploadAttachmentAsync(request);
         
         // Assert
-        Assert.ThrowsAsync<NotEnoughPermissionsException>(act);
+        Assert.ThrowsAsync<IssuerNotInRoomException>(act);
     }
 }

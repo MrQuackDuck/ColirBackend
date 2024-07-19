@@ -4,6 +4,7 @@ using Colir.BLL.Services;
 using Colir.BLL.Tests.Interfaces;
 using Colir.BLL.Tests.Utils;
 using Colir.Exceptions;
+using Colir.Exceptions.NotEnoughPermissions;
 using Colir.Exceptions.NotFound;
 using DAL;
 using DAL.Entities;
@@ -111,7 +112,7 @@ public class RoomServiceTests : IRoomServiceTests
     }
 
     [Test]
-    public async Task GetRoomInfoAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInTheRoom()
+    public async Task GetRoomInfoAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom()
     {
         // Arrange
         var request = new RequestToGetRoomInfo
@@ -124,7 +125,7 @@ public class RoomServiceTests : IRoomServiceTests
         AsyncTestDelegate act = async () => await _roomService.GetRoomInfoAsync(request);
 
         // Assert
-        Assert.ThrowsAsync<NotEnoughPermissionsException>(act);
+        Assert.ThrowsAsync<IssuerNotInRoomException>(act);
     }
 
     [Test]
@@ -479,7 +480,7 @@ public class RoomServiceTests : IRoomServiceTests
     }
 
     [Test]
-    public async Task GetLastTimeUserReadChatAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom()
+    public async Task GetLastTimeUserReadChatAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom()
     {
         // Arrange
         var room = _dbContext.Rooms.First(r => r.Id == 1);
@@ -493,7 +494,7 @@ public class RoomServiceTests : IRoomServiceTests
         AsyncTestDelegate act = async () => await _roomService.GetLastTimeUserReadChatAsync(request);
 
         // Assert
-        Assert.ThrowsAsync<NotEnoughPermissionsException>(act);
+        Assert.ThrowsAsync<IssuerNotInRoomException>(act);
     }
 
     [Test]
@@ -552,7 +553,7 @@ public class RoomServiceTests : IRoomServiceTests
     }
 
     [Test]
-    public async Task UpdateLastTimeUserReadChatAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom()
+    public async Task UpdateLastTimeUserReadChatAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom()
     {
         // Arrange
         var room = _dbContext.Rooms.First(r => r.Id == 1);
@@ -566,7 +567,7 @@ public class RoomServiceTests : IRoomServiceTests
         AsyncTestDelegate act = async () => await _roomService.UpdateLastTimeUserReadChatAsync(request);
 
         // Assert
-        Assert.ThrowsAsync<NotEnoughPermissionsException>(act);
+        Assert.ThrowsAsync<IssuerNotInRoomException>(act);
     }
 
     [Test]
@@ -760,7 +761,7 @@ public class RoomServiceTests : IRoomServiceTests
     }
 
     [Test]
-    public async Task KickMemberAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom()
+    public async Task KickMemberAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom()
     {
         // Arrange
         var room = _dbContext.Rooms.First(r => r.Id == 1);
@@ -775,7 +776,7 @@ public class RoomServiceTests : IRoomServiceTests
         AsyncTestDelegate act = async () => await _roomService.KickMemberAsync(request);
 
         // Assert
-        Assert.ThrowsAsync<NotEnoughPermissionsException>(act);
+        Assert.ThrowsAsync<IssuerNotInRoomException>(act);
     }
 
     [Test]

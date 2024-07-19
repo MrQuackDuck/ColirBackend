@@ -77,7 +77,7 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
         AsyncTestDelegate act = async () => await _attachmentRepository.GetByIdAsync(404);
 
         // Assert
-        Assert.ThrowsAsync<NotFoundException>(act);
+        Assert.ThrowsAsync<AttachmentNotFoundException>(act);
     }
 
     [Test]

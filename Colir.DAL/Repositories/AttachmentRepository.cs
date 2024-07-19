@@ -29,20 +29,20 @@ public class AttachmentRepository : IAttachmentRepository
     /// Gets the attachment by id
     /// </summary>
     /// <param name="id">Id of attachment to get</param>
-    /// <exception cref="NotFoundException">Thrown when the attachment wasn't found</exception>
+    /// <exception cref="AttachmentNotFoundException">Thrown when the attachment wasn't found</exception>
     public async Task<Attachment> GetByIdAsync(long id)
     {
         return await _dbContext.Attachments
             .AsNoTracking()
             .Include(nameof(Attachment.Message))
-            .FirstOrDefaultAsync(a => a.Id == id) ?? throw new NotFoundException();
+            .FirstOrDefaultAsync(a => a.Id == id) ?? throw new AttachmentNotFoundException();
     }
 
     /// <summary>
     /// Adds the attachment to DB
     /// </summary>
     /// <param name="attachment">An attachment to add</param>
-    /// <exception cref="MessageNotFoundException">Thrown when message wasn't found</exception>
+    /// <exception cref="MessageNotFoundException">Thrown when the message wasn't found</exception>
     public async Task AddAsync(Attachment attachment)
     {
         if (!await _dbContext.Messages.AnyAsync(m => m.Id == attachment.MessageId))

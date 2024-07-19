@@ -5,7 +5,7 @@ public interface IRoomServiceTests
 	Task GetRoomInfoAsync_ReturnsRoomInfo();
 	Task GetRoomInfoAsync_ThrowsRoomExpiredException_WhenRoomExpired();
 	Task GetRoomInfoAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
-	Task GetRoomInfoAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInTheRoom();
+	Task GetRoomInfoAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom();
 	Task GetRoomInfoAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
 
 	Task CreateAsync_CreatesRoom();
@@ -28,12 +28,12 @@ public interface IRoomServiceTests
 
 	Task GetLastTimeUserReadChatAsync_ReturnsLastTimeUserReadChat();
 	Task GetLastTimeUserReadChatAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
-	Task GetLastTimeUserReadChatAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
+	Task GetLastTimeUserReadChatAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom();
 	Task GetLastTimeUserReadChatAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
 
 	Task UpdateLastTimeUserReadChatAsync_UpdatesLastTimeUserReadChat();
 	Task UpdateLastTimeUserReadChatAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
-	Task UpdateLastTimeUserReadChatAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
+	Task UpdateLastTimeUserReadChatAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom();
 	Task UpdateLastTimeUserReadChatAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
 
 	Task JoinMemberAsync_JoinsUserToRoom();
@@ -46,7 +46,7 @@ public interface IRoomServiceTests
 	Task KickMemberAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
 	Task KickMemberAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
 	Task KickMemberAsync_ThrowsUserNotFoundException_WhenTargetWasNotFound();
-	Task KickMemberAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom();
+	Task KickMemberAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom();
 	Task KickMemberAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotOwnerOfRoom();
 
 	Task ClearRoomAsync_ReturnsIRoomCleanerObject();

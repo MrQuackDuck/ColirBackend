@@ -4,6 +4,7 @@ using Colir.BLL.Services;
 using Colir.BLL.Tests.Interfaces;
 using Colir.BLL.Tests.Utils;
 using Colir.Exceptions;
+using Colir.Exceptions.NotEnoughPermissions;
 using Colir.Exceptions.NotFound;
 using DAL;
 using DAL.Entities;
@@ -27,7 +28,8 @@ public class MessageServiceTests : IMessageServiceTests
         // Initialize the service
         var configMock = new Mock<IConfiguration>();
         var unitOfWork = new UnitOfWork(_dbContext, configMock.Object);
-        _messageService = new MessageService(unitOfWork);
+        var mapper = AutomapperProfile.InitializeAutoMapper().CreateMapper();
+        _messageService = new MessageService(unitOfWork, mapper);
 
         // Add entities
         UnitTestHelper.SeedData(_dbContext);
@@ -46,8 +48,22 @@ public class MessageServiceTests : IMessageServiceTests
         // Arrange
         var expected = new List<MessageModel>
         {
-            _dbContext.Messages.First(m => m.Id == 2).ToMessageModel(),
-            _dbContext.Messages.First(m => m.Id == 3).ToMessageModel()
+            _dbContext.Messages
+                .AsNoTracking()
+                .Include(nameof(Message.Room))
+                .Include(nameof(Message.Author))
+                .Include(nameof(Message.RepliedTo))
+                .Include(nameof(Message.Attachments))
+                .Include(nameof(Message.Reactions))
+                .First(m => m.Id == 3).ToMessageModel(),
+            _dbContext.Messages
+                .AsNoTracking()
+                .Include(nameof(Message.Room))
+                .Include(nameof(Message.Author))
+                .Include(nameof(Message.RepliedTo))
+                .Include(nameof(Message.Attachments))
+                .Include(nameof(Message.Reactions))
+                .First(m => m.Id == 2).ToMessageModel()
         };
 
         var room = _dbContext.Rooms.First(r => r.Id == 1);
@@ -146,7 +162,7 @@ public class MessageServiceTests : IMessageServiceTests
     }
 
     [Test]
-    public async Task GetLastMessagesAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom()
+    public async Task GetLastMessagesAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom()
     {
         // Arrange
         var room = _dbContext.Rooms.First(r => r.Id == 1);
@@ -162,7 +178,7 @@ public class MessageServiceTests : IMessageServiceTests
         AsyncTestDelegate act = async () => await _messageService.GetLastMessagesAsync(request);
 
         // Assert
-        Assert.ThrowsAsync<NotEnoughPermissionsException>(act);
+        Assert.ThrowsAsync<IssuerNotInRoomException>(act);
     }
 
     [Test]
@@ -189,7 +205,7 @@ public class MessageServiceTests : IMessageServiceTests
     public async Task SendAsync_SendsMessage()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 2);
+        var room = _dbContext.Rooms.First(r => r.Id == 1);
         var request = new RequestToSendMessage
         {
             IssuerId = 1,
@@ -309,7 +325,7 @@ public class MessageServiceTests : IMessageServiceTests
     }
 
     [Test]
-    public async Task SendAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom()
+    public async Task SendAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom()
     {
         // Arrange
         var room = _dbContext.Rooms.First(r => r.Id == 1);
@@ -324,7 +340,7 @@ public class MessageServiceTests : IMessageServiceTests
         AsyncTestDelegate act = async () => await _messageService.SendAsync(request);
 
         // Assert
-        Assert.ThrowsAsync<NotEnoughPermissionsException>(act);
+        Assert.ThrowsAsync<IssuerNotInRoomException>(act);
     }
 
     [Test]
@@ -384,7 +400,7 @@ public class MessageServiceTests : IMessageServiceTests
     }
 
     [Test]
-    public async Task EditAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom()
+    public async Task EditAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom()
     {
         // Arrange
         var request = new RequestToEditMessage
@@ -398,7 +414,7 @@ public class MessageServiceTests : IMessageServiceTests
         AsyncTestDelegate act = async () => await _messageService.EditAsync(request);
 
         // Assert
-        Assert.ThrowsAsync<NotEnoughPermissionsException>(act);
+        Assert.ThrowsAsync<IssuerNotInRoomException>(act);
     }
 
     [Test]
@@ -448,7 +464,7 @@ public class MessageServiceTests : IMessageServiceTests
         };
 
         // Act
-        _messageService.Delete(request);
+        await _messageService.DeleteAsync(request);
 
         // Assert
         Assert.That(_dbContext.Messages.Count() == 4);
@@ -465,14 +481,14 @@ public class MessageServiceTests : IMessageServiceTests
         };
 
         // Act
-        TestDelegate act = () => _messageService.Delete(request);
+        AsyncTestDelegate act = async () => await _messageService.DeleteAsync(request);
         
         // Assert
-        Assert.Throws<MessageNotFoundException>(act);
+        Assert.ThrowsAsync<MessageNotFoundException>(act);
     }
 
     [Test]
-    public async Task Delete_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom()
+    public async Task Delete_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom()
     {
         // Arrange
         var request = new RequestToDeleteMessage
@@ -482,10 +498,10 @@ public class MessageServiceTests : IMessageServiceTests
         };
 
         // Act
-        TestDelegate act = () => _messageService.Delete(request);
+        AsyncTestDelegate act = async () => await _messageService.DeleteAsync(request);
         
         // Assert
-        Assert.Throws<NotEnoughPermissionsException>(act);
+        Assert.ThrowsAsync<IssuerNotInRoomException>(act);
     }
 
     [Test]
@@ -499,10 +515,10 @@ public class MessageServiceTests : IMessageServiceTests
         };
 
         // Act
-        TestDelegate act = () => _messageService.Delete(request);
+        AsyncTestDelegate act = async () => await _messageService.DeleteAsync(request);
         
         // Assert
-        Assert.Throws<NotEnoughPermissionsException>(act);
+        Assert.ThrowsAsync<NotEnoughPermissionsException>(act);
     }
 
     [Test]
@@ -516,10 +532,10 @@ public class MessageServiceTests : IMessageServiceTests
         };
 
         // Act
-        TestDelegate act = () => _messageService.Delete(request);
+        AsyncTestDelegate act = async () => await _messageService.DeleteAsync(request);
         
         // Assert
-        Assert.Throws<RoomExpiredException>(act);
+        Assert.ThrowsAsync<RoomExpiredException>(act);
     }
 
     [Test]
@@ -538,8 +554,8 @@ public class MessageServiceTests : IMessageServiceTests
 
         // Assert
         var messageAfter = _dbContext.Messages.AsNoTracking().Include(nameof(Message.Reactions)).First(m => m.Id == 1);
-        Assert.That(messageAfter.Reactions.Count() == 1);
-        Assert.That(messageAfter.Reactions.First().Symbol == request.Reaction);
+        Assert.That(messageAfter.Reactions.Count() == 3);
+        Assert.That(messageAfter.Reactions.OrderByDescending(r => r.Id).First().Symbol == request.Reaction);
     }
     
     [Test]
@@ -581,7 +597,7 @@ public class MessageServiceTests : IMessageServiceTests
     }
 
     [Test]
-    public async Task AddReaction_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom()
+    public async Task AddReaction_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom()
     {
         // Arrange
         var request = new RequestToAddReactionOnMessage
@@ -595,7 +611,7 @@ public class MessageServiceTests : IMessageServiceTests
         AsyncTestDelegate act = async () => await _messageService.AddReaction(request);
 
         // Assert
-        Assert.ThrowsAsync<NotEnoughPermissionsException>(act);
+        Assert.ThrowsAsync<IssuerNotInRoomException>(act);
     }
 
     [Test]
@@ -630,6 +646,8 @@ public class MessageServiceTests : IMessageServiceTests
         await _messageService.RemoveReaction(request);
 
         // Assert
+        var messageAfter = _dbContext.Messages.AsNoTracking().Include(nameof(Message.Reactions)).First(m => m.Id == 1);
+        Assert.That(messageAfter.Reactions.Count == 1);
         Assert.That(_dbContext.Reactions.Count() == 2);
     }
 
@@ -651,7 +669,7 @@ public class MessageServiceTests : IMessageServiceTests
     }
 
     [Test]
-    public async Task RemoveReaction_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotInRoom()
+    public async Task RemoveReaction_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom()
     {
         // Arrange
         var request = new RequestToRemoveReactionFromMessage
@@ -664,7 +682,7 @@ public class MessageServiceTests : IMessageServiceTests
         AsyncTestDelegate act = async () => await _messageService.RemoveReaction(request);
 
         // Assert
-        Assert.ThrowsAsync<NotEnoughPermissionsException>(act);
+        Assert.ThrowsAsync<IssuerNotInRoomException>(act);
     }
 
     [Test]
