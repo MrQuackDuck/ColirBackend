@@ -30,6 +30,8 @@ public class HexColorGenerator : IHexColorGenerator
     /// <summary>
     /// Gets a range of unique Hex Ids
     /// </summary>
+    /// <param name="count">Count of hexs to get</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the count is below zero</exception>
     public async Task<List<int>> GetUniqueHexColorsList(int count)
     {
         if (count < 0)

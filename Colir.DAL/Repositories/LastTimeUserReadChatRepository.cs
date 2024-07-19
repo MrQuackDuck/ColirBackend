@@ -57,7 +57,7 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
     /// Gets last time user read the chat in certain room by id
     /// </summary>
     /// <param name="id">Id of the entry</param>
-    /// <exception cref="NotFoundException"></exception>
+    /// <exception cref="NotFoundException">Thrown when the entity wasn't found</exception>
     public async Task<LastTimeUserReadChat> GetByIdAsync(long id)
     {
         return await _dbContext.LastTimeUserReadChats

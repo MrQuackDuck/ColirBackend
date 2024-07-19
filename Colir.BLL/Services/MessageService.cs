@@ -55,7 +55,8 @@ public class MessageService : IMessageService
     }
 
     /// <summary>
-    /// Sends the message to the room
+    /// Sends the message in the room
+    /// + Increments the count of sent messages in user's statistics (if enabled in settings)
     /// </summary>
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
     /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
@@ -77,7 +78,7 @@ public class MessageService : IMessageService
             throw new IssuerNotInRoomException();
         }
 
-        // If ReplyMessageId is not null, check if the message to reply exists
+        // If the ReplyMessageId is not null, check if the message to reply exists
         // Otherwise, an exception will be thrown
         if (request.ReplyMessageId is not null)
         {
@@ -110,7 +111,7 @@ public class MessageService : IMessageService
         
         if (issuer.UserSettings.StatisticsEnabled)
         {
-            // Adding info about sent message to statistics
+            // Adding the info about the sent message to statistics
             issuer.UserStatistics.MessagesSent += 1;
             _unitOfWork.UserStatisticsRepository.Update(issuer.UserStatistics);
         }
@@ -147,7 +148,7 @@ public class MessageService : IMessageService
             throw new IssuerNotInRoomException();
         }
         
-        // If the issuer is not author of the message
+        // If the issuer is not the author of the message
         if (message.AuthorId != request.IssuerId)
         {
             throw new NotEnoughPermissionsException();
@@ -167,7 +168,7 @@ public class MessageService : IMessageService
     /// <summary>
     /// Deletes the message
     /// </summary>
-    /// <exception cref="RoomExpiredException"></exception>
+    /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
     /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
     /// <exception cref="NotEnoughPermissionsException">Thrown when the issuer is not the author of the message he is trying to delete</exception>
     public async Task DeleteAsync(RequestToDeleteMessage request)
@@ -190,7 +191,7 @@ public class MessageService : IMessageService
             throw new IssuerNotInRoomException();
         }
         
-        // If the issuer is not author of the message
+        // If the issuer is not the author of the message
         if (message.AuthorId != request.IssuerId)
         {
             throw new NotEnoughPermissionsException();
@@ -206,6 +207,7 @@ public class MessageService : IMessageService
 
     /// <summary>
     /// Adds a reaction to the message
+    /// + Increments the count of set reactions in user's statistics (if enabled in settings)
     /// </summary>
     /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
@@ -238,7 +240,7 @@ public class MessageService : IMessageService
         
         if (issuer.UserSettings.StatisticsEnabled)
         {
-            // Adding info about sent message to statistics
+            // Adding the info about sent message to statistics
             issuer.UserStatistics.ReactionsSet += 1;
             _unitOfWork.UserStatisticsRepository.Update(issuer.UserStatistics);
         }
@@ -290,7 +292,7 @@ public class MessageService : IMessageService
         
         if (issuer.UserSettings.StatisticsEnabled)
         {
-            // Adding info about sent message to statistics
+            // Adding the info about sent message to statistics
             issuer.UserStatistics.ReactionsSet += 1;
             _unitOfWork.UserStatisticsRepository.Update(issuer.UserStatistics);
         }

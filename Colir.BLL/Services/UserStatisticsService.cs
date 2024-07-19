@@ -20,6 +20,7 @@ public class UserStatisticsService : IUserStatisticsService
     /// <summary>
     /// Gets user statistics
     /// </summary>
+    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
     public async Task<UserStatisticsModel> GetStatisticsAsync(RequestToGetStatistics request)
     {
         var user = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
