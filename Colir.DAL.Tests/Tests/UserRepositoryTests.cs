@@ -173,7 +173,7 @@ public class UserRepositoryTests : IUserRepositoryTests
     public async Task Exists_ReturnsTrue_WhenExists()
     {
         // Act
-        var result = await _userRepository.Exists(0xFFFFFF);
+        var result = await _userRepository.ExistsAsync(0xFFFFFF);
 
         // Assert
         Assert.That(result);
@@ -183,7 +183,7 @@ public class UserRepositoryTests : IUserRepositoryTests
     public async Task Exists_ReturnsFalse_WhenDoesNotExist()
     {
         // Act
-        var result = await _userRepository.Exists(0x404040);
+        var result = await _userRepository.ExistsAsync(0x404040);
 
         // Assert
         Assert.That(!result);

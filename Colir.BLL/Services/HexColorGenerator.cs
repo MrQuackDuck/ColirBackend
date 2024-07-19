@@ -12,13 +12,32 @@ public class HexColorGenerator : IHexColorGenerator
         _unitOfWork = unitOfWork;
     }
     
-    public long GetUniqueHexColor()
+    public async Task<int> GetUniqueHexColor()
     {
-        throw new NotImplementedException();
+        var random = new Random();
+
+        int hex;
+        
+        do hex = random.Next(0, 16_777_216);
+        while (await _unitOfWork.UserRepository.ExistsAsync(hex));
+
+        return hex;
     }
 
-    public List<long> GetUniqueHexColorsList(int count)
+    public async Task<List<int>> GetUniqueHexColorsList(int count)
     {
-        throw new NotImplementedException();
+        if (count < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(count));
+        }
+        
+        var result = new List<int>();
+
+        for (int i = 0; i < count; i++)
+        {
+            result.Add(await GetUniqueHexColor());
+        }
+
+        return result;
     }
 }

@@ -11,7 +11,7 @@ namespace DAL.Entities;
 public class User : BaseEntity
 {
     [Range(0, 16_777_216)]
-    public long HexId { get; set; }
+    public int HexId { get; set; }
     
     [MaxLength(256)]
     public string? GitHubId { get; set; }

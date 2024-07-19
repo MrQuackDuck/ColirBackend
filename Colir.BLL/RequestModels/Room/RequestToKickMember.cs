@@ -3,6 +3,6 @@
 public class RequestToKickMember
 {
     public long IssuerId { get; set; }
-    public long TargetHexId { get; set; } = default!;
+    public int TargetHexId { get; set; }
     public string RoomGuid { get; set; } = default!;
 }

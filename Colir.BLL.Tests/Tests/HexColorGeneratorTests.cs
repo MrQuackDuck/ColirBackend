@@ -38,7 +38,7 @@ public class HexColorGeneratorTests : IHexColorGeneratorTests
     public async Task GetUniqueHexColor_ReturnsHexInValidFormat()
     {   
         // Act
-        var result = _hexGenerator.GetUniqueHexColor();
+        var result = await _hexGenerator.GetUniqueHexColor();
         
         // Assert
         Assert.That(result.ToString("x6").Length == 6);
@@ -48,7 +48,7 @@ public class HexColorGeneratorTests : IHexColorGeneratorTests
     public async Task GetUniqueHexColorsList_ReturnsHexsInValidFormat()
     {
         // Act
-        var result = _hexGenerator.GetUniqueHexColorsList(5);
+        var result = await _hexGenerator.GetUniqueHexColorsList(5);
         
         // Assert
         foreach (var hex in result)
@@ -61,7 +61,7 @@ public class HexColorGeneratorTests : IHexColorGeneratorTests
     public async Task GetUniqueHexColorsList_ReturnsCorrectAmountOfHexs()
     {
         // Act
-        var result = _hexGenerator.GetUniqueHexColorsList(5);
+        var result = await _hexGenerator.GetUniqueHexColorsList(5);
 
         // Assert
         Assert.That(result.Count() == 5);
@@ -71,9 +71,9 @@ public class HexColorGeneratorTests : IHexColorGeneratorTests
     public async Task GetUniqueHexColorsList_ThrowsArgumentOutOfRangeException_WhenCountIsBelowZero()
     {
         // Act
-        TestDelegate act = () => _hexGenerator.GetUniqueHexColorsList(-1);
+        AsyncTestDelegate act = async () => await _hexGenerator.GetUniqueHexColorsList(-1);
 
         // Assert
-        Assert.Throws<ArgumentOutOfRangeException>(act);  
+        Assert.ThrowsAsync<ArgumentOutOfRangeException>(act);  
     }
 }

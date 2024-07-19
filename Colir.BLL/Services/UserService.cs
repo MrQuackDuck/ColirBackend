@@ -48,7 +48,7 @@ public class UserService : IUserService
             };
             
             // Check if an user with the same HexId already exists
-            if (await _unitOfWork.UserRepository.Exists(request.HexId))
+            if (await _unitOfWork.UserRepository.ExistsAsync(request.HexId))
             {
                 throw new ArgumentException("Hex Id is not unique!");
             }
@@ -73,7 +73,7 @@ public class UserService : IUserService
         var user = new User
         {
             Username = request.DesiredUsername,
-            HexId = _hexGenerator.GetUniqueHexColor(),
+            HexId = await _hexGenerator.GetUniqueHexColor(),
             AuthType = UserAuthType.Anonymous
         };
 

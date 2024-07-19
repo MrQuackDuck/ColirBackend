@@ -5,7 +5,7 @@ namespace Colir.BLL.Models;
 public class DetailedUserModel
 {
     public long Id { get; set; }
-    public long HexId { get; set; }
+    public int HexId { get; set; }
     public string Username { get; set; } = default!;
     public UserAuthType AuthType { get; set; }
     public UserStatisticsModel UserStatistics { get; set; } = default!;

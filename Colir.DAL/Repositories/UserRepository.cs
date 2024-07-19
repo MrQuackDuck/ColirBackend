@@ -52,7 +52,7 @@ public class UserRepository : IUserRepository
     /// <param name="hexId">Hex Id of the user</param>
     /// <exception cref="ArgumentException">Thrown when invalid hex id provided</exception>
     /// <exception cref="UserNotFoundException">Thrown when the user wasn't found by provided hex id</exception>
-    public async Task<User> GetByHexIdAsync(long hexId)
+    public async Task<User> GetByHexIdAsync(int hexId)
     {
         if (hexId < 0 || hexId > 16_777_216)
         {
@@ -85,7 +85,7 @@ public class UserRepository : IUserRepository
     /// <summary>
     /// Determines if a user with provided Hex Id exists already
     /// </summary>
-    public async Task<bool> Exists(long hexId)
+    public async Task<bool> ExistsAsync(int hexId)
     {
         var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.HexId == hexId);
         

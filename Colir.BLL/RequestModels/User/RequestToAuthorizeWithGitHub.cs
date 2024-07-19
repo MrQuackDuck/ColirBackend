@@ -3,6 +3,6 @@
 public class RequestToAuthorizeWithGitHub
 {
     public string GitHubId { get; set; } = default!;
-    public long HexId { get; set; }
+    public int HexId { get; set; }
     public string Username { get; set; } = default!;
 }

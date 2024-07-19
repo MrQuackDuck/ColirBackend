@@ -45,7 +45,7 @@ public class UserStatisticsRepository : IUserStatisticsRepository
     /// <exception cref="ArgumentException">Thrown when invalid Hex Id provided</exception>
     /// <exception cref="UserNotFoundException">Thrown when the user wasn't found</exception>
     /// <exception cref="NotFoundException">Thrown when user statistics wasn't found</exception>
-    public async Task<UserStatistics> GetByUserHexIdAsync(long hexId)
+    public async Task<UserStatistics> GetByUserHexIdAsync(int hexId)
     {
         if (hexId < 0 || hexId > 16_777_216)
         {

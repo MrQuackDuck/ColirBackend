@@ -45,7 +45,7 @@ public class UserSettingsRepository : IUserSettingsRepository
     /// <exception cref="ArgumentException">Thrown when invalid Hex Id provided</exception>
     /// <exception cref="UserNotFoundException">Thrown when the user wasn't found</exception>
     /// <exception cref="NotFoundException">Thrown when user settings weren't found</exception>
-    public async Task<UserSettings> GetByUserHexIdAsync(long hexId)
+    public async Task<UserSettings> GetByUserHexIdAsync(int hexId)
     {
         if (hexId < 0 || hexId > 16_777_216)
         {

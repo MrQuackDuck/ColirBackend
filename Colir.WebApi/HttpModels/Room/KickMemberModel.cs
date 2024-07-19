@@ -2,6 +2,6 @@
 
 public class KickMemberModel
 {
-    public string TargetHexId { get; set; } = default!;
+    public int TargetHexId { get; set; } = default!;
     public string RoomGuid { get; set; } = default!;
 }

@@ -2,6 +2,6 @@
 
 public interface IHexColorGenerator
 {
-    long GetUniqueHexColor();
-    List<long> GetUniqueHexColorsList(int count);
+    Task<int> GetUniqueHexColor();
+    Task<List<int>> GetUniqueHexColorsList(int count);
 }
