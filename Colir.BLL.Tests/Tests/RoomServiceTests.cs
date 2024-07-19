@@ -671,6 +671,80 @@ public class RoomServiceTests : IRoomServiceTests
     }
 
     [Test]
+    public async Task LeaveAsync_RemovesUserFromRoom()
+    {
+        // Arrange
+        var room = _dbContext.Rooms.AsNoTracking().First(r => r.Id == 1);
+        var request = new RequestToLeaveFromRoom()
+        {
+            IssuerId = 1,
+            RoomGuid = room.Guid
+        };
+
+        // Act
+        await _roomService.LeaveAsync(request);
+
+        // Assert
+        var roomAfter = _dbContext.Rooms.AsNoTracking().Include(nameof(Room.JoinedUsers)).First(r => r.Id == 1);
+        var userAfter = _dbContext.Users.AsNoTracking().Include((nameof(User.JoinedRooms))).First(u => u.Id == 1);
+        Assert.That(roomAfter.JoinedUsers.Count == 1);
+        Assert.That(userAfter.JoinedRooms.Count == 1);
+    }
+
+    [Test]
+    public async Task LeaveAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound()
+    {
+        // Arrange
+        var request = new RequestToLeaveFromRoom()
+        {
+            IssuerId = 1,
+            RoomGuid = "404"
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _roomService.LeaveAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<RoomNotFoundException>(act);
+    }
+
+    [Test]
+    public async Task LeaveAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
+    {
+        // Arrange
+        var room = _dbContext.Rooms.AsNoTracking().First(r => r.Id == 1);
+        var request = new RequestToLeaveFromRoom()
+        {
+            IssuerId = 404,
+            RoomGuid = room.Guid
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _roomService.LeaveAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<UserNotFoundException>(act);
+    }
+
+    [Test]
+    public async Task LeaveAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom()
+    {
+        // Arrange
+        var room = _dbContext.Rooms.AsNoTracking().First(r => r.Id == 1);
+        var request = new RequestToLeaveFromRoom()
+        {
+            IssuerId = 3,
+            RoomGuid = room.Guid
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _roomService.LeaveAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<IssuerNotInRoomException>(act);
+    }
+
+    [Test]
     public async Task KickMemberAsync_KicksUserFromRoom()
     {
         // Arrange

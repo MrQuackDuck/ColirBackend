@@ -195,7 +195,6 @@ public class RoomService : IRoomService
     /// </summary>
     public async Task JoinMemberAsync(RequestToJoinRoom request)
     {
-        var transaction = _unitOfWork.BeginTransaction();
         
         var issuer = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
         var roomToJoin = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
@@ -206,6 +205,8 @@ public class RoomService : IRoomService
             _unitOfWork.UserStatisticsRepository.Update(issuer.UserStatistics);
         }
 
+        var transaction = _unitOfWork.BeginTransaction();
+        
         issuer.JoinedRooms.Add(roomToJoin);
         _unitOfWork.UserRepository.Update(issuer);
         
@@ -223,8 +224,6 @@ public class RoomService : IRoomService
     /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
     public async Task KickMemberAsync(RequestToKickMember request)
     {
-        var transaction = _unitOfWork.BeginTransaction();
-
         var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
         var issuer = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
         
@@ -243,6 +242,8 @@ public class RoomService : IRoomService
         var userToKick = await _unitOfWork.UserRepository.GetByHexIdAsync(request.TargetHexId);
         var roomToKickFrom = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
         
+        var transaction = _unitOfWork.BeginTransaction();
+        
         userToKick.JoinedRooms.Remove(userToKick.JoinedRooms.First(r => r.Id == roomToKickFrom.Id));
         _unitOfWork.UserRepository.Update(userToKick);
         
@@ -252,7 +253,36 @@ public class RoomService : IRoomService
         await _unitOfWork.SaveChangesAsync();
         await transaction.CommitAsync();
     }
-    
+
+    /// <summary>
+    /// Leaves the room
+    /// </summary>
+    /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
+    public async Task LeaveAsync(RequestToLeaveFromRoom request)
+    {
+        var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
+        var issuer = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
+        
+        // Check if the issuer's in the room
+        if (!room.JoinedUsers.Any(u => u.Id == request.IssuerId))
+        {
+            throw new IssuerNotInRoomException();
+        }
+        
+        var roomToKickFrom = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
+        
+        var transaction = _unitOfWork.BeginTransaction();
+        
+        issuer.JoinedRooms.Remove(issuer.JoinedRooms.First(r => r.Id == roomToKickFrom.Id));
+        _unitOfWork.UserRepository.Update(issuer);
+        
+        roomToKickFrom.JoinedUsers.Remove(roomToKickFrom.JoinedUsers.First(u => u.Id == issuer.Id));
+        _unitOfWork.RoomRepository.Update(roomToKickFrom);
+        
+        await _unitOfWork.SaveChangesAsync();
+        await transaction.CommitAsync();
+    }
+
     /// <summary>
     /// Returns an object that represents room cleaner
     /// </summary>
