@@ -12,6 +12,9 @@ public class HexColorGenerator : IHexColorGenerator
         _unitOfWork = unitOfWork;
     }
     
+    /// <summary>
+    /// Gets an unique Hex Id
+    /// </summary>
     public async Task<int> GetUniqueHexColor()
     {
         var random = new Random();
@@ -24,6 +27,9 @@ public class HexColorGenerator : IHexColorGenerator
         return hex;
     }
 
+    /// <summary>
+    /// Gets a range of unique Hex Ids
+    /// </summary>
     public async Task<List<int>> GetUniqueHexColorsList(int count)
     {
         if (count < 0)
