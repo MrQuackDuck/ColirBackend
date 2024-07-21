@@ -27,6 +27,8 @@ public class RoomService : IRoomService
     /// Gets the info about the room
     /// </summary>
     /// <exception cref="RoomExpiredException">Thrown when specified room is expired</exception>
+    /// <exception cref="RoomNotFoundException">Thrown when specified room wasn't found</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
     /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room he is trying to get info</exception>
     // TODO: Return real amount of occupied/free room storage
     public async Task<RoomModel> GetRoomInfoAsync(RequestToGetRoomInfo request)
@@ -48,8 +50,11 @@ public class RoomService : IRoomService
 
     /// <summary>
     /// Creates a new room
+    /// + Increments the count of created rooms in user's statistics (if enabled in settings)
     /// </summary>
     /// <returns>Guid of created room</returns>
+    /// <exception cref="ArgumentException">Thrown when the expiry date is not valid</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
     public async Task<string> CreateAsync(RequestToCreateRoom request)
     {
         var transaction = _unitOfWork.BeginTransaction();
@@ -86,6 +91,11 @@ public class RoomService : IRoomService
     /// <summary>
     /// Renames the room
     /// </summary>
+    /// <exception cref="StringTooLongException">Thrown when the name for the room is too long</exception>
+    /// <exception cref="StringTooShortException">Thrown when the name for the room is too short</exception>
+    /// <exception cref="RoomNotFoundException">Thrown when the room was not found</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
+    /// <exception cref="NotEnoughPermissionsException">Thrown when the issuer is not the owner of the room</exception>
     public async Task RenameAsync(RequestToRenameRoom request)
     {
         var transaction = _unitOfWork.BeginTransaction();
@@ -104,6 +114,8 @@ public class RoomService : IRoomService
     /// <summary>
     /// Deletes the room
     /// </summary>
+    /// <exception cref="RoomNotFoundException">Thrown when the room was not found</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
     /// <exception cref="NotEnoughPermissionsException">Thrown when the issuer is not the owner of the room</exception>
     public async Task DeleteAsync(RequestToDeleteRoom request)
     {
@@ -129,6 +141,8 @@ public class RoomService : IRoomService
     /// <summary>
     /// Gets the last time when user read the chat
     /// </summary>
+    /// <exception cref="RoomNotFoundException">Thrown when the room was not found</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
     /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
     public async Task<DateTime> GetLastTimeUserReadChatAsync(RequestToGetLastTimeUserReadChat request)
     {
@@ -150,6 +164,8 @@ public class RoomService : IRoomService
     /// <summary>
     /// Updates the last time user read the chat
     /// </summary>
+    /// <exception cref="RoomNotFoundException">Thrown when the room was not found</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
     /// <exception cref="IssuerNotInRoomException">Thrown when issuer is not in the room</exception>
     public async Task UpdateLastTimeUserReadChatAsync(RequestToUpdateLastTimeUserReadChat request)
     {
@@ -192,7 +208,10 @@ public class RoomService : IRoomService
 
     /// <summary>
     /// Joins a user to the room
+    /// + Increments the count of joined rooms in user's statistics (if enabled in settings)
     /// </summary>
+    /// <exception cref="RoomNotFoundException">Thrown when the room was not found</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
     public async Task JoinMemberAsync(RequestToJoinRoom request)
     {
         
@@ -220,6 +239,8 @@ public class RoomService : IRoomService
     /// <summary>
     /// Kicks the user from the room
     /// </summary>
+    /// <exception cref="RoomNotFoundException">Thrown when the room was not found</exception>
+    /// <exception cref="UserNotFoundException">Thrown when either the issuer wasn't found or the target wasn't found</exception>
     /// <exception cref="NotEnoughPermissionsException">Thrown when user is not the owner of the room</exception>
     /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
     public async Task KickMemberAsync(RequestToKickMember request)
@@ -257,6 +278,8 @@ public class RoomService : IRoomService
     /// <summary>
     /// Leaves the room
     /// </summary>
+    /// <exception cref="RoomNotFoundException">Thrown when the room was not found</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
     /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
     public async Task LeaveAsync(RequestToLeaveFromRoom request)
     {
@@ -284,10 +307,12 @@ public class RoomService : IRoomService
     }
 
     /// <summary>
-    /// Returns an object that represents room cleaner
+    /// Returns an object that represents the room cleaner
     /// </summary>
+    /// <exception cref="RoomNotFoundException">Thrown when the room was not found</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
     /// <exception cref="NotEnoughPermissionsException">Thrown when the user is not the owner of the room</exception>
-    public async Task<IRoomCleaner> ClearRoom(RequestToClearRoom request)
+    public async Task<IRoomCleaner> ClearRoomAsync(RequestToClearRoom request)
     {
         var issuer = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
         var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);

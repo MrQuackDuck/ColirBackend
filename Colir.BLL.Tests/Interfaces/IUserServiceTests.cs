@@ -5,9 +5,13 @@ public interface IUserServiceTests
     Task AuthorizeWithGitHubAsync_CreatesUser();
     Task AuthorizeWithGitHubAsync_ReturnsCorrectData();
     Task AuthorizeWithGitHubAsync_ThrowsArgumentException_WhenHexIsNotUnique();
+    Task AuthorizeWithGitHubAsync_ThrowsStringTooShortException_WhenNewUsernameTooShort();
+    Task AuthorizeWithGitHubAsync_ThrowsStringTooLongException_WhenNewUsernameTooLong();
 
     Task AuthorizeAsAnnoymousAsync_CreatesUser();
     Task AuthorizeAsAnnoymousAsync_ReturnsCorrectData();
+    Task AuthorizeAsAnnoymousAsync_ThrowsStringTooShortException_WhenNewUsernameTooShort();
+    Task AuthorizeAsAnnoymousAsync_ThrowsStringTooLongException_WhenNewUsernameTooLong();
 
     Task ChangeUsernameAsync_ChangesUsername();
     Task ChangeUsernameAsync_StringTooShortException_WhenNewUsernameTooShort();

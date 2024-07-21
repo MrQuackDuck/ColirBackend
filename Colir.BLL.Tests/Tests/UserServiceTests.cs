@@ -106,6 +106,42 @@ public class UserServiceTests : IUserServiceTests
     }
 
     [Test]
+    public async Task AuthorizeWithGitHubAsync_ThrowsStringTooShortException_WhenNewUsernameTooShort()
+    {
+        // Arrange
+        var request = new RequestToAuthorizeWithGitHub
+        {
+            GitHubId = "0000",
+            HexId = 0xFFABCD,
+            Username = new string('a', 1)
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _userService.AuthorizeWithGitHubAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<StringTooShortException>(act);
+    }
+
+    [Test]
+    public async Task AuthorizeWithGitHubAsync_ThrowsStringTooLongException_WhenNewUsernameTooLong()
+    {
+        // Arrange
+        var request = new RequestToAuthorizeWithGitHub
+        {
+            GitHubId = "0000",
+            HexId = 0xFFABCD,
+            Username = new string('a', 51)
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _userService.AuthorizeWithGitHubAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<StringTooLongException>(act);
+    }
+
+    [Test]
     public async Task AuthorizeAsAnnoymousAsync_CreatesUser()
     {
         // Arrange
@@ -136,6 +172,38 @@ public class UserServiceTests : IUserServiceTests
         // Assert
         Assert.That(result.Username == request.DesiredUsername);
         Assert.That(result.AuthType == DAL.Enums.UserAuthType.Anonymous);
+    }
+
+    [Test]
+    public async Task AuthorizeAsAnnoymousAsync_ThrowsStringTooShortException_WhenNewUsernameTooShort()
+    {
+        // Arrange
+        var request = new RequestToAuthorizeAsAnnoymous
+        {
+            DesiredUsername = new string('a', 1)
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _userService.AuthorizeAsAnnoymousAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<StringTooShortException>(act);
+    }
+
+    [Test]
+    public async Task AuthorizeAsAnnoymousAsync_ThrowsStringTooLongException_WhenNewUsernameTooLong()
+    {
+        // Arrange
+        var request = new RequestToAuthorizeAsAnnoymous
+        {
+            DesiredUsername = new string('a', 51)
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _userService.AuthorizeAsAnnoymousAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<StringTooLongException>(act);
     }
 
     [Test]

@@ -18,5 +18,5 @@ public interface IRoomService
     Task KickMemberAsync(RequestToKickMember request);
     Task LeaveAsync(RequestToLeaveFromRoom request);
 
-    Task<IRoomCleaner> ClearRoom(RequestToClearRoom request);
+    Task<IRoomCleaner> ClearRoomAsync(RequestToClearRoom request);
 }

@@ -64,7 +64,7 @@ public class RoomRepository : IRoomRepository
     /// <param name="room">The room to add</param>
     /// <exception cref="RoomExpiredException">Thrown when room's expiry date is earlier than now</exception>
     /// <exception cref="StringTooShortException">Thrown when the name for the room it too short</exception>
-    /// <exception cref="StringTooLongException">Thrown when the name for the room it too long></exception>
+    /// <exception cref="StringTooLongException">Thrown when the name for the room it too long</exception>
     /// <exception cref="UserNotFoundException">Thrown when provided owner wasn't found by id</exception>
     public async Task AddAsync(Room room)
     {

@@ -104,7 +104,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     }
 
     [Test]
-    public async Task GetLastMessages_ThrowsArgumentExcpetion_WhenCountLessThanZero()
+    public async Task GetLastMessages_ThrowsArgumentException_WhenCountLessThanZero()
     {
         // Act
         AsyncTestDelegate act = async () =>
@@ -115,7 +115,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     }
 
     [Test]
-    public async Task GetLastMessages_ThrowsArgumentExcpetion_WhenSkipLessThanZero()
+    public async Task GetLastMessages_ThrowsArgumentException_WhenSkipLessThanZero()
     {
         // Act
         AsyncTestDelegate act = async () =>

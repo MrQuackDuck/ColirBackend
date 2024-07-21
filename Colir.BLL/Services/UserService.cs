@@ -2,6 +2,7 @@
 using Colir.BLL.Interfaces;
 using Colir.BLL.Models;
 using Colir.BLL.RequestModels.User;
+using Colir.Exceptions;
 using Colir.Exceptions.NotFound;
 using DAL.Entities;
 using DAL.Enums;
@@ -23,11 +24,14 @@ public class UserService : IUserService
     }
     
     /// <summary>
-    /// Authorizes the user (i.e: returns account data for user)
+    /// Authorizes the user (i.e: returns account data of the user)
     ///
     /// If the user was found by GitHub Id, its data will be returned
     /// Otherwise, a new user with provided HexId and Username will be created
     /// </summary>
+    /// <exception cref="ArgumentException">Thrown when provided HexId is not unique</exception>
+    /// <exception cref="StringTooShortException">Thrown when a username is too short</exception>
+    /// <exception cref="StringTooLongException">Thrown when a username is too long</exception>
     public async Task<DetailedUserModel> AuthorizeWithGitHubAsync(RequestToAuthorizeWithGitHub request)
     {
         try
@@ -64,8 +68,10 @@ public class UserService : IUserService
     }
 
     /// <summary>
-    /// Creates a new user with provided Username and returns its data instantly
+    /// Creates a new user with provided username and returns its data instantly
     /// </summary>
+    /// <exception cref="StringTooShortException">Thrown when a username is too short</exception>
+    /// <exception cref="StringTooLongException">Thrown when a username is too long</exception>
     public async Task<DetailedUserModel> AuthorizeAsAnnoymousAsync(RequestToAuthorizeAsAnnoymous request)
     {
         var transaction = _unitOfWork.BeginTransaction();
@@ -87,6 +93,8 @@ public class UserService : IUserService
     /// <summary>
     /// Changes the username for an user
     /// </summary>
+    /// <exception cref="StringTooShortException">Thrown when new username is too short</exception>
+    /// <exception cref="StringTooLongException">Thrown when new username is too long</exception>
     public async Task<DetailedUserModel> ChangeUsernameAsync(RequestToChangeUsername request)
     {
         var transaction = _unitOfWork.BeginTransaction();
@@ -104,6 +112,7 @@ public class UserService : IUserService
     /// <summary>
     /// Changes the settings for the user
     /// </summary>
+    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
     public async Task ChangeSettingsAsync(RequestToChangeSettings request)
     {
         var transaction = _unitOfWork.BeginTransaction();
@@ -121,6 +130,7 @@ public class UserService : IUserService
     /// <summary>
     /// Deletes the account of the user
     /// </summary>
+    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
     public async Task DeleteAccount(RequestToDeleteAccount request)
     {
         var transaction = _unitOfWork.BeginTransaction();

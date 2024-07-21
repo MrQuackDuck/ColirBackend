@@ -11,7 +11,7 @@ public interface IRoomServiceTests
 	Task CreateAsync_CreatesRoom();
 	Task CreateAsync_ReturnsRoomGuid();
 	Task CreateAsync_AddsToStatistics_WhenItsEnabled();
-	Task CreateAsync_ThrowsArgumentExcpetion_WhenWrongExpiryDateWasProvided();
+	Task CreateAsync_ThrowsArgumentException_WhenWrongExpiryDateWasProvided();
 	Task CreateAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
 
 	Task RenameAsync_RenamesTheRoom();
@@ -41,11 +41,6 @@ public interface IRoomServiceTests
 	Task CreateAsync_NotAddsToStatistics_WhenItsNotEnabled();
 	Task JoinMemberAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
 	Task JoinMemberAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
-
-	Task LeaveAsync_RemovesUserFromRoom();
-	Task LeaveAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
-	Task LeaveAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
-	Task LeaveAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom();
     
 	Task KickMemberAsync_KicksUserFromRoom();
 	Task KickMemberAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
@@ -53,6 +48,11 @@ public interface IRoomServiceTests
 	Task KickMemberAsync_ThrowsUserNotFoundException_WhenTargetWasNotFound();
 	Task KickMemberAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom();
 	Task KickMemberAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotOwnerOfRoom();
+
+	Task LeaveAsync_RemovesUserFromRoom();
+	Task LeaveAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
+	Task LeaveAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
+	Task LeaveAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom();
 
 	Task ClearRoomAsync_ReturnsIRoomCleanerObject();
 	Task ClearRoomAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();

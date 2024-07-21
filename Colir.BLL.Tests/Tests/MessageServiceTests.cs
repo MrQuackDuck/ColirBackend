@@ -122,7 +122,7 @@ public class MessageServiceTests : IMessageServiceTests
     }
 
     [Test]
-    public async Task GetLastMessagesAsync_ThrowsArgumentExcpetion_WhenCountLessThanZero()
+    public async Task GetLastMessagesAsync_ThrowsArgumentException_WhenCountLessThanZero()
     {
         // Arrange
         var room = _dbContext.Rooms.First(r => r.Id == 1);
@@ -142,7 +142,7 @@ public class MessageServiceTests : IMessageServiceTests
     }
 
     [Test]
-    public async Task GetLastMessagesAsync_ThrowsArgumentExcpetion_WhenSkipLessThanZero()
+    public async Task GetLastMessagesAsync_ThrowsArgumentException_WhenSkipLessThanZero()
     {
         // Arrange
         var room = _dbContext.Rooms.First(r => r.Id == 1);

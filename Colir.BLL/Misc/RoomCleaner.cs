@@ -4,7 +4,7 @@ namespace Colir.BLL.Misc;
 
 /// <summary>
 /// Represents the room cleaning process
-/// Each time a file deleted, the "FileDeleted" event is trigerred
+/// Each time a file deleted, the "FileDeleted" event is trigerred (in order to move the progress on the client)
 /// </summary>
 public class RoomCleaner : IRoomCleaner
 {
