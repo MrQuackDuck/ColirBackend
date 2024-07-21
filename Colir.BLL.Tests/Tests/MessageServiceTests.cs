@@ -248,6 +248,26 @@ public class MessageServiceTests : IMessageServiceTests
     }
 
     [Test]
+    public async Task SendAsync_ThrowsArgumentException_WhenMessageIsEmpty()
+    {
+        // Arrange
+        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var request = new RequestToSendMessage
+        {
+            IssuerId = 1,
+            Content = "",
+            AttachmentsIds = new List<long>() { 1 },
+            RoomGuid = room.Guid
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.SendAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<ArgumentException>(act);
+    }
+
+    [Test]
     public async Task SendAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
     {
         // Arrange
@@ -379,6 +399,24 @@ public class MessageServiceTests : IMessageServiceTests
         // Assert
         var messageAfter = _dbContext.Messages.AsNoTracking().First(m => m.Id == 1);
         Assert.That(messageAfter.Content == request.NewContent);
+    }
+
+    [Test]
+    public async Task EditAsync_ThrowsArgumentException_WhenMessageIsEmpty()
+    {
+        // Arrange
+        var request = new RequestToEditMessage
+        {
+            IssuerId = 1,
+            MessageId = 1,
+            NewContent = ""
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.EditAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<ArgumentException>(act);
     }
 
     [Test]

@@ -12,6 +12,7 @@ public interface IMessageServiceTests
 
 	Task SendAsync_SendsMessage();
 	Task SendAsync_AddsToStatistics_WhenItsEnabled();
+	Task SendAsync_ThrowsArgumentException_WhenMessageIsEmpty();
 	Task SendAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
 	Task SendAsync_ThrowsMessageNotFoundException_WhenNotExistingReplyMessageIdProvided();
 	Task SendAsync_ThrowsAttachmentNotFoundException_WhenNotExistingAttachmentIdProvided();
@@ -20,6 +21,7 @@ public interface IMessageServiceTests
 	Task SendAsync_ThrowsRoomExpiredException_WhenRoomIsExpired();
 
 	Task EditAsync_EditsMessage();
+	Task EditAsync_ThrowsArgumentException_WhenMessageIsEmpty();
 	Task EditAsync_ThrowsMessageNotFoundException_WhenMessageWasNotFound();
 	Task EditAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom();
 	Task EditAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotAuthorOfMessage();

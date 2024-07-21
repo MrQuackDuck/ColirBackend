@@ -33,8 +33,8 @@ public class RoomRepository : IRoomRepository
     /// <summary>
     /// Gets a room by its id
     /// </summary>
-    /// <param name="id">Id of</param>
-    /// <exception cref="RoomNotFoundException">Thrown when room wasn't found</exception>
+    /// <param name="id">Id of a room</param>
+    /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found</exception>
     public async Task<Room> GetByIdAsync(long id)
     {
         return await _dbContext.Rooms
@@ -44,6 +44,11 @@ public class RoomRepository : IRoomRepository
             .FirstOrDefaultAsync(r => r.Id == id) ?? throw new RoomNotFoundException();
     }
     
+    /// <summary>
+    /// Gets a room by its GUID
+    /// </summary>
+    /// <param name="guid">GUID of a room</param>
+    /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found</exception>
     public async Task<Room> GetByGuidAsync(string guid)
     {
         return await _dbContext.Rooms

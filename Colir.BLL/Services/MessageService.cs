@@ -57,10 +57,17 @@ public class MessageService : IMessageService
     /// <summary>
     /// Sends the message to the room
     /// </summary>
+    /// <exception cref="ArgumentException">Thrown when the message content is empty</exception>
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
     /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
     public async Task<MessageModel> SendAsync(RequestToSendMessage request)
     {
+        // Check if not empty
+        if (request.Content.Length == 0)
+        {
+            throw new ArgumentException("Message content can't be empty!");
+        }
+        
         var issuer = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
         
         var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
@@ -124,11 +131,18 @@ public class MessageService : IMessageService
     /// <summary>
     /// Edits the sent message
     /// </summary>
+    /// <exception cref="ArgumentException">Thrown when the message content is empty</exception>
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
     /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
     /// <exception cref="NotEnoughPermissionsException">Thrown when the issuer is not the author of the message he is trying to edit</exception>
     public async Task<MessageModel> EditAsync(RequestToEditMessage request)
     {
+        // Check if not empty
+        if (request.NewContent.Length == 0)
+        {
+            throw new ArgumentException("Message content can't be empty!");
+        }
+        
         // Check if the issuer exists. Otherwise, an exception will be thrown
         await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
 
