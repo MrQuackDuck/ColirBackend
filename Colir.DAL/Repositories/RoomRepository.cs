@@ -9,13 +9,16 @@ namespace DAL.Repositories;
 
 public class RoomRepository : IRoomRepository
 {
+    public IRoomFileManager RoomFileManager { get; }
+    
     private ColirDbContext _dbContext;
     private IConfiguration _config;
     
-    public RoomRepository(ColirDbContext dbContext, IConfiguration config)
+    public RoomRepository(ColirDbContext dbContext, IConfiguration config, IRoomFileManager roomFileManager)
     {
         _dbContext = dbContext;
         _config = config;
+        RoomFileManager = roomFileManager;
     }
 
     /// <summary>
@@ -43,7 +46,7 @@ public class RoomRepository : IRoomRepository
             .Include(nameof(Room.JoinedUsers))
             .FirstOrDefaultAsync(r => r.Id == id) ?? throw new RoomNotFoundException();
     }
-    
+
     /// <summary>
     /// Gets a room by its GUID
     /// </summary>

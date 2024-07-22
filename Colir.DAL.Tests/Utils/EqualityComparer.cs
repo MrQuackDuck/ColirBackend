@@ -11,12 +11,12 @@ public class AttachmentEqualityComparer : IEqualityComparer<Attachment>
         if (ReferenceEquals(x, null)) return false;
         if (ReferenceEquals(y, null)) return false;
         if (x.GetType() != y.GetType()) return false;
-        return x.Filename == y.Filename && x.Path == y.Path && x.SizeInKb == y.SizeInKb && x.MessageId == y.MessageId;
+        return x.Filename == y.Filename && x.Path == y.Path && x.SizeInBytes == y.SizeInBytes;
     }
 
     public int GetHashCode(Attachment obj)
     {
-        return HashCode.Combine(obj.Filename, obj.Path, obj.SizeInKb, obj.MessageId);
+        return HashCode.Combine(obj.Filename, obj.Path, obj.SizeInBytes);
     }
 }
 

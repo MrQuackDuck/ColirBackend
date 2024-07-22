@@ -4,6 +4,7 @@ using Colir.BLL.Tests.Interfaces;
 using Colir.BLL.Tests.Utils;
 using Colir.Exceptions.NotFound;
 using DAL;
+using DAL.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Moq;
 
@@ -22,7 +23,8 @@ public class UserStatisticsServiceTests : IUserStatisticsServiceTests
 
         // Initialize the service
         var configMock = new Mock<IConfiguration>();
-        var unitOfWork = new UnitOfWork(_dbContext, configMock.Object);
+        var roomFileMangerMock = new Mock<IRoomFileManager>();
+        var unitOfWork = new UnitOfWork(_dbContext, configMock.Object, roomFileMangerMock.Object);
         var mapper = AutomapperProfile.InitializeAutoMapper().CreateMapper();
         _userStatisticsService = new UserStatisticsService(unitOfWork, mapper);
 

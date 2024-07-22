@@ -8,6 +8,7 @@ using Colir.Exceptions.NotEnoughPermissions;
 using Colir.Exceptions.NotFound;
 using DAL;
 using DAL.Entities;
+using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Moq;
@@ -27,7 +28,8 @@ public class MessageServiceTests : IMessageServiceTests
 
         // Initialize the service
         var configMock = new Mock<IConfiguration>();
-        var unitOfWork = new UnitOfWork(_dbContext, configMock.Object);
+        var roomFileMangerMock = new Mock<IRoomFileManager>();
+        var unitOfWork = new UnitOfWork(_dbContext, configMock.Object, roomFileMangerMock.Object);
         var mapper = AutomapperProfile.InitializeAutoMapper().CreateMapper();
         _messageService = new MessageService(unitOfWork, mapper);
 

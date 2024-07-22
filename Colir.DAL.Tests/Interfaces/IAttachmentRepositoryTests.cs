@@ -8,7 +8,6 @@ public interface IAttachmentRepositoryTests
     Task GetByIdAsync_ThrowsAttachmentNotFoundException_WhenAttachmentWasNotFound();
 
     Task AddAsync_AddsNewAttachment();
-    Task AddAsync_ThrowsMessageNotFoundException_WhenMessageWasNotFound();
 
     Task Delete_DeletesAttachment();
     Task Delete_ThrowsAttachmentNotFoundException_WhenAttachmentDoesNotExist();

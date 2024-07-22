@@ -1,11 +1,13 @@
 ﻿using Colir.BLL.RequestModels.Attachment;
 using Colir.BLL.Services;
+using Colir.BLL.Tests.Fakes;
 using Colir.BLL.Tests.Interfaces;
 using Colir.BLL.Tests.Utils;
 using Colir.Exceptions;
 using Colir.Exceptions.NotEnoughPermissions;
 using Colir.Exceptions.NotFound;
 using DAL;
+using DAL.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Moq;
 
@@ -24,8 +26,15 @@ public class AttachmentServiceTests : IAttachmentServiceTests
 
         // Initialize the service
         var configMock = new Mock<IConfiguration>();
-        var unitOfWork = new UnitOfWork(_dbContext, configMock.Object);
-        _attachmentService = new AttachmentService(unitOfWork);
+        var roomFileMangerMock = new Mock<IRoomFileManager>();
+        
+        roomFileMangerMock
+            .Setup(fileManager => fileManager.GetFreeStorageSizeAsync("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e"))
+            .ReturnsAsync(100_000_000);
+        
+        var unitOfWork = new UnitOfWork(_dbContext, configMock.Object, roomFileMangerMock.Object);
+        var mapper = AutomapperProfile.InitializeAutoMapper().CreateMapper();
+        _attachmentService = new AttachmentService(unitOfWork, mapper);
 
         // Add entities
         UnitTestHelper.SeedData(_dbContext);
@@ -36,6 +45,46 @@ public class AttachmentServiceTests : IAttachmentServiceTests
     {
         _dbContext.Database.EnsureDeleted();
         _dbContext.Dispose();
+    }
+    
+    [Test]
+    public async Task UploadAttachmentAsync_UploadsAttachment()
+    {
+        // Arrange
+        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var filename = "UnitTest.txt";
+        var request = new RequestToUploadAttachment
+        {
+            IssuerId = 1,
+            RoomGuid = room.Guid,
+            File = new FakeFormFile(filename, 1000)
+        };
+
+        // Act
+        var result = await _attachmentService.UploadAttachmentAsync(request);
+
+        // Assert
+        Assert.That(result.Filename == filename);
+        Assert.That(result.SizeInBytes == 1000);
+    }
+
+    [Test]
+    public async Task UploadAttachmentAsync_ThrowsArgumentException_WhenNoFreeStorageLeft()
+    {
+        // Arrange
+        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var request = new RequestToUploadAttachment
+        {
+            IssuerId = 1,
+            RoomGuid = room.Guid,
+            File = new FakeFormFile("BigFile.exe", 200_000_000)
+        };
+        
+        // Act
+        AsyncTestDelegate act = async () => await _attachmentService.UploadAttachmentAsync(request);
+        
+        // Assert
+        Assert.ThrowsAsync<ArgumentException>(act);
     }
 
     [Test]
@@ -77,7 +126,7 @@ public class AttachmentServiceTests : IAttachmentServiceTests
     public async Task UploadAttachmentAsync_ThrowsUserNotFoundException_WhenIssuerNotFound()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 2);
+        var room = _dbContext.Rooms.First(r => r.Id == 1);
         var request = new RequestToUploadAttachment
         {
             IssuerId = 404,

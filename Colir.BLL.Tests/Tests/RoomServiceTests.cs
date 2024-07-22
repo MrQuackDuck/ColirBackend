@@ -8,6 +8,7 @@ using Colir.Exceptions.NotEnoughPermissions;
 using Colir.Exceptions.NotFound;
 using DAL;
 using DAL.Entities;
+using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Moq;
@@ -38,7 +39,8 @@ public class RoomServiceTests : IRoomServiceTests
         roomCleanerFactoryMock.Setup(factory => factory.GetRoomCleaner("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e"))
             .Returns(roomCleanerMock.Object);
         
-        var unitOfWork = new UnitOfWork(_dbContext, configMock.Object);
+        var roomFileMangerMock = new Mock<IRoomFileManager>();
+        var unitOfWork = new UnitOfWork(_dbContext, configMock.Object, roomFileMangerMock.Object);
 
         var mapper = AutomapperProfile.InitializeAutoMapper().CreateMapper();
         

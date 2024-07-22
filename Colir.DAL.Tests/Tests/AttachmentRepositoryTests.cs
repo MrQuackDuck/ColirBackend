@@ -89,7 +89,7 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
             Id = 2,
             Filename = "newFile.zip",
             Path = "/tests/newFile.zip",
-            SizeInKb = 100,
+            SizeInBytes = 100,
             MessageId = 2, // Message: "Reply to first message"
         };
         
@@ -110,7 +110,7 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
             Id = 2,
             Filename = "newFile.zip",
             Path = "/tests/newFile.zip",
-            SizeInKb = 100,
+            SizeInBytes = 100,
             MessageId = 404,
         };
         
@@ -144,7 +144,7 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
             Id = 404,
             Filename = "newFile.zip",
             Path = "/tests/newFile.zip",
-            SizeInKb = 100,
+            SizeInBytes = 100,
             MessageId = 2, // Message: "Reply to first message"
         };
         
@@ -183,12 +183,12 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
         var attachmentToUpdate = _dbContext.Attachments.AsNoTracking().First();
         
         // Act
-        attachmentToUpdate.SizeInKb = 100;
+        attachmentToUpdate.SizeInBytes = 100;
         _attachmentRepository.Update(attachmentToUpdate);
         _attachmentRepository.SaveChanges();
         
         // Assert
-        Assert.That(_dbContext.Attachments.First().SizeInKb == 100);
+        Assert.That(_dbContext.Attachments.First().SizeInBytes == 100);
     }
 
     [Test]
@@ -200,7 +200,7 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
             Id = 404,
             Filename = "newFile.zip",
             Path = "/tests/newFile.zip",
-            SizeInKb = 100,
+            SizeInBytes = 100,
             MessageId = 2, // Message: "Reply to first message"
         };
         

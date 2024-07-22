@@ -10,7 +10,7 @@ public class Attachment : BaseEntity
     
     [MaxLength(1024)]
     public string Path { get; set; } = default!;
-    public long SizeInKb { get; set; }
+    public long SizeInBytes { get; set; }
 
     [ForeignKey(nameof(Message))]
     public long MessageId { get; set; }

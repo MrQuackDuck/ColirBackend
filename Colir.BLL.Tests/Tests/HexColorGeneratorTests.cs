@@ -2,6 +2,7 @@
 using Colir.BLL.Tests.Interfaces;
 using Colir.BLL.Tests.Utils;
 using DAL;
+using DAL.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Moq;
 
@@ -20,7 +21,8 @@ public class HexColorGeneratorTests : IHexColorGeneratorTests
 
         // Initialize the service
         var configMock = new Mock<IConfiguration>();
-        var unitOfWork = new UnitOfWork(_dbContext, configMock.Object);
+        var roomFileMangerMock = new Mock<IRoomFileManager>();
+        var unitOfWork = new UnitOfWork(_dbContext, configMock.Object, roomFileMangerMock.Object);
         _hexGenerator = new HexColorGenerator(unitOfWork);
 
         // Add entities

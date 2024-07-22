@@ -11,7 +11,7 @@ public static class DalToBllMapper
         {
             Filename = attachment.Filename,
             Path = attachment.Path,
-            SizeInKb = attachment.SizeInKb
+            SizeInBytes = attachment.SizeInBytes
         };
     }
 

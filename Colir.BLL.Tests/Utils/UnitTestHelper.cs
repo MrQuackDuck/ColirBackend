@@ -85,7 +85,7 @@ public static class UnitTestHelper
             Id = 1,
             Filename = "file.zip",
             Path = "/tests/file.zip",
-            SizeInKb = 4,
+            SizeInBytes = 4,
         };
         
         context.Attachments.Add(attachment1);

@@ -8,6 +8,7 @@ using Colir.Exceptions;
 using Colir.Exceptions.NotFound;
 using DAL;
 using DAL.Entities;
+using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Moq;
@@ -30,7 +31,8 @@ public class UserServiceTests : IUserServiceTests
         configMock.Setup(config => config["MinUsernameLength"]).Returns("2");
         configMock.Setup(config => config["MaxUsernameLength"]).Returns("50");
 
-        var unitOfWork = new UnitOfWork(_dbContext, configMock.Object);
+        var roomFileMangerMock = new Mock<IRoomFileManager>();
+        var unitOfWork = new UnitOfWork(_dbContext, configMock.Object, roomFileMangerMock.Object);
         var mapper = AutomapperProfile.InitializeAutoMapper().CreateMapper();
 
         var hexGeneratorMock = new Mock<IHexColorGenerator>();

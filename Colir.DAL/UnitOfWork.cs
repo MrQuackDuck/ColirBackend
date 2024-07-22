@@ -19,10 +19,13 @@ public class UnitOfWork : IUnitOfWork
     private ILastTimeUserReadChatRepository _lastTimeUserReadChatRepository;
     private IConfiguration _configuration;
 
-    public UnitOfWork(ColirDbContext dbContext, IConfiguration configuration)
+    private IRoomFileManager _roomFileManager;
+
+    public UnitOfWork(ColirDbContext dbContext, IConfiguration configuration, IRoomFileManager roomFileManager)
     {
         _dbContext = dbContext;
         _configuration = configuration;
+        _roomFileManager = roomFileManager;
     }
 
     /// <summary>
@@ -49,7 +52,7 @@ public class UnitOfWork : IUnitOfWork
         {
             if (this._roomRepository == null)
             {
-                this._roomRepository = new RoomRepository(_dbContext, _configuration);
+                this._roomRepository = new RoomRepository(_dbContext, _configuration, _roomFileManager);
             }
             
             return _roomRepository;

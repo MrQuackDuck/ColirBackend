@@ -204,9 +204,8 @@ public class MessageRepositoryTests : IMessageRepositoryTests
                 {
                     Id = 2,
                     Filename = "Test.exe",
-                    MessageId = 3,
                     Path = "./root/Test.exe",
-                    SizeInKb = 203
+                    SizeInBytes = 203
                 }
             }
         };
