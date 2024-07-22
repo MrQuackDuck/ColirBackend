@@ -44,7 +44,7 @@ public class AttachmentService : IAttachmentService
         }
 
         // Check if free space left
-        if (request.File.Length < await _unitOfWork.RoomRepository.RoomFileManager.GetFreeStorageSizeAsync(room.Guid))
+        if (request.File.Length > await _unitOfWork.RoomRepository.RoomFileManager.GetFreeStorageSizeAsync(room.Guid))
         {
             throw new ArgumentException("No more room storage left!");
         }
