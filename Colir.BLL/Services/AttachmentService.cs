@@ -4,6 +4,7 @@ using Colir.BLL.Models;
 using Colir.BLL.RequestModels.Attachment;
 using Colir.Exceptions;
 using Colir.Exceptions.NotEnoughPermissions;
+using Colir.Exceptions.NotFound;
 using DAL.Entities;
 using DAL.Interfaces;
 
@@ -23,6 +24,8 @@ public class AttachmentService : IAttachmentService
     /// <summary>
     /// Uploads an attachment
     /// </summary>
+    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
+    /// <exception cref="RoomNotFoundException">Thrown when the wasn't found</exception>
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
     /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
     /// <exception cref="ArgumentException">Thrown when no free space left</exception>
@@ -32,7 +35,7 @@ public class AttachmentService : IAttachmentService
         var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
         
         // Check if room's expired
-        if (room.ExpiryDate < DateTime.Now)
+        if (room.IsExpired())
         {
             throw new RoomExpiredException();
         }
@@ -60,6 +63,7 @@ public class AttachmentService : IAttachmentService
 
         var transaction = _unitOfWork.BeginTransaction();
 
+        // Adding the attachment to DB
         await _unitOfWork.AttachmentRepository.AddAsync(attachment);
         
         await _unitOfWork.SaveChangesAsync();

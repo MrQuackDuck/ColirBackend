@@ -133,7 +133,7 @@ public class UserRepository : IUserRepository
 
         foreach (var room in user.JoinedRooms)
         {
-            if (room.ExpiryDate < DateTime.Now) throw new RoomExpiredException();
+            if (room.IsExpired()) throw new RoomExpiredException();
             if (!await _dbContext.Rooms.AnyAsync(r => room.Id == r.Id)) throw new RoomNotFoundException();
         }
         

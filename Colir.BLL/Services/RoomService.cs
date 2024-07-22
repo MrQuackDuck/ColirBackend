@@ -37,7 +37,7 @@ public class RoomService : IRoomService
         await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
         
         var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
-        if (room.ExpiryDate < DateTime.Now) throw new RoomExpiredException();
+        if (room.IsExpired()) throw new RoomExpiredException();
         
         // Check if the issuer's in the room
         if (!room.JoinedUsers.Any(u => u.Id == request.IssuerId))

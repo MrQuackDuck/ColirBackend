@@ -72,7 +72,7 @@ public class RoomRepository : IRoomRepository
     public async Task AddAsync(Room room)
     {
         // Check for provided date
-        if (room.ExpiryDate < DateTime.Now)
+        if (room.IsExpired())
         {
             throw new RoomExpiredException();
         }
@@ -156,7 +156,7 @@ public class RoomRepository : IRoomRepository
     public void Update(Room room)
     {
         // Check for provided date
-        if (room.ExpiryDate < DateTime.Now)
+        if (room.IsExpired())
         {
             throw new RoomExpiredException();
         }

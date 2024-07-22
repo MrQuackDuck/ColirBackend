@@ -83,7 +83,7 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
             throw new RoomNotFoundException();
         }
 
-        if (room.ExpiryDate < DateTime.Now)
+        if (room.IsExpired())
         {
             throw new RoomExpiredException();
         }
@@ -149,7 +149,7 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
             throw new ArgumentException("You can't update last time user read chat with different room id!");
         }
 
-        if (originalEntity.Room.ExpiryDate < DateTime.Now)
+        if (originalEntity.Room.IsExpired())
         {
             throw new RoomExpiredException();
         }

@@ -50,8 +50,8 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
         Assert.That(result, Is.EqualTo(expected).Using(new AttachmentEqualityComparer()));
         
                 
-        Assert.That(result.Select(r => r.Message).OrderBy(r => r.Id),
-            Is.EqualTo(expected.Select(r => r.Message).OrderBy(r => r.Id)).Using(new MessageEqualityComparer()));
+        Assert.That(result.Select(r => r.Message).OrderBy(r => r?.Id),
+            Is.EqualTo(expected.Select(r => r.Message).OrderBy(r => r?.Id)).Using(new MessageEqualityComparer()));
     }
 
     [Test]
@@ -99,26 +99,6 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
         
         // Assert
         Assert.That(_dbContext.Attachments.Count() == 2);
-    }
-
-    [Test]
-    public async Task AddAsync_ThrowsMessageNotFoundException_WhenMessageWasNotFound()
-    {
-        // Arrange
-        var attachmentToAdd = new Attachment
-        {
-            Id = 2,
-            Filename = "newFile.zip",
-            Path = "/tests/newFile.zip",
-            SizeInBytes = 100,
-            MessageId = 404,
-        };
-        
-        // Act
-        AsyncTestDelegate act = async () => await _attachmentRepository.AddAsync(attachmentToAdd);
-        
-        // Assert
-        Assert.ThrowsAsync<MessageNotFoundException>(act);   
     }
 
     [Test]

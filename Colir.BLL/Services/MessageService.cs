@@ -36,7 +36,7 @@ public class MessageService : IMessageService
         var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
 
         // If the room is expired
-        if (room.ExpiryDate < DateTime.Now)
+        if (room.IsExpired())
         {
             throw new RoomExpiredException();
         }
@@ -74,7 +74,7 @@ public class MessageService : IMessageService
         var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
         
         // If the room is expired
-        if (room.ExpiryDate < DateTime.Now)
+        if (room.IsExpired())
         {
             throw new RoomExpiredException();
         }
@@ -151,7 +151,7 @@ public class MessageService : IMessageService
         var room = await _unitOfWork.RoomRepository.GetByIdAsync(message.RoomId);
         
         // If the room is expired
-        if (room.ExpiryDate < DateTime.Now)
+        if (room.IsExpired())
         {
             throw new RoomExpiredException();
         }
@@ -194,7 +194,7 @@ public class MessageService : IMessageService
         var room = await _unitOfWork.RoomRepository.GetByIdAsync(message.RoomId);
         
         // If the room is expired
-        if (room.ExpiryDate < DateTime.Now)
+        if (room.IsExpired())
         {
             throw new RoomExpiredException();
         }
@@ -238,7 +238,7 @@ public class MessageService : IMessageService
         }
         
         // If the room is expired
-        if (room.ExpiryDate < DateTime.Now)
+        if (room.IsExpired())
         {
             throw new RoomExpiredException();
         }
@@ -285,7 +285,7 @@ public class MessageService : IMessageService
         var room = await _unitOfWork.RoomRepository.GetByIdAsync(reaction.Message.RoomId);
         
         // If the room is expired
-        if (room.ExpiryDate < DateTime.Now)
+        if (room.IsExpired())
         {
             throw new RoomExpiredException();
         }

@@ -37,12 +37,11 @@ public class ColirDbContext : DbContext
             .WithOne(s => s.User)
             .HasForeignKey<UserStatistics>(us => us.UserId)
             .IsRequired();
-        
+
         modelBuilder.Entity<Message>()
             .HasMany(s => s.Attachments)
             .WithOne(s => s.Message)
-            .HasForeignKey(a => a.MessageId)
-            .IsRequired();
+            .HasForeignKey(a => a.MessageId);
         
         modelBuilder.Entity<Message>()
             .HasMany(s => s.Reactions)

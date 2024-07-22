@@ -45,11 +45,6 @@ public class AttachmentRepository : IAttachmentRepository
     /// <exception cref="MessageNotFoundException">Thrown when the message wasn't found</exception>
     public async Task AddAsync(Attachment attachment)
     {
-        if (!await _dbContext.Messages.AnyAsync(m => m.Id == attachment.MessageId))
-        {
-            throw new MessageNotFoundException();
-        }
-        
         await _dbContext.Attachments.AddAsync(attachment);
     }
 

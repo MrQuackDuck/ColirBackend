@@ -70,7 +70,7 @@ public class MessageRepository : IMessageRepository
 
         var room = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Guid == roomGuid) ?? throw new RoomNotFoundException();
 
-        if (room.ExpiryDate < DateTime.Now)
+        if (room.IsExpired())
         {
             throw new RoomExpiredException();
         }
@@ -105,7 +105,7 @@ public class MessageRepository : IMessageRepository
         }
 
         var room = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Id == message.RoomId) ?? throw new RoomNotFoundException();
-        if (room.ExpiryDate < DateTime.Now) throw new RoomExpiredException();
+        if (room.IsExpired()) throw new RoomExpiredException();
         
         if (!await _dbContext.Users.AnyAsync(u => u.Id == message.AuthorId))
         {
@@ -127,7 +127,7 @@ public class MessageRepository : IMessageRepository
         var target = _dbContext.Messages.FirstOrDefault(m => m.Id == message.Id) ?? throw new MessageNotFoundException();
         
         var room = _dbContext.Rooms.First(r => r.Id == target.RoomId) ?? throw new RoomNotFoundException();
-        if (room.ExpiryDate < DateTime.Now) throw new RoomExpiredException();
+        if (room.IsExpired()) throw new RoomExpiredException();
         
         _dbContext.Messages.Remove(target);
     }
@@ -144,7 +144,7 @@ public class MessageRepository : IMessageRepository
             .Include(nameof(Message.Room))
             .FirstOrDefaultAsync(m => m.Id == id) ?? throw new MessageNotFoundException();
         
-        if (target.Room.ExpiryDate < DateTime.Now) throw new RoomExpiredException();
+        if (target.Room.IsExpired()) throw new RoomExpiredException();
         
         _dbContext.Messages.Remove(target);
         _dbContext.Attachments.RemoveRange(_dbContext.Attachments.Where(a => a.MessageId == id));
@@ -166,7 +166,7 @@ public class MessageRepository : IMessageRepository
             throw new MessageNotFoundException();
         }
         
-        if (originalEntity.Room.ExpiryDate < DateTime.Now) throw new RoomExpiredException();
+        if (originalEntity.Room.IsExpired()) throw new RoomExpiredException();
         
         _dbContext.Entry(originalEntity).State = EntityState.Detached;
         _dbContext.Entry(message).State = EntityState.Modified;
