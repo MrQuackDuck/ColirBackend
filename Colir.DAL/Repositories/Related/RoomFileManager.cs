@@ -1,11 +1,19 @@
-﻿using DAL.Interfaces;
+﻿using System.IO.Abstractions;
+using DAL.Interfaces;
 using Microsoft.AspNetCore.Http;
 
 namespace DAL.Repositories.Related;
 
 public class RoomFileManager : IRoomFileManager
 {
-    public Task<IFormFile> GetFileAsync(string path)
+    private IFileSystem _fileSystem;
+    
+    public RoomFileManager(IFileSystem fileSystem)
+    {
+        _fileSystem = fileSystem;
+    }
+    
+    public Task<FileStream> GetFileAsync(string path)
     {
         throw new NotImplementedException();
     }

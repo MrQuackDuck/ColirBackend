@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.IO.Abstractions;
 using Colir.DAL.Tests.Interfaces;
 using Colir.DAL.Tests.Utils;
 using Colir.Exceptions;
@@ -30,7 +31,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         configMock.Setup(c => c["MinRoomNameLength"]).Returns("2");
         configMock.Setup(c => c["MaxRoomNameLength"]).Returns("50");
         
-        _roomRepository = new RoomRepository(_dbContext, configMock.Object, new RoomFileManager());
+        _roomRepository = new RoomRepository(_dbContext, configMock.Object, new RoomFileManager(new FileSystem()));
         
         // Add entities
         UnitTestHelper.SeedData(_dbContext);

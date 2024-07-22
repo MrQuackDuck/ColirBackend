@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.IO.Abstractions;
+using Microsoft.AspNetCore.Http;
 
 namespace DAL.Interfaces;
 
 public interface IRoomFileManager
 {
-    Task<IFormFile> GetFileAsync(string path);
+    Task<FileStream> GetFileAsync(string path);
     Task<long> GetFreeStorageSizeAsync(string roomGuid);
     Task<long> GetFilesSizeAsync(string roomGuid);
     Task<string> UploadFileAsync(string roomGuid, IFormFile file);
