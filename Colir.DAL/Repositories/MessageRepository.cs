@@ -130,6 +130,7 @@ public class MessageRepository : IMessageRepository
         if (room.IsExpired()) throw new RoomExpiredException();
         
         _dbContext.Messages.Remove(target);
+        _dbContext.Attachments.RemoveRange(_dbContext.Attachments.Where(a => a.MessageId == target.Id));
     }
 
     /// <summary>
