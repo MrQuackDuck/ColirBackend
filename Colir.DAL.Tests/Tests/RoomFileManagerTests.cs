@@ -13,7 +13,6 @@ public class RoomFileManagerTests : IRoomFileManagerTests
     public void SetUp()
     {
         _mockFileSystem = new MockFileSystem(new Dictionary<string, MockFileData>());
-
         
         _roomFileManager = new RoomFileManager(_mockFileSystem);
     }
