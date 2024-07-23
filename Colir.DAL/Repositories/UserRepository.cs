@@ -221,19 +221,16 @@ public class UserRepository : IUserRepository
             throw new ArgumentException("User with the same Hex ID exists already!");
         }
         
-        // Check if joined rooms list is changed to delete rooms where user is not present at
-        if (user.JoinedRooms != null)
+        // Check if joined rooms list was changed to delete rooms where user is not present at
+        for (int i = 0; i < originalEntity.JoinedRooms.Count; i++)
         {
-            for (int i = 0; i < originalEntity.JoinedRooms.Count; i++)
-            {
-                var room = originalEntity.JoinedRooms[i];
+            var room = originalEntity.JoinedRooms[i];
             
-                if (!user.JoinedRooms.Any(r => r.Id == room.Id))
-                {
-                    originalEntity.JoinedRooms.Remove(room);
-                    i--;
-                }
-            }   
+            if (!user.JoinedRooms.Any(r => r.Id == room.Id))
+            {
+                originalEntity.JoinedRooms.Remove(room);
+                i--;
+            }
         }
 
         _dbContext.Entry(originalEntity).State = EntityState.Detached;

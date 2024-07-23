@@ -8,6 +8,7 @@ using Colir.Exceptions.NotEnoughPermissions;
 using Colir.Exceptions.NotFound;
 using DAL;
 using DAL.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Moq;
 
@@ -17,6 +18,7 @@ public class AttachmentServiceTests : IAttachmentServiceTests
 {
     private ColirDbContext _dbContext;
     private AttachmentService _attachmentService;
+    private IFormFile fileToUpload = new FakeFormFile("UnitTest.txt", 1000);
 
     [SetUp]
     public void SetUp()
@@ -31,6 +33,10 @@ public class AttachmentServiceTests : IAttachmentServiceTests
         roomFileMangerMock
             .Setup(fileManager => fileManager.GetFreeStorageSizeAsync("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e"))
             .ReturnsAsync(100_000_000);
+
+        roomFileMangerMock
+            .Setup(fileManager => fileManager.UploadFileAsync("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e", fileToUpload))
+            .ReturnsAsync("./RoomFiles/cbaa8673-ea8b-43f8-b4cc-b8b0797b620e/UnitTest.txt");
         
         var unitOfWork = new UnitOfWork(_dbContext, configMock.Object, roomFileMangerMock.Object);
         var mapper = AutomapperProfile.InitializeAutoMapper().CreateMapper();
@@ -52,19 +58,18 @@ public class AttachmentServiceTests : IAttachmentServiceTests
     {
         // Arrange
         var room = _dbContext.Rooms.First(r => r.Id == 1);
-        var filename = "UnitTest.txt";
         var request = new RequestToUploadAttachment
         {
             IssuerId = 1,
             RoomGuid = room.Guid,
-            File = new FakeFormFile(filename, 1000)
+            File = fileToUpload
         };
 
         // Act
         var result = await _attachmentService.UploadAttachmentAsync(request);
 
         // Assert
-        Assert.That(result.Filename == filename);
+        Assert.That(result.Filename == fileToUpload.FileName);
         Assert.That(result.SizeInBytes == 1000);
     }
 

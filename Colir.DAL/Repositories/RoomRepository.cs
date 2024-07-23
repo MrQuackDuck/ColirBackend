@@ -65,7 +65,7 @@ public class RoomRepository : IRoomRepository
     /// Adds a room to DB
     /// </summary>
     /// <param name="room">The room to add</param>
-    /// <exception cref="RoomExpiredException">Thrown when room's expiry date is earlier than now</exception>
+    /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
     /// <exception cref="StringTooShortException">Thrown when the name for the room it too short</exception>
     /// <exception cref="StringTooLongException">Thrown when the name for the room it too long</exception>
     /// <exception cref="UserNotFoundException">Thrown when provided owner wasn't found by id</exception>
@@ -113,7 +113,10 @@ public class RoomRepository : IRoomRepository
         var target = _dbContext.Rooms.FirstOrDefault(r => r.Id == room.Id) ?? throw new RoomNotFoundException();
         
         _dbContext.Rooms.Remove(target);
-        _dbContext.Messages.RemoveRange(_dbContext.Messages.Where(m => m.RoomId == room.Id));
+        var messagesToDelete = _dbContext.Messages.Where(m => m.RoomId == room.Id);
+        _dbContext.Messages.RemoveRange(messagesToDelete);
+        var attachmentsToDelete = _dbContext.Attachments.Where(a => messagesToDelete.Any(m => m.Id == a.MessageId));
+        _dbContext.Attachments.RemoveRange(attachmentsToDelete);
     }
 
     /// <summary>
@@ -126,7 +129,10 @@ public class RoomRepository : IRoomRepository
         var target = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Id == id) ?? throw new RoomNotFoundException();
         
         _dbContext.Rooms.Remove(target);
-        _dbContext.Messages.RemoveRange(_dbContext.Messages.Where(m => m.RoomId == id));
+        var messagesToDelete = _dbContext.Messages.Where(m => m.RoomId == id);
+        _dbContext.Messages.RemoveRange(messagesToDelete);
+        var attachmentsToDelete = _dbContext.Attachments.Where(a => messagesToDelete.Any(m => m.Id == a.MessageId));
+        _dbContext.Attachments.RemoveRange(attachmentsToDelete);
     }
 
     /// <summary>
@@ -149,7 +155,7 @@ public class RoomRepository : IRoomRepository
     /// Updates the room
     /// </summary>
     /// <param name="room">The room to update</param>
-    /// <exception cref="RoomExpiredException">Thrown when room's expiry date is earlier than now</exception>
+    /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
     /// <exception cref="StringTooShortException">Thrown when the name for the room it too short</exception>
     /// <exception cref="StringTooLongException">Thrown when the name for the room it too long</exception>
     /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found by its id</exception>
@@ -181,7 +187,7 @@ public class RoomRepository : IRoomRepository
             .Include(nameof(Room.JoinedUsers))
             .FirstOrDefault(r => r.Id == room.Id) ?? throw new RoomNotFoundException();
 
-        // Check if joined users list is changed to delete users who are no longer in the room
+        // Check if joined users list was changed to delete users who are no longer in the room
         if (room.JoinedUsers != null)
         {
             for (int i = 0; i < originalEntity.JoinedUsers.Count; i++)

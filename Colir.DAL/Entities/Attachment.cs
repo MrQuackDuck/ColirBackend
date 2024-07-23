@@ -3,6 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DAL.Entities;
 
+#nullable enable
+
 public class Attachment : BaseEntity
 {
     [MaxLength(256)]
@@ -16,5 +18,5 @@ public class Attachment : BaseEntity
     [ForeignKey(nameof(Message))]
     public long? MessageId { get; set; }
 
-    public Message? Message { get; set; } = default!;
+    public Message? Message { get; set; }
 }

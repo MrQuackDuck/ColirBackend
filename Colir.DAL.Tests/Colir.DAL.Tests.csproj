@@ -25,6 +25,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Colir.BLL.Tests\Colir.BLL.Tests.csproj" />
       <ProjectReference Include="..\Colir.DAL\Colir.DAL.csproj" />
       <ProjectReference Include="..\Colir.Exceptions\Colir.Exceptions.csproj" />
     </ItemGroup>

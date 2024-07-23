@@ -33,7 +33,7 @@ public class RoomFileManager : IRoomFileManager
         throw new NotImplementedException();
     }
 
-    public Task DeleteFileAsync(string roomGuid, string path)
+    public Task DeleteFileAsync(string path)
     {
         throw new NotImplementedException();
     }

@@ -358,7 +358,6 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     public async Task DeleteByIdAsync_DeletesAllRelatedAttachments()
     {
         // Arrange
-        var roomCount = _dbContext.Rooms.Count();
         var roomIdToDelete = _dbContext.Rooms.First().Id;
         
         // Act
@@ -366,12 +365,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         _roomRepository.SaveChanges();
 
         // Assert
-        // Ensure that room is now couldn't be found
-        var room = _dbContext.Rooms.FirstOrDefault(r => r.Id == roomIdToDelete);
-        Assert.Null(room);
-        
-        // Ensure that room count was reduced
-        Assert.That(_dbContext.Rooms.Count() == (roomCount - 1));
+        Assert.That(_dbContext.Attachments.Count() == 0);
     }
 
     [Test]
