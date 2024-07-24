@@ -31,8 +31,8 @@ public class AttachmentServiceTests : IAttachmentServiceTests
         var roomFileMangerMock = new Mock<IRoomFileManager>();
         
         roomFileMangerMock
-            .Setup(fileManager => fileManager.GetFreeStorageSizeAsync("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e"))
-            .ReturnsAsync(100_000_000);
+            .Setup(fileManager => fileManager.GetFreeStorageSize("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e"))
+            .Returns(100_000_000);
 
         roomFileMangerMock
             .Setup(fileManager => fileManager.UploadFileAsync("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e", fileToUpload))

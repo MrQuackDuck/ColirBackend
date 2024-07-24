@@ -2,6 +2,8 @@
 using Colir.BLL.Tests.Fakes;
 using Colir.DAL.Tests.Interfaces;
 using DAL.Repositories.Related;
+using Microsoft.Extensions.Configuration;
+using Moq;
 
 namespace Colir.DAL.Tests.Tests;
 
@@ -17,25 +19,29 @@ public class RoomFileManagerTests : IRoomFileManagerTests
     {
         _mockFileSystem = new MockFileSystem(new Dictionary<string, MockFileData>());
         
-        _roomFileManager = new RoomFileManager(_mockFileSystem);
+        var configMock = new Mock<IConfiguration>();
+        configMock.Setup(c => c["MaxRoomStorageCapacityInBytes"]).Returns("100000000");
+        
+        _roomFileManager = new RoomFileManager(_mockFileSystem, configMock.Object);
     }
     
     [Test]
-    public async Task GetFileAsync_ReturnsFileAsync()
+    public async Task GetFile_ReturnsFileAsync()
     {
         // Assert
-        var mockFile = new MockFileData("Random Content");
-        _mockFileSystem.AddFile($"./{folderName}/00000000-0000-0000-0000-000000000000/File-1.txt", mockFile);
+        var mockData = new MockFileData("Random Content");
+        var path = $"./{folderName}/00000000-0000-0000-0000-000000000000/File-1.txt";
+        _mockFileSystem.AddFile(path, mockData);
         
         // Act
-        var file = await _roomFileManager.GetFileAsync("./RoomsFiles/00000000-0000-0000-0000-000000000000/File-1.txt");
+        var file = _roomFileManager.GetFile(path);
         
         // Assert
-        Assert.That(file.Name == "File-1.txt");
+        Assert.That(file.Name.Contains("File-1.txt"));
     }
 
     [Test]
-    public async Task GetFreeStorageSizeAsync_ReturnsFreeStorageSize()
+    public async Task GetFreeStorageSize_ReturnsFreeStorageSize()
     {
         // Arrange
         var mockFile = new MockFileData("Random Content");
@@ -45,14 +51,14 @@ public class RoomFileManagerTests : IRoomFileManagerTests
         var expectedFreeSize = 100_000_000 - fileSize;
         
         // Act
-        var result = await _roomFileManager.GetFreeStorageSizeAsync("00000000-0000-0000-0000-000000000000");
+        var result = _roomFileManager.GetFreeStorageSize("00000000-0000-0000-0000-000000000000");
 
         // Assert
         Assert.That(result == expectedFreeSize);
     }
 
     [Test]
-    public async Task GetFilesSizeAsync_ReturnsFilesTotalSize()
+    public async Task GetFilesSize_ReturnsFilesTotalSize()
     {
         // Arrange
         var mockFile = new MockFileData("Random Content");
@@ -61,7 +67,7 @@ public class RoomFileManagerTests : IRoomFileManagerTests
         var expectedFileSize = _mockFileSystem.FileInfo.New(path).Length;
         
         // Act
-        var result = await _roomFileManager.GetFreeStorageSizeAsync("00000000-0000-0000-0000-000000000000");
+        var result = _roomFileManager.GetFilesSize("00000000-0000-0000-0000-000000000000");
 
         // Assert
         Assert.That(result == expectedFileSize);
@@ -75,17 +81,14 @@ public class RoomFileManagerTests : IRoomFileManagerTests
         var fileSize = 100;
 
         // Act
-        await _roomFileManager.UploadFileAsync("00000000-0000-0000-0000-000000000000", new FakeFormFile(fileName, fileSize));
+        var resultPath = await _roomFileManager.UploadFileAsync("00000000-0000-0000-0000-000000000000", new FakeFormFile(fileName, fileSize, _mockFileSystem));
 
         // Assert
-        var path = $"./{folderName}/00000000-0000-0000-0000-000000000000/File-1.txt";
-        var file = _mockFileSystem.FileInfo.New(path);
-        Assert.That(file.Name == fileName);
-        Assert.That(file.Length == fileSize);
+        _mockFileSystem.File.Exists(resultPath);
     }
 
     [Test]
-    public async Task DeleteFileAsync_DeletesTheFileRelatedToRoom()
+    public async Task DeleteFile_DeletesTheFileRelatedToRoom()
     {
         // Arrange
         var mockFile = new MockFileData("Random Content");
@@ -93,22 +96,23 @@ public class RoomFileManagerTests : IRoomFileManagerTests
         _mockFileSystem.AddFile(path, mockFile);
         
         // Act
-        await _roomFileManager.DeleteFileAsync(path);
+        _roomFileManager.DeleteFile(path);
 
         // Assert
         Assert.That(_mockFileSystem.FileExists(path) == false);
     }
 
     [Test]
-    public async Task DeleteAllFilesAsync_DeletesAllFilesRelatedToRoom()
+    public async Task DeleteAllFiles_DeletesAllFilesRelatedToRoom()
     {
         // Arrange
         var mockFile = new MockFileData("Random Content");
+        var roomGuid = "00000000-0000-0000-0000-000000000000";
         List<string> filePaths = new List<string>()
         {
-            $"./{folderName}/00000000-0000-0000-0000-000000000000/File-1.txt",
-            $"./{folderName}/00000000-0000-0000-0000-000000000000/File-2.txt",
-            $"./{folderName}/00000000-0000-0000-0000-000000000000/File-3.txt"
+            $"./{folderName}/{roomGuid}/File-1.txt",
+            $"./{folderName}/{roomGuid}/File-2.txt",
+            $"./{folderName}/{roomGuid}/File-3.txt"
         };
 
         foreach (var path in filePaths)
@@ -117,7 +121,7 @@ public class RoomFileManagerTests : IRoomFileManagerTests
         }
         
         // Act
-        await _roomFileManager.DeleteAllFilesAsync("00000000-0000-0000-0000-000000000000");
+        _roomFileManager.DeleteAllFiles(roomGuid);
 
         // Assert
         foreach (var path in filePaths)

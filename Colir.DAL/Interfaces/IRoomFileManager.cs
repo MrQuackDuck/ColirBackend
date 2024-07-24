@@ -5,10 +5,10 @@ namespace DAL.Interfaces;
 
 public interface IRoomFileManager
 {
-    Task<FileStream> GetFileAsync(string path);
-    Task<long> GetFreeStorageSizeAsync(string roomGuid);
-    Task<long> GetFilesSizeAsync(string roomGuid);
+    FileSystemStream GetFile(string path);
+    long GetFreeStorageSize(string roomGuid);
+    long GetFilesSize(string roomGuid);
     Task<string> UploadFileAsync(string roomGuid, IFormFile file);
-    Task DeleteFileAsync(string path);
-    Task DeleteAllFilesAsync(string roomGuid);
+    void DeleteFile(string path);
+    void DeleteAllFiles(string roomGuid);
 }

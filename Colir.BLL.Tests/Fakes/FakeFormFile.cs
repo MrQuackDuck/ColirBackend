@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.IO.Abstractions;
+using System.IO.Abstractions.TestingHelpers;
+using Microsoft.AspNetCore.Http;
 
 namespace Colir.BLL.Tests.Fakes;
 
@@ -12,9 +14,15 @@ public class FakeFormFile : IFormFile
         throw new NotImplementedException();
     }
 
-    public void CopyTo(Stream target) { }
+    public void CopyTo(Stream target)
+    {
+        _fileSystem.File.Create(FileName);
+    }
 
-    public async Task CopyToAsync(Stream target, CancellationToken cancellationToken = new CancellationToken()) { }
+    public async Task CopyToAsync(Stream target, CancellationToken cancellationToken = new CancellationToken())
+    {
+        _fileSystem.File.Create(FileName);
+    }
 
     public string ContentType { get; } = default!;
     public string ContentDisposition { get; } = default!;
@@ -22,10 +30,19 @@ public class FakeFormFile : IFormFile
     public long Length { get; }
     public string Name { get; } = default!;
     public string FileName { get; }
+    private IFileSystem _fileSystem;
+    
+    public FakeFormFile(string fileName, long sizeInBytes, IFileSystem fileSystem)
+    {
+        FileName = fileName;
+        Length = sizeInBytes;
+        _fileSystem = fileSystem;
+    }
     
     public FakeFormFile(string fileName, long sizeInBytes)
     {
         FileName = fileName;
         Length = sizeInBytes;
+        _fileSystem = default!;
     }
 }

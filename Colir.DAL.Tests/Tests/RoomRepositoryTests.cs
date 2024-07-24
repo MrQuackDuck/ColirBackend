@@ -26,12 +26,12 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         // Create database context
         _dbContext = UnitTestHelper.CreateDbContext();
         
-        // Initialize room repository
+        // Initialize the room repository
         var configMock = new Mock<IConfiguration>();
         configMock.Setup(c => c["MinRoomNameLength"]).Returns("2");
         configMock.Setup(c => c["MaxRoomNameLength"]).Returns("50");
         
-        _roomRepository = new RoomRepository(_dbContext, configMock.Object, new RoomFileManager(new FileSystem()));
+        _roomRepository = new RoomRepository(_dbContext, configMock.Object, new RoomFileManager(new FileSystem(), configMock.Object));
         
         // Add entities
         UnitTestHelper.SeedData(_dbContext);

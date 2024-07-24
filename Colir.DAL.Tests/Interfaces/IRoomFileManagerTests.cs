@@ -2,15 +2,15 @@
 
 public interface IRoomFileManagerTests
 {
-    Task GetFileAsync_ReturnsFileAsync();
+    Task GetFile_ReturnsFileAsync();
 
-    Task GetFreeStorageSizeAsync_ReturnsFreeStorageSize();
+    Task GetFreeStorageSize_ReturnsFreeStorageSize();
 
-    Task GetFilesSizeAsync_ReturnsFilesTotalSize();
+    Task GetFilesSize_ReturnsFilesTotalSize();
 
     Task UploadFileAsync_UploadsFile();
 
-    Task DeleteFileAsync_DeletesTheFileRelatedToRoom();
+    Task DeleteFile_DeletesTheFileRelatedToRoom();
 
-    Task DeleteAllFilesAsync_DeletesAllFilesRelatedToRoom();
+    Task DeleteAllFiles_DeletesAllFilesRelatedToRoom();
 }

@@ -1,45 +1,105 @@
 ﻿using System.IO.Abstractions;
 using DAL.Interfaces;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 
 namespace DAL.Repositories.Related;
 
 public class RoomFileManager : IRoomFileManager
 {
     private IFileSystem _fileSystem;
+    private IConfiguration _config;
+    private string filesFolderName = "RoomFiles";
     
-    public RoomFileManager(IFileSystem fileSystem)
+    public RoomFileManager(IFileSystem fileSystem, IConfiguration config)
     {
         _fileSystem = fileSystem;
+        _config = config;
+
+        // Create the directory where rooms files will be stored
+        _fileSystem.Directory.CreateDirectory(filesFolderName);
     }
     
-    public Task<FileStream> GetFileAsync(string path)
+    /// <summary>
+    /// Gets a file by path
+    /// </summary>
+    /// <param name="path">A path to a file</param>
+    public FileSystemStream GetFile(string path)
     {
-        throw new NotImplementedException();
+        return _fileSystem.FileStream.New(path, FileMode.Open);
     }
 
-    public Task<long> GetFreeStorageSizeAsync(string roomGuid)
+    /// <summary>
+    /// Gets free storage left for the room
+    /// </summary>
+    /// <param name="roomGuid">Guid of the room</param>
+    public long GetFreeStorageSize(string roomGuid)
     {
-        throw new NotImplementedException();
+        var maxStorageCapacity = int.Parse(_config["MaxRoomStorageCapacityInBytes"]!);
+        
+        return maxStorageCapacity - GetFilesSize(roomGuid);
     }
 
-    public Task<long> GetFilesSizeAsync(string roomGuid)
+    /// <summary>
+    /// Gets total size of files
+    /// </summary>
+    /// <param name="roomGuid">Guid of the room</param>
+    public long GetFilesSize(string roomGuid)
     {
-        throw new NotImplementedException();
+        string pathToDirectory = $"./{filesFolderName}/{roomGuid}/";
+        var files = _fileSystem.DirectoryInfo.New(pathToDirectory).GetFiles();
+
+        long directorySize = 0;
+        foreach (var file in files)
+        {
+            directorySize += file.Length;
+        }
+
+        return directorySize;
     }
 
-    public Task<string> UploadFileAsync(string roomGuid, IFormFile file)
+    /// <summary>
+    /// Uploads a file and returns a path
+    /// </summary>
+    /// <param name="roomGuid">Guid of the room to upload into</param>
+    /// <param name="file">A file to upload</param>
+    public async Task<string> UploadFileAsync(string roomGuid, IFormFile file)
     {
-        throw new NotImplementedException();
+        // Generating a random name for the file
+        var fileName = Guid.NewGuid();
+        
+        // Create the directory if not exists
+        _fileSystem.Directory.CreateDirectory($"./{filesFolderName}/{roomGuid}");
+        
+        var path = $"./{filesFolderName}/{roomGuid}/{fileName}";
+        using (FileSystemStream fs = _fileSystem.FileStream.New(path, FileMode.CreateNew))
+        {
+            await file.CopyToAsync(fs);
+        }
+
+        return path;
     }
 
-    public Task DeleteFileAsync(string path)
+    /// <summary>
+    /// Deletes the file
+    /// </summary>
+    /// <param name="path">Path of the file</param>
+    public void DeleteFile(string path)
     {
-        throw new NotImplementedException();
+        _fileSystem.File.Delete(path);
     }
 
-    public Task DeleteAllFilesAsync(string roomGuid)
+    /// <summary>
+    /// Deletes all files in the room
+    /// </summary>
+    /// <param name="roomGuid">Guid of the room</param>
+    public void DeleteAllFiles(string roomGuid)
     {
-        throw new NotImplementedException();
+        var filesPaths = _fileSystem.Directory.GetFiles($"./{filesFolderName}/{roomGuid}/");
+
+        foreach (var path in filesPaths)
+        {
+            _fileSystem.File.Delete(path);
+        }
     }
 }
