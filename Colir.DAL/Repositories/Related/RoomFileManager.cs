@@ -9,15 +9,17 @@ public class RoomFileManager : IRoomFileManager
 {
     private IFileSystem _fileSystem;
     private IConfiguration _config;
-    private string filesFolderName = "RoomFiles";
+    private string _filesFolderName;
     
     public RoomFileManager(IFileSystem fileSystem, IConfiguration config)
     {
         _fileSystem = fileSystem;
         _config = config;
+        _filesFolderName = config["RoomFilesFolderName"];
+        ArgumentNullException.ThrowIfNull(_filesFolderName);
 
         // Create the directory where rooms files will be stored
-        _fileSystem.Directory.CreateDirectory(filesFolderName);
+        _fileSystem.Directory.CreateDirectory(_filesFolderName);
     }
     
     /// <summary>
@@ -46,7 +48,7 @@ public class RoomFileManager : IRoomFileManager
     /// <param name="roomGuid">Guid of the room</param>
     public long GetFilesSize(string roomGuid)
     {
-        string pathToDirectory = $"./{filesFolderName}/{roomGuid}/";
+        string pathToDirectory = $"./{_filesFolderName}/{roomGuid}/";
         var files = _fileSystem.DirectoryInfo.New(pathToDirectory).GetFiles();
 
         long directorySize = 0;
@@ -69,9 +71,9 @@ public class RoomFileManager : IRoomFileManager
         var fileName = Guid.NewGuid();
         
         // Create the directory if not exists
-        _fileSystem.Directory.CreateDirectory($"./{filesFolderName}/{roomGuid}");
+        _fileSystem.Directory.CreateDirectory($"./{_filesFolderName}/{roomGuid}");
         
-        var path = $"./{filesFolderName}/{roomGuid}/{fileName}";
+        var path = $"./{_filesFolderName}/{roomGuid}/{fileName}";
         using (FileSystemStream fs = _fileSystem.FileStream.New(path, FileMode.CreateNew))
         {
             await file.CopyToAsync(fs);
@@ -95,7 +97,7 @@ public class RoomFileManager : IRoomFileManager
     /// <param name="roomGuid">Guid of the room</param>
     public void DeleteAllFiles(string roomGuid)
     {
-        var filesPaths = _fileSystem.Directory.GetFiles($"./{filesFolderName}/{roomGuid}/");
+        var filesPaths = _fileSystem.Directory.GetFiles($"./{_filesFolderName}/{roomGuid}/");
 
         foreach (var path in filesPaths)
         {

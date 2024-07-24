@@ -21,6 +21,7 @@ public class RoomFileManagerTests : IRoomFileManagerTests
         
         var configMock = new Mock<IConfiguration>();
         configMock.Setup(c => c["MaxRoomStorageCapacityInBytes"]).Returns("100000000");
+        configMock.Setup(c => c["RoomFilesFolderName"]).Returns("RoomFiles");
         
         _roomFileManager = new RoomFileManager(_mockFileSystem, configMock.Object);
     }

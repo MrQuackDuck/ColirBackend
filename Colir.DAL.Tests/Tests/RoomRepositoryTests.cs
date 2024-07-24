@@ -1,13 +1,12 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.IO.Abstractions;
 using Colir.DAL.Tests.Interfaces;
 using Colir.DAL.Tests.Utils;
 using Colir.Exceptions;
 using Colir.Exceptions.NotFound;
 using DAL;
 using DAL.Entities;
+using DAL.Interfaces;
 using DAL.Repositories;
-using DAL.Repositories.Related;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Moq;
@@ -31,7 +30,9 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         configMock.Setup(c => c["MinRoomNameLength"]).Returns("2");
         configMock.Setup(c => c["MaxRoomNameLength"]).Returns("50");
         
-        _roomRepository = new RoomRepository(_dbContext, configMock.Object, new RoomFileManager(new FileSystem(), configMock.Object));
+        var roomFileManagerMock = new Mock<IRoomFileManager>();
+        
+        _roomRepository = new RoomRepository(_dbContext, configMock.Object, roomFileManagerMock.Object);
         
         // Add entities
         UnitTestHelper.SeedData(_dbContext);
