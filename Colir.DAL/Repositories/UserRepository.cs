@@ -221,7 +221,7 @@ public class UserRepository : IUserRepository
             throw new ArgumentException("User with the same Hex ID exists already!");
         }
         
-        // Check if joined rooms list was changed to delete rooms where user is not present at
+        // Check if joined rooms list has changed to delete rooms where user is not present at
         for (int i = 0; i < originalEntity.JoinedRooms.Count; i++)
         {
             var room = originalEntity.JoinedRooms[i];
