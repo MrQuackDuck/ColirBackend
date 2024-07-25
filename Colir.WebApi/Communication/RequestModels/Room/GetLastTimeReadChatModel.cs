@@ -1,4 +1,4 @@
-﻿namespace Colir.HttpModels.Room;
+﻿namespace Colir.Communication.RequestModels.Room;
 
 public class GetLastTimeReadChatModel
 {

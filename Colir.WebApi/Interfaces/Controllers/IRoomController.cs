@@ -1,5 +1,5 @@
 ﻿using Colir.BLL.Models;
-using Colir.HttpModels.Room;
+using Colir.Communication.RequestModels.Room;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Colir.Interfaces.Controllers;

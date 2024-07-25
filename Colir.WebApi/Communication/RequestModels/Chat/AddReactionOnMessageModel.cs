@@ -1,4 +1,4 @@
-﻿namespace Colir.HttpModels.Chat;
+﻿namespace Colir.Communication.RequestModels.Chat;
 
 public class AddReactionOnMessageModel
 {

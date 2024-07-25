@@ -18,4 +18,8 @@
       <ProjectReference Include="..\Colir.BLL\Colir.BLL.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Communication\RequestModels\" />
+    </ItemGroup>
+
 </Project>
