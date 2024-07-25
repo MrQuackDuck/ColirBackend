@@ -1,5 +1,5 @@
 ﻿using Colir.BLL.Models;
-using Colir.HttpModels.Message;
+using Colir.HttpModels.Chat;
 
 namespace Colir.Interfaces.Hubs;
 

@@ -3,6 +3,5 @@
 public interface IClearRoomHub
 {
     Task Connect(string roomGuid);
-
     Task Clear();
 }

@@ -1,4 +1,4 @@
-﻿namespace Colir.HttpModels.Message;
+﻿namespace Colir.HttpModels.Chat;
 
 public class SendMessageModel
 {
