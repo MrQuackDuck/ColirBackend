@@ -95,7 +95,8 @@ var app = builder.Build();
 // Ensuring DB is created
 using var scope = app.Services.CreateScope();
 var dbContext = scope.ServiceProvider.GetRequiredService<ColirDbContext>();
-dbContext.Database.EnsureCreated();
+var dbConnected = await dbContext.Database.CanConnectAsync();
+if (!dbConnected) throw new Exception("DB is not connected!");
 
 app.UseCors();
 
