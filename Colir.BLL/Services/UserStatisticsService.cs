@@ -2,7 +2,6 @@
 using Colir.BLL.Interfaces;
 using Colir.BLL.Models;
 using Colir.BLL.RequestModels.UserStatistics;
-using Colir.Exceptions.NotFound;
 using DAL.Interfaces;
 
 namespace Colir.BLL.Services;
@@ -17,11 +16,8 @@ public class UserStatisticsService : IUserStatisticsService
         _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
-    
-    /// <summary>
-    /// Gets user statistics
-    /// </summary>
-    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
+
+    /// <inheritdoc cref="IUserStatisticsService.GetStatisticsAsync"/>
     public async Task<UserStatisticsModel> GetStatisticsAsync(RequestToGetStatistics request)
     {
         var user = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);

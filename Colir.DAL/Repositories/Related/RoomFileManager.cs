@@ -39,14 +39,14 @@ public class RoomFileManager : IRoomFileManager
     {
         var maxStorageCapacity = int.Parse(_config["AppSettings:MaxRoomStorageCapacityInBytes"]!);
         
-        return maxStorageCapacity - GetFilesSize(roomGuid);
+        return maxStorageCapacity - GetOccupiedStorageSize(roomGuid);
     }
 
     /// <summary>
     /// Gets total size of files
     /// </summary>
     /// <param name="roomGuid">Guid of the room</param>
-    public long GetFilesSize(string roomGuid)
+    public long GetOccupiedStorageSize(string roomGuid)
     {
         string pathToDirectory = $"./{_filesFolderName}/{roomGuid}/";
         var files = _fileSystem.DirectoryInfo.New(pathToDirectory).GetFiles();

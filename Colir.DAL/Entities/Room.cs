@@ -17,7 +17,7 @@ public class Room : BaseEntity
 
     [ForeignKey(nameof(Owner))]
     public long OwnerId { get; set; }
-
+    
     public User Owner { get; set; }
     public IList<User> JoinedUsers { get; set; } = new List<User>();
 

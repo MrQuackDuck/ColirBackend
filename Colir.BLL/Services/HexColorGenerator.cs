@@ -12,9 +12,7 @@ public class HexColorGenerator : IHexColorGenerator
         _unitOfWork = unitOfWork;
     }
     
-    /// <summary>
-    /// Gets an unique Hex Id
-    /// </summary>
+    /// <inheritdoc cref="IHexColorGenerator.GetUniqueHexColor"/>
     public async Task<int> GetUniqueHexColor()
     {
         var random = new Random();
@@ -27,11 +25,7 @@ public class HexColorGenerator : IHexColorGenerator
         return hex;
     }
 
-    /// <summary>
-    /// Gets a range of unique Hex Ids
-    /// </summary>
-    /// <param name="count">Count of hexs to get</param>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when the count is below zero</exception>
+    /// <inheritdoc cref="IHexColorGenerator.GetUniqueHexColorsList"/>
     public async Task<List<int>> GetUniqueHexColorsList(int count)
     {
         if (count < 0)

@@ -11,9 +11,9 @@ public class UserToRoom
     [ForeignKey(nameof(Room))]
     public long RoomId { get; set; }
 
-    [DeleteBehavior(DeleteBehavior.NoAction)]
+    [DeleteBehavior(DeleteBehavior.ClientNoAction)]
     public User User { get; set; } = default!;
     
-    [DeleteBehavior(DeleteBehavior.NoAction)]
+    [DeleteBehavior(DeleteBehavior.ClientNoAction)]
     public Room Room { get; set; } = default!;
 }

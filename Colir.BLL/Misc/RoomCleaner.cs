@@ -2,10 +2,7 @@
 
 namespace Colir.BLL.Misc;
 
-/// <summary>
-/// Represents the room cleaning process
-/// Each time a file deleted, the "FileDeleted" event is trigerred (in order to move the progress on the client)
-/// </summary>
+/// <inheritdoc cref="IRoomCleaner"/>
 public class RoomCleaner : IRoomCleaner
 {
     public int FilesToDeleteCount { get; }
@@ -19,9 +16,7 @@ public class RoomCleaner : IRoomCleaner
         FilesToDeleteCount = _filesToDelete.Count;
     }
     
-    /// <summary>
-    /// Starts the cleaning process
-    /// </summary>
+    /// <inheritdoc cref="IRoomCleaner.Start"/>
     public void Start()
     {
         foreach (var file in _filesToDelete)

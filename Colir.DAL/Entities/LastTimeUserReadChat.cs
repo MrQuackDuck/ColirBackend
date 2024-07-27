@@ -13,9 +13,9 @@ public class LastTimeUserReadChat : BaseEntity
     [ForeignKey(nameof(User))]
     public long UserId { get; set; }
     
-    [DeleteBehavior(DeleteBehavior.NoAction)]
+    [DeleteBehavior(DeleteBehavior.Cascade)]
     public Room Room { get; set; } = default!;
     
-    [DeleteBehavior(DeleteBehavior.NoAction)]
+    [DeleteBehavior(DeleteBehavior.Cascade)]
     public User User { get; set; } = default!;
 }

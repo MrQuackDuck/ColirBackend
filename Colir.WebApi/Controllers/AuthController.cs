@@ -6,6 +6,8 @@ using Colir.BLL.Models;
 using Colir.BLL.RequestModels.User;
 using Colir.Communication;
 using Colir.Exceptions;
+using Colir.Exceptions.NotFound;
+using Colir.Extensions;
 using Colir.Interfaces.Controllers;
 using DAL.Enums;
 using Microsoft.AspNetCore.Authorization;
@@ -20,13 +22,11 @@ public class AuthController : ControllerBase, IAuthController
 {
     private readonly IUserService _userService;
     private readonly IConfiguration _config;
-    private readonly ILogger _logger;
 
-    public AuthController(IUserService userService, IConfiguration config, ILogger<AuthController> logger)
+    public AuthController(IUserService userService, IConfiguration config)
     {
         _userService = userService;
         _config = config;
-        _logger = logger;
     }
 
     [HttpPost]
@@ -41,14 +41,14 @@ public class AuthController : ControllerBase, IAuthController
 
             var userModel = await _userService.AuthorizeAsAnnoymousAsync(request);
 
-            // Claims for a token
+            // Creating claims for a token
             var claims = new List<Claim>
             {
                 new Claim("Id", userModel.Id.ToString()),
-                new Claim("AuthType", userModel.AuthType.ToString()),
+                new Claim("AuthType", userModel.AuthType.ToString())
             };
 
-            // Generating a token
+            // Getting the key and generating a token
             var encrpyionKey =
                 new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:JwtKey").Value!));
             var jwtToken = new JwtSecurityToken(
@@ -76,11 +76,6 @@ public class AuthController : ControllerBase, IAuthController
         {
             return BadRequest(new ErrorResponse(ErrorCode.StringWasTooLong));
         }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "An unhandled exception occurred!");
-            return BadRequest();
-        }
     }
 
     [HttpPost]
@@ -90,7 +85,7 @@ public class AuthController : ControllerBase, IAuthController
         try
         {
             // Delete the account if the request was issued by an user with anonymous auth type
-            var userId = long.Parse(HttpContext.User.Claims.First(c => c.Type == "Id").Value);
+            var userId = this.GetIssuerId();
             var authType = HttpContext.User.Claims.First(c => c.Type == "AuthType").Value;
             if (authType == UserAuthType.Anonymous.ToString())
             {
@@ -100,10 +95,9 @@ public class AuthController : ControllerBase, IAuthController
             Response.Cookies.Delete("jwt");
             return Ok();
         }
-        catch (Exception e)
+        catch (UserNotFoundException)
         {
-            _logger.LogError(e, "An unhandled exception occurred!");
-            return BadRequest();
+            return BadRequest(new ErrorResponse(ErrorCode.UserNotFound));
         }
     }
 }

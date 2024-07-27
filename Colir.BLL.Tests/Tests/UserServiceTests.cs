@@ -52,6 +52,41 @@ public class UserServiceTests : IUserServiceTests
     }
 
     [Test]
+    public async Task GetAccountInfo_ReturnsUser()
+    {
+        // Arrange
+        var userToGet = _dbContext.Users.First(u => u.Id == 1);
+        var request = new RequestToGetAccountInfo
+        {
+            IssuerId = 1
+        };
+
+        // Act
+        var result = await _userService.GetAccountInfo(request);
+
+        // Assert
+        Assert.That(result.AuthType == userToGet.AuthType);
+        Assert.That(result.Username == userToGet.Username);
+        Assert.That(result.HexId == userToGet.HexId);
+    }
+
+    [Test]
+    public async Task GetAccountInfo_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
+    {
+        // Arrange
+        var request = new RequestToGetAccountInfo
+        {
+            IssuerId = 404
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _userService.GetAccountInfo(request);
+        
+        // Assert
+        Assert.ThrowsAsync<UserNotFoundException>(act);
+    }
+
+    [Test]
     public async Task AuthorizeWithGitHubAsync_CreatesUser()
     {
         // Arrange

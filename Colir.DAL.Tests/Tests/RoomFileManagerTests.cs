@@ -20,8 +20,8 @@ public class RoomFileManagerTests : IRoomFileManagerTests
         _mockFileSystem = new MockFileSystem(new Dictionary<string, MockFileData>());
         
         var configMock = new Mock<IConfiguration>();
-        configMock.Setup(c => c["MaxRoomStorageCapacityInBytes"]).Returns("100000000");
-        configMock.Setup(c => c["RoomFilesFolderName"]).Returns("RoomFiles");
+        configMock.Setup(config => config["AppSettings:MaxRoomStorageCapacityInBytes"]).Returns("100000000");
+        configMock.Setup(config => config["AppSettings:RoomFilesFolderName"]).Returns("RoomFiles");
         
         _roomFileManager = new RoomFileManager(_mockFileSystem, configMock.Object);
     }
@@ -68,7 +68,7 @@ public class RoomFileManagerTests : IRoomFileManagerTests
         var expectedFileSize = _mockFileSystem.FileInfo.New(path).Length;
         
         // Act
-        var result = _roomFileManager.GetFilesSize("00000000-0000-0000-0000-000000000000");
+        var result = _roomFileManager.GetOccupiedStorageSize("00000000-0000-0000-0000-000000000000");
 
         // Assert
         Assert.That(result == expectedFileSize);

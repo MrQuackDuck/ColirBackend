@@ -5,15 +5,17 @@
 /// </summary>
 public enum ErrorCode
 {
+    AttachmentNotFound,
+    InvalidDate,
+    InvalidActionException,
+    IssuerNotInTheRoom,
+    MessageNotFound,
+    NotEnoughPermissions,
+    NotFound,
+    ReactionNotFound,
+    RoomExpired,
+    RoomNotFound,
     StringWasTooLong,
     StringWasTooShort,
-    IssuerNotInTheRoom,
-    NotEnoughPermissions,
-    InvalidActionException,
-    NotFound,
-    AttachmentNotFound,
-    MessageNotFound,
-    ReactionNotFound,
-    RoomNotFound,
     UserNotFound
 }

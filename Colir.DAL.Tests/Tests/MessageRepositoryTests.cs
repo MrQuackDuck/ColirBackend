@@ -53,8 +53,8 @@ public class MessageRepositoryTests : IMessageRepositoryTests
         Assert.NotNull(result);
         Assert.That(result, Is.EqualTo(expected).Using(new MessageEqualityComparer()));
         
-        Assert.That(result.Select(r => r.Author).OrderBy(r => r.Id),
-            Is.EqualTo(expected.Select(r => r.Author).OrderBy(r => r.Id)).Using(new UserEqualityComparer()));
+        Assert.That(result.Select(r => r.Author).OrderBy(r => r!.Id),
+            Is.EqualTo(expected.Select(r => r.Author).OrderBy(r => r!.Id)).Using(new UserEqualityComparer()));
         
         Assert.That(result.SelectMany(r => r.Reactions).OrderBy(r => r.Id),
             Is.EqualTo(expected.SelectMany(r => r.Reactions).OrderBy(r => r.Id)).Using(new ReactionEqualityComparer()));
@@ -82,8 +82,8 @@ public class MessageRepositoryTests : IMessageRepositoryTests
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new MessageEqualityComparer()));
                 
-        Assert.That(result.Select(r => r.Author).OrderBy(r => r.Id),
-            Is.EqualTo(expected.Select(r => r.Author).OrderBy(r => r.Id)).Using(new UserEqualityComparer()));
+        Assert.That(result.Select(r => r.Author).OrderBy(r => r!.Id),
+            Is.EqualTo(expected.Select(r => r.Author).OrderBy(r => r!.Id)).Using(new UserEqualityComparer()));
         
         Assert.That(result.SelectMany(r => r.Reactions).OrderBy(r => r.Id),
             Is.EqualTo(expected.SelectMany(r => r.Reactions).OrderBy(r => r.Id)).Using(new ReactionEqualityComparer()));

@@ -19,15 +19,8 @@ public class MessageService : IMessageService
         _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
-    
-    /// <summary>
-    /// Gets last sent messages in certain room
-    /// </summary>
-    /// <param name="request">The request object</param>
-    /// <param name="request.Count">Count of messages to take</param>
-    /// <param name="request.Skip">Count of messages to skip</param>
-    /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
-    /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
+
+    /// <inheritdoc cref="IMessageService.GetLastMessagesAsync"/>
     public async Task<List<MessageModel>> GetLastMessagesAsync(RequestToGetLastMessages request)
     {
         // Check if the issuer exists. Otherwise, an exception will be thrown
@@ -53,14 +46,8 @@ public class MessageService : IMessageService
             .Select(m => _mapper.Map<MessageModel>(m))
             .ToList();
     }
-
-    /// <summary>
-    /// Sends the message in the room
-    /// + Increments the count of sent messages in user's statistics (if enabled in settings)
-    /// </summary>
-    /// <exception cref="ArgumentException">Thrown when the message content is empty</exception>
-    /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
-    /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
+    
+    /// <inheritdoc cref="IMessageService.SendAsync"/>
     public async Task<MessageModel> SendAsync(RequestToSendMessage request)
     {
         // Check if not empty
@@ -129,13 +116,7 @@ public class MessageService : IMessageService
         return _mapper.Map<MessageModel>(messageToSend);
     }
 
-    /// <summary>
-    /// Edits the sent message
-    /// </summary>
-    /// <exception cref="ArgumentException">Thrown when the message content is empty</exception>
-    /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
-    /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
-    /// <exception cref="NotEnoughPermissionsException">Thrown when the issuer is not the author of the message he is trying to edit</exception>
+    /// <inheritdoc cref="IMessageService.EditAsync"/>
     public async Task<MessageModel> EditAsync(RequestToEditMessage request)
     {
         // Check if not empty
@@ -179,12 +160,7 @@ public class MessageService : IMessageService
         return _mapper.Map<MessageModel>(message);
     }
 
-    /// <summary>
-    /// Deletes the message
-    /// </summary>
-    /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
-    /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
-    /// <exception cref="NotEnoughPermissionsException">Thrown when the issuer is not the author of the message he is trying to delete</exception>
+    /// <inheritdoc cref="IMessageService.DeleteAsync"/>
     public async Task DeleteAsync(RequestToDeleteMessage request)
     {
         // Check if the issuer exists. Otherwise, an exception will be thrown
@@ -219,12 +195,7 @@ public class MessageService : IMessageService
         await transaction.CommitAsync();
     }
 
-    /// <summary>
-    /// Adds a reaction to the message
-    /// + Increments the count of set reactions in user's statistics (if enabled in settings)
-    /// </summary>
-    /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
-    /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
+    /// <inheritdoc cref="IMessageService.AddReaction"/>
     public async Task<MessageModel> AddReaction(RequestToAddReactionOnMessage request)
     {
         var issuer = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
@@ -271,12 +242,7 @@ public class MessageService : IMessageService
         return _mapper.Map<MessageModel>(message);
     }
 
-    /// <summary>
-    /// Removes the reaction from the message
-    /// </summary>
-    /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
-    /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
-    /// <exception cref="NotEnoughPermissionsException">Thrown when the issuer is not the author of the reaction he is trying to remove</exception>
+    /// <inheritdoc cref="IMessageService.RemoveReaction"/>
     public async Task<MessageModel> RemoveReaction(RequestToRemoveReactionFromMessage request)
     {
         var issuer = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);

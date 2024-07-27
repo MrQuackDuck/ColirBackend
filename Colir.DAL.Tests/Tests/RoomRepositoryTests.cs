@@ -27,8 +27,8 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         
         // Initialize the room repository
         var configMock = new Mock<IConfiguration>();
-        configMock.Setup(c => c["MinRoomNameLength"]).Returns("2");
-        configMock.Setup(c => c["MaxRoomNameLength"]).Returns("50");
+        configMock.Setup(config => config["AppSettings:MinRoomNameLength"]).Returns("2");
+        configMock.Setup(config => config["AppSettings:MaxRoomNameLength"]).Returns("50");
         
         var roomFileManagerMock = new Mock<IRoomFileManager>();
         

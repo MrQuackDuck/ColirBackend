@@ -23,14 +23,7 @@ public class RoomService : IRoomService
         _roomCleanerFactory = roomCleanerFactory;
     }
     
-    /// <summary>
-    /// Gets the info about the room
-    /// </summary>
-    /// <exception cref="RoomExpiredException">Thrown when specified room is expired</exception>
-    /// <exception cref="RoomNotFoundException">Thrown when specified room wasn't found</exception>
-    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
-    /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room he is trying to get info</exception>
-    // TODO: Return real amount of occupied/free room storage
+    /// <inheritdoc cref="IRoomService.GetRoomInfoAsync"/>
     public async Task<RoomModel> GetRoomInfoAsync(RequestToGetRoomInfo request)
     {
         // Check if the issuer exists (otherwise, an exception will be thrown)
@@ -45,16 +38,16 @@ public class RoomService : IRoomService
             throw new IssuerNotInRoomException();
         }
         
-        return _mapper.Map<RoomModel>(room);
+        var resultModel = _mapper.Map<RoomModel>(room);
+        
+        // Apply amount of occupied/free room storage
+        resultModel.FreeMemoryInBytes = _unitOfWork.RoomRepository.RoomFileManager.GetFreeStorageSize(room.Guid);
+        resultModel.UsedMemoryInBytes = _unitOfWork.RoomRepository.RoomFileManager.GetOccupiedStorageSize(room.Guid);
+
+        return resultModel;
     }
 
-    /// <summary>
-    /// Creates a new room
-    /// + Increments the count of created rooms in user's statistics (if enabled in settings)
-    /// </summary>
-    /// <returns>Guid of created room</returns>
-    /// <exception cref="ArgumentException">Thrown when the expiry date is not valid</exception>
-    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
+    /// <inheritdoc cref="IRoomService.CreateAsync"/>
     public async Task<string> CreateAsync(RequestToCreateRoom request)
     {
         var transaction = _unitOfWork.BeginTransaction();
@@ -88,14 +81,7 @@ public class RoomService : IRoomService
         return roomToCreate.Guid;
     }
     
-    /// <summary>
-    /// Renames the room
-    /// </summary>
-    /// <exception cref="StringTooLongException">Thrown when the name for the room is too long</exception>
-    /// <exception cref="StringTooShortException">Thrown when the name for the room is too short</exception>
-    /// <exception cref="RoomNotFoundException">Thrown when the room was not found</exception>
-    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
-    /// <exception cref="NotEnoughPermissionsException">Thrown when the issuer is not the owner of the room</exception>
+    /// <inheritdoc cref="IRoomService.RenameAsync"/>
     public async Task RenameAsync(RequestToRenameRoom request)
     {
         var transaction = _unitOfWork.BeginTransaction();
@@ -111,12 +97,7 @@ public class RoomService : IRoomService
         await transaction.CommitAsync();
     }
 
-    /// <summary>
-    /// Deletes the room
-    /// </summary>
-    /// <exception cref="RoomNotFoundException">Thrown when the room was not found</exception>
-    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
-    /// <exception cref="NotEnoughPermissionsException">Thrown when the issuer is not the owner of the room</exception>
+    /// <inheritdoc cref="IRoomService.DeleteAsync"/>
     public async Task DeleteAsync(RequestToDeleteRoom request)
     {
         var transaction = _unitOfWork.BeginTransaction();
@@ -138,12 +119,7 @@ public class RoomService : IRoomService
         await transaction.CommitAsync();
     }
 
-    /// <summary>
-    /// Gets the last time when user read the chat
-    /// </summary>
-    /// <exception cref="RoomNotFoundException">Thrown when the room was not found</exception>
-    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
-    /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
+    /// <inheritdoc cref="IRoomService.GetLastTimeUserReadChatAsync"/>
     public async Task<DateTime> GetLastTimeUserReadChatAsync(RequestToGetLastTimeUserReadChat request)
     {
         // Check if the issuer exists (otherwise, an exception will be thrown)
@@ -161,12 +137,7 @@ public class RoomService : IRoomService
         return result.Timestamp;
     }
 
-    /// <summary>
-    /// Updates the last time user read the chat
-    /// </summary>
-    /// <exception cref="RoomNotFoundException">Thrown when the room was not found</exception>
-    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
-    /// <exception cref="IssuerNotInRoomException">Thrown when issuer is not in the room</exception>
+    /// <inheritdoc cref="IRoomService.UpdateLastTimeUserReadChatAsync"/>
     public async Task UpdateLastTimeUserReadChatAsync(RequestToUpdateLastTimeUserReadChat request)
     {
         // Check if the issuer exists (otherwise, an exception will be thrown)
@@ -206,13 +177,8 @@ public class RoomService : IRoomService
         await transaction.CommitAsync();
     }
 
-    /// <summary>
-    /// Joins a user to the room
-    /// + Increments the count of joined rooms in user's statistics (if enabled in settings)
-    /// </summary>
-    /// <exception cref="RoomNotFoundException">Thrown when the room was not found</exception>
-    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
-    public async Task JoinMemberAsync(RequestToJoinRoom request)
+    /// <inheritdoc cref="IRoomService.JoinMemberAsync"/>
+    public async Task<RoomModel> JoinMemberAsync(RequestToJoinRoom request)
     {
         
         var issuer = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
@@ -234,15 +200,11 @@ public class RoomService : IRoomService
         
         await _unitOfWork.SaveChangesAsync();
         await transaction.CommitAsync();
+
+        return _mapper.Map<RoomModel>(roomToJoin);
     }
 
-    /// <summary>
-    /// Kicks the user from the room
-    /// </summary>
-    /// <exception cref="RoomNotFoundException">Thrown when the room was not found</exception>
-    /// <exception cref="UserNotFoundException">Thrown when either the issuer wasn't found or the target wasn't found</exception>
-    /// <exception cref="NotEnoughPermissionsException">Thrown when user is not the owner of the room</exception>
-    /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
+    /// <inheritdoc cref="IRoomService.KickMemberAsync"/>
     public async Task KickMemberAsync(RequestToKickMember request)
     {
         var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
@@ -275,12 +237,7 @@ public class RoomService : IRoomService
         await transaction.CommitAsync();
     }
 
-    /// <summary>
-    /// Leaves the room
-    /// </summary>
-    /// <exception cref="RoomNotFoundException">Thrown when the room was not found</exception>
-    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
-    /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
+    /// <inheritdoc cref="IRoomService.LeaveAsync"/>
     public async Task LeaveAsync(RequestToLeaveFromRoom request)
     {
         var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
@@ -306,12 +263,7 @@ public class RoomService : IRoomService
         await transaction.CommitAsync();
     }
 
-    /// <summary>
-    /// Returns an object that represents the room cleaner
-    /// </summary>
-    /// <exception cref="RoomNotFoundException">Thrown when the room was not found</exception>
-    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
-    /// <exception cref="NotEnoughPermissionsException">Thrown when the user is not the owner of the room</exception>
+    /// <inheritdoc cref="IRoomService.ClearRoomAsync"/>
     public async Task<IRoomCleaner> ClearRoomAsync(RequestToClearRoom request)
     {
         var issuer = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);

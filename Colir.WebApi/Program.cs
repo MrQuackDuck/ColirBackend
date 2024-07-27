@@ -4,6 +4,7 @@ using Colir.BLL;
 using Colir.BLL.Factories;
 using Colir.BLL.Interfaces;
 using Colir.BLL.Services;
+using Colir.ExceptionHandlers;
 using DAL;
 using DAL.Interfaces;
 using DAL.Repositories;
@@ -21,6 +22,10 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
 var services = builder.Services;
+
+// Adding an exception handler
+services.AddExceptionHandler<UnhandledExceptionsHandler>();
+builder.Services.AddProblemDetails();
 
 // Addding DB context
 services.AddDbContext<ColirDbContext>(options =>
@@ -83,7 +88,7 @@ services.AddCors(options =>
     {
         defaultPolicy.AllowAnyMethod()
             .AllowAnyHeader()
-            .SetIsOriginAllowed(origin => true)
+            .SetIsOriginAllowed(_ => true)
             .AllowCredentials();
     });
 });
@@ -117,6 +122,8 @@ catch (SqlException)
 }
 
 app.UseCors();
+
+app.UseExceptionHandler();
 
 app.UseAuthentication();
 app.UseAuthorization();
