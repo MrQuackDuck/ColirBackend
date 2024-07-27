@@ -18,7 +18,7 @@ public class AttachmentServiceTests : IAttachmentServiceTests
 {
     private ColirDbContext _dbContext;
     private AttachmentService _attachmentService;
-    private IFormFile fileToUpload = new FakeFormFile("UnitTest.txt", 1000);
+    private IFormFile _fileToUpload = new FakeFormFile("UnitTest.txt", 1000);
 
     [SetUp]
     public void SetUp()
@@ -35,7 +35,7 @@ public class AttachmentServiceTests : IAttachmentServiceTests
             .Returns(100_000_000);
 
         roomFileMangerMock
-            .Setup(fileManager => fileManager.UploadFileAsync("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e", fileToUpload))
+            .Setup(fileManager => fileManager.UploadFileAsync("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e", _fileToUpload))
             .ReturnsAsync("./RoomFiles/cbaa8673-ea8b-43f8-b4cc-b8b0797b620e/UnitTest.txt");
         
         var unitOfWork = new UnitOfWork(_dbContext, configMock.Object, roomFileMangerMock.Object);
@@ -62,14 +62,14 @@ public class AttachmentServiceTests : IAttachmentServiceTests
         {
             IssuerId = 1,
             RoomGuid = room.Guid,
-            File = fileToUpload
+            File = _fileToUpload
         };
 
         // Act
         var result = await _attachmentService.UploadAttachmentAsync(request);
 
         // Assert
-        Assert.That(result.Filename == fileToUpload.FileName);
+        Assert.That(result.Filename == _fileToUpload.FileName);
         Assert.That(result.SizeInBytes == 1000);
     }
 

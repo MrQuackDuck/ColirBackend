@@ -11,12 +11,12 @@ public class RoomCleaner : IRoomCleaner
     public int FilesToDeleteCount { get; }
     public event Action? FileDeleted;
 
-    private List<string> filesToDelete;
+    private List<string> _filesToDelete;
     
     public RoomCleaner(string directoryPath)
     {
-        filesToDelete = Directory.GetFiles(directoryPath).ToList();
-        FilesToDeleteCount = filesToDelete.Count;
+        _filesToDelete = Directory.GetFiles(directoryPath).ToList();
+        FilesToDeleteCount = _filesToDelete.Count;
     }
     
     /// <summary>
@@ -24,7 +24,7 @@ public class RoomCleaner : IRoomCleaner
     /// </summary>
     public void Start()
     {
-        foreach (var file in filesToDelete)
+        foreach (var file in _filesToDelete)
         {
             File.Delete(file);
             FileDeleted?.Invoke();

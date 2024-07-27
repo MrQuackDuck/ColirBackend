@@ -12,7 +12,7 @@ public class RoomFileManagerTests : IRoomFileManagerTests
     private RoomFileManager _roomFileManager;
     private MockFileSystem _mockFileSystem;
     
-    private readonly string folderName = "RoomFiles";
+    private readonly string _folderName = "RoomFiles";
 
     [SetUp]
     public void SetUp()
@@ -31,7 +31,7 @@ public class RoomFileManagerTests : IRoomFileManagerTests
     {
         // Assert
         var mockData = new MockFileData("Random Content");
-        var path = $"./{folderName}/00000000-0000-0000-0000-000000000000/File-1.txt";
+        var path = $"./{_folderName}/00000000-0000-0000-0000-000000000000/File-1.txt";
         _mockFileSystem.AddFile(path, mockData);
         
         // Act
@@ -46,7 +46,7 @@ public class RoomFileManagerTests : IRoomFileManagerTests
     {
         // Arrange
         var mockFile = new MockFileData("Random Content");
-        var path = $"./{folderName}/00000000-0000-0000-0000-000000000000/File-1.txt";
+        var path = $"./{_folderName}/00000000-0000-0000-0000-000000000000/File-1.txt";
         _mockFileSystem.AddFile(path, mockFile);
         var fileSize = _mockFileSystem.FileInfo.New(path).Length;
         var expectedFreeSize = 100_000_000 - fileSize;
@@ -63,7 +63,7 @@ public class RoomFileManagerTests : IRoomFileManagerTests
     {
         // Arrange
         var mockFile = new MockFileData("Random Content");
-        var path = $"./{folderName}/00000000-0000-0000-0000-000000000000/File-1.txt";
+        var path = $"./{_folderName}/00000000-0000-0000-0000-000000000000/File-1.txt";
         _mockFileSystem.AddFile(path, mockFile);
         var expectedFileSize = _mockFileSystem.FileInfo.New(path).Length;
         
@@ -93,7 +93,7 @@ public class RoomFileManagerTests : IRoomFileManagerTests
     {
         // Arrange
         var mockFile = new MockFileData("Random Content");
-        var path = $"./{folderName}/00000000-0000-0000-0000-000000000000/File-1.txt";
+        var path = $"./{_folderName}/00000000-0000-0000-0000-000000000000/File-1.txt";
         _mockFileSystem.AddFile(path, mockFile);
         
         // Act
@@ -111,9 +111,9 @@ public class RoomFileManagerTests : IRoomFileManagerTests
         var roomGuid = "00000000-0000-0000-0000-000000000000";
         List<string> filePaths = new List<string>()
         {
-            $"./{folderName}/{roomGuid}/File-1.txt",
-            $"./{folderName}/{roomGuid}/File-2.txt",
-            $"./{folderName}/{roomGuid}/File-3.txt"
+            $"./{_folderName}/{roomGuid}/File-1.txt",
+            $"./{_folderName}/{roomGuid}/File-2.txt",
+            $"./{_folderName}/{roomGuid}/File-3.txt"
         };
 
         foreach (var path in filePaths)

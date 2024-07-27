@@ -2,6 +2,7 @@
 using Colir.BLL.Interfaces;
 using Colir.BLL.Models;
 using Colir.BLL.RequestModels.UserStatistics;
+using Colir.Exceptions.NotFound;
 using DAL.Interfaces;
 
 namespace Colir.BLL.Services;
