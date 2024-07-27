@@ -7,12 +7,14 @@ using Colir.BLL.RequestModels.User;
 using Colir.Communication;
 using Colir.Exceptions;
 using Colir.Exceptions.NotFound;
-using Colir.Extensions;
+using Colir.Interfaces.ApiRelatedServices;
 using Colir.Interfaces.Controllers;
+using Colir.Misc.ExtensionMethods;
 using DAL.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 
 namespace Colir.Controllers;
 
@@ -22,11 +24,64 @@ public class AuthController : ControllerBase, IAuthController
 {
     private readonly IUserService _userService;
     private readonly IConfiguration _config;
+    private readonly IOAuth2RegistrationQueueService _registrationQueueService;
 
-    public AuthController(IUserService userService, IConfiguration config)
+    public AuthController(IUserService userService, IConfiguration config, IOAuth2RegistrationQueueService registrationQueueService)
     {
         _userService = userService;
         _config = config;
+        _registrationQueueService = registrationQueueService;
+    }
+
+    /// <summary>
+    /// Exchanges the GitHub OAuth2 code on registration queue token
+    /// Details: <see cref="IOAuth2RegistrationQueueService"/> 
+    /// </summary>
+    [HttpGet]
+    public async Task<ActionResult<string>> ExchangeGitHubCode([FromQuery] string code)
+    {
+        try
+        {
+            var githubClientId = _config["Authentication:GitHubClientId"]!;
+            var githubAuthSecret = _config["Authentication:GitHubSecret"]!;
+
+            using var httpClient = new HttpClient();
+            var requestToGetToken = new HttpRequestMessage(HttpMethod.Post, "https://github.com/login/oauth/access_token");
+            requestToGetToken.Content = new FormUrlEncodedContent(new Dictionary<string, string>()
+            {
+                { "client_id", githubClientId },
+                { "client_secret", githubAuthSecret },
+                { "code", code }
+            });
+
+            // Getting the token from GitHub
+            var responseWithToken = await (await httpClient.SendAsync(requestToGetToken)).Content.ReadAsStringAsync();
+            var token = responseWithToken[(responseWithToken.IndexOf('=') + 1)..responseWithToken.IndexOf('&')];
+
+            // Using the token to obtain a unique id of the user
+            var requestToGetUserData = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/user");
+            requestToGetUserData.Headers.Add("Accept", "application/vnd.github+json");
+            requestToGetUserData.Headers.Add("Authorization", $"Bearer {token}");
+            requestToGetUserData.Headers.Add("X-GitHub-Api-Version", "2022-11-28");
+            requestToGetUserData.Headers.Add("User-Agent", "ASP.NET");
+
+            var responseWithUserData = await httpClient.SendAsync(requestToGetUserData);
+            responseWithUserData.EnsureSuccessStatusCode();
+            dynamic userData = JObject.Parse(await responseWithUserData.Content.ReadAsStringAsync());
+            var userGitHubId = (string)userData.id.ToString();
+
+            var queueToken = _registrationQueueService.AddToQueue(userGitHubId);
+
+            return Ok(new { queueToken });
+        }
+        catch (ArgumentException)
+        {
+            return BadRequest(new ErrorResponse(ErrorCode.UserAlreadyInRegistrationQueue));   
+        }
+        catch (HttpRequestException)
+        {
+            return BadRequest();
+        }
     }
 
     [HttpPost]

@@ -6,8 +6,8 @@ using Colir.Communication.RequestModels.Room;
 using Colir.Exceptions;
 using Colir.Exceptions.NotEnoughPermissions;
 using Colir.Exceptions.NotFound;
-using Colir.Extensions;
 using Colir.Interfaces.Controllers;
+using Colir.Misc.ExtensionMethods;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

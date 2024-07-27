@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 
-namespace Colir.ExceptionHandlers;
+namespace Colir.Misc.ExceptionHandlers;
 
 /// <summary>
 /// Handler for exceptions which weren't handled in action methods

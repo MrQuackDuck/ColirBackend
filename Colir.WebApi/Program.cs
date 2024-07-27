@@ -1,10 +1,12 @@
 using System.IO.Abstractions;
 using System.Text;
+using Colir.ApiRelatedServices;
 using Colir.BLL;
 using Colir.BLL.Factories;
 using Colir.BLL.Interfaces;
 using Colir.BLL.Services;
-using Colir.ExceptionHandlers;
+using Colir.Interfaces.ApiRelatedServices;
+using Colir.Misc.ExceptionHandlers;
 using DAL;
 using DAL.Interfaces;
 using DAL.Repositories;
@@ -53,6 +55,9 @@ services.AddTransient<IRoomCleanerFactory, RoomCleanerFactory>();
 services.AddTransient<IRoomService, RoomService>();
 services.AddTransient<IUserService, UserService>();
 services.AddTransient<IUserStatisticsService, UserStatisticsService>();
+
+// Adding strictly Api-Related services
+services.AddTransient<IOAuth2RegistrationQueueService, OAuth2RegistrationQueueService>();
 
 services.AddControllers();
 

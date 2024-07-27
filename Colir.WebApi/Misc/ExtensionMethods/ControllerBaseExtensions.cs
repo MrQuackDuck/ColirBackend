@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
-namespace Colir.Extensions;
+namespace Colir.Misc.ExtensionMethods;
 
-public static class ColirControllerExtensions
+public static class ControllerBaseExtensions
 {
     /// <summary>
     /// Extension method to get an id from the issuer of the request
+    /// Warning: Use ONLY with <see cref="AuthorizeAttribute"/> set on action/controller!
     /// </summary>
     public static long GetIssuerId(this ControllerBase @base)
     {

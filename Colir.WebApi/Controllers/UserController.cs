@@ -4,8 +4,8 @@ using Colir.BLL.RequestModels.User;
 using Colir.BLL.RequestModels.UserStatistics;
 using Colir.Communication;
 using Colir.Exceptions.NotFound;
-using Colir.Extensions;
 using Colir.Interfaces.Controllers;
+using Colir.Misc.ExtensionMethods;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
