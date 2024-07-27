@@ -117,14 +117,14 @@ public class UserRepository : IUserRepository
             throw new ArgumentException("User with the same Hex ID exists already!");
         }
 
-        var minUsernameLength = int.Parse(_config["MinUsernameLength"]!);
+        var minUsernameLength = int.Parse(_config["AppSettings:MinUsernameLength"]!);
 
         if (user.Username.Length < minUsernameLength)
         {
             throw new StringTooShortException();
         }
         
-        var maxUsernameLength = int.Parse(_config["MaxUsernameLength"]!);
+        var maxUsernameLength = int.Parse(_config["AppSettings:MaxUsernameLength"]!);
         
         if (user.Username.Length > maxUsernameLength)
         {
@@ -197,14 +197,14 @@ public class UserRepository : IUserRepository
     /// <exception cref="ArgumentException">Thrown when the user with the same hex id exists already</exception>
     public void Update(User user)
     {
-        var minUsernameLength = int.Parse(_config["MinUsernameLength"]!);
+        var minUsernameLength = int.Parse(_config["AppSettings:MinUsernameLength"]!);
 
         if (user.Username.Length < minUsernameLength)
         {
             throw new StringTooShortException();
         }
         
-        var maxUsernameLength = int.Parse(_config["MaxUsernameLength"]!);
+        var maxUsernameLength = int.Parse(_config["AppSettings:MaxUsernameLength"]!);
         
         if (user.Username.Length > maxUsernameLength)
         {

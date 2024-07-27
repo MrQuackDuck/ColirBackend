@@ -6,7 +6,7 @@ public class UserStatistics : BaseEntity
 {
     [ForeignKey(nameof(User))]
     public long UserId { get; set; }
-    public decimal SecondsSpentInVoice { get; set; }
+    public long SecondsSpentInVoice { get; set; }
     public long ReactionsSet { get; set; }
     public long MessagesSent { get; set; }
     public long RoomsJoined { get; set; }

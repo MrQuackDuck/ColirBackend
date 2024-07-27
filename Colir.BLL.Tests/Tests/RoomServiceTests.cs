@@ -28,10 +28,10 @@ public class RoomServiceTests : IRoomServiceTests
 
         // Initialize the service
         var configMock = new Mock<IConfiguration>();
-        configMock.Setup(c => c["MinRoomNameLength"]).Returns("2");
-        configMock.Setup(c => c["MaxRoomNameLength"]).Returns("50");
-        configMock.Setup(config => config["MinUsernameLength"]).Returns("2");
-        configMock.Setup(config => config["MaxUsernameLength"]).Returns("50");
+        configMock.Setup(config => config["AppSettings:MinRoomNameLength"]).Returns("2");
+        configMock.Setup(config => config["AppSettings:MaxRoomNameLength"]).Returns("50");
+        configMock.Setup(config => config["AppSettings:MinUsernameLength"]).Returns("2");
+        configMock.Setup(config => config["AppSettings:MaxUsernameLength"]).Returns("50");
 
         var roomCleanerMock = new Mock<IRoomCleaner>();
         

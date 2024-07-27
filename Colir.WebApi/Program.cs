@@ -9,50 +9,57 @@ using DAL.Interfaces;
 using DAL.Repositories;
 using DAL.Repositories.Related;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.SwaggerGen.ConventionalRouting;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configuring logging
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
+var services = builder.Services;
+
 // Addding DB context
-builder.Services.AddDbContext<ColirDbContext>(options =>
+services.AddDbContext<ColirDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Adding DAL services
-builder.Services.AddTransient<IAttachmentRepository, AttachmentRepository>();
-builder.Services.AddTransient<ILastTimeUserReadChatRepository, LastTimeUserReadChatRepository>();
-builder.Services.AddTransient<IMessageRepository, MessageRepository>();
-builder.Services.AddTransient<IReactionRepository, ReactionRepository>();
-builder.Services.AddTransient<IFileSystem, FileSystem>();
-builder.Services.AddTransient<IRoomFileManager, RoomFileManager>();
-builder.Services.AddTransient<IRoomRepository, RoomRepository>();
-builder.Services.AddTransient<IUserRepository, UserRepository>();
-builder.Services.AddTransient<IUserSettingsRepository, UserSettingsRepository>();
-builder.Services.AddTransient<IUserStatisticsRepository, UserStatisticsRepository>();
-builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
+services.AddTransient<IAttachmentRepository, AttachmentRepository>();
+services.AddTransient<ILastTimeUserReadChatRepository, LastTimeUserReadChatRepository>();
+services.AddTransient<IMessageRepository, MessageRepository>();
+services.AddTransient<IReactionRepository, ReactionRepository>();
+services.AddTransient<IFileSystem, FileSystem>();
+services.AddTransient<IRoomFileManager, RoomFileManager>();
+services.AddTransient<IRoomRepository, RoomRepository>();
+services.AddTransient<IUserRepository, UserRepository>();
+services.AddTransient<IUserSettingsRepository, UserSettingsRepository>();
+services.AddTransient<IUserStatisticsRepository, UserStatisticsRepository>();
+services.AddTransient<IUnitOfWork, UnitOfWork>();
 
 // Adding BLL services
-builder.Services.AddAutoMapper(typeof(AutomapperProfile));
-builder.Services.AddTransient<IAttachmentRepository, AttachmentRepository>();
-builder.Services.AddTransient<IHexColorGenerator, HexColorGenerator>();
-builder.Services.AddTransient<IMessageRepository, MessageRepository>();
-builder.Services.AddTransient<IRoomCleanerFactory, RoomCleanerFactory>();
-builder.Services.AddTransient<IRoomService, RoomService>();
-builder.Services.AddTransient<IUserService, UserService>();
-builder.Services.AddTransient<IUserStatisticsService, UserStatisticsService>();
+services.AddAutoMapper(typeof(AutomapperProfile));
+services.AddTransient<IAttachmentRepository, AttachmentRepository>();
+services.AddTransient<IHexColorGenerator, HexColorGenerator>();
+services.AddTransient<IMessageRepository, MessageRepository>();
+services.AddTransient<IRoomCleanerFactory, RoomCleanerFactory>();
+services.AddTransient<IRoomService, RoomService>();
+services.AddTransient<IUserService, UserService>();
+services.AddTransient<IUserStatisticsService, UserStatisticsService>();
 
-builder.Services.AddControllers();
+services.AddControllers();
 
-// Adding auth
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+// Adding authentication
+services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8
-                .GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value!)),
+                .GetBytes(builder.Configuration.GetSection("AppSettings:JwtKey").Value!)),
             ValidateIssuer = false,
             ValidateAudience = false
         };
@@ -70,7 +77,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 // Adding CORS policy
-builder.Services.AddCors(options =>
+services.AddCors(options =>
 {
     options.AddDefaultPolicy(defaultPolicy =>
     {
@@ -82,21 +89,32 @@ builder.Services.AddCors(options =>
 });
 
 // Adding Swagger
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddSwaggerGenWithConventionalRoutes(options =>
+services.AddEndpointsApiExplorer();
+services.AddSwaggerGen();
+services.AddSwaggerGenWithConventionalRoutes(options =>
 {
     options.IgnoreTemplateFunc = (template) => template.StartsWith("API/");
     options.SkipDefaults = true;
 });
 
+services.AddSignalR();
+
 var app = builder.Build();
 
-// Ensuring DB is created
-using var scope = app.Services.CreateScope();
-var dbContext = scope.ServiceProvider.GetRequiredService<ColirDbContext>();
-var dbConnected = await dbContext.Database.CanConnectAsync();
-if (!dbConnected) throw new Exception("DB is not connected!");
+var logger = app.Services.GetService<ILogger<Program>>() ?? throw new ArgumentNullException();
+
+try
+{
+    // Ensuring DB is connected
+    using var scope = app.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<ColirDbContext>();
+    await dbContext.Database.MigrateAsync();
+}
+catch (SqlException)
+{
+    logger.LogCritical("An error occurred during SQL Server connection establishment!");
+    throw;
+}
 
 app.UseCors();
 

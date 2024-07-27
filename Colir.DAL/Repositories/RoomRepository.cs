@@ -78,7 +78,7 @@ public class RoomRepository : IRoomRepository
         }
 
         // Check for min name length
-        var minRoomNameLength = int.Parse(_config["MinRoomNameLength"]!);
+        var minRoomNameLength = int.Parse(_config["AppSettings:MinRoomNameLength"]!);
 
         if (room.Name.Length < minRoomNameLength)
         {
@@ -86,7 +86,7 @@ public class RoomRepository : IRoomRepository
         }
         
         // Check for max name length
-        var maxRoomNameLength = int.Parse(_config["MaxRoomNameLength"]!);
+        var maxRoomNameLength = int.Parse(_config["AppSettings:MaxRoomNameLength"]!);
 
         if (room.Name.Length > maxRoomNameLength)
         {
@@ -168,7 +168,7 @@ public class RoomRepository : IRoomRepository
         }
 
         // Check for min name length
-        var minRoomNameLength = int.Parse(_config["MinRoomNameLength"]!);
+        var minRoomNameLength = int.Parse(_config["AppSettings:MinRoomNameLength"]!);
 
         if (room.Name.Length < minRoomNameLength)
         {
@@ -176,7 +176,7 @@ public class RoomRepository : IRoomRepository
         }
         
         // Check for max name length
-        var maxRoomNameLength = int.Parse(_config["MaxRoomNameLength"]!);
+        var maxRoomNameLength = int.Parse(_config["AppSettings:MaxRoomNameLength"]!);
 
         if (room.Name.Length > maxRoomNameLength)
         {

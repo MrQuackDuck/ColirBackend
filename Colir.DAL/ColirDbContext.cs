@@ -1,5 +1,6 @@
 ﻿using DAL.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace DAL;
 
@@ -15,6 +16,15 @@ public class ColirDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<UserSettings> UserSettings { get; set; }
     public DbSet<UserStatistics> UserStatistics { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.ConfigureWarnings(warnings =>
+        {
+            warnings.Ignore(CoreEventId.ForeignKeyAttributesOnBothNavigationsWarning);
+            warnings.Ignore(CoreEventId.ForeignKeyAttributesOnBothPropertiesWarning);
+        });
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -28,8 +28,8 @@ public class UserServiceTests : IUserServiceTests
 
         // Initialize the service
         var configMock = new Mock<IConfiguration>();
-        configMock.Setup(config => config["MinUsernameLength"]).Returns("2");
-        configMock.Setup(config => config["MaxUsernameLength"]).Returns("50");
+        configMock.Setup(config => config["AppSettings:MinUsernameLength"]).Returns("2");
+        configMock.Setup(config => config["AppSettings:MaxUsernameLength"]).Returns("50");
 
         var roomFileMangerMock = new Mock<IRoomFileManager>();
         var unitOfWork = new UnitOfWork(_dbContext, configMock.Object, roomFileMangerMock.Object);

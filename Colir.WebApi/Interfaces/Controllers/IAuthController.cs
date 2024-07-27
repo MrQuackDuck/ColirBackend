@@ -5,6 +5,6 @@ namespace Colir.Interfaces.Controllers;
 
 public interface IAuthController
 {
-    ActionResult<DetailedUserModel> AnonnymousLogin(string name);
-    ActionResult Logout();
+    Task<ActionResult<DetailedUserModel>> AnonnymousLogin(string name);
+    Task<ActionResult> Logout();
 }

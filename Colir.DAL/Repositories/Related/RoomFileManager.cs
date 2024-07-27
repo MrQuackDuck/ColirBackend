@@ -15,7 +15,7 @@ public class RoomFileManager : IRoomFileManager
     {
         _fileSystem = fileSystem;
         _config = config;
-        _filesFolderName = config["RoomFilesFolderName"];
+        _filesFolderName = config["AppSettings:RoomFilesFolderName"];
         ArgumentNullException.ThrowIfNull(_filesFolderName);
 
         // Create the directory where rooms files will be stored
@@ -37,7 +37,7 @@ public class RoomFileManager : IRoomFileManager
     /// <param name="roomGuid">Guid of the room</param>
     public long GetFreeStorageSize(string roomGuid)
     {
-        var maxStorageCapacity = int.Parse(_config["MaxRoomStorageCapacityInBytes"]!);
+        var maxStorageCapacity = int.Parse(_config["AppSettings:MaxRoomStorageCapacityInBytes"]!);
         
         return maxStorageCapacity - GetFilesSize(roomGuid);
     }

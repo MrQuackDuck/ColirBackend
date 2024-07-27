@@ -26,8 +26,8 @@ public class UserRepositoryTests : IUserRepositoryTests
         
         // Initialize user repository with mocked config
         var mock = new Mock<IConfiguration>();
-        mock.Setup(config => config["MinUsernameLength"]).Returns("2");
-        mock.Setup(config => config["MaxUsernameLength"]).Returns("50");
+        mock.Setup(config => config["AppSettings:MinUsernameLength"]).Returns("2");
+        mock.Setup(config => config["AppSettings:MaxUsernameLength"]).Returns("50");
         
         _userRepository = new UserRepository(_dbContext, mock.Object);
         
