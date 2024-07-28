@@ -1,4 +1,5 @@
 ﻿using Colir.Exceptions.NotFound;
+using DAL.Enums;
 
 namespace Colir.Interfaces.ApiRelatedServices;
 
@@ -18,14 +19,15 @@ public interface IOAuth2RegistrationQueueService
     /// Adds a user to the registration queue
     /// </summary>
     /// <param name="oAuth2UserId">User's Id from OAuth service (like from Google, GitHub, etc..)</param>
+    /// <param name="authType">Type of user authentication</param>
     /// <returns>Queue token</returns>
-    string AddToQueue(string oAuth2UserId);
+    string AddToQueue(string oAuth2UserId, UserAuthType authType);
 
     /// <summary>
-    /// Returns the "oAuth2UserId" and deletes the user from the queue
+    /// Returns the "oAuth2UserId" with auth type and deletes the user from the queue
     /// </summary>
     /// <param name="queueToken">Queue token given by <see cref="AddToQueue"/> method</param>
     /// <returns>User's Id from OAuth service (Google, GitHub, etc..)</returns>
     /// <exception cref="NotFoundException">Thrown when the queueToken is not valid</exception>
-    string ExchangeToken(string queueToken);
+    (string, UserAuthType) ExchangeToken(string queueToken);
 }

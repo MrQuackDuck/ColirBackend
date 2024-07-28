@@ -1,8 +1,10 @@
 ﻿using Colir.BLL.Interfaces;
 using Colir.BLL.Models;
+using Colir.BLL.RequestModels.User;
 using Colir.Exceptions.NotFound;
 using Colir.Interfaces.ApiRelatedServices;
 using Colir.Interfaces.Hubs;
+using DAL.Enums;
 using Microsoft.AspNetCore.SignalR;
 using SignalRSwaggerGen.Attributes;
 
@@ -12,24 +14,46 @@ namespace Colir.Hubs;
 [SignalRHub]
 public class RegistrationHub : Hub, IRegistrationHub
 {
+    private readonly IUserService _userService;
     private readonly IOAuth2RegistrationQueueService _registrationQueueService;
     private readonly IHexColorGenerator _hexGenerator;
-    private readonly IWebHostEnvironment _webHostEnvironment;
-    private string _oAuth2UserId = default!;
     
     /// <summary>
-    /// Key is connection id, value is a list of hexs to offer
+    /// Dictionary to store hexs that are currently offered for users to choose from
+    /// The connection id is a key and the value is a list of hexs to offer
     /// </summary>
     private static readonly Dictionary<string, List<int>> _hexsToOffer = new();
-
-    private static readonly Dictionary<string, string> _userIds = new();
     
-    public RegistrationHub(IOAuth2RegistrationQueueService registrationQueueService, IHexColorGenerator hexGenerator, 
-        IWebHostEnvironment webHostEnvironment)
+    /// <summary>
+    /// Dictionary to store users' ids from OAuth2 service (such as from Google, GitHub etc..)
+    /// The connection id is a key and the value is user's OAuth2 id
+    /// </summary>
+    private static readonly Dictionary<string, string> _usersOAuthIds = new();
+    
+    /// <summary>
+    /// Dictionary to store users' OAuth2 types
+    /// The connection id is a key and the OAuth2 type
+    /// </summary>
+    private static readonly Dictionary<string, UserAuthType> _usersOAuthTypes = new();
+    
+    /// <summary>
+    /// Dictionary to store chosen hex ids during registration process
+    /// The connection id is a key and the value is the hex id chosen by the user
+    /// </summary>
+    private static readonly Dictionary<string, int> _chosenHexs = new();
+    
+    /// <summary>
+    /// Dictionary to store chosen usernames during registration process
+    /// The connection id is a key and the value is the username chosen by the user
+    /// </summary>
+    private static readonly Dictionary<string, string> _chosenUsernames = new();
+    
+    public RegistrationHub(IUserService userService, IOAuth2RegistrationQueueService registrationQueueService, 
+        IHexColorGenerator hexGenerator)
     {
+        _userService = userService;
         _registrationQueueService = registrationQueueService;
         _hexGenerator = hexGenerator;
-        _webHostEnvironment = webHostEnvironment;
     }
 
     public override async Task OnConnectedAsync()
@@ -38,16 +62,13 @@ public class RegistrationHub : Hub, IRegistrationHub
 
         try
         {
-            // Verify the token if the application is not in development
-            if (!_webHostEnvironment.IsDevelopment())
-            {
-                _oAuth2UserId = _registrationQueueService.ExchangeToken(queueToken!);
-                _userIds[Context.ConnectionId] = _oAuth2UserId;
-            }
+            var data = _registrationQueueService.ExchangeToken(queueToken!);
+            _usersOAuthIds[Context.ConnectionId] = data.Item1;
+            _usersOAuthTypes[Context.ConnectionId] = data.Item2;
         }
         catch (NotFoundException)
         {
-            // If queueToken is invalid
+            // Abort the connection if the "queueToken" is invalid
             Context.Abort();
             return;
         }
@@ -60,7 +81,7 @@ public class RegistrationHub : Hub, IRegistrationHub
     public override Task OnDisconnectedAsync(Exception? exception)
     {
         _hexsToOffer.Remove(Context.ConnectionId);
-        _userIds.Remove(Context.ConnectionId);
+        _usersOAuthIds.Remove(Context.ConnectionId);
         
         return Task.CompletedTask;
     }
@@ -73,20 +94,48 @@ public class RegistrationHub : Hub, IRegistrationHub
     }
     
     /// <inheritdoc cref="IRegistrationHub.ChooseHex"/>
-    public void ChooseHex(int orderOfItem)
+    public void ChooseHex(int hex)
     {
-        throw new NotImplementedException();
+        if (_hexsToOffer[Context.ConnectionId].Contains(hex))
+            _chosenHexs[Context.ConnectionId] = hex;
+        else 
+            throw new HubException("Hex is not valid");
     }
     
     /// <inheritdoc cref="IRegistrationHub.ChooseUsername"/>
     public void ChooseUsername(string username)
     {
-        throw new NotImplementedException();
+        _chosenUsernames[Context.ConnectionId] = username;
     }
     
     /// <inheritdoc cref="IRegistrationHub.FinishRegistration"/>
-    public DetailedUserModel FinishRegistration()
+    public async Task<DetailedUserModel> FinishRegistration()
     {
-        throw new NotImplementedException();
+        if (!_chosenHexs.ContainsKey(Context.ConnectionId)) throw new HubException("You haven't chosen the hex id yet!");
+        if (!_chosenUsernames.ContainsKey(Context.ConnectionId)) throw new HubException("You haven't chosen the username yet!");
+        
+        var userAuthType = _usersOAuthTypes[Context.ConnectionId];
+        var userOAuthId = _usersOAuthIds[Context.ConnectionId];
+        var chosenHex = _chosenHexs[Context.ConnectionId];
+        var chosenUsername = _chosenUsernames[Context.ConnectionId];
+        
+        DetailedUserModel? resultUserModel = default;
+
+        if (userAuthType == UserAuthType.Github)
+        {
+            var request = new RequestToAuthorizeViaGitHub
+            {
+                HexId = chosenHex,
+                Username = chosenUsername,
+                GitHubId = userOAuthId
+            };
+
+            resultUserModel = await _userService.AuthorizeViaGitHubAsync(request);
+        }
+
+        if (resultUserModel == null)
+            throw new HubException("Something went wrong!");
+        
+        return resultUserModel;
     }
 }

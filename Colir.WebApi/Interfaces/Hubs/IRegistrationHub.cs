@@ -1,5 +1,6 @@
 ﻿using Colir.BLL.Models;
 using Colir.Interfaces.ApiRelatedServices;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Colir.Interfaces.Hubs;
 
@@ -17,8 +18,9 @@ public interface IRegistrationHub
     /// <summary>
     /// Chooses the Hex Id for the user
     /// </summary>
-    /// <param name="orderOfItem">The order of chosen hex id from given list</param>
-    void ChooseHex(int orderOfItem);
+    /// <param name="hex">The hex id from previously given list</param>
+    /// <exception cref="HubException">Thrown when the hex is not present in list of hexs to choose from</exception>
+    void ChooseHex(int hex);
     
     /// <summary>
     /// Sets a username
@@ -29,5 +31,5 @@ public interface IRegistrationHub
     /// <summary>
     /// Finishes the registration
     /// </summary>
-    DetailedUserModel FinishRegistration();
+    Task<DetailedUserModel> FinishRegistration();
 }

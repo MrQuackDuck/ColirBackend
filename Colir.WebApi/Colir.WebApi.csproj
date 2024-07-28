@@ -27,7 +27,7 @@
 
     <ItemGroup>
       <Folder Include="Communication\RequestModels\" />
-      <Folder Include="Misc\" />
+      <Folder Include="Misc\Enums\" />
     </ItemGroup>
 
 </Project>

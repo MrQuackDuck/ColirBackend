@@ -89,7 +89,7 @@ public class AuthController : ControllerBase, IAuthController
             {
                 // "UserNotFoundException" exception occured, which means the user's not registered yet, so give him a queue token
                 // The token can be later exchanged in "RegistrationHub" to start registration process
-                var queueToken = _registrationQueueService.AddToQueue(userGitHubId);
+                var queueToken = _registrationQueueService.AddToQueue(userGitHubId, UserAuthType.Github);
                 return Ok(new { queueToken });   
             }
         }
