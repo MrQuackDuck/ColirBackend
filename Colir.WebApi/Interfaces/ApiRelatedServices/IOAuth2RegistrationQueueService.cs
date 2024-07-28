@@ -15,7 +15,6 @@ public interface IOAuth2RegistrationQueueService
     /// </summary>
     /// <param name="oAuth2UserId">User's Id from OAuth service (like from Google, GitHub, etc..)</param>
     /// <returns>Queue token</returns>
-    /// <exception cref="ArgumentException">Thrown when the user is already in the queue</exception>
     string AddToQueue(string oAuth2UserId);
 
     /// <summary>

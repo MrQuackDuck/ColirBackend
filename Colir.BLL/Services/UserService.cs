@@ -30,8 +30,8 @@ public class UserService : IUserService
         return _mapper.Map<DetailedUserModel>(user);
     }
 
-    /// <inheritdoc cref="IUserService.AuthorizeWithGitHubAsync"/>
-    public async Task<DetailedUserModel> AuthorizeWithGitHubAsync(RequestToAuthorizeWithGitHub request)
+    /// <inheritdoc cref="IUserService.AuthorizeViaGitHubAsync"/>
+    public async Task<DetailedUserModel> AuthorizeViaGitHubAsync(RequestToAuthorizeViaGitHub request)
     {
         try
         {

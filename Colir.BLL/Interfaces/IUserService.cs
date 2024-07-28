@@ -22,7 +22,7 @@ public interface IUserService
     /// <exception cref="ArgumentException">Thrown when provided HexId is not unique</exception>
     /// <exception cref="StringTooShortException">Thrown when a username is too short</exception>
     /// <exception cref="StringTooLongException">Thrown when a username is too long</exception>
-    Task<DetailedUserModel> AuthorizeWithGitHubAsync(RequestToAuthorizeWithGitHub request);
+    Task<DetailedUserModel> AuthorizeViaGitHubAsync(RequestToAuthorizeViaGitHub request);
     
     /// <summary>
     /// Creates a new user with provided username and returns its data instantly

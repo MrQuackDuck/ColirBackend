@@ -88,9 +88,8 @@ public class UserRepository : IUserRepository
     public async Task<bool> ExistsAsync(int hexId)
     {
         var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.HexId == hexId);
-        
-        if (user != null) return true;
-        else return false;
+
+        return user != null;
     }
 
     /// <summary>

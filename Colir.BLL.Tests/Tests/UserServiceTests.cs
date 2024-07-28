@@ -87,10 +87,10 @@ public class UserServiceTests : IUserServiceTests
     }
 
     [Test]
-    public async Task AuthorizeWithGitHubAsync_CreatesUser()
+    public async Task AuthorizeViaGitHubAsync_CreatesUser()
     {
         // Arrange
-        var request = new RequestToAuthorizeWithGitHub
+        var request = new RequestToAuthorizeViaGitHub
         {
             GitHubId = "0000",
             HexId = 0xFFABCD,
@@ -98,17 +98,17 @@ public class UserServiceTests : IUserServiceTests
         };
 
         // Act
-        await _userService.AuthorizeWithGitHubAsync(request);
+        await _userService.AuthorizeViaGitHubAsync(request);
 
         // Assert
         Assert.That(_dbContext.Users.Count() == 4);
     }
 
     [Test]
-    public async Task AuthorizeWithGitHubAsync_ReturnsCorrectData()
+    public async Task AuthorizeViaGitHubAsync_ReturnsCorrectData()
     {
         // Arrange
-        var request = new RequestToAuthorizeWithGitHub
+        var request = new RequestToAuthorizeViaGitHub
         {
             GitHubId = "0000",
             HexId = 0xFFABCD,
@@ -116,7 +116,7 @@ public class UserServiceTests : IUserServiceTests
         };
 
         // Act
-        var result = await _userService.AuthorizeWithGitHubAsync(request);
+        var result = await _userService.AuthorizeViaGitHubAsync(request);
 
         // Assert
         Assert.That(result.Username == request.Username);
@@ -125,10 +125,10 @@ public class UserServiceTests : IUserServiceTests
     }
 
     [Test]
-    public async Task AuthorizeWithGitHubAsync_ThrowsArgumentException_WhenHexIsNotUnique()
+    public async Task AuthorizeViaGitHubAsync_ThrowsArgumentException_WhenHexIsNotUnique()
     {
         // Arrange
-        var request = new RequestToAuthorizeWithGitHub
+        var request = new RequestToAuthorizeViaGitHub
         {
             GitHubId = "0000",
             HexId = 0xFFFFFF,
@@ -136,17 +136,17 @@ public class UserServiceTests : IUserServiceTests
         };
 
         // Act
-        AsyncTestDelegate act = async () => await _userService.AuthorizeWithGitHubAsync(request);
+        AsyncTestDelegate act = async () => await _userService.AuthorizeViaGitHubAsync(request);
 
         // Assert
         Assert.ThrowsAsync<ArgumentException>(act);
     }
 
     [Test]
-    public async Task AuthorizeWithGitHubAsync_ThrowsStringTooShortException_WhenNewUsernameTooShort()
+    public async Task AuthorizeViaGitHubAsync_ThrowsStringTooShortException_WhenNewUsernameTooShort()
     {
         // Arrange
-        var request = new RequestToAuthorizeWithGitHub
+        var request = new RequestToAuthorizeViaGitHub
         {
             GitHubId = "0000",
             HexId = 0xFFABCD,
@@ -154,17 +154,17 @@ public class UserServiceTests : IUserServiceTests
         };
 
         // Act
-        AsyncTestDelegate act = async () => await _userService.AuthorizeWithGitHubAsync(request);
+        AsyncTestDelegate act = async () => await _userService.AuthorizeViaGitHubAsync(request);
 
         // Assert
         Assert.ThrowsAsync<StringTooShortException>(act);
     }
 
     [Test]
-    public async Task AuthorizeWithGitHubAsync_ThrowsStringTooLongException_WhenNewUsernameTooLong()
+    public async Task AuthorizeViaGitHubAsync_ThrowsStringTooLongException_WhenNewUsernameTooLong()
     {
         // Arrange
-        var request = new RequestToAuthorizeWithGitHub
+        var request = new RequestToAuthorizeViaGitHub
         {
             GitHubId = "0000",
             HexId = 0xFFABCD,
@@ -172,7 +172,7 @@ public class UserServiceTests : IUserServiceTests
         };
 
         // Act
-        AsyncTestDelegate act = async () => await _userService.AuthorizeWithGitHubAsync(request);
+        AsyncTestDelegate act = async () => await _userService.AuthorizeViaGitHubAsync(request);
 
         // Assert
         Assert.ThrowsAsync<StringTooLongException>(act);

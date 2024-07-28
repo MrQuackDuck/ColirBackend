@@ -17,6 +17,6 @@ public enum ErrorCode
     RoomNotFound,
     StringWasTooLong,
     StringWasTooShort,
-    UserAlreadyInRegistrationQueue,
+    UserAlreadyRegistered,
     UserNotFound
 }

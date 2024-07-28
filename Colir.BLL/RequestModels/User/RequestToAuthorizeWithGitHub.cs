@@ -1,6 +1,6 @@
 ﻿namespace Colir.BLL.RequestModels.User;
 
-public class RequestToAuthorizeWithGitHub
+public class RequestToAuthorizeViaGitHub
 {
     public string GitHubId { get; set; } = default!;
     public int HexId { get; set; }

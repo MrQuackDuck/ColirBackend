@@ -5,11 +5,11 @@ public interface IUserServiceTests
     Task GetAccountInfo_ReturnsUser();
     Task GetAccountInfo_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
     
-    Task AuthorizeWithGitHubAsync_CreatesUser();
-    Task AuthorizeWithGitHubAsync_ReturnsCorrectData();
-    Task AuthorizeWithGitHubAsync_ThrowsArgumentException_WhenHexIsNotUnique();
-    Task AuthorizeWithGitHubAsync_ThrowsStringTooShortException_WhenNewUsernameTooShort();
-    Task AuthorizeWithGitHubAsync_ThrowsStringTooLongException_WhenNewUsernameTooLong();
+    Task AuthorizeViaGitHubAsync_CreatesUser();
+    Task AuthorizeViaGitHubAsync_ReturnsCorrectData();
+    Task AuthorizeViaGitHubAsync_ThrowsArgumentException_WhenHexIsNotUnique();
+    Task AuthorizeViaGitHubAsync_ThrowsStringTooShortException_WhenNewUsernameTooShort();
+    Task AuthorizeViaGitHubAsync_ThrowsStringTooLongException_WhenNewUsernameTooLong();
 
     Task AuthorizeAsAnnoymousAsync_CreatesUser();
     Task AuthorizeAsAnnoymousAsync_ReturnsCorrectData();

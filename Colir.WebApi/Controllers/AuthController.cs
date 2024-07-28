@@ -11,6 +11,7 @@ using Colir.Interfaces.ApiRelatedServices;
 using Colir.Interfaces.Controllers;
 using Colir.Misc.ExtensionMethods;
 using DAL.Enums;
+using DAL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -25,58 +26,72 @@ public class AuthController : ControllerBase, IAuthController
     private readonly IUserService _userService;
     private readonly IConfiguration _config;
     private readonly IOAuth2RegistrationQueueService _registrationQueueService;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public AuthController(IUserService userService, IConfiguration config, IOAuth2RegistrationQueueService registrationQueueService)
+    public AuthController(IUserService userService, IConfiguration config, IOAuth2RegistrationQueueService registrationQueueService, IUnitOfWork unitOfWork)
     {
         _userService = userService;
         _config = config;
         _registrationQueueService = registrationQueueService;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
     /// Exchanges the GitHub OAuth2 code on registration queue token
-    /// Details: <see cref="IOAuth2RegistrationQueueService"/> 
+    /// Details: <see cref="IOAuth2RegistrationQueueService"/>
+    /// IMPORTANT: If the user was already registered, JWT authentication token is generated and returned
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<string>> ExchangeGitHubCode([FromQuery] string code)
+    public async Task<ActionResult> ExchangeGitHubCode([FromQuery] string code)
     {
         try
         {
+            // Getting credentials from the configuration
             var githubClientId = _config["Authentication:GitHubClientId"]!;
             var githubAuthSecret = _config["Authentication:GitHubSecret"]!;
-
+            
             using var httpClient = new HttpClient();
-            var requestToGetToken = new HttpRequestMessage(HttpMethod.Post, "https://github.com/login/oauth/access_token");
-            requestToGetToken.Content = new FormUrlEncodedContent(new Dictionary<string, string>()
+
+            // Getting the token
+            var gitHubToken = await GetUserGitHubToken(httpClient, githubClientId, githubAuthSecret, code);
+            
+            // Using the token to obtain the id of the user from GitHub
+            var userGitHubId = await GetUserGitHubId(httpClient, gitHubToken);
+            
+            try
             {
-                { "client_id", githubClientId },
-                { "client_secret", githubAuthSecret },
-                { "code", code }
-            });
+                // Check if the user already registered
+                await _unitOfWork.UserRepository.GetByGithudIdAsync(userGitHubId);
+                
+                // If an exception not occurred, the user was already registered. So, authenticate him/her
+                var request = new RequestToAuthorizeViaGitHub()
+                {
+                    GitHubId = userGitHubId
+                };
 
-            // Getting the token from GitHub
-            var responseWithToken = await (await httpClient.SendAsync(requestToGetToken)).Content.ReadAsStringAsync();
-            var token = responseWithToken[(responseWithToken.IndexOf('=') + 1)..responseWithToken.IndexOf('&')];
+                var userModel = await _userService.AuthorizeViaGitHubAsync(request);
 
-            // Using the token to obtain a unique id of the user
-            var requestToGetUserData = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/user");
-            requestToGetUserData.Headers.Add("Accept", "application/vnd.github+json");
-            requestToGetUserData.Headers.Add("Authorization", $"Bearer {token}");
-            requestToGetUserData.Headers.Add("X-GitHub-Api-Version", "2022-11-28");
-            requestToGetUserData.Headers.Add("User-Agent", "ASP.NET");
+                // Creating claims for a token
+                var claims = new List<Claim>
+                {
+                    new Claim("Id", userModel.Id.ToString()),
+                    new Claim("AuthType", userModel.AuthType.ToString())
+                };
 
-            var responseWithUserData = await httpClient.SendAsync(requestToGetUserData);
-            responseWithUserData.EnsureSuccessStatusCode();
-            dynamic userData = JObject.Parse(await responseWithUserData.Content.ReadAsStringAsync());
-            var userGitHubId = (string)userData.id.ToString();
+                var jwtToken = GenerateJwtToken(claims);
 
-            var queueToken = _registrationQueueService.AddToQueue(userGitHubId);
+                // Applying the jwt token to response cookies
+                Response.ApplyJwtToken(jwtToken);
 
-            return Ok(new { queueToken });
-        }
-        catch (ArgumentException)
-        {
-            return BadRequest(new ErrorResponse(ErrorCode.UserAlreadyInRegistrationQueue));   
+                return Ok(new { jwtToken });
+            }
+            catch (UserNotFoundException)
+            {
+                // "UserNotFoundException" exception occured, which means the user's not registered yet, so give him a queue token
+                // The token can be later exchanged in "RegistrationHub" to start registration process
+                var queueToken = _registrationQueueService.AddToQueue(userGitHubId);
+                return Ok(new { queueToken });   
+            }
         }
         catch (HttpRequestException)
         {
@@ -103,25 +118,12 @@ public class AuthController : ControllerBase, IAuthController
                 new Claim("AuthType", userModel.AuthType.ToString())
             };
 
-            // Getting the key and generating a token
-            var encrpyionKey =
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:JwtKey").Value!));
-            var jwtToken = new JwtSecurityToken(
-                claims: claims,
-                expires: DateTime.UtcNow.Add(TimeSpan.FromDays(30)),
-                signingCredentials: new SigningCredentials(encrpyionKey, SecurityAlgorithms.HmacSha256));
+            var jwtToken = GenerateJwtToken(claims);
 
-            var jwtTokenString = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+            // Applying the jwt token
+            Response.ApplyJwtToken(jwtToken);
 
-            // Appending the token to cookies
-            Response.Cookies.Append("jwt", jwtTokenString, new CookieOptions()
-            {
-                HttpOnly = true,
-                SameSite = SameSiteMode.None,
-                Secure = true
-            });
-
-            return Ok(new { jwtTokenString });
+            return Ok(new { jwtToken });
         }
         catch (StringTooShortException)
         {
@@ -154,5 +156,47 @@ public class AuthController : ControllerBase, IAuthController
         {
             return BadRequest(new ErrorResponse(ErrorCode.UserNotFound));
         }
+    }
+
+    private async Task<string> GetUserGitHubToken(HttpClient httpClient, string githubClientId, string githubAuthSecret, string code)
+    {
+        var requestToGetToken = new HttpRequestMessage(HttpMethod.Post, "https://github.com/login/oauth/access_token");
+        requestToGetToken.Content = new FormUrlEncodedContent(new Dictionary<string, string>()
+        {
+            { "client_id", githubClientId },
+            { "client_secret", githubAuthSecret },
+            { "code", code }
+        });
+
+        // Sending the request to get the token from GitHub
+        var responseWithToken = await (await httpClient.SendAsync(requestToGetToken)).Content.ReadAsStringAsync();
+        return responseWithToken[(responseWithToken.IndexOf('=') + 1)..responseWithToken.IndexOf('&')];
+    }
+
+    private async Task<string> GetUserGitHubId(HttpClient httpClient, string githubToken)
+    {
+        var requestToGetUserData = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/user");
+        requestToGetUserData.Headers.Add("Accept", "application/vnd.github+json");
+        requestToGetUserData.Headers.Add("Authorization", $"Bearer {githubToken}");
+        requestToGetUserData.Headers.Add("X-GitHub-Api-Version", "2022-11-28");
+        requestToGetUserData.Headers.Add("User-Agent", "ASP.NET");
+
+        var responseWithUserData = await httpClient.SendAsync(requestToGetUserData);
+        responseWithUserData.EnsureSuccessStatusCode();
+        dynamic userData = JObject.Parse(await responseWithUserData.Content.ReadAsStringAsync());
+        return (string)userData.id.ToString();
+    }
+    
+    private string GenerateJwtToken(List<Claim> claims)
+    {
+        // Getting the key and generating a token
+        var encrpyionKey =
+            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:JwtKey").Value!));
+        var jwtToken = new JwtSecurityToken(
+            claims: claims,
+            expires: DateTime.UtcNow.Add(TimeSpan.FromDays(30)),
+            signingCredentials: new SigningCredentials(encrpyionKey, SecurityAlgorithms.HmacSha256));
+
+        return new JwtSecurityTokenHandler().WriteToken(jwtToken);
     }
 }

@@ -57,7 +57,7 @@ services.AddTransient<IUserService, UserService>();
 services.AddTransient<IUserStatisticsService, UserStatisticsService>();
 
 // Adding strictly Api-Related services
-services.AddTransient<IOAuth2RegistrationQueueService, OAuth2RegistrationQueueService>();
+services.AddSingleton<IOAuth2RegistrationQueueService, OAuth2RegistrationQueueService>();
 
 services.AddControllers();
 
