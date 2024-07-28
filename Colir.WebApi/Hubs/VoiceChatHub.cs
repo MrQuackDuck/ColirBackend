@@ -1,10 +1,12 @@
 ﻿using Colir.Interfaces.Hubs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using SignalRSwaggerGen.Attributes;
 
 namespace Colir.Hubs;
 
 [Authorize]
+[SignalRHub]
 public class VoiceChatHub : Hub<IVoiceChatHub>
 {
     public async Task Connect(string roomGuid)

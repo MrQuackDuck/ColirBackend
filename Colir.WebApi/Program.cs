@@ -100,7 +100,11 @@ services.AddCors(options =>
 
 // Adding Swagger
 services.AddEndpointsApiExplorer();
-services.AddSwaggerGen();
+services.AddSwaggerGen(options =>
+{
+    options.AddSignalRSwaggerGen();
+});
+
 services.AddSwaggerGenWithConventionalRoutes(options =>
 {
     options.IgnoreTemplateFunc = (template) => template.StartsWith("API/");

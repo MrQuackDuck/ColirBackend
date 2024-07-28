@@ -1,9 +1,11 @@
 ﻿using Colir.BLL.Models;
 using Colir.Interfaces.Hubs;
+using SignalRSwaggerGen.Attributes;
 
 namespace Colir.Hubs;
 
 /// <inheritdoc cref="IRegistrationHub"/>
+[SignalRHub]
 public class RegistrationHub : IRegistrationHub
 {
     /// <inheritdoc cref="IRegistrationHub.Connect"/>
