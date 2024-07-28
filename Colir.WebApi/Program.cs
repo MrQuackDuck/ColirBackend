@@ -133,6 +133,19 @@ app.UseExceptionHandler();
 app.UseAuthentication();
 app.UseAuthorization();
 
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+        options.RoutePrefix = string.Empty;
+        options.DocumentTitle = "Swagger";
+        options.EnableDeepLinking();
+    });
+}
+
 app.MapControllerRoute("default", "API/{controller}/{action}/");
 
 app.Run();

@@ -158,6 +158,7 @@ public class AuthController : ControllerBase, IAuthController
         }
     }
 
+    [NonAction]
     private async Task<string> GetUserGitHubToken(HttpClient httpClient, string githubClientId, string githubAuthSecret, string code)
     {
         var requestToGetToken = new HttpRequestMessage(HttpMethod.Post, "https://github.com/login/oauth/access_token");
@@ -173,6 +174,7 @@ public class AuthController : ControllerBase, IAuthController
         return responseWithToken[(responseWithToken.IndexOf('=') + 1)..responseWithToken.IndexOf('&')];
     }
 
+    [NonAction]
     private async Task<string> GetUserGitHubId(HttpClient httpClient, string githubToken)
     {
         var requestToGetUserData = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/user");
@@ -187,6 +189,7 @@ public class AuthController : ControllerBase, IAuthController
         return (string)userData.id.ToString();
     }
     
+    [NonAction]
     private string GenerateJwtToken(List<Claim> claims)
     {
         // Getting the key and generating a token
