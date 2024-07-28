@@ -1,12 +1,13 @@
 ﻿using Colir.BLL.Models;
 using Colir.Interfaces.Hubs;
+using Microsoft.AspNetCore.SignalR;
 using SignalRSwaggerGen.Attributes;
 
 namespace Colir.Hubs;
 
 /// <inheritdoc cref="IRegistrationHub"/>
 [SignalRHub]
-public class RegistrationHub : IRegistrationHub
+public class RegistrationHub : Hub<IRegistrationHub>
 {
     /// <inheritdoc cref="IRegistrationHub.Connect"/>
     public void Connect(string queueToken)

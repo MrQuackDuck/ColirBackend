@@ -5,6 +5,7 @@ using Colir.BLL;
 using Colir.BLL.Factories;
 using Colir.BLL.Interfaces;
 using Colir.BLL.Services;
+using Colir.Hubs;
 using Colir.Interfaces.ApiRelatedServices;
 using Colir.Misc.ExceptionHandlers;
 using DAL;
@@ -102,7 +103,10 @@ services.AddCors(options =>
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen(options =>
 {
-    options.AddSignalRSwaggerGen();
+    options.AddSignalRSwaggerGen(signalROptions =>
+    {
+        signalROptions.HubPathFunc = s => $"/API/{s}";
+    });
 });
 
 services.AddSwaggerGenWithConventionalRoutes(options =>
@@ -137,7 +141,13 @@ app.UseExceptionHandler();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Mapping SignalR hubs
+app.MapHub<ChatHub>("API/ChatHub");
+app.MapHub<ClearRoomHub>("API/ClearRoomHub");
+app.MapHub<RegistrationHub>("API/RegistrationHub");
+app.MapHub<VoiceChatHub>("API/VoiceChatHub");
 
+// Using Swagger
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
