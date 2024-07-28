@@ -12,8 +12,8 @@ public class HexColorGenerator : IHexColorGenerator
         _unitOfWork = unitOfWork;
     }
     
-    /// <inheritdoc cref="IHexColorGenerator.GetUniqueHexColor"/>
-    public async Task<int> GetUniqueHexColor()
+    /// <inheritdoc cref="IHexColorGenerator.GetUniqueHexColorAsync"/>
+    public async Task<int> GetUniqueHexColorAsync()
     {
         var random = new Random();
 
@@ -25,8 +25,8 @@ public class HexColorGenerator : IHexColorGenerator
         return hex;
     }
 
-    /// <inheritdoc cref="IHexColorGenerator.GetUniqueHexColorsList"/>
-    public async Task<List<int>> GetUniqueHexColorsList(int count)
+    /// <inheritdoc cref="IHexColorGenerator.GetUniqueHexColorAsyncsListAsync"/>
+    public async Task<List<int>> GetUniqueHexColorAsyncsListAsync(int count)
     {
         if (count < 0)
         {
@@ -37,7 +37,7 @@ public class HexColorGenerator : IHexColorGenerator
 
         for (int i = 0; i < count; i++)
         {
-            result.Add(await GetUniqueHexColor());
+            result.Add(await GetUniqueHexColorAsync());
         }
 
         return result;

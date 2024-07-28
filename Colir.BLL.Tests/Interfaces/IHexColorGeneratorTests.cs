@@ -2,9 +2,9 @@
 
 public interface IHexColorGeneratorTests
 {
-    Task GetUniqueHexColor_ReturnsHexInValidFormat();
+    Task GetUniqueHexColorAsync_ReturnsHexInValidFormat();
     
-    Task GetUniqueHexColorsList_ReturnsCorrectAmountOfHexs();
-    Task GetUniqueHexColorsList_ReturnsHexsInValidFormat();
-    Task GetUniqueHexColorsList_ThrowsArgumentOutOfRangeException_WhenCountIsBelowZero();
+    Task GetUniqueHexColorAsyncsListAsync_ReturnsCorrectAmountOfHexs();
+    Task GetUniqueHexColorAsyncsListAsync_ReturnsHexsInValidFormat();
+    Task GetUniqueHexColorAsyncsListAsync_ThrowsArgumentOutOfRangeException_WhenCountIsBelowZero();
 }

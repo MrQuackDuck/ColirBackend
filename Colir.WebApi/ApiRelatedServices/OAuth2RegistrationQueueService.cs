@@ -1,4 +1,5 @@
-﻿using Colir.Interfaces.ApiRelatedServices;
+﻿using Colir.Exceptions.NotFound;
+using Colir.Interfaces.ApiRelatedServices;
 using Colir.Misc.ExtensionMethods;
 
 namespace Colir.ApiRelatedServices;
@@ -25,7 +26,7 @@ public class OAuth2RegistrationQueueService : IOAuth2RegistrationQueueService
     /// <inheritdoc cref="IOAuth2RegistrationQueueService.ExchangeToken"/>
     public string ExchangeToken(string queueToken)
     {
-        var oAuth2UserId = _queue[queueToken];
+        var oAuth2UserId = _queue.GetValueOrDefault(queueToken) ?? throw new NotFoundException();
         _queue.Remove(queueToken);
         
         return oAuth2UserId;

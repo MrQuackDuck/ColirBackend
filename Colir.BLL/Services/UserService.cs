@@ -74,7 +74,7 @@ public class UserService : IUserService
         var user = new User
         {
             Username = request.DesiredUsername,
-            HexId = await _hexGenerator.GetUniqueHexColor(),
+            HexId = await _hexGenerator.GetUniqueHexColorAsync(),
             AuthType = UserAuthType.Anonymous
         };
 

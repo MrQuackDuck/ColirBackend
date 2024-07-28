@@ -1,4 +1,6 @@
-﻿namespace Colir.Interfaces.ApiRelatedServices;
+﻿using Colir.Exceptions.NotFound;
+
+namespace Colir.Interfaces.ApiRelatedServices;
 
 /// <summary>
 /// On this website, when a user is redirected from the OAuth2 page, he/she is not instantly registered and authenticated
@@ -24,5 +26,6 @@ public interface IOAuth2RegistrationQueueService
     /// </summary>
     /// <param name="queueToken">Queue token given by <see cref="AddToQueue"/> method</param>
     /// <returns>User's Id from OAuth service (Google, GitHub, etc..)</returns>
+    /// <exception cref="NotFoundException">Thrown when the queueToken is not valid</exception>
     string ExchangeToken(string queueToken);
 }

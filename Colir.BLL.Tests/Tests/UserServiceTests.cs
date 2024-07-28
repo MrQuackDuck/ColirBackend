@@ -36,7 +36,7 @@ public class UserServiceTests : IUserServiceTests
         var mapper = AutomapperProfile.InitializeAutoMapper().CreateMapper();
 
         var hexGeneratorMock = new Mock<IHexColorGenerator>();
-        hexGeneratorMock.Setup(h => h.GetUniqueHexColor()).ReturnsAsync(0x123456);
+        hexGeneratorMock.Setup(h => h.GetUniqueHexColorAsync()).ReturnsAsync(0x123456);
         
         _userService = new UserService(unitOfWork, mapper, hexGeneratorMock.Object);
 

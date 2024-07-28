@@ -10,15 +10,9 @@ namespace Colir.Interfaces.Hubs;
 public interface IRegistrationHub
 {
     /// <summary>
-    /// Connect to the Hub (<param name="queueToken"/> is required)
-    /// </summary>
-    /// <param name="queueToken">Token from <see cref="IOAuth2RegistrationQueueService"/></param>
-    void Connect(string queueToken);
-    
-    /// <summary>
     /// Regenerates the list of Hexs to choose from
     /// </summary>
-    void RegenerateHexs();
+    Task RegenerateHexs();
     
     /// <summary>
     /// Chooses the Hex Id for the user
