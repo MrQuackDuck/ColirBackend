@@ -40,7 +40,65 @@ public class AuthController : ControllerBase, IAuthController
         _gitHubOAuth2Api = gitHubOAuth2Api;
         _googleOAuth2Api = googleOAuth2Api;
     }
+    
+    /// <summary>
+    /// Exchanges the GitHub OAuth2 code for a registration queue token
+    /// Details: <see cref="IOAuth2RegistrationQueueService"/>
+    /// IMPORTANT: If the user was already registered, JWT authentication token is generated and returned
+    /// </summary>
+    [HttpGet]
+    public async Task<ActionResult> ExchangeGitHubCode([FromQuery] string code)
+    {
+        try
+        {
+            // Getting credentials from the configuration
+            var githubClientId = _config["Authentication:GitHubClientId"]!;
+            var githubAuthSecret = _config["Authentication:GitHubSecret"]!;
 
+            // Getting an access token
+            var gitHubToken = await _gitHubOAuth2Api.GetUserGitHubTokenAsync(githubClientId, githubAuthSecret, code);
+            
+            // Using the token to obtain the id of the user from GitHub
+            var userGitHubId = await _gitHubOAuth2Api.GetUserGitHubIdAsync(gitHubToken);
+            
+            try
+            {
+                // Checking if the user already registered. Otherwise, the "UserNotFoundException" will be thrown
+                await _unitOfWork.UserRepository.GetByGithudIdAsync(userGitHubId);
+                
+                // If an exception not occurred, the user was already registered. So, authenticate him/her
+                var request = new RequestToAuthorizeViaGitHub { GitHubId = userGitHubId };
+
+                var userModel = await _userService.AuthorizeViaGitHubAsync(request);
+
+                // Creating claims for a token
+                var claims = new List<Claim>
+                {
+                    new Claim("Id", userModel.Id.ToString()),
+                    new Claim("AuthType", userModel.AuthType.ToString())
+                };
+
+                var jwtToken = GenerateJwtToken(claims);
+
+                // Applying the jwt token to response's cookies
+                Response.ApplyJwtToken(jwtToken);
+
+                return Ok(new { jwtToken });
+            }
+            catch (UserNotFoundException)
+            {
+                // "UserNotFoundException" exception occured, which means the user's not registered yet, so give him a queue token
+                // The token can be later exchanged in "RegistrationHub" to start a registration process
+                var queueToken = _registrationQueueService.AddToQueue(new RegistrationUserData(userGitHubId, UserAuthType.Github));
+                return Ok(new { queueToken });   
+            }
+        }
+        catch (HttpRequestException)
+        {
+            return BadRequest();
+        }
+    }
+    
     /// <summary>
     /// Exchanges the Google OAuth2 code for a registration queue token
     /// Details: <see cref="IOAuth2RegistrationQueueService"/>
@@ -68,7 +126,7 @@ public class AuthController : ControllerBase, IAuthController
                 await _unitOfWork.UserRepository.GetByGoogleIdAsync(userGoogleid);
                 
                 // If an exception not occurred, the user was already registered. So, authenticate him/her
-                var request = new RequestToAuthorizeViaGoogle() { GoogleId = userGoogleid };
+                var request = new RequestToAuthorizeViaGoogle { GoogleId = userGoogleid };
 
                 var userModel = await _userService.AuthorizeViaGoogleAsync(request);
 
@@ -91,64 +149,6 @@ public class AuthController : ControllerBase, IAuthController
                 // "UserNotFoundException" exception occured, which means the user's not registered yet, so give him a queue token
                 // The token can be later exchanged in "RegistrationHub" to start a registration process
                 var queueToken = _registrationQueueService.AddToQueue(new RegistrationUserData(userGoogleid, UserAuthType.Google));
-                return Ok(new { queueToken });   
-            }
-        }
-        catch (HttpRequestException)
-        {
-            return BadRequest();
-        }
-    }
-
-    /// <summary>
-    /// Exchanges the GitHub OAuth2 code for a registration queue token
-    /// Details: <see cref="IOAuth2RegistrationQueueService"/>
-    /// IMPORTANT: If the user was already registered, JWT authentication token is generated and returned
-    /// </summary>
-    [HttpGet]
-    public async Task<ActionResult> ExchangeGitHubCode([FromQuery] string code)
-    {
-        try
-        {
-            // Getting credentials from the configuration
-            var githubClientId = _config["Authentication:GitHubClientId"]!;
-            var githubAuthSecret = _config["Authentication:GitHubSecret"]!;
-
-            // Getting an access token
-            var gitHubToken = await _gitHubOAuth2Api.GetUserGitHubTokenAsync(githubClientId, githubAuthSecret, code);
-            
-            // Using the token to obtain the id of the user from GitHub
-            var userGitHubId = await _gitHubOAuth2Api.GetUserGitHubIdAsync(gitHubToken);
-            
-            try
-            {
-                // Checking if the user already registered. Otherwise, the "UserNotFoundException" will be thrown
-                await _unitOfWork.UserRepository.GetByGithudIdAsync(userGitHubId);
-                
-                // If an exception not occurred, the user was already registered. So, authenticate him/her
-                var request = new RequestToAuthorizeViaGitHub() { GitHubId = userGitHubId };
-
-                var userModel = await _userService.AuthorizeViaGitHubAsync(request);
-
-                // Creating claims for a token
-                var claims = new List<Claim>
-                {
-                    new Claim("Id", userModel.Id.ToString()),
-                    new Claim("AuthType", userModel.AuthType.ToString())
-                };
-
-                var jwtToken = GenerateJwtToken(claims);
-
-                // Applying the jwt token to response's cookies
-                Response.ApplyJwtToken(jwtToken);
-
-                return Ok(new { jwtToken });
-            }
-            catch (UserNotFoundException)
-            {
-                // "UserNotFoundException" exception occured, which means the user's not registered yet, so give him a queue token
-                // The token can be later exchanged in "RegistrationHub" to start a registration process
-                var queueToken = _registrationQueueService.AddToQueue(new RegistrationUserData(userGitHubId, UserAuthType.Github));
                 return Ok(new { queueToken });   
             }
         }
@@ -200,7 +200,7 @@ public class AuthController : ControllerBase, IAuthController
     {
         try
         {
-            // Delete the account if the request was issued by an user with anonymous auth type
+            // Delete the account if the request was issued by a user with anonymous auth type
             var userId = this.GetIssuerId();
             var authType = HttpContext.User.Claims.First(c => c.Type == "AuthType").Value;
             if (authType == UserAuthType.Anonymous.ToString())
