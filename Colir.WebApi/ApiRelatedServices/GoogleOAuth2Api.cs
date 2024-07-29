@@ -1,10 +1,17 @@
 ﻿using Colir.Interfaces.ApiRelatedServices;
 using Newtonsoft.Json.Linq;
 
-namespace Colir.ApiRelatedServices.Models;
+namespace Colir.ApiRelatedServices;
 
 public class GoogleOAuth2Api : IGoogleOAuth2Api
 {
+    private readonly IConfiguration _config;
+    
+    public GoogleOAuth2Api(IConfiguration config)
+    {
+        _config = config;
+    }
+
     /// <inheritdoc cref="IGoogleOAuth2Api.GetUserGoogleAccessTokenAsync"/>
     public async Task<string> GetUserGoogleAccessTokenAsync(string googleClientId, string googleAuthSecret, string code)
     {
@@ -16,7 +23,7 @@ public class GoogleOAuth2Api : IGoogleOAuth2Api
             { "client_id", googleClientId },
             { "client_secret", googleAuthSecret },
             { "code", code },
-            { "redirect_uri", "http://localhost:7700/API/Auth/ExchangeGoogleCode" },
+            { "redirect_uri", _config["Authentication:GoogleRedirectLink"]! },
             { "grant_type", "authorization_code" }
         });
         
