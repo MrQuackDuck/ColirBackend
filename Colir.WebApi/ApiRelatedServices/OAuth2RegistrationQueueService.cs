@@ -26,7 +26,7 @@ public class OAuth2RegistrationQueueService : IOAuth2RegistrationQueueService
     /// <inheritdoc cref="IOAuth2RegistrationQueueService.ExchangeToken"/>
     public RegistrationUserData ExchangeToken(string queueToken)
     {
-        var data = _queue.GetValueOrDefault(queueToken);
+        var data = _queue.GetValueOrDefault(queueToken) ?? throw new NullReferenceException();
         _queue.Remove(queueToken);
         
         return data;

@@ -23,25 +23,25 @@ public class RegistrationHub : Hub, IRegistrationHub
     /// Dictionary to store hexs that are currently offered for users to choose from
     /// The connection id is a key and the value is a list of hexs to offer
     /// </summary>
-    private static readonly Dictionary<string, List<int>> _hexsToOffer = new();
+    private static readonly Dictionary<string, List<int>> HexsToOffer = new();
     
     /// <summary>
     /// Dictionary to store users' data needed for registration process
     /// The connection id is a key and the value is user's OAuth2 id
     /// </summary>
-    private static readonly Dictionary<string, RegistrationUserData> _usersData = new();
+    private static readonly Dictionary<string, RegistrationUserData> UsersData = new();
     
     /// <summary>
     /// Dictionary to store chosen hex ids during registration process
     /// The connection id is a key and the value is the hex id chosen by the user
     /// </summary>
-    private static readonly Dictionary<string, int> _chosenHexs = new();
+    private static readonly Dictionary<string, int> ChosenHexs = new();
     
     /// <summary>
     /// Dictionary to store chosen usernames during registration process
     /// The connection id is a key and the value is the username chosen by the user
     /// </summary>
-    private static readonly Dictionary<string, string> _chosenUsernames = new();
+    private static readonly Dictionary<string, string> ChosenUsernames = new();
     
     public RegistrationHub(IUserService userService, IOAuth2RegistrationQueueService registrationQueueService, 
         IHexColorGenerator hexGenerator)
@@ -57,7 +57,7 @@ public class RegistrationHub : Hub, IRegistrationHub
 
         try
         {
-            _usersData[Context.ConnectionId] = _registrationQueueService.ExchangeToken(queueToken!);
+            UsersData[Context.ConnectionId] = _registrationQueueService.ExchangeToken(queueToken!);
         }
         catch (NotFoundException)
         {
@@ -67,16 +67,16 @@ public class RegistrationHub : Hub, IRegistrationHub
         }
         
         // Generate list of possible Hexs and send it to the client
-        _hexsToOffer[Context.ConnectionId] = await _hexGenerator.GetUniqueHexColorAsyncsListAsync(5);
-        await Clients.Caller.SendAsync("ReceiveHexsList", _hexsToOffer[Context.ConnectionId]);
+        HexsToOffer[Context.ConnectionId] = await _hexGenerator.GetUniqueHexColorAsyncsListAsync(5);
+        await Clients.Caller.SendAsync("ReceiveHexsList", HexsToOffer[Context.ConnectionId]);
     }
 
     public override Task OnDisconnectedAsync(Exception? exception)
     {
-        _hexsToOffer.Remove(Context.ConnectionId);
-        _usersData.Remove(Context.ConnectionId);
-        _chosenHexs.Remove(Context.ConnectionId);
-        _chosenUsernames.Remove(Context.ConnectionId);
+        HexsToOffer.Remove(Context.ConnectionId);
+        UsersData.Remove(Context.ConnectionId);
+        ChosenHexs.Remove(Context.ConnectionId);
+        ChosenUsernames.Remove(Context.ConnectionId);
         
         return Task.CompletedTask;
     }
@@ -84,15 +84,15 @@ public class RegistrationHub : Hub, IRegistrationHub
     /// <inheritdoc cref="IRegistrationHub.RegenerateHexs"/>
     public async Task RegenerateHexs()
     {
-        _hexsToOffer[Context.ConnectionId] = await _hexGenerator.GetUniqueHexColorAsyncsListAsync(5);
-        await Clients.Caller.SendAsync("ReceiveHexsList", _hexsToOffer[Context.ConnectionId]);
+        HexsToOffer[Context.ConnectionId] = await _hexGenerator.GetUniqueHexColorAsyncsListAsync(5);
+        await Clients.Caller.SendAsync("ReceiveHexsList", HexsToOffer[Context.ConnectionId]);
     }
     
     /// <inheritdoc cref="IRegistrationHub.ChooseHex"/>
     public void ChooseHex(int hex)
     {
-        if (_hexsToOffer[Context.ConnectionId].Contains(hex))
-            _chosenHexs[Context.ConnectionId] = hex;
+        if (HexsToOffer[Context.ConnectionId].Contains(hex))
+            ChosenHexs[Context.ConnectionId] = hex;
         else 
             throw new HubException("Hex is not valid");
     }
@@ -100,19 +100,19 @@ public class RegistrationHub : Hub, IRegistrationHub
     /// <inheritdoc cref="IRegistrationHub.ChooseUsername"/>
     public void ChooseUsername(string username)
     {
-        _chosenUsernames[Context.ConnectionId] = username;
+        ChosenUsernames[Context.ConnectionId] = username;
     }
     
     /// <inheritdoc cref="IRegistrationHub.FinishRegistration"/>
     public async Task<DetailedUserModel> FinishRegistration()
     {
-        if (!_chosenHexs.ContainsKey(Context.ConnectionId)) throw new HubException("You haven't chosen the hex id yet!");
-        if (!_chosenUsernames.ContainsKey(Context.ConnectionId)) throw new HubException("You haven't chosen the username yet!");
+        if (!ChosenHexs.ContainsKey(Context.ConnectionId)) throw new HubException("You haven't chosen the hex id yet!");
+        if (!ChosenUsernames.ContainsKey(Context.ConnectionId)) throw new HubException("You haven't chosen the username yet!");
         
-        var userOAuthId = _usersData[Context.ConnectionId].OAuth2UserId;
-        var userAuthType = _usersData[Context.ConnectionId].AuthType;
-        var chosenHex = _chosenHexs[Context.ConnectionId];
-        var chosenUsername = _chosenUsernames[Context.ConnectionId];
+        var userOAuthId = UsersData[Context.ConnectionId].OAuth2UserId;
+        var userAuthType = UsersData[Context.ConnectionId].AuthType;
+        var chosenHex = ChosenHexs[Context.ConnectionId];
+        var chosenUsername = ChosenUsernames[Context.ConnectionId];
         
         DetailedUserModel? resultUserModel = default;
 
