@@ -44,7 +44,7 @@ public class AuthController : ControllerBase, IAuthController
     /// <summary>
     /// Exchanges the GitHub OAuth2 code for a registration queue token
     /// Details: <see cref="IOAuth2RegistrationQueueService"/>
-    /// IMPORTANT: If the user was already registered, JWT authentication token is generated and returned
+    /// IMPORTANT: If the user was already registered, a JWT authentication token is generated and returned
     /// </summary>
     [HttpGet]
     public async Task<ActionResult> ExchangeGitHubCode([FromQuery] string code)
@@ -58,7 +58,7 @@ public class AuthController : ControllerBase, IAuthController
             // Getting an access token
             var gitHubToken = await _gitHubOAuth2Api.GetUserGitHubTokenAsync(githubClientId, githubAuthSecret, code);
             
-            // Using the token to obtain the id of the user from GitHub
+            // Using the token to obtain user's id from GitHub
             var userGitHubId = await _gitHubOAuth2Api.GetUserGitHubIdAsync(gitHubToken);
             
             try
@@ -102,7 +102,7 @@ public class AuthController : ControllerBase, IAuthController
     /// <summary>
     /// Exchanges the Google OAuth2 code for a registration queue token
     /// Details: <see cref="IOAuth2RegistrationQueueService"/>
-    /// IMPORTANT: If the user was already registered, JWT authentication token is generated and returned
+    /// IMPORTANT: If the user was already registered, a JWT authentication token is generated and returned
     /// </summary>
     [HttpGet]
     public async Task<ActionResult> ExchangeGoogleCode([FromQuery] string code)
@@ -118,6 +118,7 @@ public class AuthController : ControllerBase, IAuthController
             // Getting an access token
             var token = await _googleOAuth2Api.GetUserGoogleAccessTokenAsync(googleClientId, googleAuthSecret, code);
 
+            // Using the token to obtain user's id from Google
             var userGoogleid = await _googleOAuth2Api.GetUserGoogleIdAsync(token);
 
             try
@@ -163,11 +164,8 @@ public class AuthController : ControllerBase, IAuthController
     {
         try
         {
-            var request = new RequestToAuthorizeAsAnnoymous
-            {
-                DesiredUsername = name
-            };
-
+            var request = new RequestToAuthorizeAsAnnoymous { DesiredUsername = name };
+            
             var userModel = await _userService.AuthorizeAsAnnoymousAsync(request);
 
             // Creating claims for a token
@@ -222,8 +220,7 @@ public class AuthController : ControllerBase, IAuthController
     {
         // Getting the key and generating a token
         var encrpyionKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:JwtKey").Value!));
-        var jwtToken = new JwtSecurityToken(
-            claims: claims,
+        var jwtToken = new JwtSecurityToken(claims: claims,
             expires: DateTime.UtcNow.Add(TimeSpan.FromDays(30)),
             signingCredentials: new SigningCredentials(encrpyionKey, SecurityAlgorithms.HmacSha256));
 
