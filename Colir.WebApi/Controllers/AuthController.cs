@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Colir.ApiRelatedServices.Models;
 using Colir.BLL.Interfaces;
 using Colir.BLL.Models;
 using Colir.BLL.RequestModels.User;
@@ -89,7 +90,7 @@ public class AuthController : ControllerBase, IAuthController
             {
                 // "UserNotFoundException" exception occured, which means the user's not registered yet, so give him a queue token
                 // The token can be later exchanged in "RegistrationHub" to start a registration process
-                var queueToken = _registrationQueueService.AddToQueue(userGitHubId, UserAuthType.Github);
+                var queueToken = _registrationQueueService.AddToQueue(new RegistrationUserData(userGitHubId, UserAuthType.Github));
                 return Ok(new { queueToken });   
             }
         }

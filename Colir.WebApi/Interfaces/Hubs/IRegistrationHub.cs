@@ -1,11 +1,10 @@
 ﻿using Colir.BLL.Models;
-using Colir.Interfaces.ApiRelatedServices;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Colir.Interfaces.Hubs;
 
 /// <summary>
-/// SignalR Hub for full registration process with choosing the Hex Id from a random list
+/// SignalR Hub to provide full registration process with choosing the Hex Id from a random list and the username
 /// Intended to be used by users who register their accounts via OAuth2 services such as Google, GitHub etc..
 /// </summary>
 public interface IRegistrationHub

@@ -1,4 +1,5 @@
-﻿using Colir.BLL.Interfaces;
+﻿using Colir.ApiRelatedServices.Models;
+using Colir.BLL.Interfaces;
 using Colir.BLL.Models;
 using Colir.BLL.RequestModels.User;
 using Colir.Exceptions.NotFound;
@@ -25,16 +26,10 @@ public class RegistrationHub : Hub, IRegistrationHub
     private static readonly Dictionary<string, List<int>> _hexsToOffer = new();
     
     /// <summary>
-    /// Dictionary to store users' ids from OAuth2 service (such as from Google, GitHub etc..)
+    /// Dictionary to store users' data needed for registration process
     /// The connection id is a key and the value is user's OAuth2 id
     /// </summary>
-    private static readonly Dictionary<string, string> _usersOAuthIds = new();
-    
-    /// <summary>
-    /// Dictionary to store users' OAuth2 types
-    /// The connection id is a key and the OAuth2 type
-    /// </summary>
-    private static readonly Dictionary<string, UserAuthType> _usersOAuthTypes = new();
+    private static readonly Dictionary<string, RegistrationUserData> _usersData = new();
     
     /// <summary>
     /// Dictionary to store chosen hex ids during registration process
@@ -62,9 +57,7 @@ public class RegistrationHub : Hub, IRegistrationHub
 
         try
         {
-            var data = _registrationQueueService.ExchangeToken(queueToken!);
-            _usersOAuthIds[Context.ConnectionId] = data.Item1;
-            _usersOAuthTypes[Context.ConnectionId] = data.Item2;
+            _usersData[Context.ConnectionId] = _registrationQueueService.ExchangeToken(queueToken!);
         }
         catch (NotFoundException)
         {
@@ -81,7 +74,9 @@ public class RegistrationHub : Hub, IRegistrationHub
     public override Task OnDisconnectedAsync(Exception? exception)
     {
         _hexsToOffer.Remove(Context.ConnectionId);
-        _usersOAuthIds.Remove(Context.ConnectionId);
+        _usersData.Remove(Context.ConnectionId);
+        _chosenHexs.Remove(Context.ConnectionId);
+        _chosenUsernames.Remove(Context.ConnectionId);
         
         return Task.CompletedTask;
     }
@@ -114,8 +109,8 @@ public class RegistrationHub : Hub, IRegistrationHub
         if (!_chosenHexs.ContainsKey(Context.ConnectionId)) throw new HubException("You haven't chosen the hex id yet!");
         if (!_chosenUsernames.ContainsKey(Context.ConnectionId)) throw new HubException("You haven't chosen the username yet!");
         
-        var userAuthType = _usersOAuthTypes[Context.ConnectionId];
-        var userOAuthId = _usersOAuthIds[Context.ConnectionId];
+        var userOAuthId = _usersData[Context.ConnectionId].OAuth2UserId;
+        var userAuthType = _usersData[Context.ConnectionId].AuthType;
         var chosenHex = _chosenHexs[Context.ConnectionId];
         var chosenUsername = _chosenUsernames[Context.ConnectionId];
         

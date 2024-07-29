@@ -1,35 +1,34 @@
-﻿using Colir.Exceptions.NotFound;
+﻿using Colir.ApiRelatedServices.Models;
 using Colir.Interfaces.ApiRelatedServices;
 using Colir.Misc.ExtensionMethods;
-using DAL.Enums;
 
 namespace Colir.ApiRelatedServices;
 
 /// <inheritdoc cref="IOAuth2RegistrationQueueService"/>
 public class OAuth2RegistrationQueueService : IOAuth2RegistrationQueueService
 {
-    private Dictionary<string, (string, UserAuthType)> _queue = new();
+    private Dictionary<string, RegistrationUserData> _queue = new();
     
     /// <inheritdoc cref="IOAuth2RegistrationQueueService.AddToQueue"/>
-    public string AddToQueue(string oAuth2UserId, UserAuthType authType)
+    public string AddToQueue(RegistrationUserData userData)
     {
         // If user's already in the queue, remove him from there
-        if (_queue.ContainsValue((oAuth2UserId, authType))) 
-            _queue.RemoveByValue(oAuth2UserId);
+        if (_queue.ContainsValue(userData)) 
+            _queue.RemoveByValue(userData);
         
         // Generating a new queue token
         var queueToken = Guid.NewGuid().ToString();
-        _queue.Add(queueToken, (oAuth2UserId, authType));
+        _queue.Add(queueToken, userData);
 
         return queueToken;
     }
 
     /// <inheritdoc cref="IOAuth2RegistrationQueueService.ExchangeToken"/>
-    public (string, UserAuthType) ExchangeToken(string queueToken)
+    public RegistrationUserData ExchangeToken(string queueToken)
     {
-        var oAuth2UserId = _queue.GetValueOrDefault(queueToken);
+        var data = _queue.GetValueOrDefault(queueToken);
         _queue.Remove(queueToken);
         
-        return oAuth2UserId;
+        return data;
     }
 }
