@@ -9,6 +9,7 @@ public interface IGitHubOAuth2Api
     /// <param name="githubAuthSecret">GitHub OAuth2 secret</param>
     /// <param name="code">Code from GitHub OAuth2 consent screen</param>
     /// <returns>GitHub access token</returns>
+    /// <exception cref="HttpRequestException">Thrown when <param name="code"/> is either invalid or expired</exception>
     Task<string> GetUserGitHubTokenAsync(string githubClientId, string githubAuthSecret, string code);
 
     /// <summary>

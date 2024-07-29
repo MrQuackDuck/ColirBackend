@@ -28,8 +28,10 @@ public class GoogleOAuth2Api : IGoogleOAuth2Api
         });
         
         // Sending the request to get the token from Google
-        dynamic responseWithToken = JObject.Parse(await (await httpClient.SendAsync(requestToGetToken)).Content.ReadAsStringAsync());
-        return responseWithToken.access_token.ToString();
+        var response = await httpClient.SendAsync(requestToGetToken);
+        response.EnsureSuccessStatusCode();
+        dynamic token = JObject.Parse(await response.Content.ReadAsStringAsync());
+        return token.access_token.ToString();
     }
 
     /// <inheritdoc cref="IGoogleOAuth2Api.GetUserGoogleIdAsync"/>

@@ -9,6 +9,7 @@ public interface IGoogleOAuth2Api
     /// <param name="googleAuthSecret">Google OAuth2 secret</param>
     /// <param name="code">Code from Google OAuth2 consent screen</param>
     /// <returns>Google access token</returns>
+    /// <exception cref="HttpRequestException">Thrown when <param name="code"/> is either invalid or expired</exception>
     Task<string> GetUserGoogleAccessTokenAsync(string googleClientId, string googleAuthSecret, string code);
     
     /// <summary>

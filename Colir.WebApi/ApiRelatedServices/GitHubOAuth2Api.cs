@@ -19,7 +19,10 @@ public class GitHubOAuth2Api : IGitHubOAuth2Api
         });
 
         // Sending the request to get the token from GitHub
-        var responseWithToken = await (await httpClient.SendAsync(requestToGetToken)).Content.ReadAsStringAsync();
+        var response = await httpClient.SendAsync(requestToGetToken);
+        response.EnsureSuccessStatusCode();
+        var responseWithToken = await (response).Content.ReadAsStringAsync();
+        if (responseWithToken.ToLowerInvariant().Contains("error=bad_verification_code")) throw new HttpRequestException();
         return responseWithToken[(responseWithToken.IndexOf('=') + 1)..responseWithToken.IndexOf('&')];
     }
 
