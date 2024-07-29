@@ -30,7 +30,7 @@ var services = builder.Services;
 services.AddExceptionHandler<UnhandledExceptionsHandler>();
 builder.Services.AddProblemDetails();
 
-// Addding DB context
+// Addding the DB context
 services.AddDbContext<ColirDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -123,7 +123,7 @@ var logger = app.Services.GetService<ILogger<Program>>() ?? throw new ArgumentNu
 
 try
 {
-    // Ensuring DB is connected
+    // Ensuring the DB is connected
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<ColirDbContext>();
     await dbContext.Database.MigrateAsync();

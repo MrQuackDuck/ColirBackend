@@ -64,7 +64,7 @@ public class UserStatisticsRepository : IUserStatisticsRepository
     }
 
     /// <summary>
-    /// Adds user statistics to DB
+    /// Adds user statistics to the DB
     /// </summary>
     /// <param name="statistics">User statistics to add</param>
     /// <exception cref="ArgumentException">Thrown when statistics for this user already exist</exception>
@@ -134,7 +134,7 @@ public class UserStatisticsRepository : IUserStatisticsRepository
     }
 
     /// <summary>
-    /// Saves the changes to DB
+    /// Saves the changes to the DB
     /// </summary>
     public void SaveChanges()
     {
@@ -142,7 +142,7 @@ public class UserStatisticsRepository : IUserStatisticsRepository
     }
 
     /// <summary>
-    /// Saves the changes to DB asynchronously
+    /// Saves the changes to the DB asynchronously
     /// </summary>
     public async Task SaveChangesAsync()
     {

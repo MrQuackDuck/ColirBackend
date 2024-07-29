@@ -90,7 +90,7 @@ public class MessageRepository : IMessageRepository
     }
 
     /// <summary>
-    /// Adds the message to DB
+    /// Adds the message to the DB
     /// </summary>
     /// <param name="message">Message to add</param>
     /// <exception cref="MessageNotFoundException">Thrown when replied message wasn't found</exception>
@@ -174,7 +174,7 @@ public class MessageRepository : IMessageRepository
     }
 
     /// <summary>
-    /// Saves the changes to DB
+    /// Saves the changes to the DB
     /// </summary>
     public void SaveChanges()
     {
@@ -182,7 +182,7 @@ public class MessageRepository : IMessageRepository
     }
 
     /// <summary>
-    /// Saves the changes to DB asynchronously
+    /// Saves the changes to the DB asynchronously
     /// </summary>
     public async Task SaveChangesAsync()
     {

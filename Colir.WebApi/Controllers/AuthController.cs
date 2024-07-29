@@ -37,7 +37,7 @@ public class AuthController : ControllerBase, IAuthController
     }
 
     /// <summary>
-    /// Exchanges the GitHub OAuth2 code on registration queue token
+    /// Exchanges the GitHub OAuth2 code for a registration queue token
     /// Details: <see cref="IOAuth2RegistrationQueueService"/>
     /// IMPORTANT: If the user was already registered, JWT authentication token is generated and returned
     /// </summary>
@@ -88,7 +88,7 @@ public class AuthController : ControllerBase, IAuthController
             catch (UserNotFoundException)
             {
                 // "UserNotFoundException" exception occured, which means the user's not registered yet, so give him a queue token
-                // The token can be later exchanged in "RegistrationHub" to start registration process
+                // The token can be later exchanged in "RegistrationHub" to start a registration process
                 var queueToken = _registrationQueueService.AddToQueue(userGitHubId, UserAuthType.Github);
                 return Ok(new { queueToken });   
             }

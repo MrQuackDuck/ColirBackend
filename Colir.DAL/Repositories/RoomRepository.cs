@@ -62,7 +62,7 @@ public class RoomRepository : IRoomRepository
     }
 
     /// <summary>
-    /// Adds a room to DB
+    /// Adds a room to the DB
     /// </summary>
     /// <param name="room">The room to add</param>
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
@@ -107,7 +107,7 @@ public class RoomRepository : IRoomRepository
     /// Deletes the room
     /// </summary>
     /// <param name="room">The room to delete</param>
-    /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found in DB</exception>
+    /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found in the DB</exception>
     public void Delete(Room room)
     {
         var target = _dbContext.Rooms.FirstOrDefault(r => r.Id == room.Id) ?? throw new RoomNotFoundException();
@@ -123,7 +123,7 @@ public class RoomRepository : IRoomRepository
     /// Deletes the room by id
     /// </summary>
     /// <param name="id">The id of the room to delete</param>
-    /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found by provided id in DB</exception>
+    /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found by provided id in the DB</exception>
     public async Task DeleteByIdAsync(long id)
     {
         var target = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Id == id) ?? throw new RoomNotFoundException();
@@ -215,7 +215,7 @@ public class RoomRepository : IRoomRepository
     }
 
     /// <summary>
-    /// Saves the changes to DB asynchronously
+    /// Saves the changes to the DB asynchronously
     /// </summary>
     public async Task SaveChangesAsync()
     {

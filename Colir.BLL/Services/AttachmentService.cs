@@ -55,7 +55,7 @@ public class AttachmentService : IAttachmentService
 
         var transaction = _unitOfWork.BeginTransaction();
 
-        // Adding the attachment to DB
+        // Adding the attachment to the DB
         await _unitOfWork.AttachmentRepository.AddAsync(attachment);
         
         await _unitOfWork.SaveChangesAsync();

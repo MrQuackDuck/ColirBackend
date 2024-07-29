@@ -93,7 +93,7 @@ public class UserRepository : IUserRepository
     }
 
     /// <summary>
-    /// Adds a user to DB
+    /// Adds a user to the DB
     /// </summary>
     /// <param name="user"></param>
     /// <returns></returns>
@@ -156,7 +156,7 @@ public class UserRepository : IUserRepository
     /// Deletes the user
     /// </summary>
     /// <param name="user">The user to delete</param>
-    /// <exception cref="UserNotFoundException">Thrown when the user wasn't found in DB</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the user wasn't found in the DB</exception>
     public void Delete(User user)
     {
         var target = _dbContext.Users
@@ -173,7 +173,7 @@ public class UserRepository : IUserRepository
     /// Deletes the user by id
     /// </summary>
     /// <param name="id">The id of the user to delete</param>
-    /// <exception cref="UserNotFoundException">Thrown when the user wasn't found by provided id in DB</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the user wasn't found by provided id in the DB</exception>
     public async Task DeleteByIdAsync(long id)
     {
         var target = await _dbContext.Users
@@ -192,7 +192,7 @@ public class UserRepository : IUserRepository
     /// <param name="user"></param>
     /// <exception cref="StringTooShortException">Thrown when username is too short</exception>
     /// <exception cref="StringTooLongException">Thrown when username is too long</exception>
-    /// <exception cref="UserNotFoundException">Thrown when the user wasn't found by its id in DB</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the user wasn't found by its id in the DB</exception>
     /// <exception cref="ArgumentException">Thrown when the user with the same hex id exists already</exception>
     public void Update(User user)
     {
@@ -237,7 +237,7 @@ public class UserRepository : IUserRepository
     }
 
     /// <summary>
-    /// Saves the changes to DB
+    /// Saves the changes to the DB
     /// </summary>
     public void SaveChanges()
     {
@@ -246,7 +246,7 @@ public class UserRepository : IUserRepository
 
 
     /// <summary>
-    /// Saves the changes to DB asynchronously
+    /// Saves the changes to the DB asynchronously
     /// </summary>
     public async Task SaveChangesAsync()
     {

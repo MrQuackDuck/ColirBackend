@@ -61,7 +61,7 @@ public class ReactionRepository : IReactionRepository
     }
 
     /// <summary>
-    /// Adds the reaction to DB
+    /// Adds the reaction to the DB
     /// </summary>
     /// <param name="reaction">Reaction to add</param>
     /// <exception cref="UserNotFoundException">Thrown when the author wasn't found by id</exception>
@@ -122,7 +122,7 @@ public class ReactionRepository : IReactionRepository
     }
 
     /// <summary>
-    /// Saves the changes to DB
+    /// Saves the changes to the DB
     /// </summary>
     public void SaveChanges()
     {
@@ -130,7 +130,7 @@ public class ReactionRepository : IReactionRepository
     }
 
     /// <summary>
-    /// Saves the changes to DB asynchronously
+    /// Saves the changes to the DB asynchronously
     /// </summary>
     public async Task SaveChangesAsync()
     {

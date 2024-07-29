@@ -39,7 +39,7 @@ public class AttachmentRepository : IAttachmentRepository
     }
 
     /// <summary>
-    /// Adds the attachment to DB
+    /// Adds the attachment to the DB
     /// </summary>
     /// <param name="attachment">An attachment to add</param>
     /// <exception cref="MessageNotFoundException">Thrown when the message wasn't found</exception>
@@ -86,7 +86,7 @@ public class AttachmentRepository : IAttachmentRepository
     }
 
     /// <summary>
-    /// Saves the changes to DB
+    /// Saves the changes to the DB
     /// </summary>
     public void SaveChanges()
     {
@@ -94,7 +94,7 @@ public class AttachmentRepository : IAttachmentRepository
     }
 
     /// <summary>
-    /// Saves the changes to DB asynchronously
+    /// Saves the changes to the DB asynchronously
     /// </summary>
     public async Task SaveChangesAsync()
     {

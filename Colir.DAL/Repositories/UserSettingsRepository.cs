@@ -64,7 +64,7 @@ public class UserSettingsRepository : IUserSettingsRepository
     }
 
     /// <summary>
-    /// Adds user settings to DB
+    /// Adds user settings to the DB
     /// </summary>
     /// <param name="settings">User settings to add</param>
     /// <exception cref="ArgumentException">Thrown when settings for this user already exist</exception>
@@ -134,7 +134,7 @@ public class UserSettingsRepository : IUserSettingsRepository
     }
 
     /// <summary>
-    /// Saves the changes to DB
+    /// Saves the changes to the DB
     /// </summary>
     public void SaveChanges()
     {
@@ -142,7 +142,7 @@ public class UserSettingsRepository : IUserSettingsRepository
     }
 
     /// <summary>
-    /// Saves the changes to DB asynchronously
+    /// Saves the changes to the DB asynchronously
     /// </summary>
     public async Task SaveChangesAsync()
     {

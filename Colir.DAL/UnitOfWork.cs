@@ -29,7 +29,7 @@ public class UnitOfWork : IUnitOfWork
     }
 
     /// <summary>
-    /// Begins new transaction in DB
+    /// Begins new transaction in the DB
     /// </summary>
     public IDbContextTransaction BeginTransaction() => _dbContext.Database.BeginTransaction();
 
