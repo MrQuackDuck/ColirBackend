@@ -14,15 +14,26 @@ public interface IUserService
     Task<DetailedUserModel> GetAccountInfo(RequestToGetAccountInfo request);
     
     /// <summary>
-    /// Authorizes the user (i.e: returns account data of the user)
+    /// Authorizes the user as GitHub user (i.e: returns account data of the user)
     ///
-    /// If the user was found by GitHub Id, its data will be returned
+    /// If the user was found by GitHub Id, their data will be returned
     /// Otherwise, a new user with provided HexId and Username will be created
     /// </summary>
     /// <exception cref="ArgumentException">Thrown when provided HexId is not unique</exception>
     /// <exception cref="StringTooShortException">Thrown when a username is too short</exception>
     /// <exception cref="StringTooLongException">Thrown when a username is too long</exception>
     Task<DetailedUserModel> AuthorizeViaGitHubAsync(RequestToAuthorizeViaGitHub request);
+    
+    /// <summary>
+    /// Authorizes the user as Google user (i.e: returns account data of the user)
+    ///
+    /// If the user was found by Google Id, their data will be returned
+    /// Otherwise, a new user with provided HexId and Username will be created
+    /// </summary>
+    /// <exception cref="ArgumentException">Thrown when provided HexId is not unique</exception>
+    /// <exception cref="StringTooShortException">Thrown when a username is too short</exception>
+    /// <exception cref="StringTooLongException">Thrown when a username is too long</exception>
+    Task<DetailedUserModel> AuthorizeViaGoogleAsync(RequestToAuthorizeViaGoogle request);
     
     /// <summary>
     /// Creates a new user with provided username and returns its data instantly

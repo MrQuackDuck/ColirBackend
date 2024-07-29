@@ -104,7 +104,7 @@ public class UserEqualityComparer : IEqualityComparer<User>
         if (ReferenceEquals(x, null)) return false;
         if (ReferenceEquals(y, null)) return false;
         if (x.GetType() != y.GetType()) return false;
-        return x.HexId == y.HexId && x.GitHubId == y.GitHubId && x.Username == y.Username && x.AuthType == y.AuthType && x.UserSettingsId == y.UserSettingsId;
+        return x.HexId == y.HexId && x.GitHubId == y.GitHubId && x.GoogleId == y.GoogleId && x.Username == y.Username && x.AuthType == y.AuthType && x.UserSettingsId == y.UserSettingsId;
     }
 
     public int GetHashCode(User obj)

@@ -7,6 +7,8 @@ public interface IUserRepository : IRepository<User>
     Task<User> GetByHexIdAsync(int hexId);
     
     Task<User> GetByGithudIdAsync(string githubId);
+    
+    Task<User> GetByGoogleIdAsync(string githubId);
 
     Task<bool> ExistsAsync(int hexId);
 }

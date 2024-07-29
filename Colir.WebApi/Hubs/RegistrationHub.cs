@@ -127,6 +127,17 @@ public class RegistrationHub : Hub, IRegistrationHub
 
             resultUserModel = await _userService.AuthorizeViaGitHubAsync(request);
         }
+        else if (userAuthType == UserAuthType.Google)
+        {
+            var request = new RequestToAuthorizeViaGoogle()
+            {
+                HexId = chosenHex,
+                Username = chosenUsername,
+                GoogleId = userOAuthId
+            };
+
+            resultUserModel = await _userService.AuthorizeViaGoogleAsync(request);
+        }
 
         if (resultUserModel == null)
             throw new HubException("Something went wrong!");

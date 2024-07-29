@@ -13,7 +13,7 @@ public class Message : BaseEntity
     public DateTime? EditDate { get; set; }
 
     [ForeignKey(nameof(Room))]
-    public long RoomId { get; set; }
+    public long? RoomId { get; set; }
 
     [ForeignKey(nameof(Author))]
     public long? AuthorId { get; set; }
@@ -21,8 +21,8 @@ public class Message : BaseEntity
     [ForeignKey(nameof(RepliedTo))]
     public long? RepliedMessageId { get; set; }
     
-    [DeleteBehavior(DeleteBehavior.Cascade)]
-    public Room Room { get; set; } = default!;
+    [DeleteBehavior(DeleteBehavior.NoAction)]
+    public Room? Room { get; set; } = default!;
     
     [DeleteBehavior(DeleteBehavior.NoAction)]
     public User? Author { get; set; } = default!;

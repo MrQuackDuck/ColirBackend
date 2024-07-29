@@ -16,7 +16,6 @@ using DAL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json.Linq;
 
 namespace Colir.Controllers;
 
@@ -28,13 +27,77 @@ public class AuthController : ControllerBase, IAuthController
     private readonly IConfiguration _config;
     private readonly IOAuth2RegistrationQueueService _registrationQueueService;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IGitHubOAuth2Api _gitHubOAuth2Api;
+    private readonly IGoogleOAuth2Api _googleOAuth2Api;
 
-    public AuthController(IUserService userService, IConfiguration config, IOAuth2RegistrationQueueService registrationQueueService, IUnitOfWork unitOfWork)
+    public AuthController(IUserService userService, IConfiguration config, IOAuth2RegistrationQueueService registrationQueueService, 
+        IUnitOfWork unitOfWork, IGitHubOAuth2Api gitHubOAuth2Api, IGoogleOAuth2Api googleOAuth2Api)
     {
         _userService = userService;
         _config = config;
         _registrationQueueService = registrationQueueService;
         _unitOfWork = unitOfWork;
+        _gitHubOAuth2Api = gitHubOAuth2Api;
+        _googleOAuth2Api = googleOAuth2Api;
+    }
+
+    /// <summary>
+    /// Exchanges the Google OAuth2 code for a registration queue token
+    /// Details: <see cref="IOAuth2RegistrationQueueService"/>
+    /// IMPORTANT: If the user was already registered, JWT authentication token is generated and returned
+    /// </summary>
+    [HttpGet]
+    public async Task<ActionResult> ExchangeGoogleCode([FromQuery] string code)
+    {
+        try
+        {
+            // Getting credentials from the configuration
+            var googleClientId = _config["Authentication:GoogleClientId"]!;
+            var googleAuthSecret = _config["Authentication:GoogleClientSecret"]!;
+        
+            using var httpClient = new HttpClient();
+        
+            // Getting an access token
+            var token = await _googleOAuth2Api.GetUserGoogleAccessTokenAsync(googleClientId, googleAuthSecret, code);
+
+            var userGoogleid = await _googleOAuth2Api.GetUserGoogleIdAsync(token);
+
+            try
+            {
+                // Checking if the user already registered. Otherwise, the "UserNotFoundException" will be thrown
+                await _unitOfWork.UserRepository.GetByGoogleIdAsync(userGoogleid);
+                
+                // If an exception not occurred, the user was already registered. So, authenticate him/her
+                var request = new RequestToAuthorizeViaGoogle() { GoogleId = userGoogleid };
+
+                var userModel = await _userService.AuthorizeViaGoogleAsync(request);
+
+                // Creating claims for a token
+                var claims = new List<Claim>
+                {
+                    new Claim("Id", userModel.Id.ToString()),
+                    new Claim("AuthType", userModel.AuthType.ToString())
+                };
+
+                var jwtToken = GenerateJwtToken(claims);
+
+                // Applying the jwt token to response's cookies
+                Response.ApplyJwtToken(jwtToken);
+
+                return Ok(new { jwtToken });
+            }
+            catch (UserNotFoundException)
+            {
+                // "UserNotFoundException" exception occured, which means the user's not registered yet, so give him a queue token
+                // The token can be later exchanged in "RegistrationHub" to start a registration process
+                var queueToken = _registrationQueueService.AddToQueue(new RegistrationUserData(userGoogleid, UserAuthType.Google));
+                return Ok(new { queueToken });   
+            }
+        }
+        catch (HttpRequestException)
+        {
+            return BadRequest();
+        }
     }
 
     /// <summary>
@@ -50,25 +113,20 @@ public class AuthController : ControllerBase, IAuthController
             // Getting credentials from the configuration
             var githubClientId = _config["Authentication:GitHubClientId"]!;
             var githubAuthSecret = _config["Authentication:GitHubSecret"]!;
-            
-            using var httpClient = new HttpClient();
 
-            // Getting the token
-            var gitHubToken = await GetUserGitHubToken(httpClient, githubClientId, githubAuthSecret, code);
+            // Getting an access token
+            var gitHubToken = await _gitHubOAuth2Api.GetUserGitHubTokenAsync(githubClientId, githubAuthSecret, code);
             
             // Using the token to obtain the id of the user from GitHub
-            var userGitHubId = await GetUserGitHubId(httpClient, gitHubToken);
+            var userGitHubId = await _gitHubOAuth2Api.GetUserGitHubIdAsync(gitHubToken);
             
             try
             {
-                // Check if the user already registered
+                // Checking if the user already registered. Otherwise, the "UserNotFoundException" will be thrown
                 await _unitOfWork.UserRepository.GetByGithudIdAsync(userGitHubId);
                 
                 // If an exception not occurred, the user was already registered. So, authenticate him/her
-                var request = new RequestToAuthorizeViaGitHub()
-                {
-                    GitHubId = userGitHubId
-                };
+                var request = new RequestToAuthorizeViaGitHub() { GitHubId = userGitHubId };
 
                 var userModel = await _userService.AuthorizeViaGitHubAsync(request);
 
@@ -81,7 +139,7 @@ public class AuthController : ControllerBase, IAuthController
 
                 var jwtToken = GenerateJwtToken(claims);
 
-                // Applying the jwt token to response cookies
+                // Applying the jwt token to response's cookies
                 Response.ApplyJwtToken(jwtToken);
 
                 return Ok(new { jwtToken });
@@ -158,44 +216,12 @@ public class AuthController : ControllerBase, IAuthController
             return BadRequest(new ErrorResponse(ErrorCode.UserNotFound));
         }
     }
-
-    [NonAction]
-    private async Task<string> GetUserGitHubToken(HttpClient httpClient, string githubClientId, string githubAuthSecret, string code)
-    {
-        var requestToGetToken = new HttpRequestMessage(HttpMethod.Post, "https://github.com/login/oauth/access_token");
-        requestToGetToken.Content = new FormUrlEncodedContent(new Dictionary<string, string>()
-        {
-            { "client_id", githubClientId },
-            { "client_secret", githubAuthSecret },
-            { "code", code }
-        });
-
-        // Sending the request to get the token from GitHub
-        var responseWithToken = await (await httpClient.SendAsync(requestToGetToken)).Content.ReadAsStringAsync();
-        return responseWithToken[(responseWithToken.IndexOf('=') + 1)..responseWithToken.IndexOf('&')];
-    }
-
-    [NonAction]
-    private async Task<string> GetUserGitHubId(HttpClient httpClient, string githubToken)
-    {
-        var requestToGetUserData = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/user");
-        requestToGetUserData.Headers.Add("Accept", "application/vnd.github+json");
-        requestToGetUserData.Headers.Add("Authorization", $"Bearer {githubToken}");
-        requestToGetUserData.Headers.Add("X-GitHub-Api-Version", "2022-11-28");
-        requestToGetUserData.Headers.Add("User-Agent", "ASP.NET");
-
-        var responseWithUserData = await httpClient.SendAsync(requestToGetUserData);
-        responseWithUserData.EnsureSuccessStatusCode();
-        dynamic userData = JObject.Parse(await responseWithUserData.Content.ReadAsStringAsync());
-        return (string)userData.id.ToString();
-    }
     
     [NonAction]
     private string GenerateJwtToken(List<Claim> claims)
     {
         // Getting the key and generating a token
-        var encrpyionKey =
-            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:JwtKey").Value!));
+        var encrpyionKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:JwtKey").Value!));
         var jwtToken = new JwtSecurityToken(
             claims: claims,
             expires: DateTime.UtcNow.Add(TimeSpan.FromDays(30)),

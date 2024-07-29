@@ -68,7 +68,7 @@ public class UserRepository : IUserRepository
     }
 
     /// <summary>
-    /// Gets the user by its GitHub Id
+    /// Gets the user by their GitHub Id
     /// </summary>
     /// <param name="githubId">GitHub Id of the user</param>
     /// <exception cref="UserNotFoundException">Thrown when the user wasn't found by provided hex id</exception>
@@ -80,6 +80,21 @@ public class UserRepository : IUserRepository
             .Include(nameof(User.UserSettings))
             .Include(nameof(User.JoinedRooms))
             .FirstOrDefaultAsync(u => u.GitHubId == githubId) ?? throw new UserNotFoundException();
+    }
+    
+    /// <summary>
+    /// Gets the user by their GitHub Id
+    /// </summary>
+    /// <param name="googleId">Google Id of the user</param>
+    /// <exception cref="UserNotFoundException">Thrown when the user wasn't found by provided hex id</exception>
+    public async Task<User> GetByGoogleIdAsync(string googleId)
+    {
+        return await _dbContext.Users
+            .AsNoTracking()
+            .Include(nameof(User.UserStatistics))
+            .Include(nameof(User.UserSettings))
+            .Include(nameof(User.JoinedRooms))
+            .FirstOrDefaultAsync(u => u.GoogleId == googleId) ?? throw new UserNotFoundException();
     }
 
     /// <summary>

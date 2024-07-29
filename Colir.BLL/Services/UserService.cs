@@ -65,6 +65,42 @@ public class UserService : IUserService
             return _mapper.Map<DetailedUserModel>(user);
         }
     }
+    
+    /// <inheritdoc cref="IUserService.AuthorizeViaGoogleAsync"/>
+    public async Task<DetailedUserModel> AuthorizeViaGoogleAsync(RequestToAuthorizeViaGoogle request)
+    {
+        try
+        {
+            // Returns user data if found
+            var user = await _unitOfWork.UserRepository.GetByGoogleIdAsync(request.GoogleId);
+            return _mapper.Map<DetailedUserModel>(user);
+        }
+        catch (UserNotFoundException)
+        {
+            // Create a user if wasn't found
+            var user = new User
+            {
+                Username = request.Username,
+                HexId = request.HexId,
+                GoogleId = request.GoogleId,
+                AuthType = UserAuthType.Google
+            };
+            
+            // Check if an user with the same HexId already exists
+            if (await _unitOfWork.UserRepository.ExistsAsync(request.HexId))
+            {
+                throw new ArgumentException("Hex Id is not unique!");
+            }
+
+            var transaction = _unitOfWork.BeginTransaction();
+
+            await _unitOfWork.UserRepository.AddAsync(user);
+            await _unitOfWork.SaveChangesAsync();
+            await transaction.CommitAsync();
+            
+            return _mapper.Map<DetailedUserModel>(user);
+        }
+    }
 
     /// <inheritdoc cref="IUserService.AuthorizeAsAnnoymousAsync"/>
     public async Task<DetailedUserModel> AuthorizeAsAnnoymousAsync(RequestToAuthorizeAsAnnoymous request)

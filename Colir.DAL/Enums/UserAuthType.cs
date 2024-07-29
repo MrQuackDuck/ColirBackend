@@ -3,5 +3,6 @@
 public enum UserAuthType
 {
     Anonymous,
-    Github
+    Github,
+    Google
 }

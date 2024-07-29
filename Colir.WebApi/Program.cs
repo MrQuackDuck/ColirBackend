@@ -1,6 +1,7 @@
 using System.IO.Abstractions;
 using System.Text;
 using Colir.ApiRelatedServices;
+using Colir.ApiRelatedServices.Models;
 using Colir.BLL;
 using Colir.BLL.Factories;
 using Colir.BLL.Interfaces;
@@ -58,6 +59,8 @@ services.AddTransient<IUserService, UserService>();
 services.AddTransient<IUserStatisticsService, UserStatisticsService>();
 
 // Adding strictly Api-Related services
+services.AddSingleton<IGitHubOAuth2Api, GitHubOAuth2Api>();
+services.AddSingleton<IGoogleOAuth2Api, GoogleOAuth2Api>();
 services.AddSingleton<IOAuth2RegistrationQueueService, OAuth2RegistrationQueueService>();
 
 services.AddControllers();

@@ -17,6 +17,9 @@ public class User : BaseEntity
     public string? GitHubId { get; set; }
     
     [MaxLength(256)]
+    public string? GoogleId { get; set; }
+    
+    [MaxLength(256)]
     public string Username { get; set; } = default!;
     
     public UserAuthType AuthType { get; set; }
