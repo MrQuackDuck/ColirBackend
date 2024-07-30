@@ -28,7 +28,7 @@ public class ChatHub : Hub, IChatHub
     private readonly IUnitOfWork _unitOfWork;
 
     private static readonly Dictionary<string, string> ConnectionsToGroupsMapping = new();
-    
+
     public ChatHub(IRoomService roomService, IMessageService messageService, IAttachmentService attachmentService,
         IUnitOfWork unitOfWork)
     {
@@ -37,7 +37,7 @@ public class ChatHub : Hub, IChatHub
         _attachmentService = attachmentService;
         _unitOfWork = unitOfWork;
     }
-    
+
     public override async Task OnConnectedAsync()
     {
         // Require a room GUID to connect
@@ -110,10 +110,10 @@ public class ChatHub : Hub, IChatHub
         // Uploading attachments
         var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
         var issuerId = this.GetIssuerId();
-        
+
         var allFilesSize = model.Attachments.Sum(a => a.Length);
         var roomFreeStorage = _unitOfWork.RoomRepository.RoomFileManager.GetFreeStorageSize(roomGuid);
-        
+
         if (allFilesSize > roomFreeStorage)
         {
             await SendErrorAsync(new(ErrorCode.NotEnoughSpace));
@@ -142,7 +142,7 @@ public class ChatHub : Hub, IChatHub
                     return (await _attachmentService.UploadAttachmentAsync(request)).Id;
                 })
             )).ToList();
-        
+
             var request = new RequestToSendMessage
             {
                 IssuerId = issuerId,
@@ -153,7 +153,7 @@ public class ChatHub : Hub, IChatHub
 
             // Sending the message
             var messageModel = await _messageService.SendAsync(request);
-            
+
             // Notifying others
             await Clients.Group(roomGuid).SendAsync("ReceiveMessage", messageModel);
         }
@@ -173,7 +173,7 @@ public class ChatHub : Hub, IChatHub
         try
         {
             var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
-            
+
             var request = new RequestToEditMessage
             {
                 IssuerId = this.GetIssuerId(),
@@ -182,7 +182,7 @@ public class ChatHub : Hub, IChatHub
             };
 
             var editedMessage = await _messageService.EditAsync(request);
-            
+
             // Notifying others
             await Clients.Group(roomGuid).SendAsync("MessageEdited", editedMessage);
         }
@@ -211,15 +211,11 @@ public class ChatHub : Hub, IChatHub
         try
         {
             var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
-            
-            var request = new RequestToDeleteMessage
-            {
-                IssuerId = this.GetIssuerId(),
-                MessageId = model.MessageId
-            };
+
+            var request = new RequestToDeleteMessage { IssuerId = this.GetIssuerId(), MessageId = model.MessageId };
 
             await _messageService.DeleteAsync(request);
-            
+
             // Notifying others
             await Clients.Group(roomGuid).SendAsync("MessageDeleted", model.MessageId);
         }
@@ -302,7 +298,7 @@ public class ChatHub : Hub, IChatHub
             Context.Abort();
         }
     }
-    
+
     private async Task SendErrorAsync(ErrorResponse response)
     {
         await Clients.Caller.SendAsync("Error", response);
