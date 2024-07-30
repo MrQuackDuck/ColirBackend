@@ -6,11 +6,13 @@
 public enum ErrorCode
 {
     AttachmentNotFound,
+    EmptyMessage,
     InvalidDate,
     InvalidActionException,
     IssuerNotInTheRoom,
     MessageNotFound,
     NotEnoughPermissions,
+    NotEnoughSpace,
     NotFound,
     ReactionNotFound,
     RoomExpired,

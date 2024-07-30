@@ -150,10 +150,10 @@ app.UseAuthorization();
 app.UseSession();
 
 // Mapping SignalR hubs
-app.MapHub<ChatHub>("API/ChatHub");
-app.MapHub<ClearRoomHub>("API/ClearRoomHub");
-app.MapHub<RegistrationHub>("API/RegistrationHub");
-app.MapHub<VoiceChatHub>("API/VoiceChatHub");
+app.MapHub<ChatHub>("API/Chat");
+app.MapHub<ClearRoomHub>("API/ClearRoom");
+app.MapHub<RegistrationHub>("API/Registration");
+app.MapHub<VoiceChatHub>("API/VoiceChat");
 
 // Using Swagger
 if (app.Environment.IsDevelopment())

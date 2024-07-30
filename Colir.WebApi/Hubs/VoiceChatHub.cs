@@ -7,7 +7,7 @@ namespace Colir.Hubs;
 
 [Authorize]
 [SignalRHub]
-public class VoiceChatHub : Hub<IVoiceChatHub>
+public class VoiceChatHub : Hub, IVoiceChatHub
 {
     public async Task Connect(string roomGuid)
     {

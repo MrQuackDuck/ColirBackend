@@ -7,7 +7,7 @@ namespace Colir.Hubs;
 
 [Authorize]
 [SignalRHub]
-public class ClearRoomHub : Hub<IClearRoomHub>
+public class ClearRoomHub : Hub, IClearRoomHub
 {
     public async Task Connect(string roomGuid)
     {
