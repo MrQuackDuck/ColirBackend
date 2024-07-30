@@ -40,6 +40,33 @@ public class AuthController : ControllerBase, IAuthController
         _gitHubOAuth2Api = gitHubOAuth2Api;
         _googleOAuth2Api = googleOAuth2Api;
     }
+
+    /// <summary>
+    /// Redirects the user to the GitHub authentication page
+    /// </summary>
+    [HttpGet]
+    public ActionResult GitHubLogin()
+    {
+        var githubClientId = _config["Authentication:GitHubClientId"]!;
+        var state = Guid.NewGuid().ToString();
+        HttpContext.Session.SetString("state", state);
+        var link = $"https://github.com/login/oauth/authorize?client_id={githubClientId}&state={state}";
+        return Redirect(link);
+    }
+    
+    /// <summary>
+    /// Redirects the user to the Google authentication page
+    /// </summary>
+    [HttpGet]
+    public ActionResult GoogleLogin()
+    {
+        var googleClientId = _config["Authentication:GoogleClientId"]!;
+        var redirectLink = _config["Authentication:GoogleRedirectLink"]!.Replace(":", "%3A");
+        var state = Guid.NewGuid().ToString();
+        HttpContext.Session.SetString("state", state);
+        var link = $"https://accounts.google.com/o/oauth2/v2/auth?scope=https://www.googleapis.com/auth/userinfo.email&response_type=code&redirect_uri={redirectLink}&client_id={googleClientId}&state={state}";
+        return Redirect(link);
+    }
     
     /// <summary>
     /// Exchanges the GitHub OAuth2 code for a registration queue token
@@ -47,10 +74,14 @@ public class AuthController : ControllerBase, IAuthController
     /// IMPORTANT: If the user was already registered, a JWT authentication token is generated and returned
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult> ExchangeGitHubCode([FromQuery] string code)
+    public async Task<ActionResult> ExchangeGitHubCode([FromQuery] string code, [FromQuery] string state)
     {
         try
         {
+            // Verifying the state (against XSRF attacks)
+            if (HttpContext.Session.GetString("state") != state) return BadRequest();
+            HttpContext.Session.Remove("state");
+            
             // Getting credentials from the configuration
             var githubClientId = _config["Authentication:GitHubClientId"]!;
             var githubAuthSecret = _config["Authentication:GitHubSecret"]!;
@@ -105,10 +136,14 @@ public class AuthController : ControllerBase, IAuthController
     /// IMPORTANT: If the user was already registered, a JWT authentication token is generated and returned
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult> ExchangeGoogleCode([FromQuery] string code)
+    public async Task<ActionResult> ExchangeGoogleCode([FromQuery] string code, [FromQuery] string state)
     {
         try
         {
+            // Verifying the state (against XSRF attacks)
+            if (HttpContext.Session.GetString("state") != state) return BadRequest();
+            HttpContext.Session.Remove("state");
+            
             // Getting credentials from the configuration
             var googleClientId = _config["Authentication:GoogleClientId"]!;
             var googleAuthSecret = _config["Authentication:GoogleClientSecret"]!;

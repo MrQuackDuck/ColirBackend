@@ -31,6 +31,10 @@ var services = builder.Services;
 services.AddExceptionHandler<UnhandledExceptionsHandler>();
 builder.Services.AddProblemDetails();
 
+// Adding sessions
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession();
+
 // Addding the DB context
 services.AddDbContext<ColirDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -143,6 +147,7 @@ app.UseExceptionHandler();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseSession();
 
 // Mapping SignalR hubs
 app.MapHub<ChatHub>("API/ChatHub");
