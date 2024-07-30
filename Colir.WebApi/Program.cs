@@ -80,7 +80,7 @@ services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuer = false,
             ValidateAudience = false
         };
-        
+
         options.Events = new JwtBearerEvents
         {
             OnMessageReceived = context =>

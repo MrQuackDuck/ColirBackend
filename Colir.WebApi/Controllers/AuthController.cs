@@ -1,7 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Colir.ApiRelatedServices.Models;
 using Colir.BLL.Interfaces;
 using Colir.BLL.Models;
 using Colir.BLL.RequestModels.User;
@@ -11,6 +10,7 @@ using Colir.Exceptions.NotFound;
 using Colir.Interfaces.ApiRelatedServices;
 using Colir.Interfaces.Controllers;
 using Colir.Misc.ExtensionMethods;
+using Colir.Models;
 using DAL.Enums;
 using DAL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -30,7 +30,7 @@ public class AuthController : ControllerBase, IAuthController
     private readonly IGitHubOAuth2Api _gitHubOAuth2Api;
     private readonly IGoogleOAuth2Api _googleOAuth2Api;
 
-    public AuthController(IUserService userService, IConfiguration config, IOAuth2RegistrationQueueService registrationQueueService, 
+    public AuthController(IUserService userService, IConfiguration config, IOAuth2RegistrationQueueService registrationQueueService,
         IUnitOfWork unitOfWork, IGitHubOAuth2Api gitHubOAuth2Api, IGoogleOAuth2Api googleOAuth2Api)
     {
         _userService = userService;
@@ -53,7 +53,7 @@ public class AuthController : ControllerBase, IAuthController
         var link = $"https://github.com/login/oauth/authorize?client_id={githubClientId}&state={state}";
         return Redirect(link);
     }
-    
+
     /// <summary>
     /// Redirects the user to the Google authentication page
     /// </summary>
@@ -67,7 +67,7 @@ public class AuthController : ControllerBase, IAuthController
         var link = $"https://accounts.google.com/o/oauth2/v2/auth?scope=https://www.googleapis.com/auth/userinfo.email&response_type=code&redirect_uri={redirectLink}&client_id={googleClientId}&state={state}";
         return Redirect(link);
     }
-    
+
     /// <summary>
     /// Exchanges the GitHub OAuth2 code for a registration queue token
     /// Details: <see cref="IOAuth2RegistrationQueueService"/>
@@ -81,22 +81,22 @@ public class AuthController : ControllerBase, IAuthController
             // Verifying the state (against XSRF attacks)
             if (HttpContext.Session.GetString("state") != state) return BadRequest();
             HttpContext.Session.Remove("state");
-            
+
             // Getting credentials from the configuration
             var githubClientId = _config["Authentication:GitHubClientId"]!;
             var githubAuthSecret = _config["Authentication:GitHubSecret"]!;
 
             // Getting an access token
             var gitHubToken = await _gitHubOAuth2Api.GetUserGitHubTokenAsync(githubClientId, githubAuthSecret, code);
-            
+
             // Using the token to obtain user's id from GitHub
             var userGitHubId = await _gitHubOAuth2Api.GetUserGitHubIdAsync(gitHubToken);
-            
+
             try
             {
                 // Checking if the user already registered. Otherwise, the "UserNotFoundException" will be thrown
                 await _unitOfWork.UserRepository.GetByGithudIdAsync(userGitHubId);
-                
+
                 // If an exception not occurred, the user was already registered. So, authenticate him/her
                 var request = new RequestToAuthorizeViaGitHub { GitHubId = userGitHubId };
 
@@ -121,7 +121,7 @@ public class AuthController : ControllerBase, IAuthController
                 // "UserNotFoundException" exception occured, which means the user's not registered yet, so give him a queue token
                 // The token can be later exchanged in "RegistrationHub" to start a registration process
                 var queueToken = _registrationQueueService.AddToQueue(new RegistrationUserData(userGitHubId, UserAuthType.Github));
-                return Ok(new { queueToken });   
+                return Ok(new { queueToken });
             }
         }
         catch (HttpRequestException)
@@ -129,7 +129,7 @@ public class AuthController : ControllerBase, IAuthController
             return BadRequest();
         }
     }
-    
+
     /// <summary>
     /// Exchanges the Google OAuth2 code for a registration queue token
     /// Details: <see cref="IOAuth2RegistrationQueueService"/>
@@ -143,13 +143,13 @@ public class AuthController : ControllerBase, IAuthController
             // Verifying the state (against XSRF attacks)
             if (HttpContext.Session.GetString("state") != state) return BadRequest();
             HttpContext.Session.Remove("state");
-            
+
             // Getting credentials from the configuration
             var googleClientId = _config["Authentication:GoogleClientId"]!;
             var googleAuthSecret = _config["Authentication:GoogleClientSecret"]!;
-        
+
             using var httpClient = new HttpClient();
-        
+
             // Getting an access token
             var token = await _googleOAuth2Api.GetUserGoogleAccessTokenAsync(googleClientId, googleAuthSecret, code);
 
@@ -160,7 +160,7 @@ public class AuthController : ControllerBase, IAuthController
             {
                 // Checking if the user already registered. Otherwise, the "UserNotFoundException" will be thrown
                 await _unitOfWork.UserRepository.GetByGoogleIdAsync(userGoogleid);
-                
+
                 // If an exception not occurred, the user was already registered. So, authenticate him/her
                 var request = new RequestToAuthorizeViaGoogle { GoogleId = userGoogleid };
 
@@ -185,7 +185,7 @@ public class AuthController : ControllerBase, IAuthController
                 // "UserNotFoundException" exception occured, which means the user's not registered yet, so give him a queue token
                 // The token can be later exchanged in "RegistrationHub" to start a registration process
                 var queueToken = _registrationQueueService.AddToQueue(new RegistrationUserData(userGoogleid, UserAuthType.Google));
-                return Ok(new { queueToken });   
+                return Ok(new { queueToken });
             }
         }
         catch (HttpRequestException)
@@ -200,7 +200,7 @@ public class AuthController : ControllerBase, IAuthController
         try
         {
             var request = new RequestToAuthorizeAsAnnoymous { DesiredUsername = name };
-            
+
             var userModel = await _userService.AuthorizeAsAnnoymousAsync(request);
 
             // Creating claims for a token
@@ -249,7 +249,7 @@ public class AuthController : ControllerBase, IAuthController
             return BadRequest(new ErrorResponse(ErrorCode.UserNotFound));
         }
     }
-    
+
     [NonAction]
     private string GenerateJwtToken(List<Claim> claims)
     {

@@ -1,11 +1,11 @@
-﻿using Colir.ApiRelatedServices.Models;
-using Colir.BLL.Interfaces;
+﻿using Colir.BLL.Interfaces;
 using Colir.BLL.Models;
 using Colir.BLL.RequestModels.User;
 using Colir.Communication;
 using Colir.Exceptions.NotFound;
 using Colir.Interfaces.ApiRelatedServices;
 using Colir.Interfaces.Hubs;
+using Colir.Models;
 using DAL.Enums;
 using Microsoft.AspNetCore.SignalR;
 using SignalRSwaggerGen.Attributes;
@@ -19,32 +19,32 @@ public class RegistrationHub : Hub, IRegistrationHub
     private readonly IUserService _userService;
     private readonly IOAuth2RegistrationQueueService _registrationQueueService;
     private readonly IHexColorGenerator _hexGenerator;
-    
+
     /// <summary>
     /// Dictionary to store hexs that are currently offered for users to choose from
     /// The connection id is a key and the value is a list of hexs to offer
     /// </summary>
     private static readonly Dictionary<string, List<int>> HexsToOffer = new();
-    
+
     /// <summary>
     /// Dictionary to store users' data needed for registration process
     /// The connection id is a key and the value is user's OAuth2 id
     /// </summary>
     private static readonly Dictionary<string, RegistrationUserData> UsersData = new();
-    
+
     /// <summary>
     /// Dictionary to store chosen hex ids during registration process
     /// The connection id is a key and the value is the hex id chosen by the user
     /// </summary>
     private static readonly Dictionary<string, int> ChosenHexs = new();
-    
+
     /// <summary>
     /// Dictionary to store chosen usernames during registration process
     /// The connection id is a key and the value is the username chosen by the user
     /// </summary>
     private static readonly Dictionary<string, string> ChosenUsernames = new();
-    
-    public RegistrationHub(IUserService userService, IOAuth2RegistrationQueueService registrationQueueService, 
+
+    public RegistrationHub(IUserService userService, IOAuth2RegistrationQueueService registrationQueueService,
         IHexColorGenerator hexGenerator)
     {
         _userService = userService;
@@ -66,7 +66,7 @@ public class RegistrationHub : Hub, IRegistrationHub
             Context.Abort();
             return;
         }
-        
+
         // Generate list of possible Hexs and send it to the client
         HexsToOffer[Context.ConnectionId] = await _hexGenerator.GetUniqueHexColorAsyncsListAsync(5);
         await Clients.Caller.SendAsync("ReceiveHexsList", HexsToOffer[Context.ConnectionId]);
@@ -79,7 +79,7 @@ public class RegistrationHub : Hub, IRegistrationHub
         UsersData.Remove(Context.ConnectionId);
         ChosenHexs.Remove(Context.ConnectionId);
         ChosenUsernames.Remove(Context.ConnectionId);
-        
+
         return Task.CompletedTask;
     }
 
@@ -89,7 +89,7 @@ public class RegistrationHub : Hub, IRegistrationHub
         HexsToOffer[Context.ConnectionId] = await _hexGenerator.GetUniqueHexColorAsyncsListAsync(5);
         await Clients.Caller.SendAsync("ReceiveHexsList", HexsToOffer[Context.ConnectionId]);
     }
-    
+
     /// <inheritdoc cref="IRegistrationHub.ChooseHex"/>
     public async Task ChooseHex(int hex)
     {
@@ -98,13 +98,13 @@ public class RegistrationHub : Hub, IRegistrationHub
         else
             await SendErrorAsync(new ErrorResponse(ErrorCode.InvalidActionException));
     }
-    
+
     /// <inheritdoc cref="IRegistrationHub.ChooseUsername"/>
     public void ChooseUsername(string username)
     {
         ChosenUsernames[Context.ConnectionId] = username;
     }
-    
+
     /// <inheritdoc cref="IRegistrationHub.FinishRegistration"/>
     public async Task FinishRegistration()
     {
@@ -113,18 +113,18 @@ public class RegistrationHub : Hub, IRegistrationHub
             await SendErrorAsync(new (ErrorCode.InvalidActionException, "You haven't chosen the hex id yet!"));
             return;
         }
-        
+
         if (!ChosenUsernames.ContainsKey(Context.ConnectionId))
         {
             await SendErrorAsync(new (ErrorCode.InvalidActionException, "You haven't chosen the username yet!"));
             return;
         }
-        
+
         var userOAuthId = UsersData[Context.ConnectionId].OAuth2UserId;
         var userAuthType = UsersData[Context.ConnectionId].AuthType;
         var chosenHex = ChosenHexs[Context.ConnectionId];
         var chosenUsername = ChosenUsernames[Context.ConnectionId];
-        
+
         DetailedUserModel? resultUserModel = default;
 
         if (userAuthType == UserAuthType.Github)

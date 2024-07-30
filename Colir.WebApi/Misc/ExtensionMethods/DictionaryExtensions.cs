@@ -1,4 +1,4 @@
-﻿using Colir.ApiRelatedServices.Models;
+﻿using Colir.Models;
 
 namespace Colir.Misc.ExtensionMethods;
 
