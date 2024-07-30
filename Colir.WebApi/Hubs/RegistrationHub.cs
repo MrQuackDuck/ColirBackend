@@ -74,6 +74,7 @@ public class RegistrationHub : Hub, IRegistrationHub
 
     public override Task OnDisconnectedAsync(Exception? exception)
     {
+        // Clearning up the temporary data after the user got disconnected
         HexsToOffer.Remove(Context.ConnectionId);
         UsersData.Remove(Context.ConnectionId);
         ChosenHexs.Remove(Context.ConnectionId);
@@ -155,7 +156,7 @@ public class RegistrationHub : Hub, IRegistrationHub
             return;
         }
 
-        // Returning the user model
+        // Returning the user model and closing the connection
         await Clients.Caller.SendAsync("RegistrationFinished", resultUserModel);
         Context.Abort();
     }
