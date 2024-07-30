@@ -7,8 +7,8 @@ public enum ErrorCode
 {
     AttachmentNotFound,
     EmptyMessage,
-    InvalidDate,
     InvalidActionException,
+    InvalidDate,
     IssuerNotInTheRoom,
     MessageNotFound,
     NotEnoughPermissions,
@@ -20,5 +20,7 @@ public enum ErrorCode
     StringWasTooLong,
     StringWasTooShort,
     UserAlreadyRegistered,
-    UserNotFound
+    UserNotFound,
+    YouAreNotAuthorOfMessage,
+    YouAreNotAuthorOfReaction
 }

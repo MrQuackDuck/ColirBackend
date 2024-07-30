@@ -1,5 +1,4 @@
 ﻿using Colir.BLL.Models;
-using Microsoft.AspNetCore.SignalR;
 
 namespace Colir.Interfaces.Hubs;
 

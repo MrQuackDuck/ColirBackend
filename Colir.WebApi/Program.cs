@@ -1,7 +1,6 @@
 using System.IO.Abstractions;
 using System.Text;
 using Colir.ApiRelatedServices;
-using Colir.ApiRelatedServices.Models;
 using Colir.BLL;
 using Colir.BLL.Factories;
 using Colir.BLL.Interfaces;

@@ -1,5 +1,4 @@
 ﻿using Colir.BLL.Interfaces;
-using Colir.BLL.Models;
 using Colir.BLL.RequestModels.Attachment;
 using Colir.BLL.RequestModels.Message;
 using Colir.BLL.RequestModels.Room;
@@ -129,6 +128,7 @@ public class ChatHub : Hub, IChatHub
 
         try
         {
+            // Uploading attachments and retrieving their ids
             var attachmentIds = (await Task.WhenAll(
                 model.Attachments.Select(async file =>
                 {
@@ -151,7 +151,10 @@ public class ChatHub : Hub, IChatHub
                 AttachmentsIds = attachmentIds
             };
 
+            // Sending the message
             var messageModel = await _messageService.SendAsync(request);
+            
+            // Notifying others
             await Clients.Group(roomGuid).SendAsync("ReceiveMessage", messageModel);
         }
         catch (RoomExpiredException)
@@ -162,28 +165,142 @@ public class ChatHub : Hub, IChatHub
         catch (IssuerNotInRoomException)
         {
             await SendErrorAsync(new(ErrorCode.IssuerNotInTheRoom));
-            Context.Abort();
         }
     }
 
-    public async Task<MessageModel> EditMessage(EditMessageModel model)
+    public async Task EditMessage(EditMessageModel model)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
+            
+            var request = new RequestToEditMessage
+            {
+                IssuerId = this.GetIssuerId(),
+                MessageId = model.MessageId,
+                NewContent = model.NewContent
+            };
+
+            var editedMessage = await _messageService.EditAsync(request);
+            
+            // Notifying others
+            await Clients.Group(roomGuid).SendAsync("MessageEdited", editedMessage);
+        }
+        catch (ArgumentException)
+        {
+            await SendErrorAsync(new (ErrorCode.EmptyMessage));
+        }
+        catch (RoomExpiredException)
+        {
+            await SendErrorAsync(new(ErrorCode.RoomExpired));
+            Context.Abort();
+        }
+        catch (IssuerNotInRoomException)
+        {
+            await SendErrorAsync(new(ErrorCode.IssuerNotInTheRoom));
+            Context.Abort();
+        }
+        catch (NotEnoughPermissionsException)
+        {
+            await SendErrorAsync(new(ErrorCode.YouAreNotAuthorOfMessage));
+        }
     }
 
     public async Task DeleteMessage(DeleteMessageModel model)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
+            
+            var request = new RequestToDeleteMessage
+            {
+                IssuerId = this.GetIssuerId(),
+                MessageId = model.MessageId
+            };
+
+            await _messageService.DeleteAsync(request);
+            
+            // Notifying others
+            await Clients.Group(roomGuid).SendAsync("MessageDeleted", model.MessageId);
+        }
+        catch (RoomExpiredException)
+        {
+            await SendErrorAsync(new(ErrorCode.RoomExpired));
+            Context.Abort();
+        }
+        catch (IssuerNotInRoomException)
+        {
+            await SendErrorAsync(new(ErrorCode.IssuerNotInTheRoom));
+            Context.Abort();
+        }
+        catch (NotEnoughPermissionsException)
+        {
+            await SendErrorAsync(new(ErrorCode.YouAreNotAuthorOfMessage));
+        }
     }
 
-    public async Task<MessageModel> AddReactionOnMessage(AddReactionOnMessageModel model)
+    public async Task AddReactionOnMessage(AddReactionOnMessageModel model)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
+
+            var request = new RequestToAddReactionOnMessage
+            {
+                IssuerId = this.GetIssuerId(),
+                MessageId = model.MessageId,
+                Reaction = model.Reaction
+            };
+
+            var updatedMessage = await _messageService.AddReaction(request);
+
+            // Notifying others
+            await Clients.Group(roomGuid).SendAsync("MessageGotReaction", updatedMessage);
+        }
+        catch (IssuerNotInRoomException)
+        {
+            await SendErrorAsync(new(ErrorCode.IssuerNotInTheRoom));
+            Context.Abort();
+        }
+        catch (RoomExpiredException)
+        {
+            await SendErrorAsync(new(ErrorCode.RoomExpired));
+            Context.Abort();
+        }
     }
 
-    public async Task<MessageModel> RemoveReactionFromMessage(RemoveReactionFromMessageModel model)
+    public async Task RemoveReactionFromMessage(RemoveReactionFromMessageModel model)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
+
+            var request = new RequestToRemoveReactionFromMessage()
+            {
+                IssuerId = this.GetIssuerId(),
+                ReactionId = model.ReactionId
+            };
+
+            var updatedMessage = await _messageService.RemoveReaction(request);
+
+            // Notifying others
+            await Clients.Group(roomGuid).SendAsync("MessageLostReaction", updatedMessage);
+        }
+        catch (IssuerNotInRoomException)
+        {
+            await SendErrorAsync(new(ErrorCode.IssuerNotInTheRoom));
+            Context.Abort();
+        }
+        catch (RoomExpiredException)
+        {
+            await SendErrorAsync(new(ErrorCode.RoomExpired));
+            Context.Abort();
+        }
+        catch (NotEnoughPermissionsException)
+        {
+            await SendErrorAsync(new(ErrorCode.YouAreNotAuthorOfReaction));
+            Context.Abort();
+        }
     }
     
     private async Task SendErrorAsync(ErrorResponse response)
