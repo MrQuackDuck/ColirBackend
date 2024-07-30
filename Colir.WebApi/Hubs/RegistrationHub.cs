@@ -2,6 +2,7 @@
 using Colir.BLL.Interfaces;
 using Colir.BLL.Models;
 using Colir.BLL.RequestModels.User;
+using Colir.Communication;
 using Colir.Exceptions.NotFound;
 using Colir.Interfaces.ApiRelatedServices;
 using Colir.Interfaces.Hubs;
@@ -89,12 +90,12 @@ public class RegistrationHub : Hub, IRegistrationHub
     }
     
     /// <inheritdoc cref="IRegistrationHub.ChooseHex"/>
-    public void ChooseHex(int hex)
+    public async Task ChooseHex(int hex)
     {
         if (HexsToOffer[Context.ConnectionId].Contains(hex))
             ChosenHexs[Context.ConnectionId] = hex;
-        else 
-            throw new HubException("Hex is not valid");
+        else
+            await SendErrorAsync(new ErrorResponse(ErrorCode.InvalidActionException));
     }
     
     /// <inheritdoc cref="IRegistrationHub.ChooseUsername"/>
@@ -104,10 +105,19 @@ public class RegistrationHub : Hub, IRegistrationHub
     }
     
     /// <inheritdoc cref="IRegistrationHub.FinishRegistration"/>
-    public async Task<DetailedUserModel> FinishRegistration()
+    public async Task FinishRegistration()
     {
-        if (!ChosenHexs.ContainsKey(Context.ConnectionId)) throw new HubException("You haven't chosen the hex id yet!");
-        if (!ChosenUsernames.ContainsKey(Context.ConnectionId)) throw new HubException("You haven't chosen the username yet!");
+        if (!ChosenHexs.ContainsKey(Context.ConnectionId))
+        {
+            await SendErrorAsync(new (ErrorCode.InvalidActionException, "You haven't chosen the hex id yet!"));
+            return;
+        }
+        
+        if (!ChosenUsernames.ContainsKey(Context.ConnectionId))
+        {
+            await SendErrorAsync(new (ErrorCode.InvalidActionException, "You haven't chosen the username yet!"));
+            return;
+        }
         
         var userOAuthId = UsersData[Context.ConnectionId].OAuth2UserId;
         var userAuthType = UsersData[Context.ConnectionId].AuthType;
@@ -140,8 +150,18 @@ public class RegistrationHub : Hub, IRegistrationHub
         }
 
         if (resultUserModel == null)
-            throw new HubException("Something went wrong!");
-        
-        return resultUserModel;
+        {
+            await SendErrorAsync(new ErrorResponse(ErrorCode.InvalidActionException, "Something went wrong!"));
+            return;
+        }
+
+        // Returning the user model
+        await Clients.Caller.SendAsync("RegistrationFinished", resultUserModel);
+        Context.Abort();
+    }
+
+    private async Task SendErrorAsync(ErrorResponse response)
+    {
+        await Clients.Caller.SendAsync("Error", response);
     }
 }

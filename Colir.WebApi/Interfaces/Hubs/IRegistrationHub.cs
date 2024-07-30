@@ -18,8 +18,7 @@ public interface IRegistrationHub
     /// Chooses the Hex Id for the user
     /// </summary>
     /// <param name="hex">The hex id from previously given list</param>
-    /// <exception cref="HubException">Thrown when the hex is not present in list of hexs to choose from</exception>
-    void ChooseHex(int hex);
+    Task ChooseHex(int hex);
     
     /// <summary>
     /// Sets a username
@@ -28,7 +27,7 @@ public interface IRegistrationHub
     void ChooseUsername(string username);
     
     /// <summary>
-    /// Finishes the registration
+    /// Finishes the registration and sends <see cref="DetailedUserModel"/> to the user
     /// </summary>
-    Task<DetailedUserModel> FinishRegistration();
+    Task FinishRegistration();
 }
