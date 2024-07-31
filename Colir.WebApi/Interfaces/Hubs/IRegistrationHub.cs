@@ -1,4 +1,5 @@
 ﻿using Colir.BLL.Models;
+using Colir.Communication.ResponseModels;
 
 namespace Colir.Interfaces.Hubs;
 
@@ -11,22 +12,22 @@ public interface IRegistrationHub
     /// <summary>
     /// Regenerates the list of Hexs to choose from
     /// </summary>
-    Task RegenerateHexs();
+    Task<SignalRHubResult> RegenerateHexs();
     
     /// <summary>
     /// Chooses the Hex Id for the user
     /// </summary>
     /// <param name="hex">The hex id from previously given list</param>
-    Task ChooseHex(int hex);
-    
+    SignalRHubResult ChooseHex(int hex);
+
     /// <summary>
     /// Sets a username
     /// </summary>
     /// <param name="username">Username to set</param>
-    void ChooseUsername(string username);
+    SignalRHubResult ChooseUsername(string username);
     
     /// <summary>
     /// Finishes the registration and sends <see cref="DetailedUserModel"/> to the user
     /// </summary>
-    Task FinishRegistration();
+    Task<SignalRHubResult> FinishRegistration();
 }

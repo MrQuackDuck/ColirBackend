@@ -2,7 +2,8 @@
 using Colir.BLL.Models;
 using Colir.BLL.RequestModels.User;
 using Colir.BLL.RequestModels.UserStatistics;
-using Colir.Communication;
+using Colir.Communication.Enums;
+using Colir.Communication.ResponseModels;
 using Colir.Exceptions.NotFound;
 using Colir.Interfaces.Controllers;
 using Colir.Misc.ExtensionMethods;

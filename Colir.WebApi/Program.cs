@@ -53,9 +53,9 @@ services.AddTransient<IUnitOfWork, UnitOfWork>();
 
 // Adding BLL services
 services.AddAutoMapper(typeof(AutomapperProfile));
-services.AddTransient<IAttachmentRepository, AttachmentRepository>();
+services.AddTransient<IAttachmentService, AttachmentService>();
 services.AddTransient<IHexColorGenerator, HexColorGenerator>();
-services.AddTransient<IMessageRepository, MessageRepository>();
+services.AddTransient<IMessageService, MessageService>();
 services.AddTransient<IRoomCleanerFactory, RoomCleanerFactory>();
 services.AddTransient<IRoomService, RoomService>();
 services.AddTransient<IUserService, UserService>();

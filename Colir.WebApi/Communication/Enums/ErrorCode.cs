@@ -1,4 +1,4 @@
-﻿namespace Colir.Communication;
+﻿namespace Colir.Communication.Enums;
 
 /// <summary>
 /// Lists all possible errors a client can get in error response

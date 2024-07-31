@@ -1,8 +1,9 @@
 ﻿using Colir.BLL.Interfaces;
 using Colir.BLL.Models;
 using Colir.BLL.RequestModels.Room;
-using Colir.Communication;
+using Colir.Communication.Enums;
 using Colir.Communication.RequestModels.Room;
+using Colir.Communication.ResponseModels;
 using Colir.Exceptions;
 using Colir.Exceptions.NotEnoughPermissions;
 using Colir.Exceptions.NotFound;

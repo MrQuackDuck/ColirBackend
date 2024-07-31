@@ -1,4 +1,6 @@
-﻿namespace Colir.Communication;
+﻿using Colir.Communication.Enums;
+
+namespace Colir.Communication.ResponseModels;
 
 public class ErrorResponse
 {

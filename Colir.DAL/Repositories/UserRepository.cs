@@ -111,7 +111,6 @@ public class UserRepository : IUserRepository
     /// Adds a user to the DB
     /// </summary>
     /// <param name="user"></param>
-    /// <returns></returns>
     /// <exception cref="ArgumentException">Thrown when invalid hex id provided</exception>
     /// <exception cref="ArgumentException">Thrown when the user with the same hex id exists already</exception>
     /// <exception cref="StringTooShortException">Thrown when username is too short</exception>

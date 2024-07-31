@@ -1,8 +1,9 @@
 ﻿using Colir.BLL.Interfaces;
 using Colir.BLL.Models;
 using Colir.BLL.RequestModels.User;
-using Colir.Communication;
+using Colir.Communication.Enums;
 using Colir.Communication.Models;
+using Colir.Communication.ResponseModels;
 using Colir.Exceptions.NotFound;
 using Colir.Interfaces.ApiRelatedServices;
 using Colir.Interfaces.Hubs;
@@ -14,7 +15,7 @@ namespace Colir.Hubs;
 
 /// <inheritdoc cref="IRegistrationHub"/>
 [SignalRHub]
-public class RegistrationHub : Hub, IRegistrationHub
+public class RegistrationHub : ColirHub, IRegistrationHub
 {
     private readonly IUserService _userService;
     private readonly IOAuth2RegistrationQueueService _registrationQueueService;
@@ -54,15 +55,20 @@ public class RegistrationHub : Hub, IRegistrationHub
 
     public override async Task OnConnectedAsync()
     {
-        var queueToken = Context.GetHttpContext()?.Request.Query["queueToken"].ToString();
-
         try
         {
+            var queueToken = Context.GetHttpContext()?.Request.Query["queueToken"].ToString();
             UsersData[Context.ConnectionId] = _registrationQueueService.ExchangeToken(queueToken!);
+        }
+        catch (NullReferenceException)
+        {
+            // Abort the connection if the "queueToken" wasn't provided
+            Context.Abort();
+            return;
         }
         catch (NotFoundException)
         {
-            // Abort the connection if the "queueToken" is invalid
+            // Abort the connection if the "queueToken" is invalid or missing
             Context.Abort();
             return;
         }
@@ -84,42 +90,38 @@ public class RegistrationHub : Hub, IRegistrationHub
     }
 
     /// <inheritdoc cref="IRegistrationHub.RegenerateHexs"/>
-    public async Task RegenerateHexs()
+    public async Task<SignalRHubResult> RegenerateHexs()
     {
         HexsToOffer[Context.ConnectionId] = await _hexGenerator.GetUniqueHexColorAsyncsListAsync(5);
-        await Clients.Caller.SendAsync("ReceiveHexsList", HexsToOffer[Context.ConnectionId]);
+        return Success(HexsToOffer[Context.ConnectionId]);
     }
 
     /// <inheritdoc cref="IRegistrationHub.ChooseHex"/>
-    public async Task ChooseHex(int hex)
+    public SignalRHubResult ChooseHex(int hex)
     {
-        if (HexsToOffer[Context.ConnectionId].Contains(hex))
-            ChosenHexs[Context.ConnectionId] = hex;
-        else
-            await SendErrorAsync(new ErrorResponse(ErrorCode.InvalidActionException));
+        if (!HexsToOffer[Context.ConnectionId].Contains(hex))
+            return Error(new(ErrorCode.InvalidActionException));
+        
+        ChosenHexs[Context.ConnectionId] = hex;
+        return Success();
     }
 
     /// <inheritdoc cref="IRegistrationHub.ChooseUsername"/>
-    public void ChooseUsername(string username)
+    public SignalRHubResult ChooseUsername(string username)
     {
         ChosenUsernames[Context.ConnectionId] = username;
+        return Success();
     }
 
     /// <inheritdoc cref="IRegistrationHub.FinishRegistration"/>
-    public async Task FinishRegistration()
+    public async Task<SignalRHubResult> FinishRegistration()
     {
         if (!ChosenHexs.ContainsKey(Context.ConnectionId))
-        {
-            await SendErrorAsync(new (ErrorCode.InvalidActionException, "You haven't chosen the hex id yet!"));
-            return;
-        }
-
+            return Error(new(ErrorCode.InvalidActionException, "You haven't chosen the hex id yet!"));
+        
         if (!ChosenUsernames.ContainsKey(Context.ConnectionId))
-        {
-            await SendErrorAsync(new (ErrorCode.InvalidActionException, "You haven't chosen the username yet!"));
-            return;
-        }
-
+            return Error(new(ErrorCode.InvalidActionException, "You haven't chosen the username yet!"));
+        
         var userOAuthId = UsersData[Context.ConnectionId].OAuth2UserId;
         var userAuthType = UsersData[Context.ConnectionId].AuthType;
         var chosenHex = ChosenHexs[Context.ConnectionId];
@@ -151,18 +153,17 @@ public class RegistrationHub : Hub, IRegistrationHub
         }
 
         if (resultUserModel == null)
-        {
-            await SendErrorAsync(new ErrorResponse(ErrorCode.InvalidActionException, "Something went wrong!"));
-            return;
-        }
+            return Error(new ErrorResponse(ErrorCode.InvalidActionException, "Something went wrong!"));
+        
 
         // Returning the user model and closing the connection
-        await Clients.Caller.SendAsync("RegistrationFinished", resultUserModel);
-        Context.Abort();
-    }
-
-    private async Task SendErrorAsync(ErrorResponse response)
-    {
-        await Clients.Caller.SendAsync("Error", response);
+        try
+        {
+            return Success(resultUserModel);
+        }
+        finally
+        {
+            Context.Abort();
+        }
     }
 }

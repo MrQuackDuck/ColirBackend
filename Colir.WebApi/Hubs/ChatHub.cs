@@ -2,8 +2,9 @@
 using Colir.BLL.RequestModels.Attachment;
 using Colir.BLL.RequestModels.Message;
 using Colir.BLL.RequestModels.Room;
-using Colir.Communication;
+using Colir.Communication.Enums;
 using Colir.Communication.RequestModels.Chat;
+using Colir.Communication.ResponseModels;
 using Colir.Exceptions;
 using Colir.Exceptions.NotEnoughPermissions;
 using Colir.Exceptions.NotFound;
@@ -20,7 +21,7 @@ namespace Colir.Hubs;
 [Authorize]
 [SignalRHub]
 [Route("API/ChatHub")]
-public class ChatHub : Hub, IChatHub
+public class ChatHub : ColirHub, IChatHub
 {
     private readonly IRoomService _roomService;
     private readonly IMessageService _messageService;
