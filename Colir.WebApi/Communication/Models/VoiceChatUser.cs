@@ -1,4 +1,4 @@
-﻿namespace Colir.Models;
+﻿namespace Colir.Communication.Models;
 
 public class VoiceChatUser
 {

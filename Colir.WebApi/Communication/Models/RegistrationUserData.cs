@@ -1,6 +1,6 @@
 ﻿using DAL.Enums;
 
-namespace Colir.Models;
+namespace Colir.Communication.Models;
 
 public class RegistrationUserData
 {

@@ -1,6 +1,6 @@
-﻿using Colir.Exceptions.NotFound;
+﻿using Colir.Communication.Models;
+using Colir.Exceptions.NotFound;
 using Colir.Hubs;
-using Colir.Models;
 
 namespace Colir.Interfaces.ApiRelatedServices;
 

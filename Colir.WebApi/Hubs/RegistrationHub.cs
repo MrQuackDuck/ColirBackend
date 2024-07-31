@@ -2,10 +2,10 @@
 using Colir.BLL.Models;
 using Colir.BLL.RequestModels.User;
 using Colir.Communication;
+using Colir.Communication.Models;
 using Colir.Exceptions.NotFound;
 using Colir.Interfaces.ApiRelatedServices;
 using Colir.Interfaces.Hubs;
-using Colir.Models;
 using DAL.Enums;
 using Microsoft.AspNetCore.SignalR;
 using SignalRSwaggerGen.Attributes;

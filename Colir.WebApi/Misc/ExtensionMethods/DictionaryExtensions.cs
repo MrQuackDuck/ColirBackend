@@ -1,4 +1,4 @@
-﻿using Colir.Models;
+﻿using Colir.Communication.Models;
 
 namespace Colir.Misc.ExtensionMethods;
 

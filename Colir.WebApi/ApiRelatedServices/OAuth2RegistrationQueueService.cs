@@ -1,6 +1,6 @@
-﻿using Colir.Interfaces.ApiRelatedServices;
+﻿using Colir.Communication.Models;
+using Colir.Interfaces.ApiRelatedServices;
 using Colir.Misc.ExtensionMethods;
-using Colir.Models;
 
 namespace Colir.ApiRelatedServices;
 
