@@ -47,6 +47,7 @@ public static class DalToBllMapper
             AuthorHexId = message.Author!.HexId,
             PostDate = message.PostDate,
             EditDate = message.EditDate,
+            Content = message.Content,
             RepliedMessageId = message.RepliedMessageId,
             Reactions = message.Reactions.Select(r => r.ToReactionModel()).ToList(),
             Attachments = message.Attachments.Select(a => a.ToAttachmentModel()).ToList()

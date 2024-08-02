@@ -1,13 +1,14 @@
 ﻿using Colir.Communication.RequestModels.Chat;
+using Colir.Communication.ResponseModels;
 
 namespace Colir.Interfaces.Hubs;
 
 public interface IChatHub
 {
-    Task GetMessages(GetLastMessagesModel model);
-    Task SendMessage(SendMessageModel model);
-    Task EditMessage(EditMessageModel model);
-    Task DeleteMessage(DeleteMessageModel model);
-    Task AddReactionOnMessage(AddReactionOnMessageModel model);
-    Task RemoveReactionFromMessage(RemoveReactionFromMessageModel model);
+    Task<SignalRHubResult> GetMessages(GetLastMessagesModel model);
+    Task<SignalRHubResult> SendMessage(SendMessageModel model);
+    Task<SignalRHubResult> EditMessage(EditMessageModel model);
+    Task<SignalRHubResult> DeleteMessage(DeleteMessageModel model);
+    Task<SignalRHubResult> AddReactionOnMessage(AddReactionOnMessageModel model);
+    Task<SignalRHubResult> RemoveReactionFromMessage(RemoveReactionFromMessageModel model);
 }

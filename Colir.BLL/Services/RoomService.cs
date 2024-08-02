@@ -68,12 +68,22 @@ public class RoomService : IRoomService
         var roomToCreate = new Room
         {
             Name = request.Name,
-            Guid = new Guid().ToString(),
+            Guid = Guid.NewGuid().ToString(),
             OwnerId = request.IssuerId,
             ExpiryDate = request.ExpiryDate
         };
         
         await _unitOfWork.RoomRepository.AddAsync(roomToCreate);
+        
+        await _unitOfWork.SaveChangesAsync();
+        transaction.CreateSavepoint("RoomCreated");
+        
+        // Joining the issuer to the room
+        issuer.JoinedRooms.Add(roomToCreate);
+        _unitOfWork.UserRepository.Update(issuer);
+        
+        roomToCreate.JoinedUsers.Add(issuer);
+        _unitOfWork.RoomRepository.Update(roomToCreate);
         
         await _unitOfWork.SaveChangesAsync();
         await transaction.CommitAsync();
@@ -180,7 +190,6 @@ public class RoomService : IRoomService
     /// <inheritdoc cref="IRoomService.JoinMemberAsync"/>
     public async Task<RoomModel> JoinMemberAsync(RequestToJoinRoom request)
     {
-        
         var issuer = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
         var roomToJoin = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
 

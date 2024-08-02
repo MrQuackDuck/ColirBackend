@@ -11,6 +11,7 @@ public enum ErrorCode
     InvalidDate,
     IssuerNotInTheRoom,
     MessageNotFound,
+    ModelNotValid,
     NotEnoughPermissions,
     NotEnoughSpace,
     NotFound,

@@ -45,7 +45,6 @@ public class ChatHub : ColirHub, IChatHub
         var roomGuid = Context.GetHttpContext()?.Request.Query["roomGuid"].ToString();
         if (roomGuid is null || roomGuid.Length == 0)
         {
-            await SendErrorAsync(new ErrorResponse(ErrorCode.InvalidActionException));
             Context.Abort();
         }
 
@@ -63,17 +62,14 @@ public class ChatHub : ColirHub, IChatHub
         }
         catch (RoomExpiredException)
         {
-            await SendErrorAsync(new (ErrorCode.RoomExpired));
             Context.Abort();
         }
         catch (RoomNotFoundException)
         {
-            await SendErrorAsync(new (ErrorCode.RoomNotFound));
             Context.Abort();
         }
         catch (IssuerNotInRoomException)
         {
-            await SendErrorAsync(new(ErrorCode.IssuerNotInTheRoom));
             Context.Abort();
         }
     }
@@ -84,8 +80,10 @@ public class ChatHub : ColirHub, IChatHub
         return Task.CompletedTask;
     }
 
-    public async Task GetMessages(GetLastMessagesModel model)
+    public async Task<SignalRHubResult> GetMessages(GetLastMessagesModel model)
     {
+        if (!IsModelValid(model)) return Error(new (ErrorCode.ModelNotValid));
+        
         var request = new RequestToGetLastMessages
         {
             IssuerId = this.GetIssuerId(),
@@ -96,18 +94,18 @@ public class ChatHub : ColirHub, IChatHub
 
         try
         {
-            var messages = await _messageService.GetLastMessagesAsync(request);
-            await Clients.Caller.SendAsync("ReceiveMessages", messages);
+            return Success(await _messageService.GetLastMessagesAsync(request));
         }
         catch (RoomExpiredException)
         {
-            await SendErrorAsync(new(ErrorCode.RoomExpired));
-            Context.Abort();
+            return Error(new(ErrorCode.RoomExpired), true);
         }
     }
 
-    public async Task SendMessage(SendMessageModel model)
+    public async Task<SignalRHubResult> SendMessage(SendMessageModel model)
     {
+        if (!IsModelValid(model)) return Error(new (ErrorCode.ModelNotValid));
+        
         // Uploading attachments
         var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
         var issuerId = this.GetIssuerId();
@@ -117,14 +115,12 @@ public class ChatHub : ColirHub, IChatHub
 
         if (allFilesSize > roomFreeStorage)
         {
-            await SendErrorAsync(new(ErrorCode.NotEnoughSpace));
-            return;
+            return Error(new(ErrorCode.NotEnoughSpace));
         }
 
         if (model.Content.Length == 0)
         {
-            await SendErrorAsync(new(ErrorCode.EmptyMessage));
-            return;
+            return Error(new(ErrorCode.NotEnoughSpace));
         }
 
         try
@@ -149,7 +145,8 @@ public class ChatHub : ColirHub, IChatHub
                 IssuerId = issuerId,
                 Content = model.Content,
                 RoomGuid = roomGuid,
-                AttachmentsIds = attachmentIds
+                AttachmentsIds = attachmentIds,
+                ReplyMessageId = model.ReplyMessageId
             };
 
             // Sending the message
@@ -157,20 +154,22 @@ public class ChatHub : ColirHub, IChatHub
 
             // Notifying others
             await Clients.Group(roomGuid).SendAsync("ReceiveMessage", messageModel);
+            return Success();
         }
         catch (RoomExpiredException)
         {
-            await SendErrorAsync(new (ErrorCode.RoomExpired));
-            Context.Abort();
+            return Error(new (ErrorCode.RoomExpired), true);
         }
         catch (IssuerNotInRoomException)
         {
-            await SendErrorAsync(new(ErrorCode.IssuerNotInTheRoom));
+            return Error(new(ErrorCode.IssuerNotInTheRoom));
         }
     }
 
-    public async Task EditMessage(EditMessageModel model)
+    public async Task<SignalRHubResult> EditMessage(EditMessageModel model)
     {
+        if (!IsModelValid(model)) return Error(new (ErrorCode.ModelNotValid));
+        
         try
         {
             var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
@@ -186,29 +185,30 @@ public class ChatHub : ColirHub, IChatHub
 
             // Notifying others
             await Clients.Group(roomGuid).SendAsync("MessageEdited", editedMessage);
+            return Success();
         }
         catch (ArgumentException)
         {
-            await SendErrorAsync(new (ErrorCode.EmptyMessage));
+            return Error(new (ErrorCode.EmptyMessage));
         }
         catch (RoomExpiredException)
         {
-            await SendErrorAsync(new(ErrorCode.RoomExpired));
-            Context.Abort();
+            return Error(new(ErrorCode.RoomExpired), true);
         }
         catch (IssuerNotInRoomException)
         {
-            await SendErrorAsync(new(ErrorCode.IssuerNotInTheRoom));
-            Context.Abort();
+            return Error(new(ErrorCode.IssuerNotInTheRoom));
         }
         catch (NotEnoughPermissionsException)
         {
-            await SendErrorAsync(new(ErrorCode.YouAreNotAuthorOfMessage));
+            return Error(new(ErrorCode.YouAreNotAuthorOfMessage));
         }
     }
 
-    public async Task DeleteMessage(DeleteMessageModel model)
+    public async Task<SignalRHubResult> DeleteMessage(DeleteMessageModel model)
     {
+        if (!IsModelValid(model)) return Error(new (ErrorCode.ModelNotValid));
+        
         try
         {
             var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
@@ -219,25 +219,26 @@ public class ChatHub : ColirHub, IChatHub
 
             // Notifying others
             await Clients.Group(roomGuid).SendAsync("MessageDeleted", model.MessageId);
+            return Success();
         }
         catch (RoomExpiredException)
         {
-            await SendErrorAsync(new(ErrorCode.RoomExpired));
-            Context.Abort();
+            return Error(new(ErrorCode.RoomExpired), true);
         }
         catch (IssuerNotInRoomException)
         {
-            await SendErrorAsync(new(ErrorCode.IssuerNotInTheRoom));
-            Context.Abort();
+            return Error(new(ErrorCode.IssuerNotInTheRoom), true);
         }
         catch (NotEnoughPermissionsException)
         {
-            await SendErrorAsync(new(ErrorCode.YouAreNotAuthorOfMessage));
+            return Error(new(ErrorCode.YouAreNotAuthorOfMessage));
         }
     }
 
-    public async Task AddReactionOnMessage(AddReactionOnMessageModel model)
+    public async Task<SignalRHubResult> AddReactionOnMessage(AddReactionOnMessageModel model)
     {
+        if (!IsModelValid(model)) return Error(new (ErrorCode.ModelNotValid));
+        
         try
         {
             var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
@@ -253,21 +254,22 @@ public class ChatHub : ColirHub, IChatHub
 
             // Notifying others
             await Clients.Group(roomGuid).SendAsync("MessageGotReaction", updatedMessage);
+            return Success();
         }
         catch (IssuerNotInRoomException)
         {
-            await SendErrorAsync(new(ErrorCode.IssuerNotInTheRoom));
-            Context.Abort();
+            return Error(new(ErrorCode.IssuerNotInTheRoom), true);
         }
         catch (RoomExpiredException)
         {
-            await SendErrorAsync(new(ErrorCode.RoomExpired));
-            Context.Abort();
+            return Error(new(ErrorCode.RoomExpired), true);
         }
     }
 
-    public async Task RemoveReactionFromMessage(RemoveReactionFromMessageModel model)
+    public async Task<SignalRHubResult> RemoveReactionFromMessage(RemoveReactionFromMessageModel model)
     {
+        if (!IsModelValid(model)) return Error(new (ErrorCode.ModelNotValid));
+        
         try
         {
             var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
@@ -282,26 +284,19 @@ public class ChatHub : ColirHub, IChatHub
 
             // Notifying others
             await Clients.Group(roomGuid).SendAsync("MessageLostReaction", updatedMessage);
+            return Success();
         }
         catch (IssuerNotInRoomException)
         {
-            await SendErrorAsync(new(ErrorCode.IssuerNotInTheRoom));
-            Context.Abort();
+            return Error(new(ErrorCode.IssuerNotInTheRoom), true);
         }
         catch (RoomExpiredException)
         {
-            await SendErrorAsync(new(ErrorCode.RoomExpired));
-            Context.Abort();
+            return Error(new(ErrorCode.RoomExpired), true);
         }
         catch (NotEnoughPermissionsException)
         {
-            await SendErrorAsync(new(ErrorCode.YouAreNotAuthorOfReaction));
-            Context.Abort();
+            return Error(new(ErrorCode.YouAreNotAuthorOfReaction));
         }
-    }
-
-    private async Task SendErrorAsync(ErrorResponse response)
-    {
-        await Clients.Caller.SendAsync("Error", response);
     }
 }

@@ -48,6 +48,9 @@ public class RoomFileManager : IRoomFileManager
     /// <param name="roomGuid">Guid of the room</param>
     public long GetOccupiedStorageSize(string roomGuid)
     {
+        // Create the directory if not exists
+        _fileSystem.Directory.CreateDirectory($"./{_filesFolderName}/{roomGuid}");
+        
         string pathToDirectory = $"./{_filesFolderName}/{roomGuid}/";
         var files = _fileSystem.DirectoryInfo.New(pathToDirectory).GetFiles();
 
