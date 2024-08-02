@@ -13,7 +13,14 @@ public static class UnitTestHelper
         // Create database options (in-memory for unit testing)
         var options = new DbContextOptionsBuilder<ColirDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
-            .ConfigureWarnings(config => config.Ignore(InMemoryEventId.TransactionIgnoredWarning))
+            .ConfigureWarnings(config =>
+            {
+                config.Ignore(InMemoryEventId.TransactionIgnoredWarning);
+                config.Ignore(SqlServerEventId.SavepointsDisabledBecauseOfMARS);
+                config.Ignore(SqlServerEventId.SavepointsDisabledBecauseOfMARS);
+                config.Ignore(CoreEventId.ForeignKeyAttributesOnBothNavigationsWarning);
+                config.Ignore(CoreEventId.ForeignKeyAttributesOnBothPropertiesWarning);
+            })
             .Options;
         
         return new ColirDbContext(options);

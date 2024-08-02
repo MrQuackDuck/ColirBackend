@@ -21,6 +21,7 @@ public class ColirDbContext : DbContext
     {
         optionsBuilder.ConfigureWarnings(warnings =>
         {
+            warnings.Ignore(SqlServerEventId.SavepointsDisabledBecauseOfMARS);
             warnings.Ignore(CoreEventId.ForeignKeyAttributesOnBothNavigationsWarning);
             warnings.Ignore(CoreEventId.ForeignKeyAttributesOnBothPropertiesWarning);
         });

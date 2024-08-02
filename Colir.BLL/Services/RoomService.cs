@@ -76,7 +76,6 @@ public class RoomService : IRoomService
         await _unitOfWork.RoomRepository.AddAsync(roomToCreate);
         
         await _unitOfWork.SaveChangesAsync();
-        transaction.CreateSavepoint("RoomCreated");
         
         // Joining the issuer to the room
         issuer.JoinedRooms.Add(roomToCreate);
