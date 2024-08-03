@@ -1,8 +1,7 @@
-﻿using Colir.Communication.Enums;
-using Colir.Communication.ResponseModels;
+﻿using Colir.Communication.ResponseModels;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Colir.Hubs;
+namespace Colir.Hubs.Abstract;
 
 /// <summary>
 /// Abstraction over <see cref="Hub"/> that adds "Results API"-like methods

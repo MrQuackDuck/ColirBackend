@@ -52,12 +52,6 @@ public class ColirDbContext : DbContext
                 v => stringEncryptor.Encrypt(v),
                 v => stringEncryptor.Decrypt(v));
         
-        modelBuilder.Entity<Room>()
-            .Property(u => u.Guid)
-            .HasConversion(
-                v => stringEncryptor.Encrypt(v),
-                v => stringEncryptor.Decrypt(v));
-        
         modelBuilder.Entity<User>()
             .HasOne(s => s.UserSettings)
             .WithOne(s => s.User)

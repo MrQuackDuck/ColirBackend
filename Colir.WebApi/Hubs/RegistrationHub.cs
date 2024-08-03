@@ -5,6 +5,7 @@ using Colir.Communication.Enums;
 using Colir.Communication.Models;
 using Colir.Communication.ResponseModels;
 using Colir.Exceptions.NotFound;
+using Colir.Hubs.Abstract;
 using Colir.Interfaces.ApiRelatedServices;
 using Colir.Interfaces.Hubs;
 using DAL.Enums;

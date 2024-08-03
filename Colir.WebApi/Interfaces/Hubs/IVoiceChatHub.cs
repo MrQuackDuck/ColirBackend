@@ -1,22 +1,23 @@
-﻿namespace Colir.Interfaces.Hubs;
+﻿using Colir.Communication.ResponseModels;
+
+namespace Colir.Interfaces.Hubs;
 
 public interface IVoiceChatHub
 {
-    Task Connect(string roomGuid);
-    Task Join();
-    Task Leave();
+    Task<SignalRHubResult> Join();
+    Task<SignalRHubResult> Leave();
 
-    Task MuteSelf();
-    Task UnmuteSelf();
-    Task DefeanSelf();
-    Task UndefeanSelf();
-    Task SendVoiceSignal(string audioData);
+    Task<SignalRHubResult> MuteSelf();
+    Task<SignalRHubResult> UnmuteSelf();
+    Task<SignalRHubResult> DefeanSelf();
+    Task<SignalRHubResult> UndefeanSelf();
+    Task<SignalRHubResult> SendVoiceSignal(string audioData);
 
-    Task EnableVideo();
-    Task DisableVideo();
-    Task SendVideo(string videoData);
+    Task<SignalRHubResult> EnableVideo();
+    Task<SignalRHubResult> DisableVideo();
+    Task<SignalRHubResult> SendVideo(string videoData);
 
-    Task EnableStream();
-    Task DisableStream();
-    Task SendStreamPicture(string pictureData);
+    Task<SignalRHubResult> EnableStream();
+    Task<SignalRHubResult> DisableStream();
+    Task<SignalRHubResult> SendStreamPicture(string pictureData);
 }

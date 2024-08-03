@@ -8,6 +8,7 @@ using Colir.Communication.ResponseModels;
 using Colir.Exceptions;
 using Colir.Exceptions.NotEnoughPermissions;
 using Colir.Exceptions.NotFound;
+using Colir.Hubs.Abstract;
 using Colir.Interfaces.Hubs;
 using Colir.Misc.ExtensionMethods;
 using DAL.Interfaces;
