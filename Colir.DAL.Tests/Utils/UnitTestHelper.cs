@@ -2,6 +2,8 @@
 using DAL.Entities;
 using DAL.Enums;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Moq;
 
 namespace Colir.DAL.Tests.Utils;
 
@@ -14,7 +16,11 @@ public static class UnitTestHelper
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
         
-        return new ColirDbContext(options);
+        Mock<IConfiguration> configMock = new Mock<IConfiguration>();
+        configMock.Setup(config => config["DatabaseEncryption:EncryptionPassword"]).Returns("16-char-password");
+        configMock.Setup(config => config["DatabaseEncryption:InitializationVector"]).Returns("16-char-invector");
+        
+        return new ColirDbContext(options, configMock.Object);
     }
     
     public static void SeedData(ColirDbContext context)

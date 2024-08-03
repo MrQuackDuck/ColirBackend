@@ -1,12 +1,17 @@
-﻿using DAL.Entities;
+﻿using DAL.Encrpyion;
+using DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Configuration;
 
 namespace DAL;
 
 public class ColirDbContext : DbContext
 {
-    public ColirDbContext(DbContextOptions<ColirDbContext> options) : base(options) { }
+    private readonly IConfiguration _config;
+
+    public ColirDbContext(DbContextOptions<ColirDbContext> options, IConfiguration config) : base(options)
+        => _config = config;
     
     public DbSet<Attachment> Attachments { get; set; }
     public DbSet<LastTimeUserReadChat> LastTimeUserReadChats { get; set; }
@@ -29,6 +34,10 @@ public class ColirDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        var stringEncryptor = new StringEncryptor(
+            _config["DatabaseEncryption:EncryptionPassword"],
+            _config["DatabaseEncryption:InitializationVector"]);
+        
         modelBuilder.Entity<Room>()
             .HasOne<User>(nameof(Room.Owner));
 
@@ -36,6 +45,18 @@ public class ColirDbContext : DbContext
             .HasMany(r => r.JoinedUsers)
             .WithMany(u => u.JoinedRooms)
             .UsingEntity<UserToRoom>();
+        
+        modelBuilder.Entity<Room>()
+            .Property(u => u.Name)
+            .HasConversion(
+                v => stringEncryptor.Encrypt(v),
+                v => stringEncryptor.Decrypt(v));
+        
+        modelBuilder.Entity<Room>()
+            .Property(u => u.Guid)
+            .HasConversion(
+                v => stringEncryptor.Encrypt(v),
+                v => stringEncryptor.Decrypt(v));
         
         modelBuilder.Entity<User>()
             .HasOne(s => s.UserSettings)
@@ -48,7 +69,31 @@ public class ColirDbContext : DbContext
             .WithOne(s => s.User)
             .HasForeignKey<UserStatistics>(us => us.UserId)
             .IsRequired();
+        
+        modelBuilder.Entity<User>()
+            .Property(u => u.Username)
+            .HasConversion(
+                v => stringEncryptor.Encrypt(v),
+                v => stringEncryptor.Decrypt(v));
+        
+        modelBuilder.Entity<User>()
+            .Property(u => u.GitHubId)
+            .HasConversion(
+                v => stringEncryptor.Encrypt(v),
+                v => stringEncryptor.Decrypt(v));
+        
+        modelBuilder.Entity<User>()
+            .Property(u => u.GoogleId)
+            .HasConversion(
+                v => stringEncryptor.Encrypt(v),
+                v => stringEncryptor.Decrypt(v));
 
+        modelBuilder.Entity<Message>()
+            .Property(m => m.Content)
+            .HasConversion(
+                v => stringEncryptor.Encrypt(v),
+                v => stringEncryptor.Decrypt(v));
+        
         modelBuilder.Entity<Message>()
             .HasMany(s => s.Attachments)
             .WithOne(s => s.Message)

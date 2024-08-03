@@ -43,6 +43,7 @@ public class UserRepository : IUserRepository
             .Include(nameof(User.UserStatistics))
             .Include(nameof(User.UserSettings))
             .Include(nameof(User.JoinedRooms))
+            .AsSplitQuery()
             .FirstOrDefaultAsync(u => u.Id == id) ?? throw new UserNotFoundException();
     }
 
@@ -64,6 +65,7 @@ public class UserRepository : IUserRepository
             .Include(nameof(User.UserStatistics))
             .Include(nameof(User.UserSettings))
             .Include(nameof(User.JoinedRooms))
+            .AsSplitQuery()
             .FirstOrDefaultAsync(u => u.HexId == hexId) ?? throw new UserNotFoundException();
     }
 
@@ -79,6 +81,7 @@ public class UserRepository : IUserRepository
             .Include(nameof(User.UserStatistics))
             .Include(nameof(User.UserSettings))
             .Include(nameof(User.JoinedRooms))
+            .AsSplitQuery()
             .FirstOrDefaultAsync(u => u.GitHubId == githubId) ?? throw new UserNotFoundException();
     }
     
@@ -94,6 +97,7 @@ public class UserRepository : IUserRepository
             .Include(nameof(User.UserStatistics))
             .Include(nameof(User.UserSettings))
             .Include(nameof(User.JoinedRooms))
+            .AsSplitQuery()
             .FirstOrDefaultAsync(u => u.GoogleId == googleId) ?? throw new UserNotFoundException();
     }
 
@@ -226,6 +230,7 @@ public class UserRepository : IUserRepository
         
         var originalEntity = _dbContext.Users
             .Include(nameof(User.JoinedRooms))
+            .AsSplitQuery()
             .FirstOrDefault(u => u.Id == user.Id) ?? throw new UserNotFoundException();
 
         // Check if a user with the same Hex ID exists
