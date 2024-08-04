@@ -4,6 +4,8 @@ namespace Colir.Interfaces.Hubs;
 
 public interface IVoiceChatHub
 {
+    SignalRHubResult GetVoiceChatUsers();
+    
     Task<SignalRHubResult> Join();
     Task<SignalRHubResult> Leave();
 
@@ -15,9 +17,12 @@ public interface IVoiceChatHub
 
     Task<SignalRHubResult> EnableVideo();
     Task<SignalRHubResult> DisableVideo();
-    Task<SignalRHubResult> SendVideo(string videoData);
+    Task<SignalRHubResult> SendVideoSignal(string videoData);
 
     Task<SignalRHubResult> EnableStream();
     Task<SignalRHubResult> DisableStream();
-    Task<SignalRHubResult> SendStreamPicture(string pictureData);
+    Task<SignalRHubResult> SendStreamSignal(string pictureData);
+
+    SignalRHubResult WatchStream(long userId);
+    SignalRHubResult UnwatchStream(long userId);
 }

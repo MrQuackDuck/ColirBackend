@@ -84,18 +84,31 @@ public class ChatHub : ColirHub, IChatHub
     public async Task<SignalRHubResult> GetMessages(GetLastMessagesModel model)
     {
         if (!IsModelValid(model)) return Error(new (ErrorCode.ModelNotValid));
+
+        var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
         
         var request = new RequestToGetLastMessages
         {
             IssuerId = this.GetIssuerId(),
             Count = model.Count,
             SkipCount = model.SkipCount,
-            RoomGuid = ConnectionsToGroupsMapping[Context.ConnectionId]
+            RoomGuid = roomGuid
         };
 
         try
         {
+            var requestToUpdateLastTimeUserReadChat = new RequestToUpdateLastTimeUserReadChat
+            {
+                IssuerId = this.GetIssuerId(),
+                RoomGuid = roomGuid
+            };
+            
+            await _roomService.UpdateLastTimeUserReadChatAsync(requestToUpdateLastTimeUserReadChat);
             return Success(await _messageService.GetLastMessagesAsync(request));
+        }
+        catch (IssuerNotInRoomException)
+        {
+            return Error(new(ErrorCode.IssuerNotInTheRoom));
         }
         catch (RoomExpiredException)
         {
