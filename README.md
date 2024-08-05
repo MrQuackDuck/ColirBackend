@@ -1,4 +1,4 @@
-<h1><img width=80 src="https://github.com/user-attachments/assets/9d4e3317-89b4-45f3-b974-9d2b5757abf6" /><div>Colir</div></h1>
+<h1><img width=80 src="https://github.com/user-attachments/assets/6d49cded-2929-4c5d-b74e-3c0511ad8724" /><div>Colir</div></h1>
 
 <p>
   <a href="https://dotnet.microsoft.com"><img src="https://img.shields.io/badge/.NET-gray?color=6B47C1&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IndoaXRlIiBkPSJNMS4xOTQgNy41NDN2OC45MTNjMCAxLjEwMy41ODggMi4xMjIgMS41NDQgMi42NzRsNy43MTggNC40NTZhMy4wOSAzLjA5IDAgMCAwIDMuMDg4IDBsNy43MTgtNC40NTZhMy4wOSAzLjA5IDAgMCAwIDEuNTQ0LTIuNjc0VjcuNTQzYTMuMDggMy4wOCAwIDAgMC0xLjU0NC0yLjY3M0wxMy41NDQuNDE0YTMuMDkgMy4wOSAwIDAgMC0zLjA4OCAwTDIuNzM4IDQuODdhMy4wOSAzLjA5IDAgMCAwLTEuNTQ0IDIuNjczbTUuNDAzIDIuOTE0djMuMDg3YS43Ny43NyAwIDAgMCAuNzcyLjc3MmEuNzczLjc3MyAwIDAgMCAuNzcyLS43NzJhLjc3My43NzMgMCAwIDEgMS4zMTctLjU0NmEuNzguNzggMCAwIDEgLjIyNi41NDZhMi4zMTQgMi4zMTQgMCAxIDEtNC42MzEgMHYtMy4wODdjMC0uNjE1LjI0NC0xLjIwMy42NzktMS42MzdhMi4zMSAyLjMxIDAgMCAxIDMuMjc0IDBjLjQzNC40MzQuNjc4IDEuMDIzLjY3OCAxLjYzN2EuNzcuNzcgMCAwIDEtLjIyNi41NDVhLjc2Ny43NjcgMCAwIDEtMS4wOTEgMGEuNzcuNzcgMCAwIDEtLjIyNi0uNTQ1YS43Ny43NyAwIDAgMC0uNzcyLS43NzJhLjc3Ljc3IDAgMCAwLS43NzIuNzcybTEyLjM1IDMuMDg3YS43Ny43NyAwIDAgMS0uNzcyLjc3MmgtLjc3MnYuNzcyYS43NzMuNzczIDAgMCAxLTEuNTQ0IDB2LS43NzJoLTEuNTQ0di43NzJhLjc3My43NzMgMCAwIDEtMS4zMTcuNTQ2YS43OC43OCAwIDAgMS0uMjI2LS41NDZ2LS43NzJIMTJhLjc3MS43NzEgMCAxIDEgMC0xLjU0NGguNzcydi0xLjU0M0gxMmEuNzcuNzcgMCAxIDEgMC0xLjU0NGguNzcydi0uNzcyYS43NzMuNzczIDAgMCAxIDEuMzE3LS41NDZhLjc4Ljc4IDAgMCAxIC4yMjYuNTQ2di43NzJoMS41NDR2LS43NzJhLjc3My43NzMgMCAwIDEgMS41NDQgMHYuNzcyaC43NzJhLjc3Mi43NzIgMCAwIDEgMCAxLjU0NGgtLjc3MnYxLjU0M2guNzcyYS43NzYuNzc2IDAgMCAxIC43NzIuNzcybS0zLjA4OC0yLjMxNWgtMS41NDR2MS41NDNoMS41NDR6Ii8+PC9zdmc+" /></a>
@@ -16,14 +16,14 @@ The main goal of **Colir** is to provide an ability to **communicate securely**.
 
 To implement that, **end-to-end encryption** was chosen. Before using the application, **users should discuss a secret key** that will be **used to encrypt & decrypt** the data.<br>
 
-**BackEnd's role** in all of this is **to transfer** and **store** the encrypted data.
+This **API role** is **to transfer** and **store** the encrypted data.
 
 ## 🌠 Features
 Besides that, **Colir** **has** a couple of **features**, which can interest you in:
 - **Rooms** are places where the encrypted communication happens. When a user **creates** a room, he/she chooses an **encryption key** (which will be stored at the client) and receives a **room GUID**. **They can share that GUID** with someone else so they **can join** that room. **Anyone** who has **the GUID** of a certain room **can join** it, but it will be **impossible to decrypt** the data **if** the **wrong encryption** key is provided.
 - **Expiry date** can be provided for **rooms**. **When** the **expiry date comes**, all **data won't be accessible** and **will be deleted** forever.
-- **Passwordless authentication**. There are **three ways to authenticate**: **anonymous** (gives you one-time JWT), **GitHub** account, and **Google** account.
-- Each user has a unique **"Colir ID"**, which is a **6 symbol-length hexadecimal number**, which identifies each user.
+- **Passwordless authentication**. There are **three ways to authenticate**: **anonymous** (gives you a one-time JWT), **GitHub** account, and **Google** account.
+- Each user has a unique **"Colir ID"**, which is a **6 symbol-length hexadecimal number** to identify a user.
 
 ## 🖥 Development server
 
