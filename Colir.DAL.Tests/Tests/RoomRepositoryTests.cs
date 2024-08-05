@@ -497,7 +497,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         var roomCount = _dbContext.Rooms.Count();
 
         // Act
-        await _roomRepository.DeleteAllExpiredAsync();
+        _roomRepository.DeleteAllExpired();
         _roomRepository.SaveChanges();
 
         // Assert
@@ -511,13 +511,13 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     public async Task DeleteAllExpiredAsync_ThrowsRoomNotFoundException_WhenNoExpiredRoomsExist()
     {
         // Arrange
-        await _roomRepository.DeleteAllExpiredAsync();
+        _roomRepository.DeleteAllExpired();
         _roomRepository.SaveChanges();
 
         // Act
-        AsyncTestDelegate act = async () => await _roomRepository.DeleteAllExpiredAsync();
+        TestDelegate act = () => _roomRepository.DeleteAllExpired();
 
         // Assert
-        Assert.ThrowsAsync<RoomNotFoundException>(act);
+        Assert.Throws<RoomNotFoundException>(act);
     }
 }

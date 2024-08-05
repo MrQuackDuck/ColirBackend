@@ -143,7 +143,7 @@ public class RoomRepository : IRoomRepository
     /// Deletes all expired rooms
     /// </summary>
     /// <exception cref="RoomNotFoundException">Thrown when no expired rooms found</exception>
-    public async Task DeleteAllExpiredAsync()
+    public void DeleteAllExpired()
     {
         var expiredRooms = _dbContext.Rooms.Where(r => r.ExpiryDate < DateTime.Now);
 

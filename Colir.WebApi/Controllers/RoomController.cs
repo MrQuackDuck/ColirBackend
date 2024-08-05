@@ -10,7 +10,6 @@ using Colir.Exceptions.NotFound;
 using Colir.Hubs;
 using Colir.Interfaces.Controllers;
 using Colir.Misc.ExtensionMethods;
-using DAL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;

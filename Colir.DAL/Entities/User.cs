@@ -12,16 +12,16 @@ public class User : BaseEntity
 {
     [Range(0, 16_777_216)]
     public int HexId { get; set; }
-    
+
     [MaxLength(256)]
     public string? GitHubId { get; set; }
-    
+
     [MaxLength(256)]
     public string? GoogleId { get; set; }
-    
+
     [MaxLength(256)]
     public string Username { get; set; } = default!;
-    
+
     public UserAuthType AuthType { get; set; }
 
     [ForeignKey(nameof(UserStatisticsId))]

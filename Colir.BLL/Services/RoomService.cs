@@ -133,7 +133,7 @@ public class RoomService : IRoomService
     {
         var transaction = _unitOfWork.BeginTransaction();
 
-        try { await _unitOfWork.RoomRepository.DeleteAllExpiredAsync(); }
+        try { _unitOfWork.RoomRepository.DeleteAllExpired(); }
         catch { /* ignored */ }
 
         await _unitOfWork.SaveChangesAsync();

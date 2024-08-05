@@ -7,7 +7,6 @@ using Colir.Exceptions.NotFound;
 using Colir.Hubs.Abstract;
 using Colir.Interfaces.Hubs;
 using Colir.Misc.ExtensionMethods;
-using DAL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using SignalRSwaggerGen.Attributes;
@@ -19,14 +18,12 @@ namespace Colir.Hubs;
 public class ClearRoomHub : ColirHub, IClearRoomHub
 {
     private readonly RoomService _roomService;
-    private readonly IUnitOfWork _unitOfWork;
 
     private static readonly Dictionary<string, string> ConnectionsToGroupsMapping = new();
 
-    public ClearRoomHub(RoomService roomService, IUnitOfWork unitOfWork)
+    public ClearRoomHub(RoomService roomService)
     {
         _roomService = roomService;
-        _unitOfWork = unitOfWork;
     }
 
     public override async Task OnConnectedAsync()

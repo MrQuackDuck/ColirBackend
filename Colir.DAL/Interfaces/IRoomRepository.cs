@@ -6,5 +6,5 @@ public interface IRoomRepository : IRepository<Room>
 {
     IRoomFileManager RoomFileManager { get; }
     Task<Room> GetByGuidAsync(string guid);
-    Task DeleteAllExpiredAsync();
+    void DeleteAllExpired();
 }

@@ -10,7 +10,7 @@ public interface IUserRepositoryTests
     Task GetByHexIdAsync_ReturnsUser_WhenFound();
     Task GetByHexIdAsync_ThrowsUserNotFoundException_WhenUserWasNotFound();
     Task GetByHexIdAsync_ThrowsArgumentException_WhenHexFormatIsNotCorrect();
-    
+
     Task GetByGitHubIdAsync_ReturnsUser_WhenFound();
     Task GetByGitHubIdAsync_ThrowsUserNotFoundException_WhenUserWasNotFound();
 
