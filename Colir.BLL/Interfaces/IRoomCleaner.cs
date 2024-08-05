@@ -7,6 +7,7 @@
 public interface IRoomCleaner
 {
     public event Action FileDeleted;
+    public event Action Finished;
     public int FilesToDeleteCount { get; }
 
     /// <summary>

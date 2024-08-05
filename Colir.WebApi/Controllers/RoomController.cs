@@ -10,6 +10,7 @@ using Colir.Exceptions.NotFound;
 using Colir.Hubs;
 using Colir.Interfaces.Controllers;
 using Colir.Misc.ExtensionMethods;
+using DAL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -45,7 +46,8 @@ public class RoomController : ControllerBase, IRoomController
         }
         catch (RoomExpiredException)
         {
-            return BadRequest(new ErrorResponse(ErrorCode.RoomExpired));
+            try { return BadRequest(new ErrorResponse(ErrorCode.RoomExpired)); }
+            finally { await _roomService.DeleteAllExpiredAsync(); }
         }
         catch (RoomNotFoundException)
         {
@@ -286,6 +288,11 @@ public class RoomController : ControllerBase, IRoomController
         catch (StringTooShortException)
         {
             return BadRequest(new ErrorResponse(ErrorCode.StringWasTooShort));
+        }
+        catch (RoomExpiredException)
+        {
+            try { return BadRequest(new ErrorResponse(ErrorCode.RoomExpired)); }
+            finally { await _roomService.DeleteAllExpiredAsync(); }
         }
         catch (RoomNotFoundException)
         {

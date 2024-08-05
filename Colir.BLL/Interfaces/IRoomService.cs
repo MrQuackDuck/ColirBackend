@@ -33,6 +33,7 @@ public interface IRoomService
     /// </summary>
     /// <exception cref="StringTooLongException">Thrown when the name for the room is too long</exception>
     /// <exception cref="StringTooShortException">Thrown when the name for the room is too short</exception>
+    /// <exception cref="RoomExpiredException">Thrown when specified room is expired</exception>
     /// <exception cref="RoomNotFoundException">Thrown when the room was not found</exception>
     /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
     /// <exception cref="NotEnoughPermissionsException">Thrown when the issuer is not the owner of the room</exception>
@@ -45,6 +46,11 @@ public interface IRoomService
     /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
     /// <exception cref="NotEnoughPermissionsException">Thrown when the issuer is not the owner of the room</exception>
     Task DeleteAsync(RequestToDeleteRoom request);
+
+    /// <summary>
+    /// Deletes all expired rooms
+    /// </summary>
+    Task DeleteAllExpiredAsync();
 
     /// <summary>
     /// Gets the last time when user read the chat

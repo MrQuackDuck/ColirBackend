@@ -7,6 +7,7 @@ public class RoomCleaner : IRoomCleaner
 {
     public int FilesToDeleteCount { get; }
     public event Action? FileDeleted;
+    public event Action? Finished;
 
     private List<string> _filesToDelete;
 
@@ -24,5 +25,7 @@ public class RoomCleaner : IRoomCleaner
             File.Delete(file);
             FileDeleted?.Invoke();
         }
+
+        Finished?.Invoke();
     }
 }

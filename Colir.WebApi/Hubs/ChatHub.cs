@@ -64,6 +64,7 @@ public class ChatHub : ColirHub, IChatHub
         catch (RoomExpiredException)
         {
             Context.Abort();
+            await _roomService.DeleteAllExpiredAsync();
         }
         catch (RoomNotFoundException)
         {
@@ -104,6 +105,7 @@ public class ChatHub : ColirHub, IChatHub
             };
 
             await _roomService.UpdateLastTimeUserReadChatAsync(requestToUpdateLastTimeUserReadChat);
+
             return Success(await _messageService.GetLastMessagesAsync(request));
         }
         catch (IssuerNotInRoomException)
@@ -112,7 +114,8 @@ public class ChatHub : ColirHub, IChatHub
         }
         catch (RoomExpiredException)
         {
-            return Error(new(ErrorCode.RoomExpired), true);
+            try { return Error(new(ErrorCode.RoomExpired), true); }
+            finally { await _roomService.DeleteAllExpiredAsync(); }
         }
     }
 
@@ -172,7 +175,8 @@ public class ChatHub : ColirHub, IChatHub
         }
         catch (RoomExpiredException)
         {
-            return Error(new (ErrorCode.RoomExpired), true);
+            try { return Error(new(ErrorCode.RoomExpired), true); }
+            finally { await _roomService.DeleteAllExpiredAsync(); }
         }
         catch (IssuerNotInRoomException)
         {
@@ -207,7 +211,8 @@ public class ChatHub : ColirHub, IChatHub
         }
         catch (RoomExpiredException)
         {
-            return Error(new(ErrorCode.RoomExpired), true);
+            try { return Error(new(ErrorCode.RoomExpired), true); }
+            finally { await _roomService.DeleteAllExpiredAsync(); }
         }
         catch (IssuerNotInRoomException)
         {
@@ -237,7 +242,8 @@ public class ChatHub : ColirHub, IChatHub
         }
         catch (RoomExpiredException)
         {
-            return Error(new(ErrorCode.RoomExpired), true);
+            try { return Error(new(ErrorCode.RoomExpired), true); }
+            finally { await _roomService.DeleteAllExpiredAsync(); }
         }
         catch (IssuerNotInRoomException)
         {
@@ -276,7 +282,8 @@ public class ChatHub : ColirHub, IChatHub
         }
         catch (RoomExpiredException)
         {
-            return Error(new(ErrorCode.RoomExpired), true);
+            try { return Error(new(ErrorCode.RoomExpired), true); }
+            finally { await _roomService.DeleteAllExpiredAsync(); }
         }
     }
 
@@ -306,7 +313,8 @@ public class ChatHub : ColirHub, IChatHub
         }
         catch (RoomExpiredException)
         {
-            return Error(new(ErrorCode.RoomExpired), true);
+            try { return Error(new(ErrorCode.RoomExpired), true); }
+            finally { await _roomService.DeleteAllExpiredAsync(); }
         }
         catch (NotEnoughPermissionsException)
         {

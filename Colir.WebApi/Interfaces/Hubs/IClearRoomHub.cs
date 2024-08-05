@@ -1,7 +1,8 @@
-﻿namespace Colir.Interfaces.Hubs;
+﻿using Colir.Communication.ResponseModels;
+
+namespace Colir.Interfaces.Hubs;
 
 public interface IClearRoomHub
 {
-    Task Connect(string roomGuid);
-    Task Clear();
+    Task<SignalRHubResult> Clear();
 }

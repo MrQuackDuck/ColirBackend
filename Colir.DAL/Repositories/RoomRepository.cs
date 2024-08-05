@@ -117,6 +117,8 @@ public class RoomRepository : IRoomRepository
         _dbContext.Messages.RemoveRange(messagesToDelete);
         var attachmentsToDelete = _dbContext.Attachments.Where(a => messagesToDelete.Any(m => m.Id == a.MessageId));
         _dbContext.Attachments.RemoveRange(attachmentsToDelete);
+
+        RoomFileManager.DeleteAllFiles(room.Guid);
     }
 
     /// <summary>
@@ -133,6 +135,8 @@ public class RoomRepository : IRoomRepository
         _dbContext.Messages.RemoveRange(messagesToDelete);
         var attachmentsToDelete = _dbContext.Attachments.Where(a => messagesToDelete.Any(m => m.Id == a.MessageId));
         _dbContext.Attachments.RemoveRange(attachmentsToDelete);
+
+        RoomFileManager.DeleteAllFiles(target.Guid);
     }
 
     /// <summary>
@@ -148,7 +152,10 @@ public class RoomRepository : IRoomRepository
             throw new RoomNotFoundException();
         }
 
-        _dbContext.RemoveRange(expiredRooms);
+        foreach (var room in expiredRooms)
+        {
+            Delete(room);
+        }
     }
 
     /// <summary>

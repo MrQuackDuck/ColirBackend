@@ -52,6 +52,7 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
         catch (RoomExpiredException)
         {
             Context.Abort();
+            await _roomService.DeleteAllExpiredAsync();
         }
         catch (RoomNotFoundException)
         {
