@@ -14,16 +14,16 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
 {
     private ColirDbContext _dbContext = default!;
     private UserStatisticsRepository _userStatisticsRepository = default!;
-    
+
     [SetUp]
     public void SetUp()
     {
         // Create database context
         _dbContext = UnitTestHelper.CreateDbContext();
-        
+
         // Initialize user statistics repository
         _userStatisticsRepository = new UserStatisticsRepository(_dbContext);
-        
+
         // Add entities
         UnitTestHelper.SeedData(_dbContext);
     }
@@ -34,7 +34,7 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
         _dbContext.Database.EnsureDeleted();
         _dbContext.Dispose();
     }
-    
+
     [Test]
     public async Task GetAllAsync_ReturnsAllUsersStatistics()
     {
@@ -48,7 +48,7 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
 
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new UserStatisticsEqualityComparer()));
-        
+
         Assert.That(result.Select(r => r.User).OrderBy(r => r.Id),
             Is.EqualTo(expected.Select(r => r.User).OrderBy(r => r.Id)).Using(new UserEqualityComparer()));
     }
@@ -121,7 +121,7 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
         // Arrange
         await _userStatisticsRepository.DeleteByIdAsync(3);
         _userStatisticsRepository.SaveChanges();
-        
+
         var statisticsToAdd = new UserStatistics
         {
             UserId = 3, // "Third User"
@@ -278,10 +278,10 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
             MessagesSent = 10,
             RoomsCreated = 5,
         };
-        
+
         // Act
         TestDelegate act = () => _userStatisticsRepository.Update(statsToUpdate);
-        
+
         // Assert
         Assert.Throws<NotFoundException>(act);
     }

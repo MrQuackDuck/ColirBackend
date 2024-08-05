@@ -11,21 +11,21 @@ public class RoomFileManagerTests : IRoomFileManagerTests
 {
     private RoomFileManager _roomFileManager;
     private MockFileSystem _mockFileSystem;
-    
+
     private readonly string _folderName = "RoomFiles";
 
     [SetUp]
     public void SetUp()
     {
         _mockFileSystem = new MockFileSystem(new Dictionary<string, MockFileData>());
-        
+
         var configMock = new Mock<IConfiguration>();
         configMock.Setup(config => config["AppSettings:MaxRoomStorageCapacityInBytes"]).Returns("100000000");
         configMock.Setup(config => config["AppSettings:RoomFilesFolderName"]).Returns("RoomFiles");
-        
+
         _roomFileManager = new RoomFileManager(_mockFileSystem, configMock.Object);
     }
-    
+
     [Test]
     public async Task GetFile_ReturnsFileAsync()
     {
@@ -33,10 +33,10 @@ public class RoomFileManagerTests : IRoomFileManagerTests
         var mockData = new MockFileData("Random Content");
         var path = $"./{_folderName}/00000000-0000-0000-0000-000000000000/File-1.txt";
         _mockFileSystem.AddFile(path, mockData);
-        
+
         // Act
         var file = _roomFileManager.GetFile(path);
-        
+
         // Assert
         Assert.That(file.Name.Contains("File-1.txt"));
     }
@@ -50,7 +50,7 @@ public class RoomFileManagerTests : IRoomFileManagerTests
         _mockFileSystem.AddFile(path, mockFile);
         var fileSize = _mockFileSystem.FileInfo.New(path).Length;
         var expectedFreeSize = 100_000_000 - fileSize;
-        
+
         // Act
         var result = _roomFileManager.GetFreeStorageSize("00000000-0000-0000-0000-000000000000");
 
@@ -66,7 +66,7 @@ public class RoomFileManagerTests : IRoomFileManagerTests
         var path = $"./{_folderName}/00000000-0000-0000-0000-000000000000/File-1.txt";
         _mockFileSystem.AddFile(path, mockFile);
         var expectedFileSize = _mockFileSystem.FileInfo.New(path).Length;
-        
+
         // Act
         var result = _roomFileManager.GetOccupiedStorageSize("00000000-0000-0000-0000-000000000000");
 
@@ -95,7 +95,7 @@ public class RoomFileManagerTests : IRoomFileManagerTests
         var mockFile = new MockFileData("Random Content");
         var path = $"./{_folderName}/00000000-0000-0000-0000-000000000000/File-1.txt";
         _mockFileSystem.AddFile(path, mockFile);
-        
+
         // Act
         _roomFileManager.DeleteFile(path);
 
@@ -118,9 +118,9 @@ public class RoomFileManagerTests : IRoomFileManagerTests
 
         foreach (var path in filePaths)
         {
-            _mockFileSystem.AddFile(path, mockFile);   
+            _mockFileSystem.AddFile(path, mockFile);
         }
-        
+
         // Act
         _roomFileManager.DeleteAllFiles(roomGuid);
 

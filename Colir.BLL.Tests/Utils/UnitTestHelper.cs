@@ -28,10 +28,10 @@ public static class UnitTestHelper
         Mock<IConfiguration> configMock = new Mock<IConfiguration>();
         configMock.Setup(config => config["DatabaseEncryption:EncryptionPassword"]).Returns("16-char-password");
         configMock.Setup(config => config["DatabaseEncryption:InitializationVector"]).Returns("16-char-invector");
-        
+
         return new ColirDbContext(options, configMock.Object);
     }
-    
+
     public static void SeedData(ColirDbContext context)
     {
         // Users
@@ -54,7 +54,7 @@ public static class UnitTestHelper
             Username = "Second User",
             AuthType = UserAuthType.Anonymous,
         };
-        
+
         var user3 = new User
         {
             Id = 3,
@@ -89,7 +89,7 @@ public static class UnitTestHelper
             OwnerId = 1, // "First User"
             JoinedUsers = new List<User>() { user1, user2 },
         };
-        
+
         context.Rooms.AddRange(defaultRoom, expiredRoom);
 
         // Attachments
@@ -100,9 +100,9 @@ public static class UnitTestHelper
             Path = "/tests/file.zip",
             SizeInBytes = 4,
         };
-        
+
         context.Attachments.Add(attachment1);
-        
+
         // Messages
         var message1 = new Message
         {
@@ -123,7 +123,7 @@ public static class UnitTestHelper
             AuthorId = user3.Id, // "Third User"
             RepliedMessageId = message1.Id, // "Message in Room #1"
         };
-        
+
         var message3 = new Message
         {
             Id = 3,
@@ -132,7 +132,7 @@ public static class UnitTestHelper
             RoomId = defaultRoom.Id, // "Room #1"
             AuthorId = user1.Id, // "First User"
         };
-        
+
         var message4 = new Message
         {
             Id = 4,
@@ -141,7 +141,7 @@ public static class UnitTestHelper
             RoomId = defaultRoom.Id, // "Room #1"
             AuthorId = user3.Id, // "Third   User"
         };
-        
+
         var message5 = new Message
         {
             Id = 5,
@@ -150,7 +150,7 @@ public static class UnitTestHelper
             RoomId = expiredRoom.Id, // "Room #2 (expired)"
             AuthorId = user1.Id, // "First User"
         };
-        
+
         context.Messages.AddRange(message1, message2, message3, message4, message5);
 
         // Reactions
@@ -161,7 +161,7 @@ public static class UnitTestHelper
             AuthorId = user1.Id, // "First User"
             MessageId = message1.Id, // "Message in Room #1"
         };
-        
+
         var reaction2 = new Reaction
         {
             Id = 2,
@@ -169,7 +169,7 @@ public static class UnitTestHelper
             AuthorId = user3.Id, // "Third User"
             MessageId = message1.Id, // "Message in Room #1"
         };
-        
+
         var reaction3 = new Reaction
         {
             Id = 3,
@@ -177,7 +177,7 @@ public static class UnitTestHelper
             AuthorId = user3.Id, // "Third User"
             MessageId = message5.Id, // Another message in Room #1
         };
-        
+
         context.Reactions.AddRange(reaction1, reaction2, reaction3);
 
         // Last time users read chats
@@ -188,9 +188,9 @@ public static class UnitTestHelper
             User = user1, // "First User"
             Timestamp = DateTime.Now
         };
-        
+
         context.LastTimeUserReadChats.Add(lastTimeFirstUserReadChat);
-        
+
         // Save changes
         context.SaveChanges();
     }

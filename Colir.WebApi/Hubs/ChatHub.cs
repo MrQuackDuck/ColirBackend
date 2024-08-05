@@ -86,7 +86,7 @@ public class ChatHub : ColirHub, IChatHub
         if (!IsModelValid(model)) return Error(new (ErrorCode.ModelNotValid));
 
         var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
-        
+
         var request = new RequestToGetLastMessages
         {
             IssuerId = this.GetIssuerId(),
@@ -102,7 +102,7 @@ public class ChatHub : ColirHub, IChatHub
                 IssuerId = this.GetIssuerId(),
                 RoomGuid = roomGuid
             };
-            
+
             await _roomService.UpdateLastTimeUserReadChatAsync(requestToUpdateLastTimeUserReadChat);
             return Success(await _messageService.GetLastMessagesAsync(request));
         }
@@ -119,7 +119,7 @@ public class ChatHub : ColirHub, IChatHub
     public async Task<SignalRHubResult> SendMessage(SendMessageModel model)
     {
         if (!IsModelValid(model)) return Error(new (ErrorCode.ModelNotValid));
-        
+
         // Uploading attachments
         var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
         var issuerId = this.GetIssuerId();
@@ -183,7 +183,7 @@ public class ChatHub : ColirHub, IChatHub
     public async Task<SignalRHubResult> EditMessage(EditMessageModel model)
     {
         if (!IsModelValid(model)) return Error(new (ErrorCode.ModelNotValid));
-        
+
         try
         {
             var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
@@ -222,7 +222,7 @@ public class ChatHub : ColirHub, IChatHub
     public async Task<SignalRHubResult> DeleteMessage(DeleteMessageModel model)
     {
         if (!IsModelValid(model)) return Error(new (ErrorCode.ModelNotValid));
-        
+
         try
         {
             var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
@@ -252,7 +252,7 @@ public class ChatHub : ColirHub, IChatHub
     public async Task<SignalRHubResult> AddReactionOnMessage(AddReactionOnMessageModel model)
     {
         if (!IsModelValid(model)) return Error(new (ErrorCode.ModelNotValid));
-        
+
         try
         {
             var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
@@ -283,7 +283,7 @@ public class ChatHub : ColirHub, IChatHub
     public async Task<SignalRHubResult> RemoveReactionFromMessage(RemoveReactionFromMessageModel model)
     {
         if (!IsModelValid(model)) return Error(new (ErrorCode.ModelNotValid));
-        
+
         try
         {
             var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];

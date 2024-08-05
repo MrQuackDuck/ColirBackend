@@ -14,20 +14,20 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
 {
     private ColirDbContext _dbContext;
     private AttachmentRepository _attachmentRepository;
-    
+
     [SetUp]
     public void SetUp()
     {
         // Create database context
         _dbContext = UnitTestHelper.CreateDbContext();
-        
+
         // Initialize attachment repository
         _attachmentRepository = new AttachmentRepository(_dbContext);
-        
+
         // Add entities
         UnitTestHelper.SeedData(_dbContext);
     }
-    
+
     [TearDown]
     public void CleanUp()
     {
@@ -42,14 +42,14 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
         var expected = _dbContext.Attachments
                                  .Include(nameof(Attachment.Message))
                                  .ToList();
-        
+
         // Act
         var result = await _attachmentRepository.GetAllAsync();
-        
+
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new AttachmentEqualityComparer()));
-        
-                
+
+
         Assert.That(result.Select(r => r.Message).OrderBy(r => r?.Id),
             Is.EqualTo(expected.Select(r => r.Message).OrderBy(r => r?.Id)).Using(new MessageEqualityComparer()));
     }
@@ -92,11 +92,11 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
             SizeInBytes = 100,
             MessageId = 2, // Message: "Reply to first message"
         };
-        
+
         // Act
         await _attachmentRepository.AddAsync(attachmentToAdd);
         _attachmentRepository.SaveChanges();
-        
+
         // Assert
         Assert.That(_dbContext.Attachments.Count() == 2);
     }
@@ -106,11 +106,11 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
     {
         // Arrange
         var attachmentToDelete = _dbContext.Attachments.AsNoTracking().First();
-        
+
         // Act
         _attachmentRepository.Delete(attachmentToDelete);
         _attachmentRepository.SaveChanges();
-        
+
         // Assert
         Assert.That(_dbContext.Attachments.Count() == 0);
     }
@@ -127,10 +127,10 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
             SizeInBytes = 100,
             MessageId = 2, // Message: "Reply to first message"
         };
-        
+
         // Act
         TestDelegate act = () => _attachmentRepository.Delete(attachmentToDelete);
-        
+
         // Assert
         Assert.Throws<AttachmentNotFoundException>(act);
     }
@@ -141,7 +141,7 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
         // Act
         await _attachmentRepository.DeleteByIdAsync(1);
         _attachmentRepository.SaveChanges();
-        
+
         // Assert
         Assert.That(_dbContext.Attachments.Count() == 0);
     }
@@ -151,7 +151,7 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
     {
         // Act
         AsyncTestDelegate act = async () => await _attachmentRepository.DeleteByIdAsync(404);
-        
+
         // Assert
         Assert.ThrowsAsync<AttachmentNotFoundException>(act);
     }
@@ -161,12 +161,12 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
     {
         // Arrange
         var attachmentToUpdate = _dbContext.Attachments.AsNoTracking().First();
-        
+
         // Act
         attachmentToUpdate.SizeInBytes = 100;
         _attachmentRepository.Update(attachmentToUpdate);
         _attachmentRepository.SaveChanges();
-        
+
         // Assert
         Assert.That(_dbContext.Attachments.First().SizeInBytes == 100);
     }
@@ -183,10 +183,10 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
             SizeInBytes = 100,
             MessageId = 2, // Message: "Reply to first message"
         };
-        
+
         // Act
         TestDelegate act = () => _attachmentRepository.Update(attachmentToUpdate);
-        
+
         // Assert
         Assert.Throws<AttachmentNotFoundException>(act);
     }

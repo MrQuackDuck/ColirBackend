@@ -19,15 +19,15 @@ namespace Colir.Hubs;
 public class VoiceChatHub : ColirHub, IVoiceChatHub
 {
     private readonly IRoomService _roomService;
-    
+
     private static readonly Dictionary<string, string> ConnectionsToGroupsMapping = new();
     private static readonly List<VoiceChatUser> VoiceChatUsers = new();
-    
+
     public VoiceChatHub(IRoomService roomService)
     {
         _roomService = roomService;
     }
-    
+
     public override async Task OnConnectedAsync()
     {
         // Require a room GUID to connect
@@ -72,10 +72,10 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
     public async Task<SignalRHubResult> Join()
     {
         var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
-        
+
         var user = new VoiceChatUser
         {
-            UserId = this.GetIssuerId(),
+            HexId = this.GetIssuerHexId(),
             ConnectionId = Context.ConnectionId,
             RoomGuid = roomGuid,
             IsDefeaned = false,
@@ -83,7 +83,7 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
             IsStreamEnabled = false,
             IsVideoEnabled = false
         };
-        
+
         VoiceChatUsers.Add(user);
 
         await Clients.Group(roomGuid).SendAsync("UserJoined", user);
@@ -94,7 +94,7 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
     {
         var user = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
         VoiceChatUsers.Remove(user);
-        
+
         return Task.CompletedTask;
     }
 
@@ -102,10 +102,10 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
     {
         var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
         var user = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
-        
-        await Clients.Group(roomGuid).SendAsync("UserLeft", user.UserId);
+
+        await Clients.Group(roomGuid).SendAsync("UserLeft", user.HexId);
         VoiceChatUsers.Remove(user);
-        
+
         return Success();
     }
 
@@ -113,9 +113,9 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
     {
         var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
         var user = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
-        
-        await Clients.Group(roomGuid).SendAsync("UserMuted", user.UserId);
-        
+
+        await Clients.Group(roomGuid).SendAsync("UserMuted", user.HexId);
+
         return Success();
     }
 
@@ -123,9 +123,9 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
     {
         var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
         var user = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
-        
-        await Clients.Group(roomGuid).SendAsync("UserUnmuted", user.UserId);
-        
+
+        await Clients.Group(roomGuid).SendAsync("UserUnmuted", user.HexId);
+
         return Success();
     }
 
@@ -133,9 +133,9 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
     {
         var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
         var user = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
-        
-        await Clients.Group(roomGuid).SendAsync("UserDefeaned", user.UserId);
-        
+
+        await Clients.Group(roomGuid).SendAsync("UserDefeaned", user.HexId);
+
         return Success();
     }
 
@@ -143,23 +143,23 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
     {
         var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
         var user = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
-        
-        await Clients.Group(roomGuid).SendAsync("UserUndefeaned", user.UserId);
-        
+
+        await Clients.Group(roomGuid).SendAsync("UserUndefeaned", user.HexId);
+
         return Success();
     }
 
     public async Task<SignalRHubResult> SendVoiceSignal(string audioData)
     {
         var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
-        var issuerId = this.GetIssuerId();
+        var issuerHexId = this.GetIssuerHexId();
 
         // Exclude sending data for those who are currently defeaned
         var idsToSendTo = VoiceChatUsers
             .Where(u => u.RoomGuid == roomGuid && !u.IsDefeaned)
             .Select(u => u.ConnectionId);
 
-        await Clients.Clients(idsToSendTo).SendAsync(roomGuid, new Signal(issuerId, audioData));
+        await Clients.Clients(idsToSendTo).SendAsync(roomGuid, new Signal(issuerHexId, audioData));
         return Success();
     }
 
@@ -167,9 +167,9 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
     {
         var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
         var user = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
-        
-        await Clients.Group(roomGuid).SendAsync("UserEnabledVideo", user.UserId);
-        
+
+        await Clients.Group(roomGuid).SendAsync("UserEnabledVideo", user.HexId);
+
         return Success();
     }
 
@@ -177,21 +177,21 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
     {
         var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
         var user = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
-        
-        await Clients.Group(roomGuid).SendAsync("UserDisabledVideo", user.UserId);
-        
+
+        await Clients.Group(roomGuid).SendAsync("UserDisabledVideo", user.HexId);
+
         return Success();
     }
 
     public async Task<SignalRHubResult> SendVideoSignal(string videoData)
     {
         var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
-        var issuerId = this.GetIssuerId();
+        var issuerHexId = this.GetIssuerHexId();
 
         var idsToSendTo = VoiceChatUsers
             .Select(u => u.ConnectionId);
 
-        await Clients.Clients(idsToSendTo).SendAsync(roomGuid, new Signal(issuerId, videoData));
+        await Clients.Clients(idsToSendTo).SendAsync(roomGuid, new Signal(issuerHexId, videoData));
         return Success();
     }
 
@@ -199,9 +199,9 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
     {
         var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
         var user = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
-        
-        await Clients.Group(roomGuid).SendAsync("UserEnabledStream", user.UserId);
-        
+
+        await Clients.Group(roomGuid).SendAsync("UserEnabledStream", user.HexId);
+
         return Success();
     }
 
@@ -209,38 +209,38 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
     {
         var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
         var user = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
-        
-        await Clients.Group(roomGuid).SendAsync("UserDisabledStream", user.UserId);
-        
+
+        await Clients.Group(roomGuid).SendAsync("UserDisabledStream", user.HexId);
+
         return Success();
     }
 
     public async Task<SignalRHubResult> SendStreamSignal(string pictureData)
     {
         var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
-        var issuerId = this.GetIssuerId();
+        var issuerHexId = this.GetIssuerHexId();
 
         var idsToSendTo = VoiceChatUsers
-            .Where(u => u.WatchedStreams.Contains(issuerId))
+            .Where(u => u.WatchedStreams.Contains(issuerHexId))
             .Select(u => u.ConnectionId);
 
-        await Clients.Clients(idsToSendTo).SendAsync(roomGuid, new Signal(issuerId, pictureData));
+        await Clients.Clients(idsToSendTo).SendAsync(roomGuid, new Signal(issuerHexId, pictureData));
         return Success();
     }
 
-    public SignalRHubResult WatchStream(long userId)
+    public SignalRHubResult WatchStream(long userHexId)
     {
         var issuer = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
 
-        issuer.WatchedStreams.Add(userId);
+        issuer.WatchedStreams.Add(userHexId);
         return Success();
     }
 
-    public SignalRHubResult UnwatchStream(long userId)
+    public SignalRHubResult UnwatchStream(long userHexId)
     {
         var issuer = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
 
-        issuer.WatchedStreams.Remove(userId);
+        issuer.WatchedStreams.Remove(userHexId);
         return Success();
     }
 }

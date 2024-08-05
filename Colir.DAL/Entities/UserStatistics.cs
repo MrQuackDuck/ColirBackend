@@ -11,6 +11,6 @@ public class UserStatistics : BaseEntity
     public long MessagesSent { get; set; }
     public long RoomsJoined { get; set; }
     public long RoomsCreated { get; set; }
-    
+
     public User User { get; set; } = default!;
 }

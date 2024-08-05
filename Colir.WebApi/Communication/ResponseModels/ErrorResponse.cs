@@ -13,7 +13,7 @@ public class ErrorResponse
         ErrorCode = code;
         ErrorCodeAsString = ErrorCode.ToString();
     }
-    
+
     public ErrorResponse(ErrorCode code, string details)
     {
         ErrorCode = code;

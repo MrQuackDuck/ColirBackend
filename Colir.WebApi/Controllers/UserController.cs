@@ -19,13 +19,13 @@ public class UserController : ControllerBase, IUserController
 {
     private readonly IUserService _userService;
     private readonly IUserStatisticsService _userStatisticsService;
-    
+
     public UserController(IUserService userService, IUserStatisticsService userStatisticsService)
     {
         _userService = userService;
         _userStatisticsService = userStatisticsService;
     }
-    
+
     [HttpGet]
     public async Task<ActionResult<DetailedUserModel>> GetAccountInfo()
     {

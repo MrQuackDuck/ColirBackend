@@ -37,7 +37,7 @@ public class UserServiceTests : IUserServiceTests
 
         var hexGeneratorMock = new Mock<IHexColorGenerator>();
         hexGeneratorMock.Setup(h => h.GetUniqueHexColorAsync()).ReturnsAsync(0x123456);
-        
+
         _userService = new UserService(unitOfWork, mapper, hexGeneratorMock.Object);
 
         // Add entities
@@ -81,7 +81,7 @@ public class UserServiceTests : IUserServiceTests
 
         // Act
         AsyncTestDelegate act = async () => await _userService.GetAccountInfo(request);
-        
+
         // Assert
         Assert.ThrowsAsync<UserNotFoundException>(act);
     }

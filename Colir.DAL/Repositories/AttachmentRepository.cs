@@ -8,12 +8,12 @@ namespace DAL.Repositories;
 public class AttachmentRepository : IAttachmentRepository
 {
     private ColirDbContext _dbContext;
-    
+
     public AttachmentRepository(ColirDbContext dbContext)
     {
         _dbContext = dbContext;
     }
-    
+
     /// <summary>
     /// Gets all attachments
     /// </summary>

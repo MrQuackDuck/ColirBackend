@@ -13,4 +13,13 @@ public static class HubExtensions
     {
         return long.Parse(hub.Context.User!.Claims.First(c => c.Type == "Id").Value);
     }
+
+    /// <summary>
+    /// Extension method to get the hex id from the issuer of the request
+    /// Warning: Use ONLY with <see cref="AuthorizeAttribute"/> set on action/controller!
+    /// </summary>
+    public static int GetIssuerHexId(this Hub hub)
+    {
+        return int.Parse(@hub.Context.User!.Claims.First(c => c.Type == "HexId").Value);
+    }
 }

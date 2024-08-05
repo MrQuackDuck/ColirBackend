@@ -9,13 +9,13 @@ public class RoomCleaner : IRoomCleaner
     public event Action? FileDeleted;
 
     private List<string> _filesToDelete;
-    
+
     public RoomCleaner(string directoryPath)
     {
         _filesToDelete = Directory.GetFiles(directoryPath).ToList();
         FilesToDeleteCount = _filesToDelete.Count;
     }
-    
+
     /// <inheritdoc cref="IRoomCleaner.Start"/>
     public void Start()
     {

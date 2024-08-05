@@ -6,7 +6,7 @@ public interface IHexColorGenerator
     /// Gets a unique Hex Id
     /// </summary>
     Task<int> GetUniqueHexColorAsync();
-    
+
     /// <summary>
     /// Gets a range of unique Hex Ids
     /// </summary>

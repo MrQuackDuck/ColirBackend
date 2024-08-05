@@ -13,25 +13,25 @@ public class AttachmentService : IAttachmentService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
-    
+
     public AttachmentService(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
-    
+
     /// <inheritdoc cref="IAttachmentService.UploadAttachmentAsync"/>
     public async Task<AttachmentModel> UploadAttachmentAsync(RequestToUploadAttachment request)
     {
         var issuer = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
         var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
-        
+
         // Check if room's expired
         if (room.IsExpired())
         {
             throw new RoomExpiredException();
         }
-        
+
         // Check if the issuer's in the room
         if (!room.JoinedUsers.Any(u => u.Id == issuer.Id))
         {
@@ -43,7 +43,7 @@ public class AttachmentService : IAttachmentService
         {
             throw new ArgumentException("No more room storage left!");
         }
-        
+
         var path = await _unitOfWork.RoomRepository.RoomFileManager.UploadFileAsync(room.Guid, request.File);
 
         var attachment = new Attachment
@@ -57,7 +57,7 @@ public class AttachmentService : IAttachmentService
 
         // Adding the attachment to the DB
         await _unitOfWork.AttachmentRepository.AddAsync(attachment);
-        
+
         await _unitOfWork.SaveChangesAsync();
         await transaction.CommitAsync();
 

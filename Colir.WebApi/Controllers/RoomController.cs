@@ -7,10 +7,12 @@ using Colir.Communication.ResponseModels;
 using Colir.Exceptions;
 using Colir.Exceptions.NotEnoughPermissions;
 using Colir.Exceptions.NotFound;
+using Colir.Hubs;
 using Colir.Interfaces.Controllers;
 using Colir.Misc.ExtensionMethods;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Colir.Controllers;
 
@@ -20,12 +22,14 @@ namespace Colir.Controllers;
 public class RoomController : ControllerBase, IRoomController
 {
     private readonly IRoomService _roomService;
-    
-    public RoomController(IRoomService roomService)
+    private readonly IHubContext<ChatHub> _chatHub;
+
+    public RoomController(IRoomService roomService, IHubContext<ChatHub> chatHub)
     {
         _roomService = roomService;
+        _chatHub = chatHub;
     }
-    
+
     [HttpGet]
     public async Task<ActionResult<RoomModel>> GetRoomInfo(GetRoomInfoModel model)
     {
@@ -96,7 +100,15 @@ public class RoomController : ControllerBase, IRoomController
                 RoomGuid = model.RoomGuid
             };
 
-            return Ok(await _roomService.JoinMemberAsync(request));
+            try
+            {
+                return Ok(await _roomService.JoinMemberAsync(request));
+            }
+            finally
+            {
+                // Notifying users in the Chat hub that a new user has joined
+                await _chatHub.Clients.Group(model.RoomGuid).SendAsync("UserJoined", this.GetIssuerHexId());
+            }
         }
         catch (RoomNotFoundException)
         {
@@ -121,7 +133,15 @@ public class RoomController : ControllerBase, IRoomController
 
             await _roomService.LeaveAsync(request);
 
-            return Ok();
+            try
+            {
+                return Ok();
+            }
+            finally
+            {
+                // Notifying users in the Chat hub that the user left
+                await _chatHub.Clients.Group(request.RoomGuid).SendAsync("UserLeft", this.GetIssuerHexId());
+            }
         }
         catch (RoomNotFoundException)
         {
@@ -176,7 +196,7 @@ public class RoomController : ControllerBase, IRoomController
             };
 
             await _roomService.UpdateLastTimeUserReadChatAsync(request);
-            
+
             return Ok();
         }
         catch (RoomNotFoundException)
@@ -207,7 +227,15 @@ public class RoomController : ControllerBase, IRoomController
 
             await _roomService.KickMemberAsync(request);
 
-            return Ok();
+            try
+            {
+                return Ok();
+            }
+            finally
+            {
+                // Notifying users in the Chat hub that the user was kicked
+                await _chatHub.Clients.Group(request.RoomGuid).SendAsync("UserKicked", request.TargetHexId);
+            }
         }
         catch (RoomNotFoundException)
         {
@@ -241,7 +269,15 @@ public class RoomController : ControllerBase, IRoomController
 
             await _roomService.RenameAsync(request);
 
-            return Ok();
+            try
+            {
+                return Ok();
+            }
+            finally
+            {
+                // Notifying users in the Chat hub that the room was renamed
+                await _chatHub.Clients.Group(request.RoomGuid).SendAsync("RoomRenamed", request.NewName);
+            }
         }
         catch (StringTooLongException)
         {
@@ -278,7 +314,15 @@ public class RoomController : ControllerBase, IRoomController
 
             await _roomService.DeleteAsync(request);
 
-            return Ok();
+            try
+            {
+                return Ok();
+            }
+            finally
+            {
+                // Notifying users in the Chat hub that the room was deleted
+                await _chatHub.Clients.Group(request.RoomGuid).SendAsync("RoomDeleted", request.RoomGuid);
+            }
         }
         catch (RoomNotFoundException)
         {

@@ -38,10 +38,10 @@ public class HexColorGeneratorTests : IHexColorGeneratorTests
 
     [Test]
     public async Task GetUniqueHexColorAsync_ReturnsHexInValidFormat()
-    {   
+    {
         // Act
         var result = await _hexGenerator.GetUniqueHexColorAsync();
-        
+
         // Assert
         Assert.That(result.ToString("x6").Length == 6);
     }
@@ -51,7 +51,7 @@ public class HexColorGeneratorTests : IHexColorGeneratorTests
     {
         // Act
         var result = await _hexGenerator.GetUniqueHexColorAsyncsListAsync(5);
-        
+
         // Assert
         foreach (var hex in result)
         {
@@ -76,6 +76,6 @@ public class HexColorGeneratorTests : IHexColorGeneratorTests
         AsyncTestDelegate act = async () => await _hexGenerator.GetUniqueHexColorAsyncsListAsync(-1);
 
         // Assert
-        Assert.ThrowsAsync<ArgumentOutOfRangeException>(act);  
+        Assert.ThrowsAsync<ArgumentOutOfRangeException>(act);
     }
 }

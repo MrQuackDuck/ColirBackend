@@ -2,7 +2,7 @@
 
 public class VoiceChatUser
 {
-    public long UserId { get; set; }
+    public long HexId { get; set; }
     public string ConnectionId { get; set; } = default!;
     public string RoomGuid { get; set; } = default!;
     public bool IsMuted { get; set; }

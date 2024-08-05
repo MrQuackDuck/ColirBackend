@@ -103,14 +103,7 @@ public class AuthController : ControllerBase, IAuthController
 
                 var userModel = await _userService.AuthorizeViaGitHubAsync(request);
 
-                // Creating claims for a token
-                var claims = new List<Claim>
-                {
-                    new Claim("Id", userModel.Id.ToString()),
-                    new Claim("AuthType", userModel.AuthType.ToString())
-                };
-
-                var jwtToken = GenerateJwtToken(claims);
+                var jwtToken = GenerateJwtToken(userModel.Id, userModel.HexId, userModel.AuthType);
 
                 // Applying the jwt token to response's cookies
                 Response.ApplyJwtToken(jwtToken);
@@ -167,14 +160,7 @@ public class AuthController : ControllerBase, IAuthController
 
                 var userModel = await _userService.AuthorizeViaGoogleAsync(request);
 
-                // Creating claims for a token
-                var claims = new List<Claim>
-                {
-                    new Claim("Id", userModel.Id.ToString()),
-                    new Claim("AuthType", userModel.AuthType.ToString())
-                };
-
-                var jwtToken = GenerateJwtToken(claims);
+                var jwtToken = GenerateJwtToken(userModel.Id, userModel.HexId, userModel.AuthType);
 
                 // Applying the jwt token to response's cookies
                 Response.ApplyJwtToken(jwtToken);
@@ -204,14 +190,7 @@ public class AuthController : ControllerBase, IAuthController
 
             var userModel = await _userService.AuthorizeAsAnnoymousAsync(request);
 
-            // Creating claims for a token
-            var claims = new List<Claim>
-            {
-                new Claim("Id", userModel.Id.ToString()),
-                new Claim("AuthType", userModel.AuthType.ToString())
-            };
-
-            var jwtToken = GenerateJwtToken(claims);
+            var jwtToken = GenerateJwtToken(userModel.Id, userModel.HexId, userModel.AuthType);
 
             // Applying the jwt token
             Response.ApplyJwtToken(jwtToken);
@@ -252,8 +231,16 @@ public class AuthController : ControllerBase, IAuthController
     }
 
     [NonAction]
-    private string GenerateJwtToken(List<Claim> claims)
+    private string GenerateJwtToken(long userId, long userHexId, UserAuthType authType)
     {
+        // Creating claims for a token
+        var claims = new List<Claim>
+        {
+            new Claim("Id", userId.ToString()),
+            new Claim("HexId", userHexId.ToString()),
+            new Claim("AuthType", authType.ToString())
+        };
+
         // Getting the key and generating a token
         var encrpyionKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:JwtKey").Value!));
         var jwtToken = new JwtSecurityToken(claims: claims,

@@ -27,7 +27,7 @@ public interface IRoomService
     /// <exception cref="StringTooLongException">Thrown when the name for the room is too long</exception>
     /// <exception cref="StringTooShortException">Thrown when the name for the room is too short</exception>
     Task<string> CreateAsync(RequestToCreateRoom request);
-    
+
     /// <summary>
     /// Renames the room
     /// </summary>
@@ -37,7 +37,7 @@ public interface IRoomService
     /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
     /// <exception cref="NotEnoughPermissionsException">Thrown when the issuer is not the owner of the room</exception>
     Task RenameAsync(RequestToRenameRoom request);
-    
+
     /// <summary>
     /// Deletes the room
     /// </summary>
@@ -53,7 +53,7 @@ public interface IRoomService
     /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
     /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
     Task<DateTime> GetLastTimeUserReadChatAsync(RequestToGetLastTimeUserReadChat request);
-    
+
     /// <summary>
     /// Updates the last time user read the chat
     /// </summary>
@@ -69,7 +69,7 @@ public interface IRoomService
     /// <exception cref="RoomNotFoundException">Thrown when the room was not found</exception>
     /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
     Task<RoomModel> JoinMemberAsync(RequestToJoinRoom request);
-    
+
     /// <summary>
     /// Kicks the user from the room
     /// </summary>
@@ -78,7 +78,7 @@ public interface IRoomService
     /// <exception cref="NotEnoughPermissionsException">Thrown when user is not the owner of the room</exception>
     /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
     Task KickMemberAsync(RequestToKickMember request);
-    
+
     /// <summary>
     /// Leaves the room
     /// </summary>

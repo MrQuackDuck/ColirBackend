@@ -10,10 +10,10 @@ namespace DAL.Repositories;
 public class RoomRepository : IRoomRepository
 {
     public IRoomFileManager RoomFileManager { get; }
-    
+
     private ColirDbContext _dbContext;
     private IConfiguration _config;
-    
+
     public RoomRepository(ColirDbContext dbContext, IConfiguration config, IRoomFileManager roomFileManager)
     {
         _dbContext = dbContext;
@@ -84,7 +84,7 @@ public class RoomRepository : IRoomRepository
         {
             throw new StringTooShortException();
         }
-        
+
         // Check for max name length
         var maxRoomNameLength = int.Parse(_config["AppSettings:MaxRoomNameLength"]!);
 
@@ -99,7 +99,7 @@ public class RoomRepository : IRoomRepository
         {
             throw new UserNotFoundException();
         }
-        
+
         await _dbContext.Rooms.AddAsync(room);
     }
 
@@ -111,7 +111,7 @@ public class RoomRepository : IRoomRepository
     public void Delete(Room room)
     {
         var target = _dbContext.Rooms.FirstOrDefault(r => r.Id == room.Id) ?? throw new RoomNotFoundException();
-        
+
         _dbContext.Rooms.Remove(target);
         var messagesToDelete = _dbContext.Messages.Where(m => m.RoomId == room.Id);
         _dbContext.Messages.RemoveRange(messagesToDelete);
@@ -127,7 +127,7 @@ public class RoomRepository : IRoomRepository
     public async Task DeleteByIdAsync(long id)
     {
         var target = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Id == id) ?? throw new RoomNotFoundException();
-        
+
         _dbContext.Rooms.Remove(target);
         var messagesToDelete = _dbContext.Messages.Where(m => m.RoomId == id);
         _dbContext.Messages.RemoveRange(messagesToDelete);
@@ -147,7 +147,7 @@ public class RoomRepository : IRoomRepository
         {
             throw new RoomNotFoundException();
         }
-        
+
         _dbContext.RemoveRange(expiredRooms);
     }
 
@@ -174,7 +174,7 @@ public class RoomRepository : IRoomRepository
         {
             throw new StringTooShortException();
         }
-        
+
         // Check for max name length
         var maxRoomNameLength = int.Parse(_config["AppSettings:MaxRoomNameLength"]!);
 
@@ -193,15 +193,15 @@ public class RoomRepository : IRoomRepository
             for (int i = 0; i < originalEntity.JoinedUsers.Count; i++)
             {
                 var user = originalEntity.JoinedUsers[i];
-            
+
                 if (!room.JoinedUsers.Any(u => u.Id == user.Id))
                 {
                     originalEntity.JoinedUsers.Remove(user);
                     i--;
                 }
-            }   
+            }
         }
-        
+
         _dbContext.Entry(originalEntity).State = EntityState.Detached;
         _dbContext.Entry(room).State = EntityState.Modified;
     }

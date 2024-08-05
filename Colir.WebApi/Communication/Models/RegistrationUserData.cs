@@ -8,7 +8,7 @@ public class RegistrationUserData
     /// User's Id from OAuth service (like from Google, GitHub, etc..)
     /// </summary>
     public string OAuth2UserId { get; }
-    
+
     /// <summary>
     /// Type of user authentication
     /// </summary>

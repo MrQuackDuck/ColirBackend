@@ -9,12 +9,12 @@ namespace DAL.Repositories;
 public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
 {
     private ColirDbContext _dbContext;
-    
+
     public LastTimeUserReadChatRepository(ColirDbContext dbContext)
     {
         _dbContext = dbContext;
     }
-    
+
     /// <summary>
     /// Gets all times users read any chats recently
     /// </summary>
@@ -26,7 +26,7 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
             .Include(nameof(LastTimeUserReadChat.User))
             .ToListAsync();
     }
-    
+
     /// <summary>
     /// Gets last time user read the chat in certain room by userId and roomId
     /// </summary>
@@ -40,12 +40,12 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
         {
             throw new RoomNotFoundException();
         }
-        
+
         if (!await _dbContext.Users.AnyAsync(u => u.Id == userId))
         {
             throw new UserNotFoundException();
         }
-        
+
         return await _dbContext.LastTimeUserReadChats
             .AsNoTracking()
             .Include(nameof(LastTimeUserReadChat.Room))
@@ -87,17 +87,17 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
         {
             throw new RoomExpiredException();
         }
-        
+
         if (!await _dbContext.Users.AnyAsync(u => u.Id == entity.UserId))
         {
             throw new UserNotFoundException();
         }
-        
+
         if (await _dbContext.LastTimeUserReadChats.AnyAsync(l => l.UserId == entity.UserId && l.RoomId == entity.RoomId))
         {
             throw new InvalidActionException();
         }
-        
+
         await _dbContext.LastTimeUserReadChats.AddAsync(entity);
     }
 
@@ -142,7 +142,7 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
         {
             throw new ArgumentException("You can't update last time user read chat with different user id!");
         }
-        
+
         // Check if another RoomId provided
         if (originalEntity.RoomId != entity.RoomId)
         {
@@ -153,7 +153,7 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
         {
             throw new RoomExpiredException();
         }
-        
+
         _dbContext.Entry(originalEntity).State = EntityState.Detached;
         _dbContext.Entry(entity).State = EntityState.Modified;
     }

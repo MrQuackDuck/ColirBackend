@@ -8,12 +8,12 @@ namespace DAL.Repositories;
 public class ReactionRepository : IReactionRepository
 {
     private ColirDbContext _dbContext;
-    
+
     public ReactionRepository(ColirDbContext dbContext)
     {
         _dbContext = dbContext;
     }
-    
+
     /// <summary>
     /// Gets all reactions
     /// </summary>
@@ -25,7 +25,7 @@ public class ReactionRepository : IReactionRepository
             .Include(nameof(Reaction.Message))
             .ToListAsync();
     }
-    
+
     /// <summary>
     /// Gets the reaction by id
     /// </summary>
@@ -39,7 +39,7 @@ public class ReactionRepository : IReactionRepository
             .Include(nameof(Reaction.Message))
             .FirstOrDefaultAsync(r => r.Id == id) ?? throw new ReactionNotFoundException();
     }
-    
+
     /// <summary>
     /// Gets all reactions on certain message
     /// </summary>
@@ -51,7 +51,7 @@ public class ReactionRepository : IReactionRepository
         {
             throw new MessageNotFoundException();
         }
-        
+
         return await _dbContext.Reactions
             .AsNoTracking()
             .Include(nameof(Reaction.Author))
@@ -72,12 +72,12 @@ public class ReactionRepository : IReactionRepository
         {
             throw new UserNotFoundException();
         }
-        
+
         if (!await _dbContext.Messages.AnyAsync(m => m.Id == reaction.MessageId))
         {
             throw new MessageNotFoundException();
         }
-        
+
         await _dbContext.AddAsync(reaction);
     }
 
@@ -111,12 +111,12 @@ public class ReactionRepository : IReactionRepository
     public void Update(Reaction reaction)
     {
         var originalEntity = _dbContext.Reactions.FirstOrDefault(r => r.Id == reaction.Id);
-        
+
         if (originalEntity == null)
         {
             throw new ReactionNotFoundException();
         }
-        
+
         _dbContext.Entry(originalEntity).State = EntityState.Detached;
         _dbContext.Entry(reaction).State = EntityState.Modified;
     }

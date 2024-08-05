@@ -8,7 +8,7 @@ namespace Colir.Communication.ResponseModels;
 public abstract class SignalRHubResult
 {
     public SignalrResultType ResultType { get; set; }
-    
+
     public SignalRHubResult(SignalrResultType resultType)
     {
         ResultType = resultType;

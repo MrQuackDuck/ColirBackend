@@ -4,7 +4,7 @@ public interface IUserServiceTests
 {
     Task GetAccountInfo_ReturnsUser();
     Task GetAccountInfo_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
-    
+
     Task AuthorizeViaGitHubAsync_CreatesUser();
     Task AuthorizeViaGitHubAsync_ReturnsCorrectData();
     Task AuthorizeViaGitHubAsync_ThrowsArgumentException_WhenHexIsNotUnique();

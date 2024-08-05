@@ -20,14 +20,14 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
     {
         // Create database context
         _dbContext = UnitTestHelper.CreateDbContext();
-        
+
         // Initialize reaction repository
         _reactionRepository = new ReactionRepository(_dbContext);
-        
+
         // Add entities
         UnitTestHelper.SeedData(_dbContext);
     }
-    
+
     [TearDown]
     public void CleanUp()
     {
@@ -50,10 +50,10 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
         // Assert
         Assert.NotNull(result);
         Assert.That(result, Is.EqualTo(expected).Using(new ReactionEqualityComparer()));
-        
+
         Assert.That(result.Select(r => r.Author).OrderBy(r => r.Id),
             Is.EqualTo(expected.Select(r => r.Author).OrderBy(r => r.Id)).Using(new UserEqualityComparer()));
-        
+
         Assert.That(result.Select(r => r.Message).OrderBy(r => r.Id),
             Is.EqualTo(expected.Select(r => r.Message).OrderBy(r => r.Id)).Using(new MessageEqualityComparer()));
     }
@@ -91,11 +91,11 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
     {
         // Arrange
         var expected = new List<Reaction>
-        { 
+        {
             _dbContext.Reactions
                 .Include(nameof(Reaction.Author))
                 .Include(nameof(Reaction.Message))
-                .FirstOrDefault(r => r.MessageId == 1)! 
+                .FirstOrDefault(r => r.MessageId == 1)!
         };
 
         // Act
@@ -103,10 +103,10 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
 
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new ReactionEqualityComparer()));
-        
+
         Assert.That(result.Select(r => r.Author).OrderBy(r => r.Id),
             Is.EqualTo(expected.Select(r => r.Author).OrderBy(r => r.Id)).Using(new UserEqualityComparer()));
-        
+
         Assert.That(result.Select(r => r.Message).OrderBy(r => r.Id),
             Is.EqualTo(expected.Select(r => r.Message).OrderBy(r => r.Id)).Using(new MessageEqualityComparer()));
     }

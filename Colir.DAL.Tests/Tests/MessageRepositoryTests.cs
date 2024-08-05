@@ -28,7 +28,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
         // Add entities
         UnitTestHelper.SeedData(_dbContext);
     }
-    
+
     [TearDown]
     public void CleanUp()
     {
@@ -52,13 +52,13 @@ public class MessageRepositoryTests : IMessageRepositoryTests
         // Assert
         Assert.NotNull(result);
         Assert.That(result, Is.EqualTo(expected).Using(new MessageEqualityComparer()));
-        
+
         Assert.That(result.Select(r => r.Author).OrderBy(r => r!.Id),
             Is.EqualTo(expected.Select(r => r.Author).OrderBy(r => r!.Id)).Using(new UserEqualityComparer()));
-        
+
         Assert.That(result.SelectMany(r => r.Reactions).OrderBy(r => r.Id),
             Is.EqualTo(expected.SelectMany(r => r.Reactions).OrderBy(r => r.Id)).Using(new ReactionEqualityComparer()));
-        
+
         Assert.That(result.SelectMany(r => r.Attachments).OrderBy(r => r.Id),
             Is.EqualTo(expected.SelectMany(r => r.Attachments).OrderBy(r => r.Id)).Using(new AttachmentEqualityComparer()));
     }
@@ -67,8 +67,8 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     public async Task GetLastMessages_ReturnsLastMessages()
     {
         // Arrange
-        var expected = new List<Message> 
-        { 
+        var expected = new List<Message>
+        {
             _dbContext.Messages
                 .Include(nameof(Message.Author))
                 .Include(nameof(Message.Reactions))
@@ -81,10 +81,10 @@ public class MessageRepositoryTests : IMessageRepositoryTests
 
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new MessageEqualityComparer()));
-        
+
         Assert.That(result.SelectMany(r => r.Reactions).OrderBy(r => r.Id),
             Is.EqualTo(expected.SelectMany(r => r.Reactions).OrderBy(r => r.Id)).Using(new ReactionEqualityComparer()));
-        
+
         Assert.That(result.SelectMany(r => r.Attachments).OrderBy(r => r.Id),
             Is.EqualTo(expected.SelectMany(r => r.Attachments).OrderBy(r => r.Id)).Using(new AttachmentEqualityComparer()));
     }

@@ -9,7 +9,7 @@ public class GitHubOAuth2Api : IGitHubOAuth2Api
     public async Task<string> GetUserGitHubTokenAsync(string githubClientId, string githubAuthSecret, string code)
     {
         using var httpClient = new HttpClient();
-        
+
         var requestToGetToken = new HttpRequestMessage(HttpMethod.Post, "https://github.com/login/oauth/access_token");
         requestToGetToken.Content = new FormUrlEncodedContent(new Dictionary<string, string>()
         {
@@ -30,7 +30,7 @@ public class GitHubOAuth2Api : IGitHubOAuth2Api
     public async Task<string> GetUserGitHubIdAsync(string githubAccessToken)
     {
         using var httpClient = new HttpClient();
-        
+
         var requestToGetUserData = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/user");
         requestToGetUserData.Headers.Add("Accept", "application/vnd.github+json");
         requestToGetUserData.Headers.Add("Authorization", $"Bearer {githubAccessToken}");

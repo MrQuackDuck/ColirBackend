@@ -14,14 +14,14 @@ public class UserService : IUserService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IHexColorGenerator _hexGenerator;
-    
+
     public UserService(IUnitOfWork unitOfWork, IMapper mapper, IHexColorGenerator hexGenerator)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _hexGenerator = hexGenerator;
     }
-    
+
     /// <inheritdoc cref="IUserService.GetAccountInfo"/>
     public async Task<DetailedUserModel> GetAccountInfo(RequestToGetAccountInfo request)
     {
@@ -49,7 +49,7 @@ public class UserService : IUserService
                 GitHubId = request.GitHubId,
                 AuthType = UserAuthType.Github
             };
-            
+
             // Check if an user with the same HexId already exists
             if (await _unitOfWork.UserRepository.ExistsAsync(request.HexId))
             {
@@ -61,11 +61,11 @@ public class UserService : IUserService
             await _unitOfWork.UserRepository.AddAsync(user);
             await _unitOfWork.SaveChangesAsync();
             await transaction.CommitAsync();
-            
+
             return _mapper.Map<DetailedUserModel>(user);
         }
     }
-    
+
     /// <inheritdoc cref="IUserService.AuthorizeViaGoogleAsync"/>
     public async Task<DetailedUserModel> AuthorizeViaGoogleAsync(RequestToAuthorizeViaGoogle request)
     {
@@ -85,7 +85,7 @@ public class UserService : IUserService
                 GoogleId = request.GoogleId,
                 AuthType = UserAuthType.Google
             };
-            
+
             // Check if an user with the same HexId already exists
             if (await _unitOfWork.UserRepository.ExistsAsync(request.HexId))
             {
@@ -97,7 +97,7 @@ public class UserService : IUserService
             await _unitOfWork.UserRepository.AddAsync(user);
             await _unitOfWork.SaveChangesAsync();
             await transaction.CommitAsync();
-            
+
             return _mapper.Map<DetailedUserModel>(user);
         }
     }
@@ -106,7 +106,7 @@ public class UserService : IUserService
     public async Task<DetailedUserModel> AuthorizeAsAnnoymousAsync(RequestToAuthorizeAsAnnoymous request)
     {
         var transaction = _unitOfWork.BeginTransaction();
-        
+
         var user = new User
         {
             Username = request.DesiredUsername,
@@ -128,11 +128,11 @@ public class UserService : IUserService
 
         var user = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
         user.Username = request.DesiredUsername;
-        
+
         _unitOfWork.UserRepository.Update(user);
         await _unitOfWork.SaveChangesAsync();
         await transaction.CommitAsync();
-        
+
         return _mapper.Map<DetailedUserModel>(user);
     }
 
@@ -145,7 +145,7 @@ public class UserService : IUserService
         var settingsToUpdate = _mapper.Map<UserSettings>(request.NewSettings);
         settingsToUpdate.Id = user.UserSettings.Id;
         settingsToUpdate.UserId = user.Id;
-        
+
         _unitOfWork.UserSettingsRepository.Update(settingsToUpdate);
         await _unitOfWork.SaveChangesAsync();
         await transaction.CommitAsync();

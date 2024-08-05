@@ -30,7 +30,7 @@ public interface IRoomRepositoryTests
     Task Update_ThrowsStringTooLongException_WhenNameTooLong();
     Task Update_ThrowsStringTooShortException_WhenNameTooShort();
     Task Update_ThrowsRoomNotFoundException_WhenRoomDoesNotExist();
-    
+
     Task DeleteAllExpiredAsync_DeletesAllExpiredRooms();
     Task DeleteAllExpiredAsync_ThrowsRoomNotFoundException_WhenNoExpiredRoomsExist();
 }

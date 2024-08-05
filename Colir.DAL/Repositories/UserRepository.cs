@@ -11,7 +11,7 @@ public class UserRepository : IUserRepository
 {
     private readonly ColirDbContext _dbContext;
     private readonly IConfiguration _config;
-    
+
     public UserRepository(ColirDbContext dbContext, IConfiguration config)
     {
         _dbContext = dbContext;
@@ -59,7 +59,7 @@ public class UserRepository : IUserRepository
         {
             throw new ArgumentException("Invalid Hex ID provided!");
         }
-        
+
         return await _dbContext.Users
             .AsNoTracking()
             .Include(nameof(User.UserStatistics))
@@ -84,7 +84,7 @@ public class UserRepository : IUserRepository
             .AsSplitQuery()
             .FirstOrDefaultAsync(u => u.GitHubId == githubId) ?? throw new UserNotFoundException();
     }
-    
+
     /// <summary>
     /// Gets the user by their GitHub Id
     /// </summary>
@@ -127,7 +127,7 @@ public class UserRepository : IUserRepository
         {
             throw new ArgumentException("Invalid Hex ID provided!");
         }
-        
+
         // Check if a user with the same Hex ID exists
         if (await _dbContext.Users.CountAsync(u => u.HexId == user.HexId) > 0)
         {
@@ -140,9 +140,9 @@ public class UserRepository : IUserRepository
         {
             throw new StringTooShortException();
         }
-        
+
         var maxUsernameLength = int.Parse(_config["AppSettings:MaxUsernameLength"]!);
-        
+
         if (user.Username.Length > maxUsernameLength)
         {
             throw new StringTooLongException();
@@ -153,7 +153,7 @@ public class UserRepository : IUserRepository
             if (room.IsExpired()) throw new RoomExpiredException();
             if (!await _dbContext.Rooms.AnyAsync(r => room.Id == r.Id)) throw new RoomNotFoundException();
         }
-        
+
         var userStats = new UserStatistics
         {
             User = user
@@ -164,7 +164,7 @@ public class UserRepository : IUserRepository
             User = user,
             StatisticsEnabled = true
         };
-        
+
         await _dbContext.Users.AddAsync(user);
         await _dbContext.UserStatistics.AddAsync(userStats);
         await _dbContext.UserSettings.AddAsync(userSettings);
@@ -181,12 +181,12 @@ public class UserRepository : IUserRepository
             .Include(nameof(User.UserStatistics))
             .Include(nameof(User.UserSettings))
             .FirstOrDefault(u => u.Id == user.Id) ?? throw new UserNotFoundException();
-        
+
         _dbContext.Users.Remove(target);
         _dbContext.UserSettings.Remove(target.UserSettings);
         _dbContext.UserStatistics.Remove(target.UserStatistics);
     }
-    
+
     /// <summary>
     /// Deletes the user by id
     /// </summary>
@@ -198,7 +198,7 @@ public class UserRepository : IUserRepository
             .Include(nameof(User.UserStatistics))
             .Include(nameof(User.UserSettings))
             .FirstOrDefaultAsync(u => u.Id == id) ?? throw new UserNotFoundException();
-        
+
         _dbContext.Users.Remove(target);
         _dbContext.UserSettings.Remove(target.UserSettings);
         _dbContext.UserStatistics.Remove(target.UserStatistics);
@@ -220,14 +220,14 @@ public class UserRepository : IUserRepository
         {
             throw new StringTooShortException();
         }
-        
+
         var maxUsernameLength = int.Parse(_config["AppSettings:MaxUsernameLength"]!);
-        
+
         if (user.Username.Length > maxUsernameLength)
         {
             throw new StringTooLongException();
         }
-        
+
         var originalEntity = _dbContext.Users
             .Include(nameof(User.JoinedRooms))
             .AsSplitQuery()
@@ -238,12 +238,12 @@ public class UserRepository : IUserRepository
         {
             throw new ArgumentException("User with the same Hex ID exists already!");
         }
-        
+
         // Check if joined rooms list has changed to delete rooms where user is not present at
         for (int i = 0; i < originalEntity.JoinedRooms.Count; i++)
         {
             var room = originalEntity.JoinedRooms[i];
-            
+
             if (!user.JoinedRooms.Any(r => r.Id == room.Id))
             {
                 originalEntity.JoinedRooms.Remove(room);

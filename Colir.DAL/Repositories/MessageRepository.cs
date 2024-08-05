@@ -9,7 +9,7 @@ namespace DAL.Repositories;
 public class MessageRepository : IMessageRepository
 {
     private ColirDbContext _dbContext;
-    
+
     public MessageRepository(ColirDbContext dbContext)
     {
         _dbContext = dbContext;
@@ -48,7 +48,7 @@ public class MessageRepository : IMessageRepository
             .AsSplitQuery()
             .FirstOrDefaultAsync(m => m.Id == id) ?? throw new MessageNotFoundException();
     }
-    
+
     /// <summary>
     /// Gets last sent messages in certain room
     /// </summary>
@@ -76,7 +76,7 @@ public class MessageRepository : IMessageRepository
         {
             throw new RoomExpiredException();
         }
-        
+
         return await _dbContext.Messages
             .AsNoTracking()
             .Where(m => m.RoomId == room.Id)
@@ -107,12 +107,12 @@ public class MessageRepository : IMessageRepository
 
         var room = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Id == message.RoomId) ?? throw new RoomNotFoundException();
         if (room.IsExpired()) throw new RoomExpiredException();
-        
+
         if (!await _dbContext.Users.AnyAsync(u => u.Id == message.AuthorId))
         {
             throw new UserNotFoundException();
         }
-        
+
         await _dbContext.Messages.AddAsync(message);
     }
 
@@ -126,10 +126,10 @@ public class MessageRepository : IMessageRepository
     public void Delete(Message message)
     {
         var target = _dbContext.Messages.FirstOrDefault(m => m.Id == message.Id) ?? throw new MessageNotFoundException();
-        
+
         var room = _dbContext.Rooms.First(r => r.Id == target.RoomId) ?? throw new RoomNotFoundException();
         if (room.IsExpired()) throw new RoomExpiredException();
-        
+
         _dbContext.Messages.Remove(target);
         _dbContext.Attachments.RemoveRange(_dbContext.Attachments.Where(a => a.MessageId == target.Id));
     }
@@ -145,9 +145,9 @@ public class MessageRepository : IMessageRepository
         var target = await _dbContext.Messages
             .Include(nameof(Message.Room))
             .FirstOrDefaultAsync(m => m.Id == id) ?? throw new MessageNotFoundException();
-        
+
         if (target.Room!.IsExpired()) throw new RoomExpiredException();
-        
+
         _dbContext.Messages.Remove(target);
         _dbContext.Attachments.RemoveRange(_dbContext.Attachments.Where(a => a.MessageId == id));
         _dbContext.Reactions.RemoveRange(_dbContext.Reactions.Where(r => r.MessageId == id));
@@ -162,14 +162,14 @@ public class MessageRepository : IMessageRepository
     public void Update(Message message)
     {
         var originalEntity = _dbContext.Messages.Include(nameof(Message.Room)).FirstOrDefault(m => m.Id == message.Id);
-        
+
         if (originalEntity == null)
         {
             throw new MessageNotFoundException();
         }
-        
+
         if (originalEntity.Room!.IsExpired()) throw new RoomExpiredException();
-        
+
         _dbContext.Entry(originalEntity).State = EntityState.Detached;
         _dbContext.Entry(message).State = EntityState.Modified;
     }

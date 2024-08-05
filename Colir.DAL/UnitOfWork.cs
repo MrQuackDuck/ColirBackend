@@ -8,7 +8,7 @@ namespace DAL;
 public class UnitOfWork : IUnitOfWork
 {
     private ColirDbContext _dbContext;
-    
+
     private IAttachmentRepository _attachmentRepository;
     private IRoomRepository _roomRepository;
     private IReactionRepository _reactionRepository;
@@ -41,11 +41,11 @@ public class UnitOfWork : IUnitOfWork
             {
                 this._attachmentRepository = new AttachmentRepository(_dbContext);
             }
-            
+
             return _attachmentRepository;
         }
     }
-    
+
     public IRoomRepository RoomRepository
     {
         get
@@ -54,7 +54,7 @@ public class UnitOfWork : IUnitOfWork
             {
                 this._roomRepository = new RoomRepository(_dbContext, _configuration, _roomFileManager);
             }
-            
+
             return _roomRepository;
         }
     }
@@ -67,7 +67,7 @@ public class UnitOfWork : IUnitOfWork
             {
                 this._reactionRepository = new ReactionRepository(_dbContext);
             }
-            
+
             return _reactionRepository;
         }
     }
@@ -80,7 +80,7 @@ public class UnitOfWork : IUnitOfWork
             {
                 this._messageRepository = new MessageRepository(_dbContext);
             }
-            
+
             return _messageRepository;
         }
     }
@@ -93,7 +93,7 @@ public class UnitOfWork : IUnitOfWork
             {
                 this._userRepository = new UserRepository(_dbContext, _configuration);
             }
-            
+
             return _userRepository;
         }
     }
@@ -106,7 +106,7 @@ public class UnitOfWork : IUnitOfWork
             {
                 this._userStatisticsRepository = new UserStatisticsRepository(_dbContext);
             }
-            
+
             return _userStatisticsRepository;
         }
     }
@@ -119,7 +119,7 @@ public class UnitOfWork : IUnitOfWork
             {
                 this._userSettingsRepository = new UserSettingsRepository(_dbContext);
             }
-            
+
             return _userSettingsRepository;
         }
     }
@@ -132,7 +132,7 @@ public class UnitOfWork : IUnitOfWork
             {
                 this._lastTimeUserReadChatRepository = new LastTimeUserReadChatRepository(_dbContext);
             }
-            
+
             return _lastTimeUserReadChatRepository;
         }
     }

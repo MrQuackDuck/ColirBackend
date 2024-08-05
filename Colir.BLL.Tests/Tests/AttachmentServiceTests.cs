@@ -29,7 +29,7 @@ public class AttachmentServiceTests : IAttachmentServiceTests
         // Initialize the service
         var configMock = new Mock<IConfiguration>();
         var roomFileMangerMock = new Mock<IRoomFileManager>();
-        
+
         roomFileMangerMock
             .Setup(fileManager => fileManager.GetFreeStorageSize("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e"))
             .Returns(100_000_000);
@@ -37,7 +37,7 @@ public class AttachmentServiceTests : IAttachmentServiceTests
         roomFileMangerMock
             .Setup(fileManager => fileManager.UploadFileAsync("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e", _fileToUpload))
             .ReturnsAsync("./RoomFiles/cbaa8673-ea8b-43f8-b4cc-b8b0797b620e/UnitTest.txt");
-        
+
         var unitOfWork = new UnitOfWork(_dbContext, configMock.Object, roomFileMangerMock.Object);
         var mapper = AutomapperProfile.InitializeAutoMapper().CreateMapper();
         _attachmentService = new AttachmentService(unitOfWork, mapper);
@@ -52,7 +52,7 @@ public class AttachmentServiceTests : IAttachmentServiceTests
         _dbContext.Database.EnsureDeleted();
         _dbContext.Dispose();
     }
-    
+
     [Test]
     public async Task UploadAttachmentAsync_UploadsAttachment()
     {
@@ -84,10 +84,10 @@ public class AttachmentServiceTests : IAttachmentServiceTests
             RoomGuid = room.Guid,
             File = new FakeFormFile("BigFile.exe", 200_000_000)
         };
-        
+
         // Act
         AsyncTestDelegate act = async () => await _attachmentService.UploadAttachmentAsync(request);
-        
+
         // Assert
         Assert.ThrowsAsync<ArgumentException>(act);
     }
@@ -102,10 +102,10 @@ public class AttachmentServiceTests : IAttachmentServiceTests
             IssuerId = 1,
             RoomGuid = room.Guid
         };
-        
+
         // Act
         AsyncTestDelegate act = async () => await _attachmentService.UploadAttachmentAsync(request);
-        
+
         // Assert
         Assert.ThrowsAsync<RoomExpiredException>(act);
     }
@@ -119,10 +119,10 @@ public class AttachmentServiceTests : IAttachmentServiceTests
             IssuerId = 1,
             RoomGuid = "404"
         };
-        
+
         // Act
         AsyncTestDelegate act = async () => await _attachmentService.UploadAttachmentAsync(request);
-        
+
         // Assert
         Assert.ThrowsAsync<RoomNotFoundException>(act);
     }
@@ -137,10 +137,10 @@ public class AttachmentServiceTests : IAttachmentServiceTests
             IssuerId = 404,
             RoomGuid = room.Guid
         };
-        
+
         // Act
         AsyncTestDelegate act = async () => await _attachmentService.UploadAttachmentAsync(request);
-        
+
         // Assert
         Assert.ThrowsAsync<UserNotFoundException>(act);
     }
@@ -155,10 +155,10 @@ public class AttachmentServiceTests : IAttachmentServiceTests
             IssuerId = 3,
             RoomGuid = room.Guid
         };
-        
+
         // Act
         AsyncTestDelegate act = async () => await _attachmentService.UploadAttachmentAsync(request);
-        
+
         // Assert
         Assert.ThrowsAsync<IssuerNotInRoomException>(act);
     }

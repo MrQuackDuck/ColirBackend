@@ -21,9 +21,9 @@ public class AutomapperProfile : Profile
         CreateMap<Reaction, ReactionModel>()
             .ForMember(dest => dest.AuthorHexId,
             opt => opt.MapFrom(src => src.Author.HexId));
-        
+
         CreateMap<Room, RoomModel>();
-        
+
         CreateMap<UserSettings, UserSettingsModel>()
             .ReverseMap();
 

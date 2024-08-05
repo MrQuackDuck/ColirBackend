@@ -41,7 +41,7 @@ public interface IRoomServiceTests
 	Task CreateAsync_NotAddsToStatistics_WhenItsNotEnabled();
 	Task JoinMemberAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
 	Task JoinMemberAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
-    
+
 	Task KickMemberAsync_KicksUserFromRoom();
 	Task KickMemberAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
 	Task KickMemberAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();

@@ -43,7 +43,7 @@ public class MessageServiceTests : IMessageServiceTests
         _dbContext.Database.EnsureDeleted();
         _dbContext.Dispose();
     }
-    
+
     [Test]
     public async Task GetLastMessagesAsync_ReturnsLastMessages()
     {
@@ -76,7 +76,7 @@ public class MessageServiceTests : IMessageServiceTests
             SkipCount = 1,
             RoomGuid = room.Guid
         };
-        
+
         // Act
         var result = await _messageService.GetLastMessagesAsync(request);
 
@@ -96,7 +96,7 @@ public class MessageServiceTests : IMessageServiceTests
             SkipCount = 1,
             RoomGuid = room.Guid
         };
-        
+
         // Act
         AsyncTestDelegate act = async () => await _messageService.GetLastMessagesAsync(request);
 
@@ -115,7 +115,7 @@ public class MessageServiceTests : IMessageServiceTests
             SkipCount = 1,
             RoomGuid = "404"
         };
-        
+
         // Act
         AsyncTestDelegate act = async () => await _messageService.GetLastMessagesAsync(request);
 
@@ -135,7 +135,7 @@ public class MessageServiceTests : IMessageServiceTests
             SkipCount = 1,
             RoomGuid = room.Guid
         };
-        
+
         // Act
         AsyncTestDelegate act = async () => await _messageService.GetLastMessagesAsync(request);
 
@@ -155,7 +155,7 @@ public class MessageServiceTests : IMessageServiceTests
             SkipCount = -1,
             RoomGuid = room.Guid
         };
-        
+
         // Act
         AsyncTestDelegate act = async () => await _messageService.GetLastMessagesAsync(request);
 
@@ -175,7 +175,7 @@ public class MessageServiceTests : IMessageServiceTests
             SkipCount = 1,
             RoomGuid = room.Guid
         };
-        
+
         // Act
         AsyncTestDelegate act = async () => await _messageService.GetLastMessagesAsync(request);
 
@@ -195,7 +195,7 @@ public class MessageServiceTests : IMessageServiceTests
             SkipCount = 1,
             RoomGuid = room.Guid
         };
-        
+
         // Act
         AsyncTestDelegate act = async () => await _messageService.GetLastMessagesAsync(request);
 
@@ -222,7 +222,7 @@ public class MessageServiceTests : IMessageServiceTests
         // Assert
         var message = _dbContext.Messages
             .Include(nameof(Message.Attachments)).OrderByDescending(m => m.Id).First();
-        
+
         Assert.That(_dbContext.Messages.Count() == 6);
         Assert.That(message.Attachments.Count == 1);
         Assert.That(message.Attachments.First().Id == 1);
@@ -522,7 +522,7 @@ public class MessageServiceTests : IMessageServiceTests
 
         // Act
         AsyncTestDelegate act = async () => await _messageService.DeleteAsync(request);
-        
+
         // Assert
         Assert.ThrowsAsync<MessageNotFoundException>(act);
     }
@@ -539,7 +539,7 @@ public class MessageServiceTests : IMessageServiceTests
 
         // Act
         AsyncTestDelegate act = async () => await _messageService.DeleteAsync(request);
-        
+
         // Assert
         Assert.ThrowsAsync<IssuerNotInRoomException>(act);
     }
@@ -556,7 +556,7 @@ public class MessageServiceTests : IMessageServiceTests
 
         // Act
         AsyncTestDelegate act = async () => await _messageService.DeleteAsync(request);
-        
+
         // Assert
         Assert.ThrowsAsync<NotEnoughPermissionsException>(act);
     }
@@ -573,7 +573,7 @@ public class MessageServiceTests : IMessageServiceTests
 
         // Act
         AsyncTestDelegate act = async () => await _messageService.DeleteAsync(request);
-        
+
         // Assert
         Assert.ThrowsAsync<RoomExpiredException>(act);
     }
@@ -597,7 +597,7 @@ public class MessageServiceTests : IMessageServiceTests
         Assert.That(messageAfter.Reactions.Count() == 3);
         Assert.That(messageAfter.Reactions.OrderByDescending(r => r.Id).First().Symbol == request.Reaction);
     }
-    
+
     [Test]
     public async Task AddReaction_AddsToStatistics_WhenItsEnabled()
     {
@@ -609,10 +609,10 @@ public class MessageServiceTests : IMessageServiceTests
             MessageId = 1,
             Reaction = "😎"
         };
-        
+
         // Act
         await _messageService.AddReaction(request);
-        
+
         // Assert
         var statsAfter = _dbContext.UserStatistics.AsNoTracking().First(s => s.UserId == 1);
         Assert.That(statsAfter.ReactionsSet - statsBefore.ReactionsSet == 1);
@@ -628,7 +628,7 @@ public class MessageServiceTests : IMessageServiceTests
             MessageId = 404,
             Reaction = "😎"
         };
-        
+
         // Act
         AsyncTestDelegate act = async () => await _messageService.AddReaction(request);
 
@@ -646,7 +646,7 @@ public class MessageServiceTests : IMessageServiceTests
             MessageId = 1,
             Reaction = "😎"
         };
-        
+
         // Act
         AsyncTestDelegate act = async () => await _messageService.AddReaction(request);
 
@@ -664,7 +664,7 @@ public class MessageServiceTests : IMessageServiceTests
             MessageId = 5,
             Reaction = "😎"
         };
-        
+
         // Act
         AsyncTestDelegate act = async () => await _messageService.AddReaction(request);
 

@@ -16,7 +16,7 @@ public interface IMessageService
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
     /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
     Task<List<MessageModel>> GetLastMessagesAsync(RequestToGetLastMessages request);
-    
+
     /// <summary>
     /// Sends the message in the room
     /// + Increments the count of sent messages in user's statistics (if enabled in settings)
@@ -25,7 +25,7 @@ public interface IMessageService
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
     /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
     Task<MessageModel> SendAsync(RequestToSendMessage request);
-    
+
     /// <summary>
     /// Edits the sent message
     /// </summary>
@@ -34,7 +34,7 @@ public interface IMessageService
     /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
     /// <exception cref="NotEnoughPermissionsException">Thrown when the issuer is not the author of the message he is trying to edit</exception>
     Task<MessageModel> EditAsync(RequestToEditMessage request);
-    
+
     /// <summary>
     /// Deletes the message
     /// </summary>

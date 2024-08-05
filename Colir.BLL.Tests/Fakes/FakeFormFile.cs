@@ -30,14 +30,14 @@ public class FakeFormFile : IFormFile
     public string Name { get; } = default!;
     public string FileName { get; }
     private IFileSystem _fileSystem;
-    
+
     public FakeFormFile(string fileName, long sizeInBytes, IFileSystem fileSystem)
     {
         FileName = fileName;
         Length = sizeInBytes;
         _fileSystem = fileSystem;
     }
-    
+
     public FakeFormFile(string fileName, long sizeInBytes)
     {
         FileName = fileName;

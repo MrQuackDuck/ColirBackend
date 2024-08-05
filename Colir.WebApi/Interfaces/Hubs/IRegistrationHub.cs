@@ -13,7 +13,7 @@ public interface IRegistrationHub
     /// Regenerates the list of Hexs to choose from
     /// </summary>
     Task<SignalRHubResult> RegenerateHexs();
-    
+
     /// <summary>
     /// Chooses the Hex Id for the user
     /// </summary>
@@ -25,7 +25,7 @@ public interface IRegistrationHub
     /// </summary>
     /// <param name="username">Username to set</param>
     SignalRHubResult ChooseUsername(string username);
-    
+
     /// <summary>
     /// Finishes the registration and sends <see cref="DetailedUserModel"/> to the user
     /// </summary>

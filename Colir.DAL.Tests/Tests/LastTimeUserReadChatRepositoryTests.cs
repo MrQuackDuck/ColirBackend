@@ -15,45 +15,45 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
 {
     private ColirDbContext _dbContext = default!;
     private LastTimeUserReadChatRepository _lastTimeUserReadChatRepository;
-    
+
     [SetUp]
     public void SetUp()
     {
         // Create database context
         _dbContext = UnitTestHelper.CreateDbContext();
-        
+
         // Initialize repository
         _lastTimeUserReadChatRepository = new LastTimeUserReadChatRepository(_dbContext);
-        
+
         // Add entities
         UnitTestHelper.SeedData(_dbContext);
     }
-    
+
     [TearDown]
     public void CleanUp()
     {
         _dbContext.Database.EnsureDeleted();
         _dbContext.Dispose();
     }
-    
+
     [Test]
     public async Task GetAllAsync_ReturnsAllTimesUsersReadChats()
     {
         // Arrange
         List<LastTimeUserReadChat> expected = _dbContext.LastTimeUserReadChats
                                                         .Include(nameof(LastTimeUserReadChat.Room))
-                                                        .Include(nameof(LastTimeUserReadChat.User))        
+                                                        .Include(nameof(LastTimeUserReadChat.User))
                                                         .ToList();
-        
+
         // Act
         var result = await _lastTimeUserReadChatRepository.GetAllAsync();
-        
+
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new LastTimeUserReadChatEqualityComparer()));
-        
+
         Assert.That(result.Select(r => r.Room).OrderBy(r => r.Id),
             Is.EqualTo(expected.Select(r => r.Room).OrderBy(r => r.Id)).Using(new RoomEqualityComparer()));
-        
+
         Assert.That(result.Select(r => r.User).OrderBy(r => r.Id),
             Is.EqualTo(expected.Select(r => r.User).OrderBy(r => r.Id)).Using(new UserEqualityComparer()));
     }
@@ -66,10 +66,10 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
                                  .Include(nameof(LastTimeUserReadChat.Room))
                                  .Include(nameof(LastTimeUserReadChat.User))
                                  .First(l => l.UserId == 1 && l.RoomId == 1);
-        
+
         // Act
         var result = await _lastTimeUserReadChatRepository.GetAsync(1, 1);
-        
+
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new LastTimeUserReadChatEqualityComparer()));
         Assert.That(result.Room, Is.EqualTo(expected.Room).Using(new RoomEqualityComparer()));
@@ -81,7 +81,7 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
     {
         // Act
         AsyncTestDelegate act = async () => await _lastTimeUserReadChatRepository.GetAsync(404, 1);
-        
+
         // Assert
         Assert.ThrowsAsync<UserNotFoundException>(act);
     }
@@ -91,7 +91,7 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
     {
         // Act
         AsyncTestDelegate act = async () => await _lastTimeUserReadChatRepository.GetAsync(1, 404);
-        
+
         // Assert
         Assert.ThrowsAsync<RoomNotFoundException>(act);
     }
@@ -104,10 +104,10 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
                                  .Include(nameof(LastTimeUserReadChat.Room))
                                  .Include(nameof(LastTimeUserReadChat.User))
                                  .First(l => l.Id == 1);
-        
+
         // Act
         var result = await _lastTimeUserReadChatRepository.GetByIdAsync(1);
-        
+
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new LastTimeUserReadChatEqualityComparer()));
         Assert.That(result.Room, Is.EqualTo(expected.Room).Using(new RoomEqualityComparer()));
@@ -119,7 +119,7 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
     {
         // Act
         AsyncTestDelegate act = async () => await _lastTimeUserReadChatRepository.GetByIdAsync(404);
-        
+
         // Assert
         Assert.ThrowsAsync<NotFoundException>(act);
     }
@@ -240,7 +240,7 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
             UserId = 1, // "First User"
             Timestamp = DateTime.Now
         };
-        
+
         // Act
         TestDelegate act = () => _lastTimeUserReadChatRepository.Delete(entityToDelete);
 

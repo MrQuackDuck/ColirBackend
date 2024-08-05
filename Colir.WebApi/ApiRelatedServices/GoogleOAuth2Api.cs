@@ -6,7 +6,7 @@ namespace Colir.ApiRelatedServices;
 public class GoogleOAuth2Api : IGoogleOAuth2Api
 {
     private readonly IConfiguration _config;
-    
+
     public GoogleOAuth2Api(IConfiguration config)
     {
         _config = config;
@@ -16,7 +16,7 @@ public class GoogleOAuth2Api : IGoogleOAuth2Api
     public async Task<string> GetUserGoogleAccessTokenAsync(string googleClientId, string googleAuthSecret, string code)
     {
         using var httpClient = new HttpClient();
-        
+
         var requestToGetToken = new HttpRequestMessage(HttpMethod.Post, "https://oauth2.googleapis.com/token");
         requestToGetToken.Content = new FormUrlEncodedContent(new Dictionary<string, string>()
         {
@@ -26,7 +26,7 @@ public class GoogleOAuth2Api : IGoogleOAuth2Api
             { "redirect_uri", _config["Authentication:GoogleRedirectLink"]! },
             { "grant_type", "authorization_code" }
         });
-        
+
         // Sending the request to get the token from Google
         var response = await httpClient.SendAsync(requestToGetToken);
         response.EnsureSuccessStatusCode();
@@ -38,7 +38,7 @@ public class GoogleOAuth2Api : IGoogleOAuth2Api
     public async Task<string> GetUserGoogleIdAsync(string googleAccessToken)
     {
         using var httpClient = new HttpClient();
-        
+
         var requestToGetUserData = new HttpRequestMessage(HttpMethod.Get, $"https://www.googleapis.com/oauth2/v1/userinfo?access_token={googleAccessToken}");
         requestToGetUserData.Headers.Add("Accept", "application/json");
         requestToGetUserData.Headers.Add("User-Agent", "ASP.NET");

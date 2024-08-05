@@ -34,16 +34,16 @@ public class RoomServiceTests : IRoomServiceTests
         configMock.Setup(config => config["AppSettings:MaxUsernameLength"]).Returns("50");
 
         var roomCleanerMock = new Mock<IRoomCleaner>();
-        
+
         var roomCleanerFactoryMock = new Mock<IRoomCleanerFactory>();
         roomCleanerFactoryMock.Setup(factory => factory.GetRoomCleaner("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e"))
             .Returns(roomCleanerMock.Object);
-        
+
         var roomFileMangerMock = new Mock<IRoomFileManager>();
         var unitOfWork = new UnitOfWork(_dbContext, configMock.Object, roomFileMangerMock.Object);
 
         var mapper = AutomapperProfile.InitializeAutoMapper().CreateMapper();
-        
+
         _roomService = new RoomService(unitOfWork, mapper, roomCleanerFactoryMock.Object);
 
         // Add entities
@@ -598,7 +598,7 @@ public class RoomServiceTests : IRoomServiceTests
             .AsNoTracking()
             .Include(nameof(Room.JoinedUsers))
             .First(r => r.Id == 1);
-        
+
         var request = new RequestToJoinRoom
         {
             IssuerId = 3,
@@ -613,7 +613,7 @@ public class RoomServiceTests : IRoomServiceTests
             .AsNoTracking()
             .Include(nameof(Room.JoinedUsers))
             .First(r => r.Id == 1);
-        
+
         Assert.That(roomAfter.JoinedUsers.Count() == 3);
     }
 
@@ -680,7 +680,7 @@ public class RoomServiceTests : IRoomServiceTests
             .AsNoTracking()
             .Include(nameof(Room.JoinedUsers))
             .First(r => r.Id == 1);
-        
+
         var request = new RequestToKickMember
         {
             IssuerId = 1,
@@ -701,7 +701,7 @@ public class RoomServiceTests : IRoomServiceTests
             .AsNoTracking()
             .Include(nameof(User.JoinedRooms))
             .First(u => u.HexId == 0x000000);
-        
+
         Assert.That(roomAfter.JoinedUsers.Count == 1);
         Assert.That(kickedUser.JoinedRooms.Count == 1);
     }

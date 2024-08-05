@@ -8,20 +8,20 @@ namespace DAL.Encrpyion;
 /// </summary>
 public class StringEncryptor
 {
-    private readonly byte[] key;
-    private readonly byte[] iv;
+    private readonly byte[] _key;
+    private readonly byte[] _iv;
 
     public StringEncryptor(string keyString, string ivString)
     {
-        key = Encoding.UTF8.GetBytes(keyString);
-        iv = Encoding.UTF8.GetBytes(ivString);
+        _key = Encoding.UTF8.GetBytes(keyString);
+        _iv = Encoding.UTF8.GetBytes(ivString);
     }
 
     public string Encrypt(string plainText)
     {
         using var aes = Aes.Create();
-        aes.Key = key;
-        aes.IV = iv;
+        aes.Key = _key;
+        aes.IV = _iv;
 
         var encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
 
@@ -40,8 +40,8 @@ public class StringEncryptor
     public string Decrypt(string cipherText)
     {
         using var aes = Aes.Create();
-        aes.Key = key;
-        aes.IV = iv;
+        aes.Key = _key;
+        aes.IV = _iv;
 
         var decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
 

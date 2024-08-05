@@ -9,13 +9,13 @@ public class LastTimeUserReadChat : BaseEntity
 
     [ForeignKey(nameof(Room))]
     public long? RoomId { get; set; }
-    
+
     [ForeignKey(nameof(User))]
     public long? UserId { get; set; }
-    
+
     [DeleteBehavior(DeleteBehavior.NoAction)]
     public Room Room { get; set; } = default!;
-    
+
     [DeleteBehavior(DeleteBehavior.NoAction)]
     public User User { get; set; } = default!;
 }

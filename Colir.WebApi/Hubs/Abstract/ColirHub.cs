@@ -16,7 +16,7 @@ public abstract class ColirHub : Hub
     {
         return new SuccessWithContentHubResult(content);
     }
-    
+
     /// <summary>
     /// Overload of <see cref="Success(object)"/> that takes no arguments
     /// <returns>Success <see cref="SignalRHubResult"/> without any content</returns>

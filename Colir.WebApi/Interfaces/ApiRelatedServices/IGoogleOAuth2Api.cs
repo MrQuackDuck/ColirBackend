@@ -11,7 +11,7 @@ public interface IGoogleOAuth2Api
     /// <returns>Google access token</returns>
     /// <exception cref="HttpRequestException">Thrown when <param name="code"/> is either invalid or expired</exception>
     Task<string> GetUserGoogleAccessTokenAsync(string googleClientId, string googleAuthSecret, string code);
-    
+
     /// <summary>
     /// Gets user id from the Google profile
     /// </summary>

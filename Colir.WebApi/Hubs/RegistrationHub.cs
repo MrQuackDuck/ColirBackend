@@ -102,7 +102,7 @@ public class RegistrationHub : ColirHub, IRegistrationHub
     {
         if (!HexsToOffer[Context.ConnectionId].Contains(hex))
             return Error(new(ErrorCode.InvalidActionException));
-        
+
         ChosenHexs[Context.ConnectionId] = hex;
         return Success();
     }
@@ -119,10 +119,10 @@ public class RegistrationHub : ColirHub, IRegistrationHub
     {
         if (!ChosenHexs.ContainsKey(Context.ConnectionId))
             return Error(new(ErrorCode.InvalidActionException, "You haven't chosen the hex id yet!"));
-        
+
         if (!ChosenUsernames.ContainsKey(Context.ConnectionId))
             return Error(new(ErrorCode.InvalidActionException, "You haven't chosen the username yet!"));
-        
+
         var userOAuthId = UsersData[Context.ConnectionId].OAuth2UserId;
         var userAuthType = UsersData[Context.ConnectionId].AuthType;
         var chosenHex = ChosenHexs[Context.ConnectionId];
@@ -155,7 +155,7 @@ public class RegistrationHub : ColirHub, IRegistrationHub
 
         if (resultUserModel == null)
             return Error(new ErrorResponse(ErrorCode.InvalidActionException, "Something went wrong!"));
-        
+
 
         // Returning the user model and closing the connection
         try

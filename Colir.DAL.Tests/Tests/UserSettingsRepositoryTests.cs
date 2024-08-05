@@ -14,27 +14,27 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
 {
     private ColirDbContext _dbContext = default!;
     private UserSettingsRepository _userSettingsRepository = default!;
-    
+
     [SetUp]
     public void SetUp()
     {
         // Create database context
         _dbContext = UnitTestHelper.CreateDbContext();
-        
+
         // Initialize user settings repository
         _userSettingsRepository = new UserSettingsRepository(_dbContext);
-        
+
         // Add entities
         UnitTestHelper.SeedData(_dbContext);
     }
-    
+
     [TearDown]
     public void CleanUp()
     {
         _dbContext.Database.EnsureDeleted();
         _dbContext.Dispose();
     }
-    
+
     [Test]
     public async Task GetAllAsync_ReturnsAllUsersSettings()
     {
@@ -49,7 +49,7 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
         // Assert
         Assert.NotNull(result);
         Assert.That(result, Is.EqualTo(expected).Using(new UserSettingsEqualityComparer()));
-        
+
         Assert.That(result.Select(r => r.User).OrderBy(r => r.Id),
             Is.EqualTo(expected.Select(r => r.User).OrderBy(r => r.Id)).Using(new UserEqualityComparer()));
     }
@@ -61,10 +61,10 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
         UserSettings expected = _dbContext.UserSettings
                                            .Include(nameof(UserSettings.User))
                                            .First(us => us.Id == 1);
-        
+
         // Act
         var result = await _userSettingsRepository.GetByUserHexIdAsync(0xFFFFFF);
-        
+
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new UserSettingsEqualityComparer()));
         Assert.That(result.User, Is.EqualTo(expected.User).Using(new UserEqualityComparer()));
@@ -97,10 +97,10 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
         UserSettings expected = _dbContext.UserSettings
                                                 .Include(nameof(UserSettings.User))
                                                 .First(us => us.Id == 1);
-        
+
         // Act
         var result = await _userSettingsRepository.GetByIdAsync(1);
-        
+
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new UserSettingsEqualityComparer()));
         Assert.That(result.User, Is.EqualTo(expected.User).Using(new UserEqualityComparer()));
@@ -122,7 +122,7 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
         // Arrange
         await _userSettingsRepository.DeleteByIdAsync(3);
         _userSettingsRepository.SaveChanges();
-        
+
         var userSettingsToAdd = new UserSettings
         {
             UserId = 3,
@@ -264,10 +264,10 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
             UserId = 1, // "First User"
             StatisticsEnabled = true,
         };
-        
+
         // Act
         TestDelegate act = () => _userSettingsRepository.Update(userSettingsToUpdate);
-        
+
         // Assert
         Assert.Throws<NotFoundException>(act);
     }

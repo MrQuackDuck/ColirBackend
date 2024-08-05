@@ -23,18 +23,18 @@ public class UserRepositoryTests : IUserRepositoryTests
     {
         // Create database context
         _dbContext = UnitTestHelper.CreateDbContext();
-        
+
         // Initialize user repository with mocked config
         var mock = new Mock<IConfiguration>();
         mock.Setup(config => config["AppSettings:MinUsernameLength"]).Returns("2");
         mock.Setup(config => config["AppSettings:MaxUsernameLength"]).Returns("50");
-        
+
         _userRepository = new UserRepository(_dbContext, mock.Object);
-        
+
         // Add entities
         UnitTestHelper.SeedData(_dbContext);
     }
-    
+
     [TearDown]
     public void CleanUp()
     {
@@ -58,13 +58,13 @@ public class UserRepositoryTests : IUserRepositoryTests
         // Assert
         Assert.NotNull(result);
         Assert.That(result, Is.EqualTo(expected).Using(new UserEqualityComparer()));
-        
+
         Assert.That(result.Select(r => r.UserStatistics).OrderBy(r => r.Id),
             Is.EqualTo(expected.Select(r => r.UserStatistics).OrderBy(r => r.Id)).Using(new UserStatisticsEqualityComparer()));
-        
+
         Assert.That(result.Select(r => r.UserSettings).OrderBy(r => r.Id),
             Is.EqualTo(expected.Select(r => r.UserSettings).OrderBy(r => r.Id)).Using(new UserSettingsEqualityComparer()));
-        
+
         Assert.That(result.SelectMany(r => r.JoinedRooms).OrderBy(r => r.Id),
             Is.EqualTo(expected.SelectMany(r => r.JoinedRooms).OrderBy(r => r.Id)).Using(new RoomEqualityComparer()));
     }
@@ -208,7 +208,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         // Assert
         Assert.That(_dbContext.Users.Count() == 4);
     }
-    
+
     [Test]
     public async Task AddAsync_CreatesUserSettings()
     {
@@ -521,7 +521,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         TestDelegate act = () => _userRepository.Update(userToUpdate);
 
         // Assert
-        Assert.Throws<StringTooLongException>(act);   
+        Assert.Throws<StringTooLongException>(act);
     }
 
     [Test]
@@ -535,7 +535,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         TestDelegate act = () => _userRepository.Update(userToUpdate);
 
         // Assert
-        Assert.Throws<StringTooShortException>(act);   
+        Assert.Throws<StringTooShortException>(act);
     }
 
     [Test]
@@ -549,7 +549,7 @@ public class UserRepositoryTests : IUserRepositoryTests
         TestDelegate act = () => _userRepository.Update(userToUpdate);
 
         // Assert
-        Assert.Throws<ArgumentException>(act);   
+        Assert.Throws<ArgumentException>(act);
     }
 
     [Test]

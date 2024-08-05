@@ -10,7 +10,7 @@ public class RoomFileManager : IRoomFileManager
     private IFileSystem _fileSystem;
     private IConfiguration _config;
     private string _filesFolderName;
-    
+
     public RoomFileManager(IFileSystem fileSystem, IConfiguration config)
     {
         _fileSystem = fileSystem;
@@ -21,7 +21,7 @@ public class RoomFileManager : IRoomFileManager
         // Create the directory where rooms files will be stored
         _fileSystem.Directory.CreateDirectory(_filesFolderName);
     }
-    
+
     /// <summary>
     /// Gets a file by path
     /// </summary>
@@ -38,7 +38,7 @@ public class RoomFileManager : IRoomFileManager
     public long GetFreeStorageSize(string roomGuid)
     {
         var maxStorageCapacity = int.Parse(_config["AppSettings:MaxRoomStorageCapacityInBytes"]!);
-        
+
         return maxStorageCapacity - GetOccupiedStorageSize(roomGuid);
     }
 
@@ -50,7 +50,7 @@ public class RoomFileManager : IRoomFileManager
     {
         // Create the directory if not exists
         _fileSystem.Directory.CreateDirectory($"./{_filesFolderName}/{roomGuid}");
-        
+
         string pathToDirectory = $"./{_filesFolderName}/{roomGuid}/";
         var files = _fileSystem.DirectoryInfo.New(pathToDirectory).GetFiles();
 
@@ -72,10 +72,10 @@ public class RoomFileManager : IRoomFileManager
     {
         // Generating a random name for the file
         var fileName = Guid.NewGuid();
-        
+
         // Create the directory if not exists
         _fileSystem.Directory.CreateDirectory($"./{_filesFolderName}/{roomGuid}");
-        
+
         var path = $"./{_filesFolderName}/{roomGuid}/{fileName}";
         using (FileSystemStream fs = _fileSystem.FileStream.New(path, FileMode.CreateNew))
         {

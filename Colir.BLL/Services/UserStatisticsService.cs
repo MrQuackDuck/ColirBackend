@@ -10,7 +10,7 @@ public class UserStatisticsService : IUserStatisticsService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
-    
+
     public UserStatisticsService(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _unitOfWork = unitOfWork;

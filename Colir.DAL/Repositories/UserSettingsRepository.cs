@@ -8,12 +8,12 @@ namespace DAL.Repositories;
 public class UserSettingsRepository : IUserSettingsRepository
 {
     private ColirDbContext _dbContext;
-    
+
     public UserSettingsRepository(ColirDbContext dbContext)
     {
         _dbContext = dbContext;
     }
-    
+
     /// <summary>
     /// Gets all users' settings
     /// </summary>
@@ -37,7 +37,7 @@ public class UserSettingsRepository : IUserSettingsRepository
             .Include(nameof(UserSettings.User))
             .FirstOrDefaultAsync(s => s.Id == id) ?? throw new NotFoundException();
     }
-    
+
     /// <summary>
     /// Gets user settings by user's hex id
     /// </summary>
@@ -51,12 +51,12 @@ public class UserSettingsRepository : IUserSettingsRepository
         {
             throw new ArgumentException("Invalid Hex ID provided!");
         }
-        
+
         if (!await _dbContext.Users.AnyAsync(u => u.HexId == hexId))
         {
             throw new UserNotFoundException();
         }
-        
+
         return await _dbContext.UserSettings
             .AsNoTracking()
             .Include(nameof(UserSettings.User))
@@ -80,7 +80,7 @@ public class UserSettingsRepository : IUserSettingsRepository
         {
             throw new UserNotFoundException();
         }
-        
+
         await _dbContext.AddAsync(settings);
     }
 
@@ -92,7 +92,7 @@ public class UserSettingsRepository : IUserSettingsRepository
     public void Delete(UserSettings settings)
     {
         var target = _dbContext.UserSettings.FirstOrDefault(s => s.Id == settings.Id) ?? throw new NotFoundException();
-        
+
         _dbContext.UserSettings.Remove(target);
     }
 
@@ -104,7 +104,7 @@ public class UserSettingsRepository : IUserSettingsRepository
     public async Task DeleteByIdAsync(long id)
     {
         var target = await _dbContext.UserSettings.FirstOrDefaultAsync(s => s.Id == id) ?? throw new NotFoundException();
-        
+
         _dbContext.UserSettings.Remove(target);
     }
 
@@ -117,12 +117,12 @@ public class UserSettingsRepository : IUserSettingsRepository
     public void Update(UserSettings settings)
     {
         var originalEntity = _dbContext.UserSettings.FirstOrDefault(s => s.Id == settings.Id);
-        
+
         if (originalEntity == null)
         {
             throw new NotFoundException();
         }
-        
+
         // Check if another UserId provided
         if (originalEntity.UserId != settings.UserId)
         {

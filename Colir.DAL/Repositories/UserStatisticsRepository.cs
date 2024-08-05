@@ -8,7 +8,7 @@ namespace DAL.Repositories;
 public class UserStatisticsRepository : IUserStatisticsRepository
 {
     private ColirDbContext _dbContext;
-    
+
     public UserStatisticsRepository(ColirDbContext dbContext)
     {
         _dbContext = dbContext;
@@ -37,7 +37,7 @@ public class UserStatisticsRepository : IUserStatisticsRepository
             .Include(nameof(UserStatistics.User))
             .FirstOrDefaultAsync(s => s.Id == id) ?? throw new NotFoundException();
     }
-    
+
     /// <summary>
     /// Gets user statistics by user's hex id
     /// </summary>
@@ -51,12 +51,12 @@ public class UserStatisticsRepository : IUserStatisticsRepository
         {
             throw new ArgumentException("Invalid Hex ID provided!");
         }
-        
+
         if (!await _dbContext.Users.AnyAsync(u => u.HexId == hexId))
         {
             throw new UserNotFoundException();
         }
-        
+
         return await _dbContext.UserStatistics
             .AsNoTracking()
             .Include(nameof(UserSettings.User))
@@ -80,7 +80,7 @@ public class UserStatisticsRepository : IUserStatisticsRepository
         {
             throw new UserNotFoundException();
         }
-        
+
         await _dbContext.AddAsync(statistics);
     }
 
@@ -117,12 +117,12 @@ public class UserStatisticsRepository : IUserStatisticsRepository
     public void Update(UserStatistics statistics)
     {
         var originalEntity = _dbContext.UserStatistics.FirstOrDefault(s => s.Id == statistics.Id);
-        
+
         if (originalEntity == null)
         {
             throw new NotFoundException();
         }
-        
+
         // Check if another UserId provided
         if (originalEntity.UserId != statistics.UserId)
         {
