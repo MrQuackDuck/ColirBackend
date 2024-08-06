@@ -74,6 +74,10 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
     {
         var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
 
+        // Removing the old user if connected already
+        var oldUser = VoiceChatUsers.FirstOrDefault(u => u.ConnectionId == Context.ConnectionId);
+        if (oldUser != null) VoiceChatUsers.Remove(oldUser);
+
         var user = new VoiceChatUser
         {
             HexId = this.GetIssuerHexId(),

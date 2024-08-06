@@ -146,6 +146,7 @@ app.UseCors();
 
 app.UseExceptionHandler();
 
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();
