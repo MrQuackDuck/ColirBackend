@@ -1,0 +1,13 @@
+﻿services:
+  web:
+    container_name: colir.backend
+    build:
+      context: .
+      network: host
+      dockerfile: Dockerfile
+    extra_hosts:
+      - "localhost:192.168.0.107"
+    ports:
+      - 7700:7700
+    volumes:
+      - ./attachments:/src/wwwroot/RoomFiles
