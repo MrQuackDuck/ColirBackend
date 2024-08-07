@@ -17,4 +17,5 @@ CMD dotnet tool install --global dotnet-ef --version 6.0.25
 ENV PATH="${PATH}:/root/.dotnet/tools"
 CMD dotnet ef database update
 
-ENTRYPOINT [ "dotnet", "Colir.WebApi.dll", "--urls", "http://+:7700" ]
+ENV ASPNETCORE_HTTP_PORTS=7700
+ENTRYPOINT [ "dotnet", "Colir.WebApi.dll" ]
