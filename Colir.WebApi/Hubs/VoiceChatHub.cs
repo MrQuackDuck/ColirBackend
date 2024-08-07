@@ -1,5 +1,6 @@
 ﻿using Colir.BLL.Interfaces;
 using Colir.BLL.RequestModels.Room;
+using Colir.Communication.Enums;
 using Colir.Communication.Models;
 using Colir.Communication.ResponseModels;
 using Colir.Exceptions;
@@ -97,7 +98,7 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
 
     public override Task OnDisconnectedAsync(Exception? exception)
     {
-        var user = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
+        var user = VoiceChatUsers.FirstOrDefault(u => u.ConnectionId == Context.ConnectionId)!;
         VoiceChatUsers.Remove(user);
 
         return Task.CompletedTask;
@@ -106,106 +107,162 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
     public async Task<SignalRHubResult> Leave()
     {
         var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
-        var user = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
+        var issuer = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
 
-        await Clients.Group(roomGuid).SendAsync("UserLeft", user.HexId);
-        VoiceChatUsers.Remove(user);
+        await Clients.Group(roomGuid).SendAsync("UserLeft", issuer.HexId);
+        VoiceChatUsers.Remove(issuer);
 
         return Success();
     }
 
     public async Task<SignalRHubResult> MuteSelf()
     {
-        var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
-        var user = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
+        try
+        {
+            var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
+            var issuer = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
 
-        await Clients.Group(roomGuid).SendAsync("UserMuted", user.HexId);
+            await Clients.Group(roomGuid).SendAsync("UserMuted", issuer.HexId);
 
-        return Success();
+            return Success();
+        }
+        catch (InvalidOperationException)
+        {
+            return Error(new(ErrorCode.YouAreNotConnectedToVoiceChannel));
+        }
     }
 
     public async Task<SignalRHubResult> UnmuteSelf()
     {
-        var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
-        var user = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
+        try
+        {
+            var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
+            var issuer = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
 
-        await Clients.Group(roomGuid).SendAsync("UserUnmuted", user.HexId);
+            await Clients.Group(roomGuid).SendAsync("UserUnmuted", issuer.HexId);
 
-        return Success();
+            return Success();
+        }
+        catch (InvalidOperationException)
+        {
+            return Error(new(ErrorCode.YouAreNotConnectedToVoiceChannel));
+        }
     }
 
     public async Task<SignalRHubResult> DefeanSelf()
     {
-        var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
-        var user = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
+        try
+        {
+            var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
+            var issuer = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
 
-        await Clients.Group(roomGuid).SendAsync("UserDefeaned", user.HexId);
+            await Clients.Group(roomGuid).SendAsync("UserDefeaned", issuer.HexId);
 
-        return Success();
+            return Success();
+        }
+        catch (InvalidOperationException)
+        {
+            return Error(new(ErrorCode.YouAreNotConnectedToVoiceChannel));
+        }
     }
 
     public async Task<SignalRHubResult> UndefeanSelf()
     {
-        var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
-        var user = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
+        try
+        {
+            var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
+            var issuer = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
 
-        await Clients.Group(roomGuid).SendAsync("UserUndefeaned", user.HexId);
+            await Clients.Group(roomGuid).SendAsync("UserUndefeaned", issuer.HexId);
 
-        return Success();
+            return Success();
+        }
+        catch (InvalidOperationException)
+        {
+            return Error(new(ErrorCode.YouAreNotConnectedToVoiceChannel));
+        }
     }
 
     public async Task<SignalRHubResult> SendVoiceSignal(string audioData)
     {
-        var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
-        var issuerHexId = this.GetIssuerHexId();
+        try
+        {
+            var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
+            var issuer = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
 
-        // Exclude sending data for those who are currently defeaned
-        var idsToSendTo = VoiceChatUsers
-            .Where(u => u.RoomGuid == roomGuid && !u.IsDefeaned)
-            .Select(u => u.ConnectionId);
+            // Exclude sending data for those who are currently defeaned
+            var idsToSendTo = VoiceChatUsers
+                .Where(u => u.RoomGuid == roomGuid && !u.IsDefeaned)
+                .Select(u => u.ConnectionId);
 
-        await Clients.Clients(idsToSendTo).SendAsync(roomGuid, new Signal(issuerHexId, audioData));
-        return Success();
+            await Clients.Clients(idsToSendTo).SendAsync(roomGuid, new Signal(issuer.HexId, audioData));
+            return Success();
+        }
+        catch (InvalidOperationException)
+        {
+            return Error(new(ErrorCode.YouAreNotConnectedToVoiceChannel));
+        }
     }
 
     public async Task<SignalRHubResult> EnableVideo()
     {
-        var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
-        var user = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
+        try
+        {
+            var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
+            var issuer = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
 
-        await Clients.Group(roomGuid).SendAsync("UserEnabledVideo", user.HexId);
+            await Clients.Group(roomGuid).SendAsync("UserEnabledVideo", issuer.HexId);
 
-        return Success();
+            return Success();
+        }
+        catch (InvalidOperationException)
+        {
+            return Error(new(ErrorCode.YouAreNotConnectedToVoiceChannel));
+        }
     }
 
     public async Task<SignalRHubResult> DisableVideo()
     {
-        var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
-        var user = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
+        try
+        {
+            var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
+            var issuer = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
 
-        await Clients.Group(roomGuid).SendAsync("UserDisabledVideo", user.HexId);
+            await Clients.Group(roomGuid).SendAsync("UserDisabledVideo", issuer.HexId);
 
-        return Success();
+            return Success();
+        }
+        catch (InvalidOperationException)
+        {
+            return Error(new(ErrorCode.YouAreNotConnectedToVoiceChannel));
+        }
     }
 
     public async Task<SignalRHubResult> SendVideoSignal(string videoData)
     {
-        var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
-        var issuerHexId = this.GetIssuerHexId();
+        try
+        {
+            var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
+            var issuer = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
 
-        var idsToSendTo = VoiceChatUsers
-            .Select(u => u.ConnectionId);
+            var idsToSendTo = VoiceChatUsers
+                .Select(u => u.ConnectionId);
 
-        await Clients.Clients(idsToSendTo).SendAsync(roomGuid, new Signal(issuerHexId, videoData));
-        return Success();
+            await Clients.Clients(idsToSendTo).SendAsync(roomGuid, new Signal(issuer.HexId, videoData));
+            return Success();
+        }
+        catch (InvalidOperationException)
+        {
+            return Error(new(ErrorCode.YouAreNotConnectedToVoiceChannel));
+        }
     }
 
     public async Task<SignalRHubResult> EnableStream()
     {
         var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
-        var user = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
+        var issuer = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
 
-        await Clients.Group(roomGuid).SendAsync("UserEnabledStream", user.HexId);
+        await Clients.Group(roomGuid).SendAsync("UserEnabledStream", issuer.HexId);
 
         return Success();
     }
@@ -213,39 +270,60 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
     public async Task<SignalRHubResult> DisableStream()
     {
         var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
-        var user = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
+        var issuer = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
 
-        await Clients.Group(roomGuid).SendAsync("UserDisabledStream", user.HexId);
+        await Clients.Group(roomGuid).SendAsync("UserDisabledStream", issuer.HexId);
 
         return Success();
     }
 
     public async Task<SignalRHubResult> SendStreamSignal(string pictureData)
     {
-        var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
-        var issuerHexId = this.GetIssuerHexId();
+        try
+        {
+            var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
+            var issuer = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
 
-        var idsToSendTo = VoiceChatUsers
-            .Where(u => u.WatchedStreams.Contains(issuerHexId))
-            .Select(u => u.ConnectionId);
+            var idsToSendTo = VoiceChatUsers
+                .Where(u => u.WatchedStreams.Contains(issuer.HexId))
+                .Select(u => u.ConnectionId);
 
-        await Clients.Clients(idsToSendTo).SendAsync(roomGuid, new Signal(issuerHexId, pictureData));
-        return Success();
+            await Clients.Clients(idsToSendTo).SendAsync(roomGuid, new Signal(issuer.HexId, pictureData));
+            return Success();
+        }
+        catch (InvalidOperationException)
+        {
+            return Error(new(ErrorCode.YouAreNotConnectedToVoiceChannel));
+        }
     }
 
     public SignalRHubResult WatchStream(long userHexId)
     {
-        var issuer = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
+        try
+        {
+            var issuer = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
 
-        issuer.WatchedStreams.Add(userHexId);
-        return Success();
+            issuer.WatchedStreams.Add(userHexId);
+            return Success();
+        }
+        catch (InvalidOperationException)
+        {
+            return Error(new(ErrorCode.YouAreNotConnectedToVoiceChannel));
+        }
     }
 
     public SignalRHubResult UnwatchStream(long userHexId)
     {
-        var issuer = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
+        try
+        {
+            var issuer = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
 
-        issuer.WatchedStreams.Remove(userHexId);
-        return Success();
+            issuer.WatchedStreams.Remove(userHexId);
+            return Success();
+        }
+        catch (InvalidOperationException)
+        {
+            return Error(new(ErrorCode.YouAreNotConnectedToVoiceChannel));
+        }
     }
 }

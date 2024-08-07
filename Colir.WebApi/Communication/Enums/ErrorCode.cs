@@ -23,5 +23,6 @@ public enum ErrorCode
     UserAlreadyRegistered,
     UserNotFound,
     YouAreNotAuthorOfMessage,
-    YouAreNotAuthorOfReaction
+    YouAreNotAuthorOfReaction,
+    YouAreNotConnectedToVoiceChannel
 }
