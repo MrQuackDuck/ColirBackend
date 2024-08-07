@@ -30,6 +30,26 @@ Besides that, **Colir** **has** a couple of **features**, which can interest you
 > If you authenticate as **anonymous**, you **won't be able to login** into that account again.<br>
 > **Therefore**, use **3rd party providers** such as **GitHub** and **Google** to be able to login as much as you want.
 
+## 🐳 Deployment
+1. Install <a href="https://docs.docker.com/get-docker/">Docker</a>
+2. Clone this repo <br>
+   **>** `git clone https://github.com/MrQuackDuck/ColirBackend.git`
+3. Jump into the folder <br>
+   **>** `cd .\ColirBackend\`
+4. Run the container <br>
+   **>** `docker compose up`
+
+> [!IMPORTANT]
+> When you've cloned the repository, make sure to configure these variables in `appsettings.json`:<br>
+> - `AppSettings:JwtKey` - a **secret key** used to make **JWT tokens**
+> - `Authentication:GitHubClientId` - **GitHub Client Id** (see <a href="https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps">Authorizing OAuth apps</a>)
+> - `Authentication:GitHubSecret` - **GitHub Client Secret** (see <a href="https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps">Authorizing OAuth apps</a>)
+> - `Authentication:GoogleClientId` - **Google Client Id** (see <a href="https://developers.google.com/identity/protocols/oauth2#1.-obtain-oauth-2.0-credentials-from-the-dynamic_data.setvar.console_name-.">Using OAuth 2.0 to Access Google APIs</a>)
+> - `Authentication:GoogleClientSecret` - **Google Client Secret** (see <a href="https://developers.google.com/identity/protocols/oauth2#1.-obtain-oauth-2.0-credentials-from-the-dynamic_data.setvar.console_name-.">Using OAuth 2.0 to Access Google APIs</a>)
+> - `Authentication:GoogleRedirectLink` - **Google Redirect Link** (the callback-link after **Google OAuth2** consent you've configured in <a href="https://console.cloud.google.com">Google Cloud Console</a>)
+> - `DatabaseEncryption:EncryptionPassword` - The **16-char password** that will be used to encrypt some data on writing/reading into/from the database.
+> - `DatabaseEncryption:InitializationVector` - The **16-char initialization vector** that will be used to encrypt some data on writing/reading into/from the database.
+
 ## 🖥 Development server
 
 1. Install <a href="https://dotnet.microsoft.com/en-us/download/dotnet/8.0">.NET 8</a>
