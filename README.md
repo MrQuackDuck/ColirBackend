@@ -23,7 +23,7 @@ This **API role** is **to transfer** and **store** the encrypted data.
 
 ## 🌠 Features
 Besides that, **Colir** **has** a couple of **features**, which can interest you in:
-- **Rooms** are places where the encrypted communication happens. When a user **creates** a room, he/she chooses an **encryption key** (which will be stored at the client) and receives a **room GUID**. **They can share that GUID** with someone else so they **can join** that room. **Anyone** who has **the GUID** of a certain room **can join** it, but it will be **impossible to decrypt** the data **if** the **wrong encryption** key is provided.
+- **Rooms** are places where the encrypted communication happens. When a user **creates** a room, he/she chooses an **encryption key** (which will be stored at the client) and receives a **room GUID**. **They can share that GUID** with someone else so they **can join** that room. **Anyone** who has **the GUID** of a certain room **can join** it, but it will be **impossible to decrypt** the data **if** the **wrong encryption** key was provided.
 - **Expiry date** can be provided for **rooms**. **When** the **expiry date comes**, all **data won't be accessible** and **will be deleted** forever.
 - There's only **one voice channel** per room.
 - **Passwordless authentication**. There are **three ways to authenticate**: **anonymous** (gives you a one-time JWT), **GitHub** account, and **Google** account.
