@@ -65,6 +65,7 @@ public class ClearRoomHub : ColirHub, IClearRoomHub
         }
     }
 
+    /// <inheritdoc cref="IClearRoomHub.Clear"/>
     public async Task<SignalRHubResult> Clear()
     {
         var request = new RequestToClearRoom

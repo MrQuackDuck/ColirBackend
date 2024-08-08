@@ -156,7 +156,6 @@ public class RegistrationHub : ColirHub, IRegistrationHub
         if (resultUserModel == null)
             return Error(new ErrorResponse(ErrorCode.InvalidActionException, "Something went wrong!"));
 
-
         // Returning the user model and closing the connection
         try
         {

@@ -1,5 +1,6 @@
 ﻿using DAL.Encrpyion;
 using DAL.Entities;
+using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
@@ -9,9 +10,14 @@ namespace DAL;
 public class ColirDbContext : DbContext
 {
     private readonly IConfiguration _config;
+    private readonly IRoomFileManager _roomFileManager;
 
-    public ColirDbContext(DbContextOptions<ColirDbContext> options, IConfiguration config) : base(options)
-        => _config = config;
+    public ColirDbContext(DbContextOptions<ColirDbContext> options, IConfiguration config,
+        IRoomFileManager roomFileManager) : base(options)
+    {
+        _config = config;
+        _roomFileManager = roomFileManager;
+    }
 
     public DbSet<Attachment> Attachments { get; set; }
     public DbSet<LastTimeUserReadChat> LastTimeUserReadChats { get; set; }
@@ -98,5 +104,35 @@ public class ColirDbContext : DbContext
             .WithOne(s => s.Message)
             .HasForeignKey(r => r.MessageId)
             .IsRequired();
+    }
+
+    public override int SaveChanges()
+    {
+        HandleDeletedAttachments();
+        return base.SaveChanges();
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
+    {
+        HandleDeletedAttachments();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// When an attachment is marked to be removed,
+    /// deletes it from the file system also
+    /// </summary>
+    private void HandleDeletedAttachments()
+    {
+        // Get all entities marked for deletion
+        var deletedEntities = ChangeTracker.Entries()
+            .Where(e => e.State == EntityState.Deleted)
+            .ToList();
+
+        foreach (var entityEntry in deletedEntities)
+        {
+            if (entityEntry.Entity is Attachment attachment)
+                _roomFileManager.DeleteFile(attachment.Path);
+        }
     }
 }

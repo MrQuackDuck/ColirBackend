@@ -10,7 +10,6 @@ using Colir.Interfaces.ApiRelatedServices;
 using Colir.Misc.ExceptionHandlers;
 using DAL;
 using DAL.Interfaces;
-using DAL.Repositories;
 using DAL.Repositories.Related;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Data.SqlClient;
@@ -39,16 +38,8 @@ services.AddDbContext<ColirDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Adding DAL services
-services.AddTransient<IAttachmentRepository, AttachmentRepository>();
-services.AddTransient<ILastTimeUserReadChatRepository, LastTimeUserReadChatRepository>();
-services.AddTransient<IMessageRepository, MessageRepository>();
-services.AddTransient<IReactionRepository, ReactionRepository>();
 services.AddTransient<IFileSystem, FileSystem>();
 services.AddTransient<IRoomFileManager, RoomFileManager>();
-services.AddTransient<IRoomRepository, RoomRepository>();
-services.AddTransient<IUserRepository, UserRepository>();
-services.AddTransient<IUserSettingsRepository, UserSettingsRepository>();
-services.AddTransient<IUserStatisticsRepository, UserStatisticsRepository>();
 services.AddTransient<IUnitOfWork, UnitOfWork>();
 
 // Adding BLL services

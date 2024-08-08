@@ -50,7 +50,7 @@ public class MessageRepository : IMessageRepository
     }
 
     /// <summary>
-    /// Gets last sent messages in certain room
+    /// Gets last sent messages from certain room
     /// </summary>
     /// <param name="roomGuid">Room GUID to get messages in</param>
     /// <param name="count">Count of messages to take</param>
@@ -175,7 +175,7 @@ public class MessageRepository : IMessageRepository
     }
 
     /// <summary>
-    /// Saves the changes to the DB
+    /// Saves changes to the DB
     /// </summary>
     public void SaveChanges()
     {
@@ -183,7 +183,7 @@ public class MessageRepository : IMessageRepository
     }
 
     /// <summary>
-    /// Saves the changes to the DB asynchronously
+    /// Saves changes to the DB asynchronously
     /// </summary>
     public async Task SaveChangesAsync()
     {

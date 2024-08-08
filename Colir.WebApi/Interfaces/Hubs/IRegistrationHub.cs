@@ -1,4 +1,5 @@
 ﻿using Colir.BLL.Models;
+using Colir.Communication.Enums;
 using Colir.Communication.ResponseModels;
 
 namespace Colir.Interfaces.Hubs;
@@ -16,6 +17,7 @@ public interface IRegistrationHub
 
     /// <summary>
     /// Chooses the Hex Id for the user
+    /// An error with <see cref="ErrorCode.InvalidActionException"/> code returned when the chosen hex is not present in the offered list
     /// </summary>
     /// <param name="hex">The hex id from previously given list</param>
     SignalRHubResult ChooseHex(int hex);
@@ -28,6 +30,7 @@ public interface IRegistrationHub
 
     /// <summary>
     /// Finishes the registration and sends <see cref="DetailedUserModel"/> to the user
+    /// An error with <see cref="ErrorCode.InvalidActionException"/> code returned either when the hex or the username wasn't chosen yet (or an unhandled exception occurred)
     /// </summary>
     Task<SignalRHubResult> FinishRegistration();
 }

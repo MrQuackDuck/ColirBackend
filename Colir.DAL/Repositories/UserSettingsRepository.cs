@@ -134,7 +134,7 @@ public class UserSettingsRepository : IUserSettingsRepository
     }
 
     /// <summary>
-    /// Saves the changes to the DB
+    /// Saves changes to the DB
     /// </summary>
     public void SaveChanges()
     {
@@ -142,7 +142,7 @@ public class UserSettingsRepository : IUserSettingsRepository
     }
 
     /// <summary>
-    /// Saves the changes to the DB asynchronously
+    /// Saves changes to the DB asynchronously
     /// </summary>
     public async Task SaveChangesAsync()
     {

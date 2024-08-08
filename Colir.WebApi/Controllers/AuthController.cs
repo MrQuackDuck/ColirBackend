@@ -42,9 +42,7 @@ public class AuthController : ControllerBase, IAuthController
         _googleOAuth2Api = googleOAuth2Api;
     }
 
-    /// <summary>
-    /// Redirects the user to the GitHub authentication page
-    /// </summary>
+    /// <inheritdoc cref="IAuthController.GitHubLogin"/>
     [HttpGet]
     public ActionResult GitHubLogin()
     {
@@ -55,9 +53,7 @@ public class AuthController : ControllerBase, IAuthController
         return Redirect(link);
     }
 
-    /// <summary>
-    /// Redirects the user to the Google authentication page
-    /// </summary>
+    /// <inheritdoc cref="IAuthController.GoogleLogin"/>
     [HttpGet]
     public ActionResult GoogleLogin()
     {
@@ -69,11 +65,7 @@ public class AuthController : ControllerBase, IAuthController
         return Redirect(link);
     }
 
-    /// <summary>
-    /// Exchanges the GitHub OAuth2 code for a registration queue token
-    /// Details: <see cref="IOAuth2RegistrationQueueService"/>
-    /// IMPORTANT: If the user was already registered, a JWT authentication token is generated and returned
-    /// </summary>
+    /// <inheritdoc cref="IAuthController.ExchangeGitHubCode"/>
     [HttpGet]
     public async Task<ActionResult> ExchangeGitHubCode([FromQuery] string code, [FromQuery] string state)
     {
@@ -124,11 +116,7 @@ public class AuthController : ControllerBase, IAuthController
         }
     }
 
-    /// <summary>
-    /// Exchanges the Google OAuth2 code for a registration queue token
-    /// Details: <see cref="IOAuth2RegistrationQueueService"/>
-    /// IMPORTANT: If the user was already registered, a JWT authentication token is generated and returned
-    /// </summary>
+    /// <inheritdoc cref="IAuthController.ExchangeGoogleCode"/>
     [HttpGet]
     public async Task<ActionResult> ExchangeGoogleCode([FromQuery] string code, [FromQuery] string state)
     {
@@ -181,6 +169,7 @@ public class AuthController : ControllerBase, IAuthController
         }
     }
 
+    /// <inheritdoc cref="IAuthController.AnonnymousLogin"/>
     [HttpPost]
     public async Task<ActionResult<DetailedUserModel>> AnonnymousLogin(string name)
     {
@@ -207,6 +196,7 @@ public class AuthController : ControllerBase, IAuthController
         }
     }
 
+    /// <inheritdoc cref="IAuthController.Logout"/>
     [HttpPost]
     [Authorize]
     public async Task<ActionResult> Logout()

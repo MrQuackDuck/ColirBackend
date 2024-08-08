@@ -30,6 +30,7 @@ public class RoomController : ControllerBase, IRoomController
         _chatHub = chatHub;
     }
 
+    /// <inheritdoc cref="IRoomController.GetRoomInfo"/>
     [HttpGet]
     public async Task<ActionResult<RoomModel>> GetRoomInfo(GetRoomInfoModel model)
     {
@@ -62,6 +63,7 @@ public class RoomController : ControllerBase, IRoomController
         }
     }
 
+    /// <inheritdoc cref="IRoomController.CreateRoom"/>
     [HttpPost]
     public async Task<ActionResult<string>> CreateRoom(CreateRoomModel model)
     {
@@ -90,6 +92,7 @@ public class RoomController : ControllerBase, IRoomController
         }
     }
 
+    /// <inheritdoc cref="IRoomController.JoinRoom"/>
     [HttpPost]
     public async Task<ActionResult<RoomModel>> JoinRoom(JoinRoomModel model)
     {
@@ -121,6 +124,7 @@ public class RoomController : ControllerBase, IRoomController
         }
     }
 
+    /// <inheritdoc cref="IRoomController.LeaveRoom"/>
     [HttpPost]
     public async Task<ActionResult> LeaveRoom(LeaveRoomModel model)
     {
@@ -158,6 +162,7 @@ public class RoomController : ControllerBase, IRoomController
         }
     }
 
+    /// <inheritdoc cref="IRoomController.GetLastTimeReadChatModel"/>
     [HttpGet]
     public async Task<ActionResult<DateTime>> GetLastTimeReadChatModel(GetLastTimeReadChatModel model)
     {
@@ -185,6 +190,7 @@ public class RoomController : ControllerBase, IRoomController
         }
     }
 
+    /// <inheritdoc cref="IRoomController.UpdateLastTimeReadChat"/>
     [HttpPut]
     public async Task<ActionResult> UpdateLastTimeReadChat(UpdateLastTimeReadChatModel model)
     {
@@ -214,6 +220,7 @@ public class RoomController : ControllerBase, IRoomController
         }
     }
 
+    /// <inheritdoc cref="IRoomController.KickMember"/>
     [HttpDelete]
     public async Task<ActionResult> KickMember(KickMemberModel model)
     {
@@ -256,6 +263,7 @@ public class RoomController : ControllerBase, IRoomController
         }
     }
 
+    /// <inheritdoc cref="IRoomController.RenameRoom"/>
     [HttpPut]
     public async Task<ActionResult> RenameRoom(RenameRoomModel model)
     {
@@ -307,6 +315,7 @@ public class RoomController : ControllerBase, IRoomController
         }
     }
 
+    /// <inheritdoc cref="IRoomController.DeleteRoom"/>
     [HttpDelete]
     public async Task<ActionResult> DeleteRoom(DeleteRoomModel model)
     {

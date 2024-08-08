@@ -1,6 +1,7 @@
 ﻿using DAL;
 using DAL.Entities;
 using DAL.Enums;
+using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Moq;
@@ -20,7 +21,9 @@ public static class UnitTestHelper
         configMock.Setup(config => config["DatabaseEncryption:EncryptionPassword"]).Returns("16-char-password");
         configMock.Setup(config => config["DatabaseEncryption:InitializationVector"]).Returns("16-char-invector");
 
-        return new ColirDbContext(options, configMock.Object);
+        Mock<IRoomFileManager> roomFileManagerMock = new Mock<IRoomFileManager>();
+
+        return new ColirDbContext(options, configMock.Object, roomFileManagerMock.Object);
     }
 
     public static void SeedData(ColirDbContext context)

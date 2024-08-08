@@ -214,7 +214,7 @@ public class RoomRepository : IRoomRepository
     }
 
     /// <summary>
-    /// Saves the changes
+    /// Saves changes
     /// </summary>
     public void SaveChanges()
     {
@@ -222,7 +222,7 @@ public class RoomRepository : IRoomRepository
     }
 
     /// <summary>
-    /// Saves the changes to the DB asynchronously
+    /// Saves changes to the DB asynchronously
     /// </summary>
     public async Task SaveChangesAsync()
     {

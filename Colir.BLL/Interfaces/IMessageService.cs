@@ -8,7 +8,7 @@ namespace Colir.BLL.Interfaces;
 public interface IMessageService
 {
     /// <summary>
-    /// Gets last sent messages in certain room
+    /// Gets last sent messages from certain room
     /// </summary>
     /// <param name="request">The request object</param>
     /// <param name="request.Count">Count of messages to take</param>

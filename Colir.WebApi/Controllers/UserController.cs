@@ -26,6 +26,7 @@ public class UserController : ControllerBase, IUserController
         _userStatisticsService = userStatisticsService;
     }
 
+    /// <inheritdoc cref="IUserController.GetAccountInfo"/>
     [HttpGet]
     public async Task<ActionResult<DetailedUserModel>> GetAccountInfo()
     {
@@ -44,6 +45,7 @@ public class UserController : ControllerBase, IUserController
         }
     }
 
+    /// <inheritdoc cref="IUserController.GetStatistics"/>
     [HttpGet]
     public async Task<ActionResult<UserStatisticsModel>> GetStatistics()
     {
@@ -62,6 +64,7 @@ public class UserController : ControllerBase, IUserController
         }
     }
 
+    /// <inheritdoc cref="IUserController.ChangeSettings"/>
     [HttpPut]
     public async Task<ActionResult> ChangeSettings(UserSettingsModel newSettings)
     {
@@ -83,6 +86,7 @@ public class UserController : ControllerBase, IUserController
         }
     }
 
+    /// <inheritdoc cref="IUserController.DeleteAccount"/>
     [HttpDelete]
     public async Task<ActionResult> DeleteAccount()
     {

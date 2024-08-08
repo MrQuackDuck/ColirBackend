@@ -6,7 +6,7 @@ public class VoiceChatUser
     public string ConnectionId { get; set; } = default!;
     public string RoomGuid { get; set; } = default!;
     public bool IsMuted { get; set; }
-    public bool IsDefeaned { get; set; }
+    public bool IsDeafened { get; set; }
     public bool IsVideoEnabled { get; set; }
     public bool IsStreamEnabled { get; set; }
 

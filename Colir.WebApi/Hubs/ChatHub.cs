@@ -82,6 +82,7 @@ public class ChatHub : ColirHub, IChatHub
         return Task.CompletedTask;
     }
 
+    /// <inheritdoc cref="IChatHub.GetMessages"/>
     public async Task<SignalRHubResult> GetMessages(GetLastMessagesModel model)
     {
         if (!IsModelValid(model)) return Error(new (ErrorCode.ModelNotValid));
@@ -110,7 +111,7 @@ public class ChatHub : ColirHub, IChatHub
         }
         catch (IssuerNotInRoomException)
         {
-            return Error(new(ErrorCode.IssuerNotInTheRoom));
+            return Error(new(ErrorCode.IssuerNotInTheRoom), true);
         }
         catch (RoomExpiredException)
         {
@@ -119,6 +120,7 @@ public class ChatHub : ColirHub, IChatHub
         }
     }
 
+    /// <inheritdoc cref="IChatHub.SendMessage"/>
     public async Task<SignalRHubResult> SendMessage(SendMessageModel model)
     {
         if (!IsModelValid(model)) return Error(new (ErrorCode.ModelNotValid));
@@ -180,10 +182,11 @@ public class ChatHub : ColirHub, IChatHub
         }
         catch (IssuerNotInRoomException)
         {
-            return Error(new(ErrorCode.IssuerNotInTheRoom));
+            return Error(new(ErrorCode.IssuerNotInTheRoom), true);
         }
     }
 
+    /// <inheritdoc cref="IChatHub.EditMessage"/>
     public async Task<SignalRHubResult> EditMessage(EditMessageModel model)
     {
         if (!IsModelValid(model)) return Error(new (ErrorCode.ModelNotValid));
@@ -216,7 +219,7 @@ public class ChatHub : ColirHub, IChatHub
         }
         catch (IssuerNotInRoomException)
         {
-            return Error(new(ErrorCode.IssuerNotInTheRoom));
+            return Error(new(ErrorCode.IssuerNotInTheRoom), true);
         }
         catch (NotEnoughPermissionsException)
         {
@@ -224,6 +227,7 @@ public class ChatHub : ColirHub, IChatHub
         }
     }
 
+    /// <inheritdoc cref="IChatHub.DeleteMessage"/>
     public async Task<SignalRHubResult> DeleteMessage(DeleteMessageModel model)
     {
         if (!IsModelValid(model)) return Error(new (ErrorCode.ModelNotValid));
@@ -255,6 +259,7 @@ public class ChatHub : ColirHub, IChatHub
         }
     }
 
+    /// <inheritdoc cref="IChatHub.AddReactionOnMessage"/>
     public async Task<SignalRHubResult> AddReactionOnMessage(AddReactionOnMessageModel model)
     {
         if (!IsModelValid(model)) return Error(new (ErrorCode.ModelNotValid));
@@ -287,6 +292,7 @@ public class ChatHub : ColirHub, IChatHub
         }
     }
 
+    /// <inheritdoc cref="IChatHub.RemoveReactionFromMessage"/>
     public async Task<SignalRHubResult> RemoveReactionFromMessage(RemoveReactionFromMessageModel model)
     {
         if (!IsModelValid(model)) return Error(new (ErrorCode.ModelNotValid));
