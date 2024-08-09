@@ -19,7 +19,7 @@ To implement that, **end-to-end encryption** was chosen. Before using the applic
 > [!NOTE]
 > The **encryption keys** for rooms are stored **on the client only**. They're **not being sent to the server**.
 
-This **API role** is **to transfer** and **store** the encrypted data.
+This **API's role** is **to transfer** and **store** the encrypted data.
 
 ## 🌠 Features
 Besides that, **Colir** **has** a couple of **features**, which can interest you in:
