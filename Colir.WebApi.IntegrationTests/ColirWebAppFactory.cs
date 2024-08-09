@@ -31,7 +31,7 @@ internal class ColirWebAppFactory : WebApplicationFactory<Program>
         });
     }
 
-    private string GetConnectionString(IServiceCollection services)
+    private static string GetConnectionString(IServiceCollection services)
     {
         var serviceProvider = services.BuildServiceProvider();
         var scope = serviceProvider.CreateScope();
