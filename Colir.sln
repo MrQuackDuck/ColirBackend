@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Colir.BLL.Tests", "Colir.BL
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Colir.Exceptions", "Colir.Exceptions\Colir.Exceptions.csproj", "{38AF8308-143C-4486-BC21-C9CE0C171440}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Colir.WebApi.IntegrationTests", "Colir.WebApi.IntegrationTests\Colir.WebApi.IntegrationTests.csproj", "{9510046A-5E4C-4187-9A99-4822C4764F89}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +44,9 @@ Global
 		{38AF8308-143C-4486-BC21-C9CE0C171440}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{38AF8308-143C-4486-BC21-C9CE0C171440}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{38AF8308-143C-4486-BC21-C9CE0C171440}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9510046A-5E4C-4187-9A99-4822C4764F89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9510046A-5E4C-4187-9A99-4822C4764F89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9510046A-5E4C-4187-9A99-4822C4764F89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9510046A-5E4C-4187-9A99-4822C4764F89}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

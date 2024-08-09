@@ -169,9 +169,9 @@ public class AuthController : ControllerBase, IAuthController
         }
     }
 
-    /// <inheritdoc cref="IAuthController.AnonnymousLogin"/>
+    /// <inheritdoc cref="IAuthController.AnonymousLogin"/>
     [HttpPost]
-    public async Task<ActionResult<DetailedUserModel>> AnonnymousLogin(string name)
+    public async Task<ActionResult<DetailedUserModel>> AnonymousLogin(string name)
     {
         try
         {

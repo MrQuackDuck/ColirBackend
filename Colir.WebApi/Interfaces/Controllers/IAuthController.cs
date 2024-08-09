@@ -35,7 +35,7 @@ public interface IAuthController
     /// Returns JWT token instantly
     /// </summary>
     /// <param name="name">Desired name</param>
-    Task<ActionResult<DetailedUserModel>> AnonnymousLogin(string name);
+    Task<ActionResult<DetailedUserModel>> AnonymousLogin(string name);
 
     /// <summary>
     /// Logs user out of his account
