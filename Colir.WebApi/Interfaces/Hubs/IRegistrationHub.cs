@@ -29,7 +29,7 @@ public interface IRegistrationHub
     SignalRHubResult ChooseUsername(string username);
 
     /// <summary>
-    /// Finishes the registration and sends <see cref="DetailedUserModel"/> to the user
+    /// Finishes the registration and sends JWT token to the user
     /// An error with <see cref="ErrorCode.InvalidActionException"/> code returned either when the hex or the username wasn't chosen yet (or an unhandled exception occurred)
     /// </summary>
     Task<SignalRHubResult> FinishRegistration();

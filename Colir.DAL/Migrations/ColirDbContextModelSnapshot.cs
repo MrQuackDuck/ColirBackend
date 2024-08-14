@@ -320,18 +320,17 @@ namespace DAL.Migrations
                 {
                     b.HasOne("DAL.Entities.User", "Author")
                         .WithMany()
-                        .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .HasForeignKey("AuthorId");
 
                     b.HasOne("DAL.Entities.Message", "RepliedTo")
                         .WithMany()
                         .HasForeignKey("RepliedMessageId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("DAL.Entities.Room", "Room")
                         .WithMany()
                         .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Author");
 

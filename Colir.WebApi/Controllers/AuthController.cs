@@ -1,7 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Colir.BLL.Interfaces;
+﻿using Colir.BLL.Interfaces;
 using Colir.BLL.Models;
 using Colir.BLL.RequestModels.User;
 using Colir.Communication.Enums;
@@ -16,7 +13,6 @@ using DAL.Enums;
 using DAL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Colir.Controllers;
 
@@ -30,9 +26,10 @@ public class AuthController : ControllerBase, IAuthController
     private readonly IUnitOfWork _unitOfWork;
     private readonly IGitHubOAuth2Api _gitHubOAuth2Api;
     private readonly IGoogleOAuth2Api _googleOAuth2Api;
+    private readonly ITokenGenerator _tokenGenerator;
 
     public AuthController(IUserService userService, IConfiguration config, IOAuth2RegistrationQueueService registrationQueueService,
-        IUnitOfWork unitOfWork, IGitHubOAuth2Api gitHubOAuth2Api, IGoogleOAuth2Api googleOAuth2Api)
+        IUnitOfWork unitOfWork, IGitHubOAuth2Api gitHubOAuth2Api, IGoogleOAuth2Api googleOAuth2Api, ITokenGenerator tokenGenerator)
     {
         _userService = userService;
         _config = config;
@@ -40,6 +37,7 @@ public class AuthController : ControllerBase, IAuthController
         _unitOfWork = unitOfWork;
         _gitHubOAuth2Api = gitHubOAuth2Api;
         _googleOAuth2Api = googleOAuth2Api;
+        _tokenGenerator = tokenGenerator;
     }
 
     /// <inheritdoc cref="IAuthController.GitHubLogin"/>
@@ -95,7 +93,7 @@ public class AuthController : ControllerBase, IAuthController
 
                 var userModel = await _userService.AuthorizeViaGitHubAsync(request);
 
-                var jwtToken = GenerateJwtToken(userModel.Id, userModel.HexId, userModel.AuthType);
+                var jwtToken = _tokenGenerator.GenerateJwtToken(userModel.Id, userModel.HexId, userModel.AuthType);
 
                 // Applying the jwt token to response's cookies
                 Response.ApplyJwtToken(jwtToken);
@@ -148,7 +146,7 @@ public class AuthController : ControllerBase, IAuthController
 
                 var userModel = await _userService.AuthorizeViaGoogleAsync(request);
 
-                var jwtToken = GenerateJwtToken(userModel.Id, userModel.HexId, userModel.AuthType);
+                var jwtToken = _tokenGenerator.GenerateJwtToken(userModel.Id, userModel.HexId, userModel.AuthType);
 
                 // Applying the jwt token to response's cookies
                 Response.ApplyJwtToken(jwtToken);
@@ -179,7 +177,7 @@ public class AuthController : ControllerBase, IAuthController
 
             var userModel = await _userService.AuthorizeAsAnnoymousAsync(request);
 
-            var jwtToken = GenerateJwtToken(userModel.Id, userModel.HexId, userModel.AuthType);
+            var jwtToken = _tokenGenerator.GenerateJwtToken(userModel.Id, userModel.HexId, userModel.AuthType);
 
             // Applying the jwt token
             Response.ApplyJwtToken(jwtToken);
@@ -218,25 +216,5 @@ public class AuthController : ControllerBase, IAuthController
         {
             return BadRequest(new ErrorResponse(ErrorCode.UserNotFound));
         }
-    }
-
-    [NonAction]
-    private string GenerateJwtToken(long userId, long userHexId, UserAuthType authType)
-    {
-        // Creating claims for a token
-        var claims = new List<Claim>
-        {
-            new Claim("Id", userId.ToString()),
-            new Claim("HexId", userHexId.ToString()),
-            new Claim("AuthType", authType.ToString())
-        };
-
-        // Getting the key and generating a token
-        var encrpyionKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:JwtKey").Value!));
-        var jwtToken = new JwtSecurityToken(claims: claims,
-            expires: DateTime.UtcNow.Add(TimeSpan.FromDays(30)),
-            signingCredentials: new SigningCredentials(encrpyionKey, SecurityAlgorithms.HmacSha256));
-
-        return new JwtSecurityTokenHandler().WriteToken(jwtToken);
     }
 }

@@ -53,6 +53,7 @@ services.AddTransient<IUserService, UserService>();
 services.AddTransient<IUserStatisticsService, UserStatisticsService>();
 
 // Adding strictly Api-Related services
+services.AddSingleton<ITokenGenerator, TokenGenerator>();
 services.AddSingleton<IGitHubOAuth2Api, GitHubOAuth2Api>();
 services.AddSingleton<IGoogleOAuth2Api, GoogleOAuth2Api>();
 services.AddSingleton<IOAuth2RegistrationQueueService, OAuth2RegistrationQueueService>();

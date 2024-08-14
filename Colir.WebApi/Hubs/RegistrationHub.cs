@@ -21,6 +21,7 @@ public class RegistrationHub : ColirHub, IRegistrationHub
     private readonly IUserService _userService;
     private readonly IOAuth2RegistrationQueueService _registrationQueueService;
     private readonly IHexColorGenerator _hexGenerator;
+    private readonly ITokenGenerator _tokenGenerator;
 
     /// <summary>
     /// Dictionary to store hexs that are currently offered for users to choose from
@@ -47,11 +48,12 @@ public class RegistrationHub : ColirHub, IRegistrationHub
     private static readonly Dictionary<string, string> ChosenUsernames = new();
 
     public RegistrationHub(IUserService userService, IOAuth2RegistrationQueueService registrationQueueService,
-        IHexColorGenerator hexGenerator)
+        IHexColorGenerator hexGenerator, ITokenGenerator tokenGenerator)
     {
         _userService = userService;
         _registrationQueueService = registrationQueueService;
         _hexGenerator = hexGenerator;
+        _tokenGenerator = tokenGenerator;
     }
 
     public override async Task OnConnectedAsync()
@@ -156,14 +158,16 @@ public class RegistrationHub : ColirHub, IRegistrationHub
         if (resultUserModel == null)
             return Error(new ErrorResponse(ErrorCode.InvalidActionException, "Something went wrong!"));
 
-        // Returning the user model and closing the connection
-        try
+        var jwtToken = _tokenGenerator.GenerateJwtToken(resultUserModel.Id, resultUserModel.HexId, resultUserModel.AuthType);
+
+        // Start a task to abort the connection after some time
+        _ = Task.Run(async () =>
         {
-            return Success(resultUserModel);
-        }
-        finally
-        {
-            Context.Abort();
-        }
+            await Task.Delay(TimeSpan.FromMilliseconds(700));
+            Context.Abort(); // Abort the connection
+        });
+
+        // Returning the token
+        return Success(jwtToken);
     }
 }

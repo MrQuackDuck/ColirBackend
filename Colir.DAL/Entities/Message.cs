@@ -21,13 +21,13 @@ public class Message : BaseEntity
     [ForeignKey(nameof(RepliedTo))]
     public long? RepliedMessageId { get; set; }
 
-    [DeleteBehavior(DeleteBehavior.NoAction)]
-    public Room? Room { get; set; } = default!;
+    [DeleteBehavior(DeleteBehavior.SetNull)]
+    public Room? Room { get; set; }
 
-    [DeleteBehavior(DeleteBehavior.NoAction)]
-    public User? Author { get; set; } = default!;
+    [DeleteBehavior(DeleteBehavior.ClientSetNull)]
+    public User? Author { get; set; }
 
-    [DeleteBehavior(DeleteBehavior.NoAction)]
+    [DeleteBehavior(DeleteBehavior.Restrict)]
     public Message? RepliedTo { get; set; }
     public List<Attachment> Attachments { get; set; } = default!;
     public List<Reaction> Reactions { get; set; } = default!;
