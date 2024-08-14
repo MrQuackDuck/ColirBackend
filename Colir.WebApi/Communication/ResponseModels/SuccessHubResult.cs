@@ -4,7 +4,7 @@ namespace Colir.Communication.ResponseModels;
 
 public class SuccessHubResult : SignalRHubResult
 {
-    public SuccessHubResult() : base(SignalrResultType.Success)
+    public SuccessHubResult() : base(SignalRResultType.Success)
     {
     }
 }

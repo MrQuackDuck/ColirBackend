@@ -1,6 +1,6 @@
 ﻿namespace Colir.Communication.Enums;
 
-public enum SignalrResultType
+public enum SignalRResultType
 {
     Success,
     Error

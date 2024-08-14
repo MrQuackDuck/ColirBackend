@@ -50,7 +50,7 @@ public class AuthController : ControllerBase, IAuthController
         var state = Guid.NewGuid().ToString();
         HttpContext.Session.SetString("state", state);
         var link = $"https://github.com/login/oauth/authorize?client_id={githubClientId}&state={state}";
-        return Redirect(link);
+        return Ok(link);
     }
 
     /// <inheritdoc cref="IAuthController.GoogleLogin"/>
@@ -62,7 +62,7 @@ public class AuthController : ControllerBase, IAuthController
         var state = Guid.NewGuid().ToString();
         HttpContext.Session.SetString("state", state);
         var link = $"https://accounts.google.com/o/oauth2/v2/auth?scope=https://www.googleapis.com/auth/userinfo.email&response_type=code&redirect_uri={redirectLink}&client_id={googleClientId}&state={state}";
-        return Redirect(link);
+        return Ok(link);
     }
 
     /// <inheritdoc cref="IAuthController.ExchangeGitHubCode"/>
