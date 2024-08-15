@@ -182,6 +182,7 @@ public class UserRepository : IUserRepository
             .Include(nameof(User.UserSettings))
             .FirstOrDefault(u => u.Id == user.Id) ?? throw new UserNotFoundException();
 
+        _dbContext.UsersToRooms.RemoveRange(_dbContext.UsersToRooms.Where(userToRoom => userToRoom.UserId == user.Id));
         _dbContext.Users.Remove(target);
         _dbContext.UserSettings.Remove(target.UserSettings);
         _dbContext.UserStatistics.Remove(target.UserStatistics);
@@ -199,6 +200,7 @@ public class UserRepository : IUserRepository
             .Include(nameof(User.UserSettings))
             .FirstOrDefaultAsync(u => u.Id == id) ?? throw new UserNotFoundException();
 
+        _dbContext.UsersToRooms.RemoveRange(_dbContext.UsersToRooms.Where(userToRoom => userToRoom.UserId == id));
         _dbContext.Users.Remove(target);
         _dbContext.UserSettings.Remove(target.UserSettings);
         _dbContext.UserStatistics.Remove(target.UserStatistics);

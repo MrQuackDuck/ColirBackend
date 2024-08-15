@@ -112,6 +112,7 @@ public class RoomRepository : IRoomRepository
     {
         var target = _dbContext.Rooms.FirstOrDefault(r => r.Id == room.Id) ?? throw new RoomNotFoundException();
 
+        _dbContext.UsersToRooms.RemoveRange(_dbContext.UsersToRooms.Where(userToRoom => userToRoom.RoomId == room.Id));
         _dbContext.Rooms.Remove(target);
         var messagesToDelete = _dbContext.Messages.Where(m => m.RoomId == room.Id);
         _dbContext.Messages.RemoveRange(messagesToDelete);
@@ -130,6 +131,7 @@ public class RoomRepository : IRoomRepository
     {
         var target = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Id == id) ?? throw new RoomNotFoundException();
 
+        _dbContext.UsersToRooms.RemoveRange(_dbContext.UsersToRooms.Where(userToRoom => userToRoom.RoomId == id));
         _dbContext.Rooms.Remove(target);
         var messagesToDelete = _dbContext.Messages.Where(m => m.RoomId == id);
         _dbContext.Messages.RemoveRange(messagesToDelete);

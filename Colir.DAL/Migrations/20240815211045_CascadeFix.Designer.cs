@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.Migrations
 {
     [DbContext(typeof(ColirDbContext))]
-    [Migration("20240814173302_CascadeFix")]
+    [Migration("20240815211045_CascadeFix")]
     partial class CascadeFix
     {
         /// <inheritdoc />
@@ -107,7 +107,7 @@ namespace DAL.Migrations
                     b.Property<long?>("RepliedMessageId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("RoomId")
+                    b.Property<long>("RoomId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
@@ -160,21 +160,22 @@ namespace DAL.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Guid")
+                        .IsRequired()
                         .HasMaxLength(36)
                         .HasColumnType("nvarchar(36)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasMaxLength(2147483647)
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("OwnerId")
+                    b.Property<long?>("OwnerId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Guid")
-                        .IsUnique()
-                        .HasFilter("[Guid] IS NOT NULL");
+                        .IsUnique();
 
                     b.HasIndex("OwnerId");
 
@@ -290,7 +291,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserToRoom");
+                    b.ToTable("UsersToRooms");
                 });
 
             modelBuilder.Entity("DAL.Entities.Attachment", b =>
@@ -323,7 +324,8 @@ namespace DAL.Migrations
                 {
                     b.HasOne("DAL.Entities.User", "Author")
                         .WithMany()
-                        .HasForeignKey("AuthorId");
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("DAL.Entities.Message", "RepliedTo")
                         .WithMany()
@@ -333,7 +335,8 @@ namespace DAL.Migrations
                     b.HasOne("DAL.Entities.Room", "Room")
                         .WithMany()
                         .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Author");
 
@@ -366,8 +369,7 @@ namespace DAL.Migrations
                     b.HasOne("DAL.Entities.User", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Owner");
                 });

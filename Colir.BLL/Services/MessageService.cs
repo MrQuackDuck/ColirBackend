@@ -129,7 +129,7 @@ public class MessageService : IMessageService
         await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
 
         var message = await _unitOfWork.MessageRepository.GetByIdAsync(request.MessageId);
-        var room = await _unitOfWork.RoomRepository.GetByIdAsync(message.RoomId ?? 0);
+        var room = await _unitOfWork.RoomRepository.GetByIdAsync(message.RoomId);
 
         // If the room is expired
         if (room.IsExpired())
@@ -167,7 +167,7 @@ public class MessageService : IMessageService
         await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
 
         var message = await _unitOfWork.MessageRepository.GetByIdAsync(request.MessageId);
-        var room = await _unitOfWork.RoomRepository.GetByIdAsync(message.RoomId ?? 0);
+        var room = await _unitOfWork.RoomRepository.GetByIdAsync(message.RoomId);
 
         // If the room is expired
         if (room.IsExpired())
@@ -200,7 +200,7 @@ public class MessageService : IMessageService
     {
         var issuer = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
         var message = await _unitOfWork.MessageRepository.GetByIdAsync(request.MessageId);
-        var room = await _unitOfWork.RoomRepository.GetByIdAsync(message.RoomId ?? 0);
+        var room = await _unitOfWork.RoomRepository.GetByIdAsync(message.RoomId);
 
         // If the issuer is not in the room
         if (!room.JoinedUsers.Any(u => u.Id == request.IssuerId))
@@ -248,7 +248,7 @@ public class MessageService : IMessageService
         var issuer = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
         var reaction = await _unitOfWork.ReactionRepository.GetByIdAsync(request.ReactionId);
         var message = await _unitOfWork.MessageRepository.GetByIdAsync(reaction.MessageId);
-        var room = await _unitOfWork.RoomRepository.GetByIdAsync(reaction.Message.RoomId ?? 0);
+        var room = await _unitOfWork.RoomRepository.GetByIdAsync(reaction.Message.RoomId);
 
         // If the room is expired
         if (room.IsExpired())

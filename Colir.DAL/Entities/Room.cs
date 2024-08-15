@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Entities;
 
+#nullable enable
+
 [Index(nameof(Guid), IsUnique = true)]
 public class Room : BaseEntity
 {
@@ -16,9 +18,10 @@ public class Room : BaseEntity
     public DateTime? ExpiryDate { get; set; }
 
     [ForeignKey(nameof(Owner))]
-    public long OwnerId { get; set; }
+    public long? OwnerId { get; set; }
 
-    public User Owner { get; set; }
+    [DeleteBehavior(DeleteBehavior.SetNull)]
+    public User? Owner { get; set; }
     public IList<User> JoinedUsers { get; set; } = new List<User>();
 
     /// <summary>

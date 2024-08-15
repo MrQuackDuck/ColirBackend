@@ -25,6 +25,7 @@ public class ColirDbContext : DbContext
     public DbSet<Reaction> Reactions { get; set; }
     public DbSet<Room> Rooms { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<UserToRoom> UsersToRooms { get; set; }
     public DbSet<UserSettings> UserSettings { get; set; }
     public DbSet<UserStatistics> UserStatistics { get; set; }
 
