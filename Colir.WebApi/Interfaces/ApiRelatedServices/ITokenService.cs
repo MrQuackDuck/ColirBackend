@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using DAL.Enums;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Colir.Interfaces.ApiRelatedServices;
 
@@ -31,5 +32,6 @@ public interface ITokenService
     /// <summary>
     /// Gets claims from the token
     /// </summary>
+    /// <exception cref="SecurityTokenException">Thrown when the token is invalid</exception>
     public List<Claim> GetClaimsFromExpiredToken(string token);
 }

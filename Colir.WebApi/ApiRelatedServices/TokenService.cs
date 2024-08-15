@@ -100,6 +100,7 @@ public class TokenService : ITokenService
         }
     }
 
+    /// <inheritdoc cref="ITokenService.GetClaimsFromExpiredToken"/>
     public List<Claim> GetClaimsFromExpiredToken(string token)
     {
         var tokenValidationParameters = new TokenValidationParameters
