@@ -53,7 +53,7 @@ services.AddTransient<IUserService, UserService>();
 services.AddTransient<IUserStatisticsService, UserStatisticsService>();
 
 // Adding strictly Api-Related services
-services.AddSingleton<ITokenGenerator, TokenGenerator>();
+services.AddTransient<ITokenService, TokenService>();
 services.AddSingleton<IGitHubOAuth2Api, GitHubOAuth2Api>();
 services.AddSingleton<IGoogleOAuth2Api, GoogleOAuth2Api>();
 services.AddSingleton<IOAuth2RegistrationQueueService, OAuth2RegistrationQueueService>();
@@ -68,7 +68,7 @@ services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8
-                .GetBytes(builder.Configuration.GetSection("AppSettings:JwtKey").Value!)),
+                .GetBytes(builder.Configuration.GetSection("Authentication:JwtKey").Value!)),
             ValidateIssuer = false,
             ValidateAudience = false,
             ValidateLifetime = true,

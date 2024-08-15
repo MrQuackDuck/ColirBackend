@@ -21,7 +21,7 @@ public class RegistrationHub : ColirHub, IRegistrationHub
     private readonly IUserService _userService;
     private readonly IOAuth2RegistrationQueueService _registrationQueueService;
     private readonly IHexColorGenerator _hexGenerator;
-    private readonly ITokenGenerator _tokenGenerator;
+    private readonly ITokenService _tokenService;
 
     /// <summary>
     /// Dictionary to store hexs that are currently offered for users to choose from
@@ -48,12 +48,12 @@ public class RegistrationHub : ColirHub, IRegistrationHub
     private static readonly Dictionary<string, string> ChosenUsernames = new();
 
     public RegistrationHub(IUserService userService, IOAuth2RegistrationQueueService registrationQueueService,
-        IHexColorGenerator hexGenerator, ITokenGenerator tokenGenerator)
+        IHexColorGenerator hexGenerator, ITokenService tokenService)
     {
         _userService = userService;
         _registrationQueueService = registrationQueueService;
         _hexGenerator = hexGenerator;
-        _tokenGenerator = tokenGenerator;
+        _tokenService = tokenService;
     }
 
     public override async Task OnConnectedAsync()
@@ -158,7 +158,8 @@ public class RegistrationHub : ColirHub, IRegistrationHub
         if (resultUserModel == null)
             return Error(new ErrorResponse(ErrorCode.InvalidActionException, "Something went wrong!"));
 
-        var jwtToken = _tokenGenerator.GenerateJwtToken(resultUserModel.Id, resultUserModel.HexId, resultUserModel.AuthType);
+        var jwtToken = _tokenService.GenerateJwtToken(resultUserModel.Id, resultUserModel.HexId, resultUserModel.AuthType);
+        var refreshToken = _tokenService.GenerateRefreshToken(jwtToken);
 
         // Start a task to abort the connection after some time
         _ = Task.Run(async () =>
@@ -168,6 +169,6 @@ public class RegistrationHub : ColirHub, IRegistrationHub
         });
 
         // Returning the token
-        return Success(jwtToken);
+        return Success(new { jwtToken, refreshToken });
     }
 }

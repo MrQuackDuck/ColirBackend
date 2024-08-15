@@ -26,10 +26,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Communication\RequestModels\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <InternalsVisibleTo Include="Colir.WebApi.IntegrationTests" />
     </ItemGroup>
 </Project>

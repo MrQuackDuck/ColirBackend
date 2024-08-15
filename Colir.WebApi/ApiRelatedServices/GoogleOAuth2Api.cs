@@ -23,7 +23,7 @@ public class GoogleOAuth2Api : IGoogleOAuth2Api
             { "client_id", googleClientId },
             { "client_secret", googleAuthSecret },
             { "code", code },
-            { "redirect_uri", _config["Authentication:GoogleRedirectLink"]! },
+            { "redirect_uri", _config["OAuth2:GoogleRedirectLink"]! },
             { "grant_type", "authorization_code" }
         });
 

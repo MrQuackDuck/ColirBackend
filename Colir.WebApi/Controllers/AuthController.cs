@@ -3,6 +3,7 @@ using Colir.BLL.Models;
 using Colir.BLL.RequestModels.User;
 using Colir.Communication.Enums;
 using Colir.Communication.Models;
+using Colir.Communication.RequestModels.Auth;
 using Colir.Communication.ResponseModels;
 using Colir.Exceptions;
 using Colir.Exceptions.NotFound;
@@ -26,10 +27,10 @@ public class AuthController : ControllerBase, IAuthController
     private readonly IUnitOfWork _unitOfWork;
     private readonly IGitHubOAuth2Api _gitHubOAuth2Api;
     private readonly IGoogleOAuth2Api _googleOAuth2Api;
-    private readonly ITokenGenerator _tokenGenerator;
+    private readonly ITokenService _tokenService;
 
     public AuthController(IUserService userService, IConfiguration config, IOAuth2RegistrationQueueService registrationQueueService,
-        IUnitOfWork unitOfWork, IGitHubOAuth2Api gitHubOAuth2Api, IGoogleOAuth2Api googleOAuth2Api, ITokenGenerator tokenGenerator)
+        IUnitOfWork unitOfWork, IGitHubOAuth2Api gitHubOAuth2Api, IGoogleOAuth2Api googleOAuth2Api, ITokenService tokenService)
     {
         _userService = userService;
         _config = config;
@@ -37,14 +38,18 @@ public class AuthController : ControllerBase, IAuthController
         _unitOfWork = unitOfWork;
         _gitHubOAuth2Api = gitHubOAuth2Api;
         _googleOAuth2Api = googleOAuth2Api;
-        _tokenGenerator = tokenGenerator;
+        _tokenService = tokenService;
     }
+
+    [HttpGet]
+    [Authorize]
+    public ActionResult IsAuthenticated() => Ok();
 
     /// <inheritdoc cref="IAuthController.GitHubLogin"/>
     [HttpGet]
     public ActionResult GitHubLogin()
     {
-        var githubClientId = _config["Authentication:GitHubClientId"]!;
+        var githubClientId = _config["OAuth2:GitHubClientId"]!;
         var state = Guid.NewGuid().ToString();
         HttpContext.Session.SetString("state", state);
         var link = $"https://github.com/login/oauth/authorize?client_id={githubClientId}&state={state}";
@@ -55,8 +60,8 @@ public class AuthController : ControllerBase, IAuthController
     [HttpGet]
     public ActionResult GoogleLogin()
     {
-        var googleClientId = _config["Authentication:GoogleClientId"]!;
-        var redirectLink = _config["Authentication:GoogleRedirectLink"]!.Replace(":", "%3A");
+        var googleClientId = _config["OAuth2:GoogleClientId"]!;
+        var redirectLink = _config["OAuth2:GoogleRedirectLink"]!.Replace(":", "%3A");
         var state = Guid.NewGuid().ToString();
         HttpContext.Session.SetString("state", state);
         var link = $"https://accounts.google.com/o/oauth2/v2/auth?scope=https://www.googleapis.com/auth/userinfo.email&response_type=code&redirect_uri={redirectLink}&client_id={googleClientId}&state={state}";
@@ -74,8 +79,8 @@ public class AuthController : ControllerBase, IAuthController
             HttpContext.Session.Remove("state");
 
             // Getting credentials from the configuration
-            var githubClientId = _config["Authentication:GitHubClientId"]!;
-            var githubAuthSecret = _config["Authentication:GitHubSecret"]!;
+            var githubClientId = _config["OAuth2:GitHubClientId"]!;
+            var githubAuthSecret = _config["OAuth2:GitHubSecret"]!;
 
             // Getting an access token
             var gitHubToken = await _gitHubOAuth2Api.GetUserGitHubTokenAsync(githubClientId, githubAuthSecret, code);
@@ -93,12 +98,13 @@ public class AuthController : ControllerBase, IAuthController
 
                 var userModel = await _userService.AuthorizeViaGitHubAsync(request);
 
-                var jwtToken = _tokenGenerator.GenerateJwtToken(userModel.Id, userModel.HexId, userModel.AuthType);
+                var jwtToken = _tokenService.GenerateJwtToken(userModel.Id, userModel.HexId, userModel.AuthType);
+                var refreshToken = _tokenService.GenerateRefreshToken(jwtToken);
 
                 // Applying the jwt token to response's cookies
                 Response.ApplyJwtToken(jwtToken);
 
-                return Ok(new { jwtToken });
+                return Ok(new { jwtToken, refreshToken });
             }
             catch (UserNotFoundException)
             {
@@ -125,8 +131,8 @@ public class AuthController : ControllerBase, IAuthController
             HttpContext.Session.Remove("state");
 
             // Getting credentials from the configuration
-            var googleClientId = _config["Authentication:GoogleClientId"]!;
-            var googleAuthSecret = _config["Authentication:GoogleClientSecret"]!;
+            var googleClientId = _config["OAuth2:GoogleClientId"]!;
+            var googleAuthSecret = _config["OAuth2:GoogleClientSecret"]!;
 
             using var httpClient = new HttpClient();
 
@@ -146,12 +152,13 @@ public class AuthController : ControllerBase, IAuthController
 
                 var userModel = await _userService.AuthorizeViaGoogleAsync(request);
 
-                var jwtToken = _tokenGenerator.GenerateJwtToken(userModel.Id, userModel.HexId, userModel.AuthType);
+                var jwtToken = _tokenService.GenerateJwtToken(userModel.Id, userModel.HexId, userModel.AuthType);
+                var refreshToken = _tokenService.GenerateRefreshToken(jwtToken);
 
                 // Applying the jwt token to response's cookies
                 Response.ApplyJwtToken(jwtToken);
 
-                return Ok(new { jwtToken });
+                return Ok(new { jwtToken, refreshToken });
             }
             catch (UserNotFoundException)
             {
@@ -177,12 +184,13 @@ public class AuthController : ControllerBase, IAuthController
 
             var userModel = await _userService.AuthorizeAsAnnoymousAsync(request);
 
-            var jwtToken = _tokenGenerator.GenerateJwtToken(userModel.Id, userModel.HexId, userModel.AuthType);
+            var jwtToken = _tokenService.GenerateJwtToken(userModel.Id, userModel.HexId, userModel.AuthType);
+            var refreshToken = _tokenService.GenerateRefreshToken(jwtToken);
 
             // Applying the jwt token
             Response.ApplyJwtToken(jwtToken);
 
-            return Ok(new { jwtToken });
+            return Ok(new { jwtToken, refreshToken });
         }
         catch (StringTooShortException)
         {
@@ -191,6 +199,35 @@ public class AuthController : ControllerBase, IAuthController
         catch (StringTooLongException)
         {
             return BadRequest(new ErrorResponse(ErrorCode.StringWasTooLong));
+        }
+    }
+
+    /// <inheritdoc cref="IAuthController.RefreshToken"/>
+    [HttpPost]
+    public async Task<IActionResult> RefreshToken(RefreshTokenRequestModel model)
+    {
+        try
+        {
+            var isValid = await _tokenService.ValidateRefreshToken(model.AccessToken, model.RefreshToken);
+            if (!isValid) return BadRequest();
+
+            var claims = _tokenService.GetClaimsFromExpiredToken(model.AccessToken);
+            var id = long.Parse(claims.First(c => c.Type == "Id").Value);
+            var hexId = int.Parse(claims.First(c => c.Type == "HexId").Value);
+            var authType = (UserAuthType)Enum.Parse(typeof(UserAuthType), claims.First(c => c.Type == "AuthType").Value);
+
+            var newJwtToken = _tokenService.GenerateJwtToken(id, hexId, authType);
+            var refreshToken = _tokenService.GenerateRefreshToken(newJwtToken);
+
+            // Applying the new jwt token
+            Response.Cookies.Delete("jwt");
+            Response.ApplyJwtToken(newJwtToken);
+
+            return Ok(new { newJwtToken, refreshToken });
+        }
+        catch (InvalidOperationException)
+        {
+            return BadRequest();
         }
     }
 
