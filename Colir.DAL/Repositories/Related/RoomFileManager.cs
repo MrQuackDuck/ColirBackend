@@ -100,6 +100,9 @@ public class RoomFileManager : IRoomFileManager
     /// <param name="roomGuid">Guid of the room</param>
     public void DeleteAllFiles(string roomGuid)
     {
+        // Create the directory if not exists
+        _fileSystem.Directory.CreateDirectory($"./{_filesFolderName}/{roomGuid}");
+
         var filesPaths = _fileSystem.Directory.GetFiles($"./{_filesFolderName}/{roomGuid}/");
 
         foreach (var path in filesPaths)
