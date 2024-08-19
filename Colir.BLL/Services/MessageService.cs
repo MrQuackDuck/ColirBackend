@@ -46,6 +46,7 @@ public class MessageService : IMessageService
             .Select(m =>
             {
                 var mapped = _mapper.Map<MessageModel>(m);
+                mapped.RoomGuid = room.Guid;
                 return mapped;
             })
             .ToList();
