@@ -43,7 +43,12 @@ public class MessageService : IMessageService
         return (await _unitOfWork
             .MessageRepository
             .GetLastMessages(request.RoomGuid, request.Count, request.SkipCount))
-            .Select(m => _mapper.Map<MessageModel>(m))
+            .Select(m =>
+            {
+                var mapped = _mapper.Map<MessageModel>(m);
+                mapped.RoomGuid = room.Guid;
+                return mapped;
+            })
             .ToList();
     }
 
@@ -113,7 +118,9 @@ public class MessageService : IMessageService
         await _unitOfWork.SaveChangesAsync();
         await transaction.CommitAsync();
 
-        return _mapper.Map<MessageModel>(messageToSend);
+        var result = _mapper.Map<MessageModel>(messageToSend);
+        result.AuthorHexId = issuer.HexId;
+        return result;
     }
 
     /// <inheritdoc cref="IMessageService.EditAsync"/>

@@ -32,7 +32,7 @@ public class RoomController : ControllerBase, IRoomController
 
     /// <inheritdoc cref="IRoomController.GetRoomInfo"/>
     [HttpGet]
-    public async Task<ActionResult<RoomModel>> GetRoomInfo(GetRoomInfoModel model)
+    public async Task<ActionResult<RoomModel>> GetRoomInfo([FromQuery]GetRoomInfoModel model)
     {
         try
         {
@@ -107,6 +107,10 @@ public class RoomController : ControllerBase, IRoomController
             try
             {
                 return Ok(await _roomService.JoinMemberAsync(request));
+            }
+            catch (InvalidActionException)
+            {
+                return BadRequest(new ErrorResponse(ErrorCode.UserAlreadyInRoom));
             }
             finally
             {

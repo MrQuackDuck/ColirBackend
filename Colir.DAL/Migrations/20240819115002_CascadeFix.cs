@@ -11,6 +11,14 @@ namespace DAL.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
+                name: "FK_LastTimeUserReadChats_Rooms_RoomId",
+                table: "LastTimeUserReadChats");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_LastTimeUserReadChats_Users_UserId",
+                table: "LastTimeUserReadChats");
+
+            migrationBuilder.DropForeignKey(
                 name: "FK_Messages_Messages_RepliedMessageId",
                 table: "Messages");
 
@@ -105,6 +113,22 @@ namespace DAL.Migrations
                 unique: true);
 
             migrationBuilder.AddForeignKey(
+                name: "FK_LastTimeUserReadChats_Rooms_RoomId",
+                table: "LastTimeUserReadChats",
+                column: "RoomId",
+                principalTable: "Rooms",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_LastTimeUserReadChats_Users_UserId",
+                table: "LastTimeUserReadChats",
+                column: "UserId",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
                 name: "FK_Messages_Messages_RepliedMessageId",
                 table: "Messages",
                 column: "RepliedMessageId",
@@ -154,6 +178,14 @@ namespace DAL.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_LastTimeUserReadChats_Rooms_RoomId",
+                table: "LastTimeUserReadChats");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_LastTimeUserReadChats_Users_UserId",
+                table: "LastTimeUserReadChats");
+
             migrationBuilder.DropForeignKey(
                 name: "FK_Messages_Messages_RepliedMessageId",
                 table: "Messages");
@@ -244,6 +276,20 @@ namespace DAL.Migrations
                 column: "Guid",
                 unique: true,
                 filter: "[Guid] IS NOT NULL");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_LastTimeUserReadChats_Rooms_RoomId",
+                table: "LastTimeUserReadChats",
+                column: "RoomId",
+                principalTable: "Rooms",
+                principalColumn: "Id");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_LastTimeUserReadChats_Users_UserId",
+                table: "LastTimeUserReadChats",
+                column: "UserId",
+                principalTable: "Users",
+                principalColumn: "Id");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Messages_Messages_RepliedMessageId",

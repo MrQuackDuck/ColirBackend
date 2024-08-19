@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.Migrations
 {
     [DbContext(typeof(ColirDbContext))]
-    [Migration("20240815211045_CascadeFix")]
+    [Migration("20240819115002_CascadeFix")]
     partial class CascadeFix
     {
         /// <inheritdoc />
@@ -308,12 +308,12 @@ namespace DAL.Migrations
                     b.HasOne("DAL.Entities.Room", "Room")
                         .WithMany()
                         .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("DAL.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Room");
 

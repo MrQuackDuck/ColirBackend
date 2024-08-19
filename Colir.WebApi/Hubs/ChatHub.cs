@@ -1,4 +1,5 @@
-﻿using Colir.BLL.Interfaces;
+﻿using System.Collections.Concurrent;
+using Colir.BLL.Interfaces;
 using Colir.BLL.RequestModels.Attachment;
 using Colir.BLL.RequestModels.Message;
 using Colir.BLL.RequestModels.Room;
@@ -29,7 +30,7 @@ public class ChatHub : ColirHub, IChatHub
     private readonly IAttachmentService _attachmentService;
     private readonly IUnitOfWork _unitOfWork;
 
-    private static readonly Dictionary<string, string> ConnectionsToGroupsMapping = new();
+    private static readonly ConcurrentDictionary<string, string> ConnectionsToGroupsMapping = new();
 
     public ChatHub(IRoomService roomService, IMessageService messageService, IAttachmentService attachmentService,
         IUnitOfWork unitOfWork)
@@ -59,6 +60,7 @@ public class ChatHub : ColirHub, IChatHub
             });
 
             await Groups.AddToGroupAsync(Context.ConnectionId, roomGuid!);
+
             ConnectionsToGroupsMapping[Context.ConnectionId] = roomGuid!;
         }
         catch (RoomExpiredException)
@@ -78,7 +80,7 @@ public class ChatHub : ColirHub, IChatHub
 
     public override Task OnDisconnectedAsync(Exception? exception)
     {
-        ConnectionsToGroupsMapping.Remove(Context.ConnectionId);
+        ConnectionsToGroupsMapping.Remove(Context.ConnectionId, out _);
         return Task.CompletedTask;
     }
 

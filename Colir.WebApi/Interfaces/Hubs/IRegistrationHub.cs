@@ -1,5 +1,4 @@
-﻿using Colir.BLL.Models;
-using Colir.Communication.Enums;
+﻿using Colir.Communication.Enums;
 using Colir.Communication.ResponseModels;
 
 namespace Colir.Interfaces.Hubs;

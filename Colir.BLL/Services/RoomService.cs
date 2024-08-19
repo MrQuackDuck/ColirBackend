@@ -204,6 +204,10 @@ public class RoomService : IRoomService
         var issuer = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
         var roomToJoin = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
 
+        // If user already is in the room
+        if (roomToJoin.JoinedUsers.Any(u => u.Id == request.IssuerId))
+            throw new InvalidActionException();
+
         if (issuer.UserSettings.StatisticsEnabled)
         {
             issuer.UserStatistics.RoomsJoined += 1;

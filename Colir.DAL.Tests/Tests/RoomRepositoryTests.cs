@@ -61,8 +61,8 @@ public class RoomRepositoryTests : IRoomRepositoryTests
         Assert.NotNull(result);
         Assert.That(result, Is.EqualTo(expected).Using(new RoomEqualityComparer()));
 
-        Assert.That(result.Select(r => r.Owner).OrderBy(r => r.Id),
-            Is.EqualTo(expected.Select(r => r.Owner).OrderBy(r => r.Id)).Using(new UserEqualityComparer()));
+        Assert.That(result.Select(r => r.Owner).OrderBy(r => r!.Id),
+            Is.EqualTo(expected.Select(r => r.Owner).OrderBy(r => r!.Id)).Using(new UserEqualityComparer()));
 
         Assert.That(result.SelectMany(r => r.JoinedUsers).OrderBy(r => r.Id),
             Is.EqualTo(expected.SelectMany(r => r.JoinedUsers).OrderBy(r => r.Id)).Using(new UserEqualityComparer()));

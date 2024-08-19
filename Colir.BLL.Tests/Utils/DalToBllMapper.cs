@@ -43,7 +43,6 @@ public static class DalToBllMapper
         return new MessageModel
         {
             Id = message.Id,
-            RoomId = message.RoomId,
             AuthorHexId = message.Author!.HexId,
             PostDate = message.PostDate,
             EditDate = message.EditDate,
@@ -71,7 +70,7 @@ public static class DalToBllMapper
             Guid = room.Guid,
             Name = room.Name,
             ExpiryDate = room.ExpiryDate,
-            Owner = room.Owner.ToUserModel(),
+            Owner = room.Owner!.ToUserModel(),
             JoinedUsers = room.JoinedUsers.Select(u => u.ToUserModel()).ToList(),
             FreeMemoryInBytes = 0,
             UsedMemoryInBytes = 0

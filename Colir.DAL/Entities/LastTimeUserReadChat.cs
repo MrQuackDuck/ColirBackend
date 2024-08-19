@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Entities;
 
+#nullable enable
+
 public class LastTimeUserReadChat : BaseEntity
 {
     public DateTime Timestamp { get; set; }
@@ -13,9 +15,9 @@ public class LastTimeUserReadChat : BaseEntity
     [ForeignKey(nameof(User))]
     public long? UserId { get; set; }
 
-    [DeleteBehavior(DeleteBehavior.NoAction)]
-    public Room Room { get; set; } = default!;
+    [DeleteBehavior(DeleteBehavior.Cascade)]
+    public Room? Room { get; set; }
 
-    [DeleteBehavior(DeleteBehavior.NoAction)]
-    public User User { get; set; } = default!;
+    [DeleteBehavior(DeleteBehavior.Cascade)]
+    public User? User { get; set; }
 }

@@ -74,6 +74,7 @@ public interface IRoomService
     /// </summary>
     /// <exception cref="RoomNotFoundException">Thrown when the room was not found</exception>
     /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
+    /// <exception cref="InvalidActionException">Thrown when the issuer is already joined the room</exception>
     Task<RoomModel> JoinMemberAsync(RequestToJoinRoom request);
 
     /// <summary>

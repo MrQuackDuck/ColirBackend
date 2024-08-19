@@ -34,6 +34,7 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
     /// <param name="roomId">Id of the room</param>
     /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found</exception>
     /// <exception cref="UserNotFoundException">Thrown when the user wasn't found</exception>
+    /// <exception cref="NotFoundException">Thrown when the record wasn't found</exception>
     public async Task<LastTimeUserReadChat> GetAsync(long userId, long roomId)
     {
         if (!await _dbContext.Rooms.AnyAsync(r => r.Id == roomId))
@@ -50,7 +51,7 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
             .AsNoTracking()
             .Include(nameof(LastTimeUserReadChat.Room))
             .Include(nameof(LastTimeUserReadChat.User))
-            .FirstAsync(l => l.RoomId == roomId && l.UserId == userId);
+            .FirstOrDefaultAsync(l => l.RoomId == roomId && l.UserId == userId) ?? throw new NotFoundException();
     }
 
     /// <summary>

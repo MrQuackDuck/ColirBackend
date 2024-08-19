@@ -28,12 +28,12 @@ class MessageModelEqualityComparer : IEqualityComparer<MessageModel>
         if (ReferenceEquals(x, null)) return false;
         if (ReferenceEquals(y, null)) return false;
         if (x.GetType() != y.GetType()) return false;
-        return x.Id == y.Id && x.RoomId == y.RoomId && x.AuthorHexId == y.AuthorHexId && x.PostDate.Equals(y.PostDate) && Nullable.Equals(x.EditDate, y.EditDate) && x.RepliedMessageId == y.RepliedMessageId;
+        return x.Id == y.Id && x.AuthorHexId == y.AuthorHexId && x.PostDate.Equals(y.PostDate) && Nullable.Equals(x.EditDate, y.EditDate) && x.RepliedMessageId == y.RepliedMessageId;
     }
 
     public int GetHashCode(MessageModel obj)
     {
-        return HashCode.Combine(obj.Id, obj.RoomId, obj.AuthorHexId, obj.PostDate, obj.EditDate, obj.RepliedMessageId);
+        return HashCode.Combine(obj.Id, obj.RoomGuid, obj.AuthorHexId, obj.PostDate, obj.EditDate, obj.RepliedMessageId);
     }
 }
 

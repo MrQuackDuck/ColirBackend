@@ -3,7 +3,7 @@
 public class MessageModel
 {
     public long Id { get; set; }
-    public long? RoomId { get; set; }
+    public string RoomGuid { get; set; } = default!;
     public long AuthorHexId { get; set; }
     public DateTime PostDate { get; set; }
     public DateTime? EditDate { get; set; }
