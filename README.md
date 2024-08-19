@@ -43,12 +43,13 @@ Besides that, **Colir** **has** a couple of **features**, which can interest you
 
 > [!IMPORTANT]
 > When you've cloned the repository, make sure to configure these variables in `appsettings.json`:<br>
-> - `AppSettings:JwtKey` - a **secret key** used to make **JWT tokens**
-> - `Authentication:GitHubClientId` - **GitHub Client Id** (see <a href="https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps">Authorizing OAuth apps</a>)
-> - `Authentication:GitHubSecret` - **GitHub Client Secret** (see <a href="https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps">Authorizing OAuth apps</a>)
-> - `Authentication:GoogleClientId` - **Google Client Id** (see <a href="https://developers.google.com/identity/protocols/oauth2#1.-obtain-oauth-2.0-credentials-from-the-dynamic_data.setvar.console_name-.">Using OAuth 2.0 to Access Google APIs</a>)
-> - `Authentication:GoogleClientSecret` - **Google Client Secret** (see <a href="https://developers.google.com/identity/protocols/oauth2#1.-obtain-oauth-2.0-credentials-from-the-dynamic_data.setvar.console_name-.">Using OAuth 2.0 to Access Google APIs</a>)
-> - `Authentication:GoogleRedirectLink` - **Google Redirect Link** (the callback-link after **Google OAuth2** consent you've configured in <a href="https://console.cloud.google.com">Google Cloud Console</a>)
+> - `Authentication:JwtKey` - a **secret key** used to sign **JWT tokens**
+> - `Authentication:RefreshTokenKey` - a **secret key** used to sign **refresh tokens**
+> - `OAuth2:GitHubClientId` - **GitHub Client Id** (see <a href="https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps">Authorizing OAuth apps</a>)
+> - `OAuth2:GitHubSecret` - **GitHub Client Secret** (see <a href="https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps">Authorizing OAuth apps</a>)
+> - `OAuth2:GoogleClientId` - **Google Client Id** (see <a href="https://developers.google.com/identity/protocols/oauth2#1.-obtain-oauth-2.0-credentials-from-the-dynamic_data.setvar.console_name-.">Using OAuth 2.0 to Access Google APIs</a>)
+> - `OAuth2:GoogleClientSecret` - **Google Client Secret** (see <a href="https://developers.google.com/identity/protocols/oauth2#1.-obtain-oauth-2.0-credentials-from-the-dynamic_data.setvar.console_name-.">Using OAuth 2.0 to Access Google APIs</a>)
+> - `OAuth2:GoogleRedirectLink` - **Google Redirect Link** (the callback-link after **Google OAuth2** consent you've configured in <a href="https://console.cloud.google.com">Google Cloud Console</a>)
 > - `DatabaseEncryption:EncryptionPassword` - The **16-char password** that will be used to encrypt some data on writing/reading into/from the database.
 > - `DatabaseEncryption:InitializationVector` - The **16-char initialization vector** that will be used to encrypt some data on writing/reading into/from the database.
 
