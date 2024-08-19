@@ -204,6 +204,83 @@ public class MessageServiceTests : IMessageServiceTests
     }
 
     [Test]
+    public async Task GetMessageById_ReturnsCorrectMessage()
+    {
+        // Arrange
+        var expected = _dbContext.Messages
+            .AsNoTracking()
+            .Include(nameof(Message.Room))
+            .Include(nameof(Message.Author))
+            .Include(nameof(Message.RepliedTo))
+            .Include(nameof(Message.Attachments))
+            .Include(nameof(Message.Reactions))
+            .First(m => m.Id == 2).ToMessageModel();
+
+        var request = new RequestToGetMessage
+        {
+            IssuerId = 1,
+            MessageId = 2
+        };
+
+        // Act
+        var result = await _messageService.GetMessageById(request);
+
+        // Assert
+        Assert.That(result, Is.EqualTo(expected).Using(new MessageModelEqualityComparer()));
+    }
+
+    [Test]
+    public async Task GetMessageById_ThrowsMessageNotFoundException_WhenNotFound()
+    {
+        // Arrange
+        var request = new RequestToGetMessage
+        {
+            IssuerId = 1,
+            MessageId = 404
+        };
+
+        // Act
+        AsyncTestDelegate act = async ()=> await _messageService.GetMessageById(request);
+
+        // Assert
+        Assert.ThrowsAsync<MessageNotFoundException>(act);
+    }
+
+    [Test]
+    public async Task GetMessageById_ThrowsRoomExpiredException_WhenRoomExpired()
+    {
+        // Arrange
+        var request = new RequestToGetMessage
+        {
+            IssuerId = 2,
+            MessageId = 5
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.GetMessageById(request);
+
+        // Assert
+        Assert.ThrowsAsync<RoomExpiredException>(act);
+    }
+
+    [Test]
+    public async Task GetMessageById_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom()
+    {
+        // Arrange
+        var request = new RequestToGetMessage
+        {
+            IssuerId = 3,
+            MessageId = 2
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.GetMessageById(request);
+
+        // Assert
+        Assert.ThrowsAsync<IssuerNotInRoomException>(act);
+    }
+
+    [Test]
     public async Task SendAsync_SendsMessage()
     {
         // Arrange

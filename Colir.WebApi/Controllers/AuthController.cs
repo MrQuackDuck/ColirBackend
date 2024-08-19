@@ -7,6 +7,7 @@ using Colir.Communication.RequestModels.Auth;
 using Colir.Communication.ResponseModels;
 using Colir.Exceptions;
 using Colir.Exceptions.NotFound;
+using Colir.Hubs;
 using Colir.Interfaces.ApiRelatedServices;
 using Colir.Interfaces.Controllers;
 using Colir.Misc.ExtensionMethods;
@@ -14,6 +15,7 @@ using DAL.Enums;
 using DAL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Colir.Controllers;
 
@@ -28,9 +30,11 @@ public class AuthController : ControllerBase, IAuthController
     private readonly IGitHubOAuth2Api _gitHubOAuth2Api;
     private readonly IGoogleOAuth2Api _googleOAuth2Api;
     private readonly ITokenService _tokenService;
+    private readonly IHubContext<ChatHub> _chatHub;
 
     public AuthController(IUserService userService, IConfiguration config, IOAuth2RegistrationQueueService registrationQueueService,
-        IUnitOfWork unitOfWork, IGitHubOAuth2Api gitHubOAuth2Api, IGoogleOAuth2Api googleOAuth2Api, ITokenService tokenService)
+        IUnitOfWork unitOfWork, IGitHubOAuth2Api gitHubOAuth2Api, IGoogleOAuth2Api googleOAuth2Api, ITokenService tokenService,
+        IHubContext<ChatHub> chatHub)
     {
         _userService = userService;
         _config = config;
@@ -39,6 +43,7 @@ public class AuthController : ControllerBase, IAuthController
         _gitHubOAuth2Api = gitHubOAuth2Api;
         _googleOAuth2Api = googleOAuth2Api;
         _tokenService = tokenService;
+        _chatHub = chatHub;
     }
 
     [HttpGet]
@@ -240,10 +245,17 @@ public class AuthController : ControllerBase, IAuthController
         {
             // Delete the account if the request was issued by a user with anonymous auth type
             var userId = this.GetIssuerId();
+            var user = await _userService.GetAccountInfo(new() { IssuerId = userId });
             var authType = HttpContext.User.Claims.First(c => c.Type == "AuthType").Value;
             if (authType == UserAuthType.Anonymous.ToString())
             {
                 await _userService.DeleteAccount(new() { IssuerId = userId });
+
+                // Notifying that the user left from everywhere
+                foreach (var room in user.JoinedRooms)
+                {
+                    await _chatHub.Clients.Group(room.Guid).SendAsync("UserLeft", this.GetIssuerHexId());
+                }
             }
 
             Response.Cookies.Delete("jwt");

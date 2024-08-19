@@ -148,7 +148,7 @@ public static class UnitTestHelper
         var message5 = new Message
         {
             Id = 5,
-            Content = "Another message in Room #1",
+            Content = "Another message in Room #2",
             PostDate = DateTime.Now,
             RoomId = expiredRoom.Id, // "Room #2 (expired)"
             AuthorId = user1.Id, // "First User"

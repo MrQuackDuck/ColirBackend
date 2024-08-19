@@ -46,10 +46,34 @@ public class MessageService : IMessageService
             .Select(m =>
             {
                 var mapped = _mapper.Map<MessageModel>(m);
-                mapped.RoomGuid = room.Guid;
                 return mapped;
             })
             .ToList();
+    }
+
+    /// <inheritdoc cref="IMessageService.GetMessageById"/>
+    public async Task<MessageModel> GetMessageById(RequestToGetMessage request)
+    {
+        // Check if the issuer exists. Otherwise, an exception will be thrown
+        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
+
+        var messageToGet = await _unitOfWork.MessageRepository.GetByIdAsync(request.MessageId);
+
+        var room = await _unitOfWork.RoomRepository.GetByIdAsync(messageToGet.RoomId);
+
+        // If the room is expired
+        if (room.IsExpired())
+        {
+            throw new RoomExpiredException();
+        }
+
+        // If the issuer is not in the room
+        if (!room.JoinedUsers.Any(u => u.Id == request.IssuerId))
+        {
+            throw new IssuerNotInRoomException();
+        }
+
+        return _mapper.Map<MessageModel>(messageToGet);
     }
 
     /// <inheritdoc cref="IMessageService.SendAsync"/>

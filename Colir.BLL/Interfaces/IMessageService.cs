@@ -2,6 +2,7 @@
 using Colir.BLL.RequestModels.Message;
 using Colir.Exceptions;
 using Colir.Exceptions.NotEnoughPermissions;
+using Colir.Exceptions.NotFound;
 
 namespace Colir.BLL.Interfaces;
 
@@ -15,7 +16,17 @@ public interface IMessageService
     /// <param name="request.Skip">Count of messages to skip</param>
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
     /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
     Task<List<MessageModel>> GetLastMessagesAsync(RequestToGetLastMessages request);
+
+    /// <summary>
+    /// Gets the message by id
+    /// </summary>
+    /// <exception cref="MessageNotFoundException">Thrown when the message wasn't found</exception>
+    /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
+    /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
+    Task<MessageModel> GetMessageById(RequestToGetMessage request);
 
     /// <summary>
     /// Sends the message in the room
@@ -24,6 +35,7 @@ public interface IMessageService
     /// <exception cref="ArgumentException">Thrown when the message content is empty</exception>
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
     /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
     Task<MessageModel> SendAsync(RequestToSendMessage request);
 
     /// <summary>
@@ -33,6 +45,7 @@ public interface IMessageService
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
     /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
     /// <exception cref="NotEnoughPermissionsException">Thrown when the issuer is not the author of the message he is trying to edit</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
     Task<MessageModel> EditAsync(RequestToEditMessage request);
 
     /// <summary>
@@ -41,6 +54,7 @@ public interface IMessageService
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
     /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
     /// <exception cref="NotEnoughPermissionsException">Thrown when the issuer is not the author of the message he is trying to delete</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
     Task DeleteAsync(RequestToDeleteMessage request);
 
     /// <summary>
@@ -49,6 +63,7 @@ public interface IMessageService
     /// </summary>
     /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
     Task<MessageModel> AddReaction(RequestToAddReactionOnMessage request);
 
     /// <summary>
@@ -57,5 +72,6 @@ public interface IMessageService
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
     /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
     /// <exception cref="NotEnoughPermissionsException">Thrown when the issuer is not the author of the reaction he is trying to remove</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
     Task<MessageModel> RemoveReaction(RequestToRemoveReactionFromMessage request);
 }

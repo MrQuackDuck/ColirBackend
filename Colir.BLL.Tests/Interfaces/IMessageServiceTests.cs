@@ -10,6 +10,11 @@ public interface IMessageServiceTests
 	Task GetLastMessagesAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom();
 	Task GetLastMessagesAsync_ThrowsRoomExpiredException_WhenRoomIsExpired();
 
+	Task GetMessageById_ReturnsCorrectMessage();
+	Task GetMessageById_ThrowsMessageNotFoundException_WhenNotFound();
+	Task GetMessageById_ThrowsRoomExpiredException_WhenRoomExpired();
+	Task GetMessageById_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom();
+
 	Task SendAsync_SendsMessage();
 	Task SendAsync_AddsToStatistics_WhenItsEnabled();
 	Task SendAsync_ThrowsArgumentException_WhenMessageIsEmpty();

@@ -91,7 +91,7 @@ public class ChatHub : ColirHub, IChatHub
 
         var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
 
-        var request = new RequestToGetLastMessages
+        var requestToGetLastMessages = new RequestToGetLastMessages
         {
             IssuerId = this.GetIssuerId(),
             Count = model.Count,
@@ -99,17 +99,47 @@ public class ChatHub : ColirHub, IChatHub
             RoomGuid = roomGuid
         };
 
+        var requestToUpdateLastTimeUserReadChat = new RequestToUpdateLastTimeUserReadChat
+        {
+            IssuerId = this.GetIssuerId(),
+            RoomGuid = roomGuid
+        };
+
         try
         {
-            var requestToUpdateLastTimeUserReadChat = new RequestToUpdateLastTimeUserReadChat
-            {
-                IssuerId = this.GetIssuerId(),
-                RoomGuid = roomGuid
-            };
-
             await _roomService.UpdateLastTimeUserReadChatAsync(requestToUpdateLastTimeUserReadChat);
 
-            return Success(await _messageService.GetLastMessagesAsync(request));
+            return Success(await _messageService.GetLastMessagesAsync(requestToGetLastMessages));
+        }
+        catch (IssuerNotInRoomException)
+        {
+            return Error(new(ErrorCode.IssuerNotInTheRoom), true);
+        }
+        catch (RoomExpiredException)
+        {
+            try { return Error(new(ErrorCode.RoomExpired), true); }
+            finally { await _roomService.DeleteAllExpiredAsync(); }
+        }
+    }
+
+    /// <inheritdoc cref="IChatHub.GetMessageById"/>
+    public async Task<SignalRHubResult> GetMessageById(GetMessageByIdModel model)
+    {
+        if (!IsModelValid(model)) return Error(new (ErrorCode.ModelNotValid));
+
+        var request = new RequestToGetMessage
+        {
+            IssuerId = this.GetIssuerId(),
+            MessageId = model.MessageId
+        };
+
+        try
+        {
+            return Success(await _messageService.GetMessageById(request));
+        }
+        catch (MessageNotFoundException)
+        {
+            return Error(new(ErrorCode.MessageNotFound));
         }
         catch (IssuerNotInRoomException)
         {

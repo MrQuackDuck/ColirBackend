@@ -16,7 +16,9 @@ public class AutomapperProfile : Profile
 
         CreateMap<Message, MessageModel>()
             .ForMember(dest => dest.AuthorHexId,
-                opt => opt.MapFrom(src => src.Author!.HexId));
+                opt => opt.MapFrom(src => src.Author!.HexId))
+            .ForMember(dest => dest.RoomGuid,
+                opt => opt.MapFrom(src => src.Room.Guid));
 
         CreateMap<Reaction, ReactionModel>()
             .ForMember(dest => dest.AuthorHexId,

@@ -15,6 +15,15 @@ public interface IChatHub
     Task<SignalRHubResult> GetMessages(GetLastMessagesModel model);
 
     /// <summary>
+    /// Gets the message by it's id
+    /// </summary>
+    /// An error with <see cref="ErrorCode.ModelNotValid"/> code returned when the model is not valid
+    /// An error with <see cref="ErrorCode.MessageNotFound"/> code returned when the message wasn't found
+    /// An error with <see cref="ErrorCode.IssuerNotInTheRoom"/> code returned when the issuer is not in the room (+ disconnects from the hub)
+    /// An error with <see cref="ErrorCode.RoomExpired"/> code returned when the room is expired (+ disconnects from the hub)
+    Task<SignalRHubResult> GetMessageById(GetMessageByIdModel model);
+
+    /// <summary>
     /// Sends a message to the room. Notifies others with "ReceiveMessage" signal
     /// An error with <see cref="ErrorCode.ModelNotValid"/> code returned when the model is not valid
     /// An error with <see cref="ErrorCode.NotEnoughSpace"/> code returned when the room has not enough space to store attachments from the request
