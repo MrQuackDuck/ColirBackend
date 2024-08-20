@@ -130,6 +130,10 @@ public class MessageRepository : IMessageRepository
         var room = _dbContext.Rooms.First(r => r.Id == target.RoomId) ?? throw new RoomNotFoundException();
         if (room.IsExpired()) throw new RoomExpiredException();
 
+        var reliedMessages = _dbContext.Messages.Where(m => m.RepliedMessageId == target.Id);
+        foreach (var reliedMessage in reliedMessages)
+            reliedMessage.RepliedTo = null;
+
         _dbContext.Messages.Remove(target);
         _dbContext.Attachments.RemoveRange(_dbContext.Attachments.Where(a => a.MessageId == target.Id));
     }
@@ -169,6 +173,8 @@ public class MessageRepository : IMessageRepository
         }
 
         if (originalEntity.Room!.IsExpired()) throw new RoomExpiredException();
+
+        message.EditDate = DateTime.Now;
 
         _dbContext.Entry(originalEntity).State = EntityState.Detached;
         _dbContext.Entry(message).State = EntityState.Modified;

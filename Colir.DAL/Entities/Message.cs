@@ -29,6 +29,7 @@ public class Message : BaseEntity
 
     [DeleteBehavior(DeleteBehavior.Restrict)]
     public Message? RepliedTo { get; set; }
+
     public List<Attachment> Attachments { get; set; } = default!;
     public List<Reaction> Reactions { get; set; } = default!;
 }
