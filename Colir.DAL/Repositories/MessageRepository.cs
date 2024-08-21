@@ -27,6 +27,7 @@ public class MessageRepository : IMessageRepository
             .Include(nameof(Message.RepliedTo))
             .Include(nameof(Message.Attachments))
             .Include(nameof(Message.Reactions))
+            .Include(nameof(Message.Reactions) + "." + nameof(Reaction.Author))
             .AsSplitQuery()
             .ToListAsync();
     }
@@ -45,6 +46,7 @@ public class MessageRepository : IMessageRepository
             .Include(nameof(Message.RepliedTo))
             .Include(nameof(Message.Attachments))
             .Include(nameof(Message.Reactions))
+            .Include(nameof(Message.Reactions) + "." + nameof(Reaction.Author))
             .AsSplitQuery()
             .FirstOrDefaultAsync(m => m.Id == id) ?? throw new MessageNotFoundException();
     }
@@ -83,6 +85,7 @@ public class MessageRepository : IMessageRepository
             .Include(nameof(Message.Author))
             .Include(nameof(Message.Attachments))
             .Include(nameof(Message.Reactions))
+            .Include(nameof(Message.Reactions) + "." + nameof(Reaction.Author))
             .OrderByDescending(m => m.PostDate)
             .Skip(skip)
             .Take(count)

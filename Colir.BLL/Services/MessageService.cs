@@ -256,7 +256,7 @@ public class MessageService : IMessageService
 
         var reactionToAdd = new Reaction
         {
-            AuthorId = request.IssuerId,
+            AuthorId = issuer.Id,
             MessageId = message.Id,
             Symbol = request.Reaction
         };
@@ -277,6 +277,7 @@ public class MessageService : IMessageService
         await _unitOfWork.SaveChangesAsync();
         await transaction.CommitAsync();
 
+        reactionToAdd.Author = issuer;
         return _mapper.Map<MessageModel>(message);
     }
 
@@ -314,6 +315,8 @@ public class MessageService : IMessageService
             issuer.UserStatistics.ReactionsSet += 1;
             _unitOfWork.UserStatisticsRepository.Update(issuer.UserStatistics);
         }
+
+        message.Reactions.Remove(message.Reactions.First(r => r.Id == reaction.Id));
 
         await _unitOfWork.ReactionRepository.DeleteByIdAsync(reaction.Id);
         await _unitOfWork.SaveChangesAsync();

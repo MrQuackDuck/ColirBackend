@@ -133,8 +133,8 @@ namespace DAL.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("Symbol")
-                        .HasMaxLength(4)
-                        .HasColumnType("nvarchar(4)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
 

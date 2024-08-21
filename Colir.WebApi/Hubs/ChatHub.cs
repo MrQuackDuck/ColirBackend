@@ -353,6 +353,10 @@ public class ChatHub : ColirHub, IChatHub
         {
             return Error(new(ErrorCode.IssuerNotInTheRoom), true);
         }
+        catch (ReactionNotFoundException)
+        {
+            return Error(new(ErrorCode.ReactionNotFound));
+        }
         catch (RoomExpiredException)
         {
             try { return Error(new(ErrorCode.RoomExpired), true); }

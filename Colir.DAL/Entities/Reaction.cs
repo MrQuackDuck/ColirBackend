@@ -5,7 +5,7 @@ namespace DAL.Entities;
 
 public class Reaction : BaseEntity
 {
-    [MaxLength(4)]
+    [MaxLength(256)]
     public string Symbol { get; set; } = default!;
 
     [ForeignKey(nameof(Author))]
