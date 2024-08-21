@@ -62,6 +62,7 @@ public interface IMessageService
     /// + Increments the count of set reactions in user's statistics (if enabled in settings)
     /// </summary>
     /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
+    /// <exception cref="InvalidActionException">Thrown when the reaction with the same symbol is already set</exception>
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
     /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
     Task<MessageModel> AddReaction(RequestToAddReactionOnMessage request);

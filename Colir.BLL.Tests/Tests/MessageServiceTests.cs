@@ -676,6 +676,24 @@ public class MessageServiceTests : IMessageServiceTests
     }
 
     [Test]
+    public async Task AddReaction_ThrowsInvalidActionException_WhenReactionWithTheSameSymbolIsAlreadySet()
+    {
+        // Arrange
+        var request = new RequestToAddReactionOnMessage
+        {
+            IssuerId = 1,
+            MessageId = 1,
+            Reaction = "🤣"
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.AddReaction(request);
+
+        // Assert
+        Assert.ThrowsAsync<InvalidActionException>(act);
+    }
+
+    [Test]
     public async Task AddReaction_AddsToStatistics_WhenItsEnabled()
     {
         // Arrange

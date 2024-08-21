@@ -15,6 +15,7 @@ public enum ErrorCode
     NotEnoughPermissions,
     NotEnoughSpace,
     NotFound,
+    ReactionAlreadySet,
     ReactionNotFound,
     RoomExpired,
     RoomNotFound,

@@ -234,6 +234,12 @@ public class MessageService : IMessageService
         var message = await _unitOfWork.MessageRepository.GetByIdAsync(request.MessageId);
         var room = await _unitOfWork.RoomRepository.GetByIdAsync(message.RoomId);
 
+        // If the reaction is already set
+        if (message.Reactions.Any(r => r.AuthorId == request.IssuerId && r.Symbol == request.Reaction))
+        {
+            throw new InvalidActionException();
+        }
+
         // If the issuer is not in the room
         if (!room.JoinedUsers.Any(u => u.Id == request.IssuerId))
         {

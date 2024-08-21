@@ -313,6 +313,10 @@ public class ChatHub : ColirHub, IChatHub
             await Clients.Group(roomGuid).SendAsync("MessageGotReaction", updatedMessage);
             return Success();
         }
+        catch (InvalidActionException)
+        {
+            return Error(new(ErrorCode.ReactionAlreadySet));
+        }
         catch (IssuerNotInRoomException)
         {
             return Error(new(ErrorCode.IssuerNotInTheRoom), true);

@@ -51,11 +51,11 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new LastTimeUserReadChatEqualityComparer()));
 
-        Assert.That(result.Select(r => r.Room).OrderBy(r => r.Id),
-            Is.EqualTo(expected.Select(r => r.Room).OrderBy(r => r.Id)).Using(new RoomEqualityComparer()));
+        Assert.That(result.Select(r => r.Room).OrderBy(r => r!.Id),
+            Is.EqualTo(expected.Select(r => r.Room).OrderBy(r => r!.Id)).Using(new RoomEqualityComparer()));
 
-        Assert.That(result.Select(r => r.User).OrderBy(r => r.Id),
-            Is.EqualTo(expected.Select(r => r.User).OrderBy(r => r.Id)).Using(new UserEqualityComparer()));
+        Assert.That(result.Select(r => r.User).OrderBy(r => r!.Id),
+            Is.EqualTo(expected.Select(r => r.User).OrderBy(r => r!.Id)).Using(new UserEqualityComparer()));
     }
 
     [Test]
