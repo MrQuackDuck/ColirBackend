@@ -343,8 +343,8 @@ public class RoomServiceTests : IRoomServiceTests
         // Arrange
         var request = new RequestToRenameRoom
         {
-            IssuerId = 1,
-            RoomGuid = "404",
+            IssuerId = 2,
+            RoomGuid = "cbaa8673-ea8b-43f8-b4cc-b8b0797b620e",
             NewName = "New name"
         };
 
@@ -352,7 +352,7 @@ public class RoomServiceTests : IRoomServiceTests
         AsyncTestDelegate act = async () => await _roomService.RenameAsync(request);
 
         // Assert
-        Assert.ThrowsAsync<RoomNotFoundException>(act);
+        Assert.ThrowsAsync<NotEnoughPermissionsException>(act);
     }
 
     [Test]

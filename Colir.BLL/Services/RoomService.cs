@@ -99,6 +99,12 @@ public class RoomService : IRoomService
         await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
 
         var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
+
+        if (request.IssuerId != room.OwnerId)
+        {
+            throw new NotEnoughPermissionsException();
+        }
+
         room.Name = request.NewName;
         _unitOfWork.RoomRepository.Update(room);
         await _unitOfWork.SaveChangesAsync();
