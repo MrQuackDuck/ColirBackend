@@ -231,6 +231,8 @@ public class RoomService : IRoomService
         await _unitOfWork.SaveChangesAsync();
         await transaction.CommitAsync();
 
+        roomToJoin.JoinedUsers = roomToJoin.JoinedUsers.DistinctBy(u => u.Id).ToList();
+
         return _mapper.Map<RoomModel>(roomToJoin);
     }
 
