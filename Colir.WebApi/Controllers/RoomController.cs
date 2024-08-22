@@ -112,16 +112,13 @@ public class RoomController : ControllerBase, IRoomController
 
             try
             {
-                try
-                {
-                    return Ok(await _roomService.JoinMemberAsync(request));
-                }
-                finally
-                {
-                    // Notifying users in the Chat hub that a new user has joined
-                    var user = _mapper.Map<UserModel>(await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId));
-                    await _chatHub.Clients.Group(model.RoomGuid).SendAsync("UserJoined", user);
-                }
+                var result = await _roomService.JoinMemberAsync(request);
+
+                // Notifying users in the Chat hub that a new user has joined
+                var user = _mapper.Map<UserModel>(await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId));
+                await _chatHub.Clients.Group(model.RoomGuid).SendAsync("UserJoined", user);
+
+                return Ok(result);
             }
             catch (InvalidActionException)
             {
@@ -152,15 +149,10 @@ public class RoomController : ControllerBase, IRoomController
 
             await _roomService.LeaveAsync(request);
 
-            try
-            {
-                return Ok();
-            }
-            finally
-            {
-                // Notifying users in the Chat hub that the user left
-                await _chatHub.Clients.Group(request.RoomGuid).SendAsync("UserLeft", this.GetIssuerHexId());
-            }
+            // Notifying users in the Chat hub that the user left
+            await _chatHub.Clients.Group(request.RoomGuid).SendAsync("UserLeft", this.GetIssuerHexId());
+
+            return Ok();
         }
         catch (RoomNotFoundException)
         {
