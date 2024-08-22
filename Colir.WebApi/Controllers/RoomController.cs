@@ -1,4 +1,5 @@
-﻿using Colir.BLL.Interfaces;
+﻿using AutoMapper;
+using Colir.BLL.Interfaces;
 using Colir.BLL.Models;
 using Colir.BLL.RequestModels.Room;
 using Colir.Communication.Enums;
@@ -10,6 +11,7 @@ using Colir.Exceptions.NotFound;
 using Colir.Hubs;
 using Colir.Interfaces.Controllers;
 using Colir.Misc.ExtensionMethods;
+using DAL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -23,11 +25,15 @@ public class RoomController : ControllerBase, IRoomController
 {
     private readonly IRoomService _roomService;
     private readonly IHubContext<ChatHub> _chatHub;
+    private readonly IMapper _mapper;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public RoomController(IRoomService roomService, IHubContext<ChatHub> chatHub)
+    public RoomController(IRoomService roomService, IHubContext<ChatHub> chatHub, IMapper mapper, IUnitOfWork unitOfWork)
     {
         _roomService = roomService;
         _chatHub = chatHub;
+        _mapper = mapper;
+        _unitOfWork = unitOfWork;
     }
 
     /// <inheritdoc cref="IRoomController.GetRoomInfo"/>
@@ -106,16 +112,20 @@ public class RoomController : ControllerBase, IRoomController
 
             try
             {
-                return Ok(await _roomService.JoinMemberAsync(request));
+                try
+                {
+                    return Ok(await _roomService.JoinMemberAsync(request));
+                }
+                finally
+                {
+                    // Notifying users in the Chat hub that a new user has joined
+                    var user = _mapper.Map<UserModel>(await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId));
+                    await _chatHub.Clients.Group(model.RoomGuid).SendAsync("UserJoined", user);
+                }
             }
             catch (InvalidActionException)
             {
                 return BadRequest(new ErrorResponse(ErrorCode.UserAlreadyInRoom));
-            }
-            finally
-            {
-                // Notifying users in the Chat hub that a new user has joined
-                await _chatHub.Clients.Group(model.RoomGuid).SendAsync("UserJoined", this.GetIssuerHexId());
             }
         }
         catch (RoomNotFoundException)

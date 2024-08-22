@@ -9,7 +9,7 @@ public interface IRoomServiceTests
 	Task GetRoomInfoAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
 
 	Task CreateAsync_CreatesRoom();
-	Task CreateAsync_ReturnsRoomGuid();
+	Task CreateAsync_ReturnsRoomModel();
 	Task CreateAsync_AddsToStatistics_WhenItsEnabled();
 	Task CreateAsync_ThrowsArgumentException_WhenWrongExpiryDateWasProvided();
 	Task CreateAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();

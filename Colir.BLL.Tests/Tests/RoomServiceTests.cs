@@ -166,7 +166,7 @@ public class RoomServiceTests : IRoomServiceTests
     }
 
     [Test]
-    public async Task CreateAsync_ReturnsRoomGuid()
+    public async Task CreateAsync_ReturnsRoomModel()
     {
         // Arrange
         var request = new RequestToCreateRoom
@@ -180,7 +180,7 @@ public class RoomServiceTests : IRoomServiceTests
         var result = await _roomService.CreateAsync(request);
 
         // Assert
-        Assert.That(result.Length == 36);
+        Assert.That(result.Guid.Length == 36);
     }
 
     [Test]

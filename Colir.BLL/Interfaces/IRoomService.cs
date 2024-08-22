@@ -21,12 +21,11 @@ public interface IRoomService
     /// Creates a new room
     /// + Increments the count of created rooms in user's statistics (if enabled in settings)
     /// </summary>
-    /// <returns>Guid of created room</returns>
     /// <exception cref="ArgumentException">Thrown when the expiry date is not valid</exception>
     /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
     /// <exception cref="StringTooLongException">Thrown when the name for the room is too long</exception>
     /// <exception cref="StringTooShortException">Thrown when the name for the room is too short</exception>
-    Task<string> CreateAsync(RequestToCreateRoom request);
+    Task<RoomModel> CreateAsync(RequestToCreateRoom request);
 
     /// <summary>
     /// Renames the room

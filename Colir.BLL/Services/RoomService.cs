@@ -48,7 +48,7 @@ public class RoomService : IRoomService
     }
 
     /// <inheritdoc cref="IRoomService.CreateAsync"/>
-    public async Task<string> CreateAsync(RequestToCreateRoom request)
+    public async Task<RoomModel> CreateAsync(RequestToCreateRoom request)
     {
         var transaction = _unitOfWork.BeginTransaction();
 
@@ -87,7 +87,7 @@ public class RoomService : IRoomService
         await _unitOfWork.SaveChangesAsync();
         await transaction.CommitAsync();
 
-        return roomToCreate.Guid;
+        return _mapper.Map<RoomModel>(roomToCreate);
     }
 
     /// <inheritdoc cref="IRoomService.RenameAsync"/>
