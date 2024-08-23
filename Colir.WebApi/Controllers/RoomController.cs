@@ -110,20 +110,17 @@ public class RoomController : ControllerBase, IRoomController
                 RoomGuid = model.RoomGuid
             };
 
-            try
-            {
-                var result = await _roomService.JoinMemberAsync(request);
+            var result = await _roomService.JoinMemberAsync(request);
 
-                // Notifying users in the Chat hub that a new user has joined
-                var user = _mapper.Map<UserModel>(await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId));
-                await _chatHub.Clients.Group(model.RoomGuid).SendAsync("UserJoined", user);
+            // Notifying users in the Chat hub that a new user has joined
+            var user = _mapper.Map<UserModel>(await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId));
+            await _chatHub.Clients.Group(model.RoomGuid).SendAsync("UserJoined", user);
 
-                return Ok(result);
-            }
-            catch (InvalidActionException)
-            {
-                return BadRequest(new ErrorResponse(ErrorCode.UserAlreadyInRoom));
-            }
+            return Ok(result);
+        }
+        catch (InvalidActionException)
+        {
+            return BadRequest(new ErrorResponse(ErrorCode.UserAlreadyInRoom));
         }
         catch (RoomNotFoundException)
         {
