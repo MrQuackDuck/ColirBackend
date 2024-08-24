@@ -1,4 +1,5 @@
-﻿using Colir.BLL.RequestModels.Room;
+﻿using System.Collections.Concurrent;
+using Colir.BLL.RequestModels.Room;
 using Colir.BLL.Services;
 using Colir.Communication.ResponseModels;
 using Colir.Exceptions;
@@ -19,7 +20,7 @@ public class ClearRoomHub : ColirHub, IClearRoomHub
 {
     private readonly RoomService _roomService;
 
-    private static readonly Dictionary<string, string> ConnectionsToGroupsMapping = new();
+    private static readonly ConcurrentDictionary<string, string> ConnectionsToGroupsMapping = new();
 
     public ClearRoomHub(RoomService roomService)
     {

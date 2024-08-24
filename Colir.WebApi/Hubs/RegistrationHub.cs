@@ -1,4 +1,5 @@
-﻿using Colir.BLL.Interfaces;
+﻿using System.Collections.Concurrent;
+using Colir.BLL.Interfaces;
 using Colir.BLL.Models;
 using Colir.BLL.RequestModels.User;
 using Colir.Communication.Enums;
@@ -27,25 +28,25 @@ public class RegistrationHub : ColirHub, IRegistrationHub
     /// Dictionary to store hexs that are currently offered for users to choose from
     /// The connection id is a key and the value is a list of hexs to offer
     /// </summary>
-    private static readonly Dictionary<string, List<int>> HexsToOffer = new();
+    private static readonly ConcurrentDictionary<string, List<int>> HexsToOffer = new();
 
     /// <summary>
     /// Dictionary to store users' data needed for registration process
     /// The connection id is a key and the value is user's OAuth2 id
     /// </summary>
-    private static readonly Dictionary<string, RegistrationUserData> UsersData = new();
+    private static readonly ConcurrentDictionary<string, RegistrationUserData> UsersData = new();
 
     /// <summary>
     /// Dictionary to store chosen hex ids during registration process
     /// The connection id is a key and the value is the hex id chosen by the user
     /// </summary>
-    private static readonly Dictionary<string, int> ChosenHexs = new();
+    private static readonly ConcurrentDictionary<string, int> ChosenHexs = new();
 
     /// <summary>
     /// Dictionary to store chosen usernames during registration process
     /// The connection id is a key and the value is the username chosen by the user
     /// </summary>
-    private static readonly Dictionary<string, string> ChosenUsernames = new();
+    private static readonly ConcurrentDictionary<string, string> ChosenUsernames = new();
 
     public RegistrationHub(IUserService userService, IOAuth2RegistrationQueueService registrationQueueService,
         IHexColorGenerator hexGenerator, ITokenService tokenService)
@@ -84,10 +85,10 @@ public class RegistrationHub : ColirHub, IRegistrationHub
     public override Task OnDisconnectedAsync(Exception? exception)
     {
         // Clearning up the temporary data after the user got disconnected
-        HexsToOffer.Remove(Context.ConnectionId);
-        UsersData.Remove(Context.ConnectionId);
-        ChosenHexs.Remove(Context.ConnectionId);
-        ChosenUsernames.Remove(Context.ConnectionId);
+        HexsToOffer.Remove(Context.ConnectionId, out _);
+        UsersData.Remove(Context.ConnectionId, out _);
+        ChosenHexs.Remove(Context.ConnectionId, out _);
+        ChosenUsernames.Remove(Context.ConnectionId, out _);
 
         return Task.CompletedTask;
     }
