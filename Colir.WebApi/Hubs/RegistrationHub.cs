@@ -26,25 +26,25 @@ public class RegistrationHub : ColirHub, IRegistrationHub
 
     /// <summary>
     /// Dictionary to store hexs that are currently offered for users to choose from
-    /// The connection id is a key and the value is a list of hexs to offer
+    /// The connection id is a key and the value is a list of hexs to offer to specific user
     /// </summary>
     private static readonly ConcurrentDictionary<string, List<int>> HexsToOffer = new();
 
     /// <summary>
     /// Dictionary to store users' data needed for registration process
-    /// The connection id is a key and the value is user's OAuth2 id
+    /// The connection id is a key and the value is user's data
     /// </summary>
     private static readonly ConcurrentDictionary<string, RegistrationUserData> UsersData = new();
 
     /// <summary>
-    /// Dictionary to store chosen hex ids during registration process
-    /// The connection id is a key and the value is the hex id chosen by the user
+    /// Dictionary to store chosen by users hexs during a registration process
+    /// The connection id is a key and the value is the hex id chosen by specific user
     /// </summary>
     private static readonly ConcurrentDictionary<string, int> ChosenHexs = new();
 
     /// <summary>
     /// Dictionary to store chosen usernames during registration process
-    /// The connection id is a key and the value is the username chosen by the user
+    /// The connection id is a key and the value is the username chosen by specific user
     /// </summary>
     private static readonly ConcurrentDictionary<string, string> ChosenUsernames = new();
 
