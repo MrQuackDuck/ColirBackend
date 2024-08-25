@@ -197,7 +197,7 @@ public class RoomRepository : IRoomRepository
             .FirstOrDefault(r => r.Id == room.Id) ?? throw new RoomNotFoundException();
 
         // Check if joined users list has changed to delete users who are no longer in the room
-        if (room.JoinedUsers != null)
+        if ((room.JoinedUsers) != null)
         {
             for (int i = 0; i < originalEntity.JoinedUsers.Count; i++)
             {

@@ -347,6 +347,46 @@ public class MessageServiceTests : IMessageServiceTests
     }
 
     [Test]
+    public async Task SendAsync_ThorwsAttachmentNotFoundException_WhenAttachmentWasNotFound()
+    {
+        // Arrange
+        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var request = new RequestToSendMessage
+        {
+            IssuerId = 1,
+            Content = "Hello",
+            AttachmentsIds = new List<long>() { 404 },
+            RoomGuid = room.Guid
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.SendAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<AttachmentNotFoundException>(act);
+    }
+
+    [Test]
+    public async Task SendAsync_ThrowsAttachmentNotFoundException_WhenAttachmentIsNotInRoom()
+    {
+        // Arrange
+        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var request = new RequestToSendMessage
+        {
+            IssuerId = 1,
+            Content = "Hello",
+            AttachmentsIds = new List<long>() { 2 },
+            RoomGuid = room.Guid
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.SendAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<AttachmentNotFoundException>(act);
+    }
+
+    [Test]
     public async Task SendAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
     {
         // Arrange

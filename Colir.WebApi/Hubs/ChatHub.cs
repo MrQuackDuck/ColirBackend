@@ -1,6 +1,5 @@
 ﻿using System.Collections.Concurrent;
 using Colir.BLL.Interfaces;
-using Colir.BLL.RequestModels.Attachment;
 using Colir.BLL.RequestModels.Message;
 using Colir.BLL.RequestModels.Room;
 using Colir.Communication.Enums;
@@ -12,7 +11,6 @@ using Colir.Exceptions.NotFound;
 using Colir.Hubs.Abstract;
 using Colir.Interfaces.Hubs;
 using Colir.Misc.ExtensionMethods;
-using DAL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR;
@@ -27,18 +25,13 @@ public class ChatHub : ColirHub, IChatHub
 {
     private readonly IRoomService _roomService;
     private readonly IMessageService _messageService;
-    private readonly IAttachmentService _attachmentService;
-    private readonly IUnitOfWork _unitOfWork;
 
     private static readonly ConcurrentDictionary<string, string> ConnectionsToGroupsMapping = new();
 
-    public ChatHub(IRoomService roomService, IMessageService messageService, IAttachmentService attachmentService,
-        IUnitOfWork unitOfWork)
+    public ChatHub(IRoomService roomService, IMessageService messageService)
     {
         _roomService = roomService;
         _messageService = messageService;
-        _attachmentService = attachmentService;
-        _unitOfWork = unitOfWork;
     }
 
     public override async Task OnConnectedAsync()
@@ -161,42 +154,19 @@ public class ChatHub : ColirHub, IChatHub
         var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
         var issuerId = this.GetIssuerId();
 
-        var allFilesSize = model.Attachments.Sum(a => a.Length);
-        var roomFreeStorage = _unitOfWork.RoomRepository.RoomFileManager.GetFreeStorageSize(roomGuid);
-
-        if (allFilesSize > roomFreeStorage)
-        {
-            return Error(new(ErrorCode.NotEnoughSpace));
-        }
-
         if (model.Content.Length == 0)
         {
-            return Error(new(ErrorCode.NotEnoughSpace));
+            return Error(new(ErrorCode.EmptyMessage));
         }
 
         try
         {
-            // Uploading attachments and retrieving their ids
-            var attachmentIds = (await Task.WhenAll(
-                model.Attachments.Select(async file =>
-                {
-                    var request = new RequestToUploadAttachment
-                    {
-                        IssuerId = issuerId,
-                        RoomGuid = roomGuid,
-                        File = file
-                    };
-
-                    return (await _attachmentService.UploadAttachmentAsync(request)).Id;
-                })
-            )).ToList();
-
             var request = new RequestToSendMessage
             {
                 IssuerId = issuerId,
                 Content = model.Content,
                 RoomGuid = roomGuid,
-                AttachmentsIds = attachmentIds,
+                AttachmentsIds = model.AttachmentsIds,
                 ReplyMessageId = model.ReplyMessageId
             };
 
@@ -206,6 +176,10 @@ public class ChatHub : ColirHub, IChatHub
             // Notifying others
             await Clients.Group(roomGuid).SendAsync("ReceiveMessage", messageModel);
             return Success();
+        }
+        catch (AttachmentNotFoundException)
+        {
+            return Error(new(ErrorCode.AttachmentNotFound));
         }
         catch (RoomExpiredException)
         {

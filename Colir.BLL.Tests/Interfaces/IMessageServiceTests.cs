@@ -17,6 +17,8 @@ public interface IMessageServiceTests
 
 	Task SendAsync_SendsMessage();
 	Task SendAsync_AddsToStatistics_WhenItsEnabled();
+	Task SendAsync_ThorwsAttachmentNotFoundException_WhenAttachmentWasNotFound();
+	Task SendAsync_ThrowsAttachmentNotFoundException_WhenAttachmentIsNotInRoom();
 	Task SendAsync_ThrowsArgumentException_WhenMessageIsEmpty();
 	Task SendAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
 	Task SendAsync_ThrowsMessageNotFoundException_WhenNotExistingReplyMessageIdProvided();

@@ -4,6 +4,7 @@ using Colir.BLL.Models;
 using Colir.BLL.RequestModels.Message;
 using Colir.Exceptions;
 using Colir.Exceptions.NotEnoughPermissions;
+using Colir.Exceptions.NotFound;
 using DAL.Entities;
 using DAL.Interfaces;
 
@@ -128,6 +129,14 @@ public class MessageService : IMessageService
             foreach (var attachmentId in request.AttachmentsIds)
             {
                 var attachment = await _unitOfWork.AttachmentRepository.GetByIdAsync(attachmentId);
+
+                // Verifying that attachment is in the room the message is being sent to
+                // TODO: Fix the violation of "Information Expert" principle in the line below (The MessageService shouldn't know about the structure of the attachment path)
+                if (!attachment.Path.Contains(request.RoomGuid))
+                {
+                    throw new AttachmentNotFoundException();
+                }
+
                 attachment.Message = messageToSend;
                 _unitOfWork.AttachmentRepository.Update(attachment);
             }

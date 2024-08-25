@@ -100,11 +100,19 @@ public static class UnitTestHelper
         {
             Id = 1,
             Filename = "file.zip",
-            Path = "/tests/file.zip",
+            Path = "/cbaa8673-ea8b-43f8-b4cc-b8b0797b620e/tests/file.zip",
             SizeInBytes = 4,
         };
 
-        context.Attachments.Add(attachment1);
+        var attachment2 = new Attachment
+        {
+            Id = 2,
+            Filename = "file.zip",
+            Path = "/12ffb712-aca7-416f-b899-8f9aaac6770f/tests/file.zip",
+            SizeInBytes = 4,
+        };
+
+        context.Attachments.AddRange(attachment1, attachment2);
 
         // Messages
         var message1 = new Message

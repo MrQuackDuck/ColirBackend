@@ -32,6 +32,7 @@ public interface IMessageService
     /// Sends the message in the room
     /// + Increments the count of sent messages in user's statistics (if enabled in settings)
     /// </summary>
+    /// <exception cref="AttachmentNotFoundException">Thrown when the attachment wasn't found or it's not in the room the message is being sent to</exception>
     /// <exception cref="ArgumentException">Thrown when the message content is empty</exception>
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
     /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
