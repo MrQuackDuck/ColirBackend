@@ -154,11 +154,6 @@ public class ChatHub : ColirHub, IChatHub
         var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
         var issuerId = this.GetIssuerId();
 
-        if (model.Content.Length == 0)
-        {
-            return Error(new(ErrorCode.EmptyMessage));
-        }
-
         try
         {
             var request = new RequestToSendMessage
@@ -176,6 +171,10 @@ public class ChatHub : ColirHub, IChatHub
             // Notifying others
             await Clients.Group(roomGuid).SendAsync("ReceiveMessage", messageModel);
             return Success();
+        }
+        catch (ArgumentException)
+        {
+            return Error(new(ErrorCode.EmptyMessage));
         }
         catch (AttachmentNotFoundException)
         {

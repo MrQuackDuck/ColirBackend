@@ -82,9 +82,9 @@ public class MessageService : IMessageService
     public async Task<MessageModel> SendAsync(RequestToSendMessage request)
     {
         // Check if not empty
-        if (request.Content.Length == 0)
+        if (request.Content.Length == 0 && (request.AttachmentsIds == null ? true : request.AttachmentsIds.Count == 0))
         {
-            throw new ArgumentException("Message content can't be empty!");
+            throw new ArgumentException("Message can't be empty!");
         }
 
         var issuer = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
@@ -160,16 +160,17 @@ public class MessageService : IMessageService
     /// <inheritdoc cref="IMessageService.EditAsync"/>
     public async Task<MessageModel> EditAsync(RequestToEditMessage request)
     {
-        // Check if not empty
-        if (request.NewContent.Length == 0)
-        {
-            throw new ArgumentException("Message content can't be empty!");
-        }
-
         // Check if the issuer exists. Otherwise, an exception will be thrown
         await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
 
         var message = await _unitOfWork.MessageRepository.GetByIdAsync(request.MessageId);
+
+        // Check if not empty
+        if (request.NewContent.Length == 0 && message.Attachments.Count == 0)
+        {
+            throw new ArgumentException("Message content can't be empty!");
+        }
+
         var room = await _unitOfWork.RoomRepository.GetByIdAsync(message.RoomId);
 
         // If the room is expired

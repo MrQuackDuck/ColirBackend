@@ -335,7 +335,6 @@ public class MessageServiceTests : IMessageServiceTests
         {
             IssuerId = 1,
             Content = "",
-            AttachmentsIds = new List<long>() { 1 },
             RoomGuid = room.Guid
         };
 
@@ -526,8 +525,8 @@ public class MessageServiceTests : IMessageServiceTests
         // Arrange
         var request = new RequestToEditMessage
         {
-            IssuerId = 1,
-            MessageId = 1,
+            IssuerId = 3,
+            MessageId = 2,
             NewContent = ""
         };
 
