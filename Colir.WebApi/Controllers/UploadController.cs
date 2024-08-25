@@ -15,7 +15,7 @@ namespace Colir.Controllers;
 
 [ApiController]
 [Authorize]
-[Route("api/[controller]")]
+[Route("API/[controller]/[action]")]
 public class UploadController : ControllerBase, IUploadController
 {
     private readonly IAttachmentService _attachmentService;
@@ -28,6 +28,9 @@ public class UploadController : ControllerBase, IUploadController
     }
 
     /// <inheritdoc cref="IUploadController.UploadAttachments"/>
+    [HttpPost]
+    [RequestFormLimits(MultipartBodyLengthLimit = 120_000_000)]
+    [RequestSizeLimit(120_000_000)]
     public async Task<ActionResult<List<long>>> UploadAttachments([FromForm] UploadAttachmentsModel model)
     {
         try

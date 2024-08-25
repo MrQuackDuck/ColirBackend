@@ -28,4 +28,30 @@
     <ItemGroup>
       <InternalsVisibleTo Include="Colir.WebApi.IntegrationTests" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="wwwroot\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="wwwroot\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="wwwroot\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="wwwroot\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\RoomFiles\7e577f29-4b93-4540-8ef8-33bd1c60523f\1f819da5-e795-4a67-a75a-5662c50f48bf" />
+      <_ContentIncludedByDefault Remove="wwwroot\RoomFiles\7e577f29-4b93-4540-8ef8-33bd1c60523f\2f7799cc-a30e-4c03-a9f1-f771f08cde02" />
+      <_ContentIncludedByDefault Remove="wwwroot\RoomFiles\7e577f29-4b93-4540-8ef8-33bd1c60523f\5402140d-0123-436a-ace2-1c3aa1413a74" />
+      <_ContentIncludedByDefault Remove="wwwroot\RoomFiles\7e577f29-4b93-4540-8ef8-33bd1c60523f\66774d70-d002-4512-a490-a2d614c2805b" />
+      <_ContentIncludedByDefault Remove="wwwroot\RoomFiles\7e577f29-4b93-4540-8ef8-33bd1c60523f\ea33d066-27bd-469d-87bc-de2837c75178" />
+      <_ContentIncludedByDefault Remove="wwwroot\RoomFiles\bd4f768e-7644-4282-b9ed-7a20849feb86\68386339-2ac7-48f7-99b5-1f9b529c0f1e" />
+      <_ContentIncludedByDefault Remove="wwwroot\RoomFiles\f4da23c3-fc46-4d88-a1bf-9dedad05724e\7b4103e7-3680-4cf1-aff8-f02f222d110e" />
+    </ItemGroup>
 </Project>

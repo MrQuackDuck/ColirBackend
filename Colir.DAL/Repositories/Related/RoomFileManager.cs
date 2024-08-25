@@ -7,15 +7,15 @@ namespace DAL.Repositories.Related;
 
 public class RoomFileManager : IRoomFileManager
 {
-    private IFileSystem _fileSystem;
-    private IConfiguration _config;
-    private string _filesFolderName;
+    private readonly IFileSystem _fileSystem;
+    private readonly IConfiguration _config;
+    private readonly string _filesFolderName;
 
     public RoomFileManager(IFileSystem fileSystem, IConfiguration config)
     {
         _fileSystem = fileSystem;
         _config = config;
-        _filesFolderName = config["AppSettings:RoomFilesFolderName"];
+        _filesFolderName = Path.Combine(config["AppSettings:RoomFilesFolderName"]!);
         ArgumentNullException.ThrowIfNull(_filesFolderName);
 
         // Create the directory where rooms files will be stored
@@ -48,10 +48,11 @@ public class RoomFileManager : IRoomFileManager
     /// <param name="roomGuid">Guid of the room</param>
     public long GetOccupiedStorageSize(string roomGuid)
     {
-        // Create the directory if not exists
-        _fileSystem.Directory.CreateDirectory($"./{_filesFolderName}/{roomGuid}");
+        string pathToDirectory = Path.Combine(_filesFolderName, roomGuid);
 
-        string pathToDirectory = $"./{_filesFolderName}/{roomGuid}/";
+        // Create the directory if not exists
+        _fileSystem.Directory.CreateDirectory(Path.Combine(_filesFolderName, roomGuid));
+
         var files = _fileSystem.DirectoryInfo.New(pathToDirectory).GetFiles();
 
         long directorySize = 0;
@@ -71,12 +72,14 @@ public class RoomFileManager : IRoomFileManager
     public async Task<string> UploadFileAsync(string roomGuid, IFormFile file)
     {
         // Generating a random name for the file
-        var fileName = Guid.NewGuid();
+        var fileName = Guid.NewGuid().ToString();
+
+        string pathToDirectory = Path.Combine(_filesFolderName, roomGuid);
 
         // Create the directory if not exists
-        _fileSystem.Directory.CreateDirectory($"./{_filesFolderName}/{roomGuid}");
+        _fileSystem.Directory.CreateDirectory(pathToDirectory);
 
-        var path = $"./{_filesFolderName}/{roomGuid}/{fileName}";
+        var path = Path.Combine(_filesFolderName, roomGuid, fileName);
         using (FileSystemStream fs = _fileSystem.FileStream.New(path, FileMode.CreateNew))
         {
             await file.CopyToAsync(fs);
@@ -91,7 +94,8 @@ public class RoomFileManager : IRoomFileManager
     /// <param name="path">Path of the file</param>
     public void DeleteFile(string path)
     {
-        _fileSystem.File.Delete(path);
+        if (_fileSystem.File.Exists(path))
+            _fileSystem.File.Delete(path);
     }
 
     /// <summary>
@@ -100,10 +104,12 @@ public class RoomFileManager : IRoomFileManager
     /// <param name="roomGuid">Guid of the room</param>
     public void DeleteAllFiles(string roomGuid)
     {
-        // Create the directory if not exists
-        _fileSystem.Directory.CreateDirectory($"./{_filesFolderName}/{roomGuid}");
+        string pathToDirectory = Path.Combine(_filesFolderName, roomGuid);
 
-        var filesPaths = _fileSystem.Directory.GetFiles($"./{_filesFolderName}/{roomGuid}/");
+        // Create the directory if not exists
+        _fileSystem.Directory.CreateDirectory(pathToDirectory);
+
+        var filesPaths = _fileSystem.Directory.GetFiles(pathToDirectory);
 
         foreach (var path in filesPaths)
         {

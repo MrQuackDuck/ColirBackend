@@ -138,7 +138,12 @@ app.UseCors();
 
 app.UseExceptionHandler();
 
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    RequestPath = "/wwwroot",
+    ServeUnknownFileTypes = true,
+    DefaultContentType = "text/plain"
+});
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();
