@@ -12,7 +12,6 @@ public interface ITokenService
     /// <param name="userId">Id of the user</param>
     /// <param name="userHexId">Hex Id of the user</param>
     /// <param name="authType">Auth type of the user</param>
-    /// <returns></returns>
     public string GenerateJwtToken(long userId, long userHexId, UserAuthType authType);
 
     /// <summary>
@@ -26,7 +25,6 @@ public interface ITokenService
     /// </summary>
     /// <param name="expiredAccessToken">The expired JWT token</param>
     /// <param name="refreshToken">The refresh token</param>
-    /// <returns></returns>
     public Task<bool> ValidateRefreshToken(string expiredAccessToken, string refreshToken);
 
     /// <summary>
