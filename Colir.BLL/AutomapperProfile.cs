@@ -22,7 +22,9 @@ public class AutomapperProfile : Profile
             .ForMember(dest => dest.AuthorHexId,
                 opt => opt.MapFrom(src => src.Author!.HexId))
             .ForMember(dest => dest.Reactions,
-                opt => opt.MapFrom(src => src.Reactions));
+                opt => opt.MapFrom(src => src.Reactions))
+            .ForMember(dest => dest.RepliedMessage,
+                opt => opt.MapFrom(src => src.RepliedTo));
 
         CreateMap<Room, RoomModel>();
 

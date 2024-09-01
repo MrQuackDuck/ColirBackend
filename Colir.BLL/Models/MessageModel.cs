@@ -9,6 +9,7 @@ public class MessageModel
     public DateTime? EditDate { get; set; }
     public string Content { get; set; } = default!;
     public long? RepliedMessageId { get; set; }
+    public MessageModel? RepliedMessage { get; set; }
 
     public List<ReactionModel> Reactions { get; set; } = default!;
     public List<AttachmentModel> Attachments { get; set; } = default!;
