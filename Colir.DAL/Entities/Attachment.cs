@@ -19,4 +19,7 @@ public class Attachment : BaseEntity
     public long? MessageId { get; set; }
 
     public Message? Message { get; set; }
+
+    public bool IsInRoom(string roomGuid) =>
+        Path.ToLowerInvariant().Contains(roomGuid.ToLowerInvariant());
 }
