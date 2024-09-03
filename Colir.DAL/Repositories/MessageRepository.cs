@@ -98,6 +98,70 @@ public class MessageRepository : IMessageRepository
     }
 
     /// <summary>
+    /// Retrieves messages around the message
+    /// </summary>
+    /// <param name="roomGuid">Room GUID to get messages in</param>
+    /// <param name="messageId">Id of the message to get surrounding messages of</param>
+    /// <param name="count">Count of messages to take</param>
+    /// <exception cref="ArgumentException">Thrown when count is less than zero</exception>
+    /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found by provided GUID</exception>
+    /// <exception cref="MessageNotFoundException">Thrown when the message wasn't found by provided id</exception>
+    public async Task<List<Message>> GetSurroundingMessages(string roomGuid, long messageId, int count)
+    {
+        if (count < 0)
+        {
+            throw new ArgumentException("Count to take can't be less than zero!");
+        }
+
+        var room = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Guid == roomGuid) ?? throw new RoomNotFoundException();
+
+        if (room.IsExpired())
+        {
+            throw new RoomExpiredException();
+        }
+
+        var message = await _dbContext.Messages
+            .AsNoTracking()
+            .Include(nameof(Message.Author))
+            .Include(nameof(Message.Attachments))
+            .Include(nameof(Message.RepliedTo))
+            .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Attachments))
+            .Include(nameof(Message.Reactions))
+            .Include(nameof(Message.Reactions) + "." + nameof(Reaction.Author))
+            .FirstOrDefaultAsync(m => m.Id == messageId) ?? throw new MessageNotFoundException();
+
+        var messagesBefore = await _dbContext.Messages
+            .AsNoTracking()
+            .Where(m => m.RoomId == room.Id && m.PostDate < message.PostDate)
+            .Include(nameof(Message.Author))
+            .Include(nameof(Message.Attachments))
+            .Include(nameof(Message.RepliedTo))
+            .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Attachments))
+            .Include(nameof(Message.Reactions))
+            .Include(nameof(Message.Reactions) + "." + nameof(Reaction.Author))
+            .OrderByDescending(m => m.PostDate)
+            .Take(count / 2)
+            .ToListAsync();
+
+        var messagesAfter = await _dbContext.Messages
+            .AsNoTracking()
+            .Where(m => m.RoomId == room.Id && m.PostDate > message.PostDate)
+            .Include(nameof(Message.Author))
+            .Include(nameof(Message.Attachments))
+            .Include(nameof(Message.RepliedTo))
+            .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Attachments))
+            .Include(nameof(Message.Reactions))
+            .Include(nameof(Message.Reactions) + "." + nameof(Reaction.Author))
+            .OrderBy(m => m.PostDate)
+            .Take(count / 2)
+            .ToListAsync();
+
+        var result = messagesBefore.Concat(new[] { message }).Concat(messagesAfter).ToList();
+
+        return result;
+    }
+
+    /// <summary>
     /// Adds the message to the DB
     /// </summary>
     /// <param name="message">Message to add</param>

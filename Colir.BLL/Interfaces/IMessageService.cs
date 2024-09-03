@@ -20,6 +20,17 @@ public interface IMessageService
     Task<List<MessageModel>> GetLastMessagesAsync(RequestToGetLastMessages request);
 
     /// <summary>
+    /// Gets surrounding messages from certain message
+    /// </summary>
+    /// <param name="request">The request object</param>
+    /// <param name="request.Count">Count of messages to take</param>
+    /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
+    /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
+    /// <exception cref="MessageNotFoundException">Thrown when the message wasn't found</exception>
+    Task <List<MessageModel>> GetSurroundingMessagesAsync(RequestToGetSurroundingMessages request);
+
+    /// <summary>
     /// Gets the message by id
     /// </summary>
     /// <exception cref="MessageNotFoundException">Thrown when the message wasn't found</exception>

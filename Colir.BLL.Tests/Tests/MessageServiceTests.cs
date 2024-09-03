@@ -204,6 +204,78 @@ public class MessageServiceTests : IMessageServiceTests
     }
 
     [Test]
+    public async Task GetSurroundingMessagesAsync_ThrowsArgumentException_WhenCountLessThanZero()
+    {
+        // Arrange
+        var request = new RequestToGetSurroundingMessages
+        {
+            IssuerId = 1,
+            MessageId = 1,
+            Count = -1
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.GetSurroundingMessagesAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<ArgumentException>(act);
+    }
+
+    [Test]
+    public async Task GetSurroundingMessagesAsync_ThrowsMessageNotFoundException_WhenMessageWasNotFound()
+    {
+        // Arrange
+        var request = new RequestToGetSurroundingMessages
+        {
+            IssuerId = 1,
+            MessageId = 404,
+            Count = 1
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.GetSurroundingMessagesAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<MessageNotFoundException>(act);
+    }
+
+    [Test]
+    public async Task GetSurroundingMessagesAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom()
+    {
+        // Arrange
+        var request = new RequestToGetSurroundingMessages
+        {
+            IssuerId = 3,
+            MessageId = 1,
+            Count = 1
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.GetSurroundingMessagesAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<IssuerNotInRoomException>(act);
+    }
+
+    [Test]
+    public async Task GetSurroundingMessagesAsync_ThrowsRoomExpiredException_WhenRoomIsExpired()
+    {
+        // Arrange
+        var request = new RequestToGetSurroundingMessages
+        {
+            IssuerId = 1,
+            MessageId = 5,
+            Count = 1
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.GetSurroundingMessagesAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<RoomExpiredException>(act);
+    }
+
+    [Test]
     public async Task GetMessageById_ReturnsCorrectMessage()
     {
         // Arrange

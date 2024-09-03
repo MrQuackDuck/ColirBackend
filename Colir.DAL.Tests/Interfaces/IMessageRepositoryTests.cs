@@ -10,6 +10,10 @@ public interface IMessageRepositoryTests
     Task GetLastMessages_ThrowsArgumentException_WhenSkipLessThanZero();
     Task GetLastMessages_ThrowsRoomExpiredException_WhenRoomExpired();
 
+    Task GetSurroundingMessages_ThrowsArgumentException_WhenCountLessThanZero();
+    Task GetSurroundingMessages_ThrowsMessageNotFoundException_WhenMessageWasNotFound();
+    Task GetSurroundingMessages_ThrowsRoomExpiredException_WhenRoomExpired();
+
     Task GetByIdAsync_ReturnsMessage_WhenFound();
     Task GetByIdAsync_ThrowsMessageNotFoundException_WhenMessageWasNotFound();
 

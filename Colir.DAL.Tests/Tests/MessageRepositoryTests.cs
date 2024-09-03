@@ -134,6 +134,39 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     }
 
     [Test]
+    public async Task GetSurroundingMessages_ThrowsArgumentException_WhenCountLessThanZero()
+    {
+        // Act
+        AsyncTestDelegate act = async () =>
+            await _messageRepository.GetSurroundingMessages("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e", 1, -1);
+
+        // Assert
+        Assert.ThrowsAsync<ArgumentException>(act);
+    }
+
+    [Test]
+    public async Task GetSurroundingMessages_ThrowsMessageNotFoundException_WhenMessageWasNotFound()
+    {
+        // Act
+        AsyncTestDelegate act = async () =>
+            await _messageRepository.GetSurroundingMessages("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e", 404, 1);
+
+        // Assert
+        Assert.ThrowsAsync<MessageNotFoundException>(act);
+    }
+
+    [Test]
+    public async Task GetSurroundingMessages_ThrowsRoomExpiredException_WhenRoomExpired()
+    {
+        // Act
+        AsyncTestDelegate act = async () =>
+            await _messageRepository.GetSurroundingMessages("12ffb712-aca7-416f-b899-8f9aaac6770f", 1, 1);
+
+        // Assert
+        Assert.ThrowsAsync<RoomExpiredException>(act);
+    }
+
+    [Test]
     public async Task GetByIdAsync_ReturnsMessage_WhenFound()
     {
         // Arrange
