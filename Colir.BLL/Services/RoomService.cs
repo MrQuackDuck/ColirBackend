@@ -141,11 +141,13 @@ public class RoomService : IRoomService
     {
         var transaction = _unitOfWork.BeginTransaction();
 
-        try { _unitOfWork.RoomRepository.DeleteAllExpired(); }
+        try
+        {
+            _unitOfWork.RoomRepository.DeleteAllExpired();
+            await _unitOfWork.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
         catch { /* ignored */ }
-
-        await _unitOfWork.SaveChangesAsync();
-        await transaction.CommitAsync();
     }
 
     /// <inheritdoc cref="IRoomService.GetLastTimeUserReadChatAsync"/>
