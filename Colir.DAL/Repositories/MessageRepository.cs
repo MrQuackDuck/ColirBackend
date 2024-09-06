@@ -87,6 +87,7 @@ public class MessageRepository : IMessageRepository
             .Include(nameof(Message.Author))
             .Include(nameof(Message.Attachments))
             .Include(nameof(Message.RepliedTo))
+            .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Author))
             .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Attachments))
             .Include(nameof(Message.Reactions))
             .Include(nameof(Message.Reactions) + "." + nameof(Reaction.Author))
@@ -125,35 +126,41 @@ public class MessageRepository : IMessageRepository
             .Include(nameof(Message.Author))
             .Include(nameof(Message.Attachments))
             .Include(nameof(Message.RepliedTo))
+            .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Author))
             .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Attachments))
             .Include(nameof(Message.Reactions))
             .Include(nameof(Message.Reactions) + "." + nameof(Reaction.Author))
+            .AsSplitQuery()
             .FirstOrDefaultAsync(m => m.Id == messageId) ?? throw new MessageNotFoundException();
 
         var messagesBefore = await _dbContext.Messages
             .AsNoTracking()
-            .Where(m => m.RoomId == room.Id && m.PostDate < message.PostDate)
+            .Where(m => m.RoomId == room.Id && m.Id < message.Id)
             .Include(nameof(Message.Author))
             .Include(nameof(Message.Attachments))
             .Include(nameof(Message.RepliedTo))
+            .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Author))
             .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Attachments))
             .Include(nameof(Message.Reactions))
             .Include(nameof(Message.Reactions) + "." + nameof(Reaction.Author))
             .OrderByDescending(m => m.PostDate)
             .Take(count / 2)
+            .AsSplitQuery()
             .ToListAsync();
 
         var messagesAfter = await _dbContext.Messages
             .AsNoTracking()
-            .Where(m => m.RoomId == room.Id && m.PostDate > message.PostDate)
+            .Where(m => m.RoomId == room.Id && m.Id > message.Id)
             .Include(nameof(Message.Author))
             .Include(nameof(Message.Attachments))
             .Include(nameof(Message.RepliedTo))
+            .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Author))
             .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Attachments))
             .Include(nameof(Message.Reactions))
             .Include(nameof(Message.Reactions) + "." + nameof(Reaction.Author))
             .OrderBy(m => m.PostDate)
             .Take(count / 2)
+            .AsSplitQuery()
             .ToListAsync();
 
         var result = messagesBefore.Concat(new[] { message }).Concat(messagesAfter).ToList();

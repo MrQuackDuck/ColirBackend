@@ -47,6 +47,10 @@ public class MessageService : IMessageService
             .Select(m =>
             {
                 var mapped = _mapper.Map<MessageModel>(m);
+                if (mapped.RepliedMessage != null)
+                {
+                    mapped.RepliedMessage.AuthorHexId = m.RepliedTo!.Author!.HexId;
+                }
                 mapped.RoomGuid = room.Guid;
                 return mapped;
             })
@@ -82,6 +86,10 @@ public class MessageService : IMessageService
             {
                 var mapped = _mapper.Map<MessageModel>(m);
                 mapped.RoomGuid = room.Guid;
+                if (mapped.RepliedMessage != null)
+                {
+                    mapped.RepliedMessage.AuthorHexId = m.RepliedTo!.Author!.HexId;
+                }
                 return mapped;
             })
             .ToList();
@@ -137,11 +145,13 @@ public class MessageService : IMessageService
             throw new IssuerNotInRoomException();
         }
 
+        Message repliedMessage = null!;
+
         // If the ReplyMessageId is not null, check if the message to reply exists
         // Otherwise, an exception will be thrown
         if (request.ReplyMessageId is not null)
         {
-            await _unitOfWork.MessageRepository.GetByIdAsync(request.ReplyMessageId ?? -1);
+            repliedMessage = await _unitOfWork.MessageRepository.GetByIdAsync(request.ReplyMessageId ?? -1);
         }
 
         var transaction = _unitOfWork.BeginTransaction();
@@ -187,6 +197,11 @@ public class MessageService : IMessageService
 
         var result = _mapper.Map<MessageModel>(messageToSend);
         result.AuthorHexId = issuer.HexId;
+        if (repliedMessage != null)
+        {
+            result.RepliedMessage = _mapper.Map<MessageModel>(repliedMessage);
+        }
+
         return result;
     }
 
