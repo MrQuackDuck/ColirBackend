@@ -31,6 +31,19 @@ public interface IMessageService
     Task <List<MessageModel>> GetSurroundingMessagesAsync(RequestToGetSurroundingMessages request);
 
     /// <summary>
+    /// Gets messages range from certain room
+    /// </summary>
+    /// <param name="request">The request object</param>
+    /// <param name="request.StartId">Id of the first message in the range</param>
+    /// <param name="request.EndId">Id of the last message in the range</param>
+    /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
+    /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
+    /// <exception cref="MessageNotFoundException">Thrown when the message wasn't found or the startId or endId is not in the room</exception>
+    /// <exception cref="ArgumentException">Thrown when the startId or endId is less than zero</exception>
+    Task <List<MessageModel>> GetMessagesRangeAsync(RequestToGetMessagesRange request);
+
+    /// <summary>
     /// Gets the message by id
     /// </summary>
     /// <exception cref="MessageNotFoundException">Thrown when the message wasn't found</exception>

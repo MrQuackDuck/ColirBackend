@@ -62,7 +62,7 @@ public class MessageRepository : IMessageRepository
     /// <exception cref="ArgumentException">Thrown when either count or skip is less than zero</exception>
     /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found by provided GUID</exception>
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
-    public async Task<List<Message>> GetLastMessages(string roomGuid, int count, int skip)
+    public async Task<List<Message>> GetLastMessagesAsync(string roomGuid, int count, int skip)
     {
         if (count < 0)
         {
@@ -91,9 +91,53 @@ public class MessageRepository : IMessageRepository
             .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Attachments))
             .Include(nameof(Message.Reactions))
             .Include(nameof(Message.Reactions) + "." + nameof(Reaction.Author))
-            .OrderByDescending(m => m.PostDate)
+            .OrderByDescending(m => m.Id)
             .Skip(skip)
             .Take(count)
+            .AsSplitQuery()
+            .ToListAsync();
+    }
+
+    /// <summary>
+    /// Retrieves messages in the range
+    /// </summary>
+    /// <param name="roomGuid">Room GUID to get messages in</param>
+    /// <param name="startId">Id of the first message</param>
+    /// <param name="endId">Id of the last message</param>
+    /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found by provided GUID</exception>
+    /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
+    public Task<List<Message>> GetMessagesRangeAsync(string roomGuid, long startId, long endId)
+    {
+        if (startId < 0 || endId < 0)
+        {
+            throw new ArgumentException("Message IDs can't be less than zero!");
+        }
+
+        var room = _dbContext.Rooms.FirstOrDefault(r => r.Guid == roomGuid) ?? throw new RoomNotFoundException();
+
+        if (room.IsExpired())
+        {
+            throw new RoomExpiredException();
+        }
+
+        if (startId > endId)
+        {
+            var temp = startId;
+            startId = endId;
+            endId = temp;
+        }
+
+        return _dbContext.Messages
+            .AsNoTracking()
+            .Include(nameof(Message.Author))
+            .Include(nameof(Message.Attachments))
+            .Include(nameof(Message.RepliedTo))
+            .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Author))
+            .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Attachments))
+            .Include(nameof(Message.Reactions))
+            .Include(nameof(Message.Reactions) + "." + nameof(Reaction.Author))
+            .Where(m => m.Room.Guid == roomGuid && m.Id >= startId && m.Id <= endId)
+            .OrderBy(m => m.Id)
             .AsSplitQuery()
             .ToListAsync();
     }
@@ -143,7 +187,7 @@ public class MessageRepository : IMessageRepository
             .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Attachments))
             .Include(nameof(Message.Reactions))
             .Include(nameof(Message.Reactions) + "." + nameof(Reaction.Author))
-            .OrderByDescending(m => m.PostDate)
+            .OrderByDescending(m => m.Id)
             .Take(count / 2)
             .AsSplitQuery()
             .ToListAsync();
@@ -158,7 +202,7 @@ public class MessageRepository : IMessageRepository
             .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Attachments))
             .Include(nameof(Message.Reactions))
             .Include(nameof(Message.Reactions) + "." + nameof(Reaction.Author))
-            .OrderBy(m => m.PostDate)
+            .OrderBy(m => m.Id)
             .Take(count / 2)
             .AsSplitQuery()
             .ToListAsync();

@@ -15,6 +15,13 @@ public interface IMessageServiceTests
 	Task GetSurroundingMessagesAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom();
 	Task GetSurroundingMessagesAsync_ThrowsRoomExpiredException_WhenRoomIsExpired();
 
+	Task GetMessagesRangeAsync_ReturnsMessagesRange();
+	Task GetMessagesRangeAsync_ThrowsArgumentException_WhenStartIdLessThanZero();
+	Task GetMessagesRangeAsync_ThrowsArgumentException_WhenEndIdLessThanZero();
+	Task GetMessagesRangeAsync_ThrowsMessageNotFoundException_WhenStartIdIsNotInRoom();
+	Task GetMessagesRangeAsync_ThrowsMessageNotFoundException_WhenEndIdIsNotInRoom();
+	Task GetMessagesRangeAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom();
+
 	Task GetMessageById_ReturnsCorrectMessage();
 	Task GetMessageById_ThrowsMessageNotFoundException_WhenNotFound();
 	Task GetMessageById_ThrowsRoomExpiredException_WhenRoomExpired();

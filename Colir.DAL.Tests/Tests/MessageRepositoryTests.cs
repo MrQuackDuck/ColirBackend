@@ -77,7 +77,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
         };
 
         // Act
-        var result = await _messageRepository.GetLastMessages("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e", 1, 0);
+        var result = await _messageRepository.GetLastMessagesAsync("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e", 1, 0);
 
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new MessageEqualityComparer()));
@@ -94,7 +94,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     {
         // Act
         AsyncTestDelegate act = async () =>
-            await _messageRepository.GetLastMessages("00000000-0000-0000-0000-000000000000", 1, 1);
+            await _messageRepository.GetLastMessagesAsync("00000000-0000-0000-0000-000000000000", 1, 1);
 
         // Assert
         Assert.ThrowsAsync<RoomNotFoundException>(act);
@@ -105,7 +105,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     {
         // Act
         AsyncTestDelegate act = async () =>
-            await _messageRepository.GetLastMessages("00000000-0000-0000-0000-000000000000", -1, 1);
+            await _messageRepository.GetLastMessagesAsync("00000000-0000-0000-0000-000000000000", -1, 1);
 
         // Assert
         Assert.ThrowsAsync<ArgumentException>(act);
@@ -116,7 +116,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     {
         // Act
         AsyncTestDelegate act = async () =>
-            await _messageRepository.GetLastMessages("00000000-0000-0000-0000-000000000000", 1, -1);
+            await _messageRepository.GetLastMessagesAsync("00000000-0000-0000-0000-000000000000", 1, -1);
 
         // Assert
         Assert.ThrowsAsync<ArgumentException>(act);
@@ -127,7 +127,76 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     {
         // Act
         AsyncTestDelegate act = async () =>
-            await _messageRepository.GetLastMessages("12ffb712-aca7-416f-b899-8f9aaac6770f", 1, 1);
+            await _messageRepository.GetLastMessagesAsync("12ffb712-aca7-416f-b899-8f9aaac6770f", 1, 1);
+
+        // Assert
+        Assert.ThrowsAsync<RoomExpiredException>(act);
+    }
+
+    [Test]
+    public async Task GetMessagesRange_ReturnsMessagesRange()
+    {
+        // Arrange
+        var expected = new List<Message>
+        {
+            _dbContext.Messages
+                .Include(nameof(Message.Author))
+                .Include(nameof(Message.Reactions))
+                .Include(nameof(Message.Attachments))
+                .FirstOrDefault(message => message.Id == 1)!,
+            _dbContext.Messages
+                .Include(nameof(Message.Author))
+                .Include(nameof(Message.Reactions))
+                .Include(nameof(Message.Attachments))
+                .FirstOrDefault(message => message.Id == 2)!
+        };
+
+        // Act
+        var result = await _messageRepository.GetMessagesRangeAsync("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e", 1, 2);
+
+        // Assert
+        Assert.That(result, Is.EqualTo(expected).Using(new MessageEqualityComparer()));
+    }
+
+    [Test]
+    public async Task GetMessagesRange_ThrowsMessageNotFoundException_WhenRoomWasNotFound()
+    {
+        // Act
+        AsyncTestDelegate act = async () =>
+            await _messageRepository.GetMessagesRangeAsync("00000000-0000-0000-0000-000000000000", 1, 1);
+
+        // Assert
+        Assert.ThrowsAsync<RoomNotFoundException>(act);
+    }
+
+    [Test]
+    public async Task GetMessagesRange_ThrowsArgumentException_WhenStartIdLessThanZero()
+    {
+        // Act
+        AsyncTestDelegate act = async () =>
+            await _messageRepository.GetMessagesRangeAsync("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e", -1, 1);
+
+        // Assert
+        Assert.ThrowsAsync<ArgumentException>(act);
+    }
+
+    [Test]
+    public async Task GetMessagesRange_ThrowsArgumentException_WhenEndIdLessThanZero()
+    {
+        // Act
+        AsyncTestDelegate act = async () =>
+            await _messageRepository.GetMessagesRangeAsync("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e", 1, -1);
+
+        // Assert
+        Assert.ThrowsAsync<ArgumentException>(act);
+    }
+
+    [Test]
+    public async Task GetMessagesRange_ThrowsRoomExpiredException_WhenRoomExpired()
+    {
+        // Act
+        AsyncTestDelegate act = async () =>
+            await _messageRepository.GetMessagesRangeAsync("12ffb712-aca7-416f-b899-8f9aaac6770f", 1, 1);
 
         // Assert
         Assert.ThrowsAsync<RoomExpiredException>(act);

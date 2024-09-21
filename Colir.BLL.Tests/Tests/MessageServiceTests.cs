@@ -276,6 +276,140 @@ public class MessageServiceTests : IMessageServiceTests
     }
 
     [Test]
+    public async Task GetMessagesRangeAsync_ReturnsMessagesRange()
+    {
+        // Arrange
+        var expected = new List<MessageModel>
+        {
+            _dbContext.Messages
+                .AsNoTracking()
+                .Include(nameof(Message.Room))
+                .Include(nameof(Message.Author))
+                .Include(nameof(Message.RepliedTo))
+                .Include(nameof(Message.Attachments))
+                .Include(nameof(Message.Reactions))
+                .First(m => m.Id == 2).ToMessageModel(),
+            _dbContext.Messages
+                .AsNoTracking()
+                .Include(nameof(Message.Room))
+                .Include(nameof(Message.Author))
+                .Include(nameof(Message.RepliedTo))
+                .Include(nameof(Message.Attachments))
+                .Include(nameof(Message.Reactions))
+                .First(m => m.Id == 3).ToMessageModel()
+        };
+
+        var request = new RequestToGetMessagesRange
+        {
+            IssuerId = 1,
+            StartId = 2,
+            EndId = 3,
+            RoomGuid = "cbaa8673-ea8b-43f8-b4cc-b8b0797b620e"
+        };
+
+        // Act
+        var result = await _messageService.GetMessagesRangeAsync(request);
+
+        // Assert
+        Assert.That(result, Is.EqualTo(expected).Using(new MessageModelEqualityComparer()));
+    }
+
+    [Test]
+    public async Task GetMessagesRangeAsync_ThrowsArgumentException_WhenStartIdLessThanZero()
+    {
+        // Arrange
+        var request = new RequestToGetMessagesRange
+        {
+            IssuerId = 1,
+            StartId = -1,
+            EndId = 3,
+            RoomGuid = "cbaa8673-ea8b-43f8-b4cc-b8b0797b620e"
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.GetMessagesRangeAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<ArgumentException>(act);
+    }
+
+    [Test]
+    public async Task GetMessagesRangeAsync_ThrowsArgumentException_WhenEndIdLessThanZero()
+    {
+        // Arrange
+        var request = new RequestToGetMessagesRange
+        {
+            IssuerId = 1,
+            StartId = 2,
+            EndId = -1,
+            RoomGuid = "cbaa8673-ea8b-43f8-b4cc-b8b0797b620e"
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.GetMessagesRangeAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<ArgumentException>(act);
+    }
+
+    [Test]
+    public async Task GetMessagesRangeAsync_ThrowsMessageNotFoundException_WhenStartIdIsNotInRoom()
+    {
+        // Arrange
+        var request = new RequestToGetMessagesRange
+        {
+            IssuerId = 1,
+            StartId = 3,
+            EndId = 5,
+            RoomGuid = "cbaa8673-ea8b-43f8-b4cc-b8b0797b620e"
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.GetMessagesRangeAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<MessageNotFoundException>(act);
+    }
+
+    [Test]
+    public async Task GetMessagesRangeAsync_ThrowsMessageNotFoundException_WhenEndIdIsNotInRoom()
+    {
+        // Arrange
+        var request = new RequestToGetMessagesRange
+        {
+            IssuerId = 1,
+            StartId = 2,
+            EndId = 5,
+            RoomGuid = "cbaa8673-ea8b-43f8-b4cc-b8b0797b620e"
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.GetMessagesRangeAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<MessageNotFoundException>(act);
+    }
+
+    [Test]
+    public async Task GetMessagesRangeAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom()
+    {
+        // Arrange
+        var request = new RequestToGetMessagesRange
+        {
+            IssuerId = 3,
+            StartId = 2,
+            EndId = 3,
+            RoomGuid = "cbaa8673-ea8b-43f8-b4cc-b8b0797b620e"
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.GetMessagesRangeAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<IssuerNotInRoomException>(act);
+    }
+
+    [Test]
     public async Task GetMessageById_ReturnsCorrectMessage()
     {
         // Arrange

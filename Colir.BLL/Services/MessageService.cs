@@ -43,7 +43,7 @@ public class MessageService : IMessageService
 
         return (await _unitOfWork
             .MessageRepository
-            .GetLastMessages(request.RoomGuid, request.Count, request.SkipCount))
+            .GetLastMessagesAsync(request.RoomGuid, request.Count, request.SkipCount))
             .Select(m =>
             {
                 var mapped = _mapper.Map<MessageModel>(m);
@@ -82,6 +82,55 @@ public class MessageService : IMessageService
         return (await _unitOfWork
             .MessageRepository
             .GetSurroundingMessages(room.Guid, request.MessageId, request.Count))
+            .Select(m =>
+            {
+                var mapped = _mapper.Map<MessageModel>(m);
+                mapped.RoomGuid = room.Guid;
+                if (mapped.RepliedMessage != null)
+                {
+                    mapped.RepliedMessage.AuthorHexId = m.RepliedTo!.Author!.HexId;
+                }
+                return mapped;
+            })
+            .ToList();
+    }
+
+    /// <inheritdoc cref="IMessageService.GetMessagesRangeAsync"/>
+    public async Task<List<MessageModel>> GetMessagesRangeAsync(RequestToGetMessagesRange request)
+    {
+        if (request.StartId < 0 || request.EndId < 0)
+        {
+            throw new ArgumentException("Ids must be positive");
+        }
+
+        // Check if the issuer exists. Otherwise, an exception will be thrown
+        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
+
+        var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
+
+        // If the room is expired
+        if (room.IsExpired())
+        {
+            throw new RoomExpiredException();
+        }
+
+        // If the issuer is not in the room
+        if (!room.JoinedUsers.Any(u => u.Id == request.IssuerId))
+        {
+            throw new IssuerNotInRoomException();
+        }
+
+        var startMessage = await _unitOfWork.MessageRepository.GetByIdAsync(request.StartId);
+        var endMessage = await _unitOfWork.MessageRepository.GetByIdAsync(request.EndId);
+
+        if (startMessage.RoomId != room.Id || endMessage.RoomId != room.Id)
+        {
+            throw new MessageNotFoundException();
+        }
+
+        return (await _unitOfWork
+            .MessageRepository
+            .GetMessagesRangeAsync(request.RoomGuid, request.StartId, request.EndId))
             .Select(m =>
             {
                 var mapped = _mapper.Map<MessageModel>(m);

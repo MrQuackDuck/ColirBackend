@@ -146,6 +146,42 @@ public class ChatHub : ColirHub, IChatHub
         }
     }
 
+    /// <inheritdoc cref="IChatHub.GetMessagesRange"/>
+    public async Task<SignalRHubResult> GetMessagesRange(GetMessagesRangeModel model)
+    {
+        if (!IsModelValid(model)) return Error(new (ErrorCode.ModelNotValid));
+
+        var request = new RequestToGetMessagesRange
+        {
+            IssuerId = this.GetIssuerId(),
+            StartId = model.StartId,
+            EndId = model.EndId,
+            RoomGuid = ConnectionsToGroupsMapping[Context.ConnectionId]
+        };
+
+        try
+        {
+            return Success(await _messageService.GetMessagesRangeAsync(request));
+        }
+        catch (MessageNotFoundException)
+        {
+            return Error(new(ErrorCode.MessageNotFound));
+        }
+        catch (IssuerNotInRoomException)
+        {
+            return Error(new(ErrorCode.IssuerNotInTheRoom), true);
+        }
+        catch (RoomExpiredException)
+        {
+            try { return Error(new(ErrorCode.RoomExpired), true); }
+            finally { await _roomService.DeleteAllExpiredAsync(); }
+        }
+        catch (ArgumentException)
+        {
+            return Error(new(ErrorCode.MessageNotFound));
+        }
+    }
+
     /// <inheritdoc cref="IChatHub.GetMessageById"/>
     public async Task<SignalRHubResult> GetMessageById(GetMessageByIdModel model)
     {
