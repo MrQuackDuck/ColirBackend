@@ -11,13 +11,17 @@ public static class ConcurrentBagExtensions
     {
         while (bag.Count > 0)
         {
-            T result;
-            bag.TryTake(out result!);
+            T? result;
+            bag.TryTake(out result);
 
-            // If the predicate is false, add the item back to the bag
-            if (!predicate(result))
+            // Check if result is null
+            if (result == null || !predicate(result))
             {
-                bag.Add(result);
+                // If result is null or predicate is false, add the item back to the bag
+                if (result != null)
+                {
+                    bag.Add(result);
+                }
             }
         }
     }
