@@ -1,14 +1,17 @@
 ﻿using System.Collections.Concurrent;
+using System.Reflection;
 using Colir.BLL.Interfaces;
 using Colir.BLL.RequestModels.Message;
 using Colir.BLL.RequestModels.Room;
 using Colir.Communication.Enums;
+using Colir.Communication.Models;
 using Colir.Communication.RequestModels.Chat;
 using Colir.Communication.ResponseModels;
 using Colir.Exceptions;
 using Colir.Exceptions.NotEnoughPermissions;
 using Colir.Exceptions.NotFound;
 using Colir.Hubs.Abstract;
+using Colir.Interfaces.ApiRelatedServices;
 using Colir.Interfaces.Hubs;
 using Colir.Misc.ExtensionMethods;
 using Microsoft.AspNetCore.Authorization;
@@ -27,11 +30,13 @@ public class ChatHub : ColirHub, IChatHub
     private readonly IMessageService _messageService;
 
     private static readonly ConcurrentDictionary<string, string> ConnectionsToGroupsMapping = new();
+    private static readonly ConcurrentBag<ChatUser> ConnectedUsers = new();
 
-    public ChatHub(IRoomService roomService, IMessageService messageService)
+    public ChatHub(IRoomService roomService, IMessageService messageService, IEventService eventService)
     {
         _roomService = roomService;
         _messageService = messageService;
+        eventService.UserKicked += OnUserKicked;
     }
 
     public override async Task OnConnectedAsync()
@@ -54,6 +59,14 @@ public class ChatHub : ColirHub, IChatHub
 
             await Groups.AddToGroupAsync(Context.ConnectionId, roomGuid!);
 
+            // Adding the user to the list of connected users
+            ConnectedUsers.Add(new ChatUser
+            {
+                ConnectionId = Context.ConnectionId,
+                HexId = this.GetIssuerHexId(),
+                RoomGuid = roomGuid!
+            });
+
             ConnectionsToGroupsMapping[Context.ConnectionId] = roomGuid!;
         }
         catch (RoomExpiredException)
@@ -74,6 +87,7 @@ public class ChatHub : ColirHub, IChatHub
     public override Task OnDisconnectedAsync(Exception? exception)
     {
         ConnectionsToGroupsMapping.Remove(Context.ConnectionId, out _);
+        ConnectedUsers.RemoveWhere(x => x.ConnectionId == Context.ConnectionId);
         return Task.CompletedTask;
     }
 
@@ -405,6 +419,47 @@ public class ChatHub : ColirHub, IChatHub
         catch (NotEnoughPermissionsException)
         {
             return Error(new(ErrorCode.YouAreNotAuthorOfReaction));
+        }
+    }
+
+    private void OnUserKicked((int hexId, string roomGuid) data)
+    {
+        var connectionId = ConnectedUsers.FirstOrDefault(x => x.HexId == data.hexId && x.RoomGuid == data.roomGuid)?.ConnectionId;
+        if (connectionId is not null)
+        {
+            Disconnect(connectionId);
+        }
+    }
+
+    /// <summary>
+    /// Disconnects the user
+    /// </summary>
+    private void Disconnect(string connectionId)
+    {
+        var all = GetConnectedClients();
+        if (all.TryGetValue(connectionId, out var connection))
+        {
+            connection.Abort();
+        }
+    }
+
+    /// <summary>
+    /// Gets all connected clients
+    /// </summary>
+    private ConcurrentDictionary<string, HubConnectionContext> GetConnectedClients()
+    {
+        try
+        {
+            var lifetimeManagerPropInfo = this.Clients.All.GetType().GetField("_lifetimeManager", BindingFlags.NonPublic | BindingFlags.Instance);
+            var lifetimeManager = lifetimeManagerPropInfo!.GetValue(this.Clients.All);
+            var connectionsPropInfo = lifetimeManager!.GetType().GetField("_connections", BindingFlags.NonPublic | BindingFlags.Instance);
+            var connections = connectionsPropInfo!.GetValue(lifetimeManager);
+            var connectionsInnerPropInfo = connections!.GetType().GetField("_connections", BindingFlags.NonPublic | BindingFlags.Instance);
+            return (ConcurrentDictionary<string, HubConnectionContext>) connectionsInnerPropInfo!.GetValue(connections)!;
+        }
+        catch (ObjectDisposedException)
+        {
+            return new();
         }
     }
 }

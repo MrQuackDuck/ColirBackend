@@ -9,6 +9,7 @@ using Colir.Exceptions;
 using Colir.Exceptions.NotEnoughPermissions;
 using Colir.Exceptions.NotFound;
 using Colir.Hubs;
+using Colir.Interfaces.ApiRelatedServices;
 using Colir.Interfaces.Controllers;
 using Colir.Misc.ExtensionMethods;
 using DAL.Interfaces;
@@ -27,13 +28,15 @@ public class RoomController : ControllerBase, IRoomController
     private readonly IHubContext<ChatHub> _chatHub;
     private readonly IMapper _mapper;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IEventService _eventService;
 
-    public RoomController(IRoomService roomService, IHubContext<ChatHub> chatHub, IMapper mapper, IUnitOfWork unitOfWork)
+    public RoomController(IRoomService roomService, IHubContext<ChatHub> chatHub, IMapper mapper, IUnitOfWork unitOfWork, IEventService eventService)
     {
         _roomService = roomService;
         _chatHub = chatHub;
         _mapper = mapper;
         _unitOfWork = unitOfWork;
+        _eventService = eventService;
     }
 
     /// <inheritdoc cref="IRoomController.GetRoomInfo"/>
@@ -246,6 +249,13 @@ public class RoomController : ControllerBase, IRoomController
             {
                 // Notifying users in the Chat hub that the user was kicked
                 await _chatHub.Clients.Group(request.RoomGuid).SendAsync("UserKicked", request.TargetHexId);
+
+                // Start a task to abort the connection with target user after some time
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(TimeSpan.FromMilliseconds(700));
+                    _eventService.KickUser(request.TargetHexId, request.RoomGuid);
+                });
             }
         }
         catch (RoomNotFoundException)

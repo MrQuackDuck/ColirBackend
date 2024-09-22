@@ -30,7 +30,7 @@ public abstract class ColirHub : Hub
     /// Error result that indicates that an error occurred
     /// </summary>
     /// <param name="error">Error response object</param>
-    /// <param name="disconnect">Is user supposted to disconnect after sending the error</param>
+    /// <param name="disconnect">Is user supposted to be disconnected after receiving an error</param>
     protected SignalRHubResult Error(ErrorResponse error, bool disconnect = false)
     {
         try
