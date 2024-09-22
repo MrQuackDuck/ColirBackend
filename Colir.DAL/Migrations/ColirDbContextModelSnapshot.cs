@@ -201,6 +201,9 @@ namespace DAL.Migrations
                     b.Property<int>("HexId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("RegistrationDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<long>("UserSettingsId")
                         .HasColumnType("bigint");
 

@@ -22,6 +22,8 @@ public class User : BaseEntity
     [MaxLength(256)]
     public string Username { get; set; } = default!;
 
+    public DateTime RegistrationDate { get; set; } = DateTime.Now.Date;
+
     public UserAuthType AuthType { get; set; }
 
     [ForeignKey(nameof(UserStatisticsId))]

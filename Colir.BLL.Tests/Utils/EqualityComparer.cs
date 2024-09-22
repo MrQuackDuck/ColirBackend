@@ -79,12 +79,12 @@ class UserModelEqualityComparer : IEqualityComparer<UserModel>
         if (ReferenceEquals(x, null)) return false;
         if (ReferenceEquals(y, null)) return false;
         if (x.GetType() != y.GetType()) return false;
-        return x.HexId == y.HexId && x.HexId == y.HexId && x.Username == y.Username && x.AuthType == y.AuthType;
+        return x.HexId == y.HexId && x.HexId == y.HexId && x.Username == y.Username && x.RegistrationDate == y.RegistrationDate && x.AuthType == y.AuthType;
     }
 
     public int GetHashCode(UserModel obj)
     {
-        return HashCode.Combine(obj.HexId, obj.HexId, obj.Username, (int)obj.AuthType);
+        return HashCode.Combine(obj.HexId, obj.HexId, obj.Username, obj.RegistrationDate, (int)obj.AuthType);
     }
 }
 
@@ -96,12 +96,12 @@ class DetailedUserModelEqualityComparer : IEqualityComparer<DetailedUserModel>
         if (ReferenceEquals(x, null)) return false;
         if (ReferenceEquals(y, null)) return false;
         if (x.GetType() != y.GetType()) return false;
-        return x.Id == y.Id && x.HexId == y.HexId && x.Username == y.Username && x.AuthType == y.AuthType;
+        return x.Id == y.Id && x.HexId == y.HexId && x.Username == y.Username && x.RegistrationDate == y.RegistrationDate && x.AuthType == y.AuthType;
     }
 
     public int GetHashCode(DetailedUserModel obj)
     {
-        return HashCode.Combine(obj.Id, obj.HexId, obj.Username, (int)obj.AuthType);
+        return HashCode.Combine(obj.Id, obj.HexId, obj.Username, obj.RegistrationDate, (int)obj.AuthType);
     }
 }
 
