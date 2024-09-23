@@ -424,8 +424,9 @@ public class ChatHub : ColirHub, IChatHub
 
     private void OnUserKicked((int hexId, string roomGuid) data)
     {
-        var connectionId = ConnectedUsers.FirstOrDefault(x => x.HexId == data.hexId && x.RoomGuid == data.roomGuid)?.ConnectionId;
-        if (connectionId is not null)
+        var connectionIds = ConnectedUsers.Where(x => x.HexId == data.hexId && x.RoomGuid == data.roomGuid).Select(c => c.ConnectionId);
+
+        foreach (var connectionId in connectionIds)
         {
             Disconnect(connectionId);
         }
