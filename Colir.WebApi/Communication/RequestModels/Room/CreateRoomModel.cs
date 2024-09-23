@@ -3,5 +3,5 @@
 public class CreateRoomModel
 {
     public string Name { get; set; } = default!;
-    public DateTime? ExpiryDate { get; set; } = null;
+    public int? MinutesToLive { get; set; }
 }

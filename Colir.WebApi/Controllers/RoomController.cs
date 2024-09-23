@@ -78,11 +78,15 @@ public class RoomController : ControllerBase, IRoomController
     {
         try
         {
+            DateTime? expiryDate = model.MinutesToLive.HasValue && model.MinutesToLive > 0
+                ? DateTime.Now.AddMinutes(model.MinutesToLive.Value)
+                : null;
+
             var request = new RequestToCreateRoom
             {
                 IssuerId = this.GetIssuerId(),
                 Name = model.Name,
-                ExpiryDate = model.ExpiryDate
+                ExpiryDate = expiryDate
             };
 
             return Ok(await _roomService.CreateAsync(request));
