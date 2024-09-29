@@ -231,7 +231,6 @@ public class ChatHub : ColirHub, IChatHub
     {
         if (!IsModelValid(model)) return Error(new (ErrorCode.ModelNotValid));
 
-        // Uploading attachments
         var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
         var issuerId = this.GetIssuerId();
 
