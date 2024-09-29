@@ -1,4 +1,6 @@
 ﻿using Colir.BLL.Interfaces;
+using Colir.Exceptions.NotFound;
+using DAL.Interfaces;
 
 namespace Colir.BLL.Misc;
 
@@ -9,19 +11,28 @@ public class RoomCleaner : IRoomCleaner
     public event Action? FileDeleted;
     public event Action? Finished;
 
-    private List<string> _filesToDelete;
+    private readonly List<string> _filesToDelete;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public RoomCleaner(string directoryPath)
+    public RoomCleaner(string roomGuid, IUnitOfWork unitOfWork)
     {
-        _filesToDelete = Directory.GetFiles(directoryPath).ToList();
+        _filesToDelete = Directory.GetFiles(roomGuid).ToList();
+        _unitOfWork = unitOfWork;
         FilesToDeleteCount = _filesToDelete.Count;
     }
 
-    /// <inheritdoc cref="IRoomCleaner.Start"/>
-    public void Start()
+    /// <inheritdoc cref="IRoomCleaner.StartAsync"/>
+    public async Task StartAsync()
     {
         foreach (var file in _filesToDelete)
         {
+            try
+            {
+                await _unitOfWork.AttachmentRepository.DeleteAttachmentByPathAsync(file);
+                await _unitOfWork.SaveChangesAsync();
+            }
+            catch (AttachmentNotFoundException) { /* ignored */ }
+
             File.Delete(file);
             FileDeleted?.Invoke();
         }

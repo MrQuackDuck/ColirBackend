@@ -7,6 +7,8 @@ using Microsoft.Extensions.Configuration;
 
 namespace DAL.Repositories;
 
+#nullable enable
+
 public class UserRepository : IUserRepository
 {
     private readonly ColirDbContext _dbContext;
@@ -86,7 +88,7 @@ public class UserRepository : IUserRepository
     }
 
     /// <summary>
-    /// Gets the user by their GitHub Id
+    /// Gets the user by their Google Id
     /// </summary>
     /// <param name="googleId">Google Id of the user</param>
     /// <exception cref="UserNotFoundException">Thrown when the user wasn't found by provided hex id</exception>
@@ -106,9 +108,7 @@ public class UserRepository : IUserRepository
     /// </summary>
     public async Task<bool> ExistsAsync(int hexId)
     {
-        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.HexId == hexId);
-
-        return user != null;
+        return await _dbContext.Users.AnyAsync(u => u.HexId == hexId);
     }
 
     /// <summary>
@@ -242,14 +242,16 @@ public class UserRepository : IUserRepository
         }
 
         // Check if joined rooms list has changed to delete rooms where user is not present at
-        for (int i = 0; i < originalEntity.JoinedRooms.Count; i++)
+        if ((List<Room>?)originalEntity.JoinedRooms != null)
         {
-            var room = originalEntity.JoinedRooms[i];
-
-            if (!user.JoinedRooms.Any(r => r.Id == room.Id))
+            for (int i = originalEntity.JoinedRooms.Count - 1; i >= 0; i--)
             {
-                originalEntity.JoinedRooms.Remove(room);
-                i--;
+                var room = originalEntity.JoinedRooms[i];
+
+                if (!user.JoinedRooms.Any(r => r.Id == room.Id))
+                {
+                    originalEntity.JoinedRooms.Remove(room);
+                }
             }
         }
 

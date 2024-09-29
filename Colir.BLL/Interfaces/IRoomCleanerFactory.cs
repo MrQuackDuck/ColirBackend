@@ -1,6 +1,8 @@
-﻿namespace Colir.BLL.Interfaces;
+﻿using DAL.Interfaces;
+
+namespace Colir.BLL.Interfaces;
 
 public interface IRoomCleanerFactory
 {
-    IRoomCleaner GetRoomCleaner(string roomGuid);
+    IRoomCleaner GetRoomCleaner(string roomGuid, IUnitOfWork unitOfWork);
 }

@@ -1,5 +1,6 @@
 ﻿using Colir.BLL.Interfaces;
 using Colir.BLL.Misc;
+using DAL.Interfaces;
 
 namespace Colir.BLL.Factories;
 
@@ -8,8 +9,8 @@ namespace Colir.BLL.Factories;
 /// </summary>
 public class RoomCleanerFactory : IRoomCleanerFactory
 {
-    public IRoomCleaner GetRoomCleaner(string directoryPath)
+    public IRoomCleaner GetRoomCleaner(string roomGuid, IUnitOfWork unitOfWork)
     {
-        return new RoomCleaner(directoryPath);
+        return new RoomCleaner(roomGuid, unitOfWork);
     }
 }

@@ -7,12 +7,14 @@ using Microsoft.Extensions.Configuration;
 
 namespace DAL.Repositories;
 
+#nullable enable
+
 public class RoomRepository : IRoomRepository
 {
     public IRoomFileManager RoomFileManager { get; }
 
-    private ColirDbContext _dbContext;
-    private IConfiguration _config;
+    private readonly ColirDbContext _dbContext;
+    private readonly IConfiguration _config;
 
     public RoomRepository(ColirDbContext dbContext, IConfiguration config, IRoomFileManager roomFileManager)
     {
@@ -197,16 +199,15 @@ public class RoomRepository : IRoomRepository
             .FirstOrDefault(r => r.Id == room.Id) ?? throw new RoomNotFoundException();
 
         // Check if joined users list has changed to delete users who are no longer in the room
-        if (room.JoinedUsers != null)
+        if ((List<User>?)room.JoinedUsers != null)
         {
-            for (int i = 0; i < originalEntity.JoinedUsers.Count; i++)
+            for (int i = originalEntity.JoinedUsers.Count - 1; i >= 0; i--)
             {
                 var user = originalEntity.JoinedUsers[i];
 
                 if (!room.JoinedUsers.Any(u => u.Id == user.Id))
                 {
                     originalEntity.JoinedUsers.Remove(user);
-                    i--;
                 }
             }
         }

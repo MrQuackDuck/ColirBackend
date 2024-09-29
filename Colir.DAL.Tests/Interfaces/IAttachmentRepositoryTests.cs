@@ -15,6 +15,9 @@ public interface IAttachmentRepositoryTests
     Task DeleteByIdAsync_DeletesAttachment();
     Task DeleteByIdAsync_ThrowsAttachmentNotFoundException_WhenAttachmentWasNotFoundById();
 
+    Task DeleteAttachmentByPathAsync_DeletesAttachment();
+    Task DeleteAttachmentByPathAsync_ThrowsAttachmentNotFoundException_WhenAttachmentWasNotFoundByFileName();
+
     Task Update_UpdatesAttachment();
     Task Update_ThrowsAttachmentNotFoundException_WhenAttachmentDoesNotExist();
 }

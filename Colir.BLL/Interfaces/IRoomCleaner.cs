@@ -13,5 +13,5 @@ public interface IRoomCleaner
     /// <summary>
     /// Starts the cleaning process
     /// </summary>
-    void Start();
+    Task StartAsync();
 }

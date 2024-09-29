@@ -87,8 +87,20 @@ public class ClearRoomHub : ColirHub, IClearRoomHub
         roomCleaner.Finished += async () =>
         {
             await Clients.Client(issuerConnectionId).SendAsync("CleaningFinished");
-            Context.Abort();
+            // Abort the connection after 400 ms
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(400);
+                Context.Abort();
+            });
         };
+
+        // Start the cleaning process after 400 ms
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(400);
+            await roomCleaner.StartAsync();
+        });
 
         return Success(roomCleaner.FilesToDeleteCount);
     }

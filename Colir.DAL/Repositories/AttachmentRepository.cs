@@ -7,7 +7,7 @@ namespace DAL.Repositories;
 
 public class AttachmentRepository : IAttachmentRepository
 {
-    private ColirDbContext _dbContext;
+    private readonly ColirDbContext _dbContext;
 
     public AttachmentRepository(ColirDbContext dbContext)
     {
@@ -49,7 +49,7 @@ public class AttachmentRepository : IAttachmentRepository
     }
 
     /// <summary>
-    /// Deletes the attachment
+    /// Deletes the attachment (not from the storage)
     /// </summary>
     /// <param name="attachment">An attachment to delete</param>
     /// <exception cref="NotFoundException">Thrown when the attachment wasn't found</exception>
@@ -60,7 +60,18 @@ public class AttachmentRepository : IAttachmentRepository
     }
 
     /// <summary>
-    /// Deletes the attachment by id
+    /// Deletes the attachment from DB by filename (not from the storage)
+    /// </summary>
+    /// <param name="fileName">Filename of the attachment to delete</param>
+    /// <exception cref="AttachmentNotFoundException">Thrown when the attachment wasn't found</exception>
+    public async Task DeleteAttachmentByPathAsync(string fileName)
+    {
+        var target = await _dbContext.Attachments.FirstOrDefaultAsync(a => a.Path.ToLower() == fileName.ToLower()) ?? throw new AttachmentNotFoundException();
+        _dbContext.Attachments.Remove(target);
+    }
+
+    /// <summary>
+    /// Deletes the attachment by id (not from the storage)
     /// </summary>
     /// <param name="id">Id of the attachment to delete</param>
     public async Task DeleteByIdAsync(long id)

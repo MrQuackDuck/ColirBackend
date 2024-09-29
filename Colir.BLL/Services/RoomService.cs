@@ -310,6 +310,6 @@ public class RoomService : IRoomService
             throw new NotEnoughPermissionsException();
         }
 
-        return _roomCleanerFactory.GetRoomCleaner(request.RoomGuid);
+        return _roomCleanerFactory.GetRoomCleaner(request.RoomGuid, _unitOfWork);
     }
 }

@@ -35,12 +35,12 @@ public class RoomServiceTests : IRoomServiceTests
 
         var roomCleanerMock = new Mock<IRoomCleaner>();
 
-        var roomCleanerFactoryMock = new Mock<IRoomCleanerFactory>();
-        roomCleanerFactoryMock.Setup(factory => factory.GetRoomCleaner("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e"))
-            .Returns(roomCleanerMock.Object);
-
         var roomFileMangerMock = new Mock<IRoomFileManager>();
         var unitOfWork = new UnitOfWork(_dbContext, configMock.Object, roomFileMangerMock.Object);
+
+        var roomCleanerFactoryMock = new Mock<IRoomCleanerFactory>();
+        roomCleanerFactoryMock.Setup(factory => factory.GetRoomCleaner("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e", unitOfWork))
+            .Returns(roomCleanerMock.Object);
 
         var mapper = AutomapperProfile.InitializeAutoMapper().CreateMapper();
 
@@ -67,9 +67,9 @@ public class RoomServiceTests : IRoomServiceTests
             RoomGuid = "cbaa8673-ea8b-43f8-b4cc-b8b0797b620e"
         };
 
-        var expected = _dbContext.Rooms
-            .Include(nameof(Room.Owner))
-            .First(r => r.Guid == "cbaa8673-ea8b-43f8-b4cc-b8b0797b620e")
+        var expected = (await _dbContext.Rooms
+                .Include(nameof(Room.Owner))
+                .FirstAsync(r => r.Guid == "cbaa8673-ea8b-43f8-b4cc-b8b0797b620e"))
             .ToRoomModel();
 
         // Act
@@ -162,7 +162,7 @@ public class RoomServiceTests : IRoomServiceTests
         await _roomService.CreateAsync(request);
 
         // Assert
-        Assert.That(_dbContext.Rooms.Count() == 3);
+        Assert.That(await _dbContext.Rooms.CountAsync() == 3);
     }
 
     [Test]
@@ -187,7 +187,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task CreateAsync_AddsToStatistics_WhenItsEnabled()
     {
         // Arrange
-        var statsBefore = _dbContext.UserStatistics.AsNoTracking().First(u => u.UserId == 1);
+        var statsBefore = await _dbContext.UserStatistics.AsNoTracking().FirstAsync(u => u.UserId == 1);
         var request = new RequestToCreateRoom
         {
             IssuerId = 1,
@@ -199,7 +199,7 @@ public class RoomServiceTests : IRoomServiceTests
         await _roomService.CreateAsync(request);
 
         // Assert
-        var statsAfter = _dbContext.UserStatistics.AsNoTracking().First(u => u.UserId == 1);
+        var statsAfter = await _dbContext.UserStatistics.AsNoTracking().FirstAsync(u => u.UserId == 1);
         Assert.That(statsAfter.RoomsCreated - statsBefore.RoomsCreated == 1);
     }
 
@@ -207,7 +207,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task CreateAsync_NotAddsToStatistics_WhenItsNotEnabled()
     {
         // Arrange
-        var statsBefore = _dbContext.UserStatistics.AsNoTracking().First(u => u.UserId == 1);
+        var statsBefore = await _dbContext.UserStatistics.AsNoTracking().FirstAsync(u => u.UserId == 1);
         var request = new RequestToCreateRoom
         {
             IssuerId = 2,
@@ -219,7 +219,7 @@ public class RoomServiceTests : IRoomServiceTests
         await _roomService.CreateAsync(request);
 
         // Assert
-        var statsAfter = _dbContext.UserStatistics.AsNoTracking().First(u => u.UserId == 1);
+        var statsAfter = await _dbContext.UserStatistics.AsNoTracking().FirstAsync(u => u.UserId == 1);
         Assert.That(statsAfter.RoomsCreated - statsBefore.RoomsCreated == 0);
     }
 
@@ -263,7 +263,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task RenameAsync_RenamesTheRoom()
     {
         // Arrange
-        var roomToRename = _dbContext.Rooms.First(r => r.Id == 1);
+        var roomToRename = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
 
         var request = new RequestToRenameRoom
         {
@@ -277,7 +277,7 @@ public class RoomServiceTests : IRoomServiceTests
         await _roomService.RenameAsync(request);
 
         // Assert
-        var roomAfter = _dbContext.Rooms.First(r => r.Id == 1);
+        var roomAfter = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         Assert.That(roomAfter.Name == "New name");
     }
 
@@ -285,7 +285,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task RenameAsync_ThrowsStringTooLongException_WhenNewNameIsTooLong()
     {
         // Arrange
-        var roomToRename = _dbContext.Rooms.First(r => r.Id == 1);
+        var roomToRename = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToRenameRoom
         {
             IssuerId = 1,
@@ -304,7 +304,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task RenameAsync_ThrowsStringTooShortException_WhenNewNameIsTooShort()
     {
         // Arrange
-        var roomToRename = _dbContext.Rooms.First(r => r.Id == 1);
+        var roomToRename = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToRenameRoom
         {
             IssuerId = 1,
@@ -359,7 +359,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task RenameAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
     {
         // Arrange
-        var roomToRename = _dbContext.Rooms.First(r => r.Id == 1);
+        var roomToRename = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToRenameRoom
         {
             IssuerId = 404,
@@ -378,7 +378,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task DeleteAsync_DeletesTheRoom()
     {
         // Arrange
-        var roomToDelete = _dbContext.Rooms.First(r => r.Id == 1);
+        var roomToDelete = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToDeleteRoom
         {
             IssuerId = 1,
@@ -389,7 +389,7 @@ public class RoomServiceTests : IRoomServiceTests
         await _roomService.DeleteAsync(request);
 
         // Assert
-        Assert.That(_dbContext.Rooms.Count() == 1);
+        Assert.That(await _dbContext.Rooms.CountAsync() == 1);
     }
 
     [Test]
@@ -413,7 +413,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task DeleteAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotOwnerOfRoom()
     {
         // Arrange
-        var roomToDelete = _dbContext.Rooms.First(r => r.Id == 1);
+        var roomToDelete = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToDeleteRoom
         {
             IssuerId = 2,
@@ -431,7 +431,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task DeleteAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
     {
         // Arrange
-        var roomToDelete = _dbContext.Rooms.First(r => r.Id == 1);
+        var roomToDelete = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToDeleteRoom
         {
             IssuerId = 404,
@@ -449,8 +449,11 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task GetLastTimeUserReadChatAsync_ReturnsLastTimeUserReadChat()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
-        var expectedTime = _dbContext.LastTimeUserReadChats.First(u => u.UserId == 1).Timestamp;
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
+        var expectedTime = (await _dbContext.LastTimeUserReadChats
+            .FirstAsync(u => u.UserId == 1))
+            .Timestamp;
+
         var request = new RequestToGetLastTimeUserReadChat
         {
             IssuerId = 1,
@@ -485,7 +488,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task GetLastTimeUserReadChatAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToGetLastTimeUserReadChat
         {
             IssuerId = 3,
@@ -503,7 +506,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task GetLastTimeUserReadChatAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToGetLastTimeUserReadChat
         {
             IssuerId = 404,
@@ -521,7 +524,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task UpdateLastTimeUserReadChatAsync_UpdatesLastTimeUserReadChat()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToUpdateLastTimeUserReadChat
         {
             IssuerId = 1,
@@ -531,7 +534,11 @@ public class RoomServiceTests : IRoomServiceTests
         // Act
         await _roomService.UpdateLastTimeUserReadChatAsync(request);
 
-        var lastTimeUserReadChat = _dbContext.LastTimeUserReadChats.First(l => l.UserId == 1 && l.RoomId == room.Id).Timestamp;
+        var lastTimeUserReadChat =
+            (await _dbContext
+                .LastTimeUserReadChats
+                .FirstAsync(l => l.UserId == 1 && l.RoomId == room.Id))
+            .Timestamp;
 
         // Assert (approximately)
         Assert.That(DateTime.Now - lastTimeUserReadChat < TimeSpan.FromSeconds(1));
@@ -558,7 +565,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task UpdateLastTimeUserReadChatAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToUpdateLastTimeUserReadChat
         {
             IssuerId = 3,
@@ -576,7 +583,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task UpdateLastTimeUserReadChatAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToUpdateLastTimeUserReadChat
         {
             IssuerId = 404,
@@ -594,10 +601,10 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task JoinMemberAsync_JoinsUserToRoom()
     {
         // Arrange
-        var room = _dbContext.Rooms
+        var room = await _dbContext.Rooms
             .AsNoTracking()
             .Include(nameof(Room.JoinedUsers))
-            .First(r => r.Id == 1);
+            .FirstAsync(r => r.Id == 1);
 
         var request = new RequestToJoinRoom
         {
@@ -609,10 +616,10 @@ public class RoomServiceTests : IRoomServiceTests
         await _roomService.JoinMemberAsync(request);
 
         // Assert
-        var roomAfter = _dbContext.Rooms
+        var roomAfter = await _dbContext.Rooms
             .AsNoTracking()
             .Include(nameof(Room.JoinedUsers))
-            .First(r => r.Id == 1);
+            .FirstAsync(r => r.Id == 1);
 
         Assert.That(roomAfter.JoinedUsers.Count() == 3);
     }
@@ -621,8 +628,8 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task JoinMemberAsync_AddsToStatistics_WhenItsEnabled()
     {
         // Arrange
-        var statsBefore = _dbContext.UserStatistics.AsNoTracking().First(u => u.UserId == 3);
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var statsBefore = await _dbContext.UserStatistics.AsNoTracking().FirstAsync(u => u.UserId == 3);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToJoinRoom
         {
             IssuerId = 3,
@@ -633,7 +640,7 @@ public class RoomServiceTests : IRoomServiceTests
         await _roomService.JoinMemberAsync(request);
 
         // Assert
-        var statsAfter = _dbContext.UserStatistics.AsNoTracking().First(s => s.UserId == 3);
+        var statsAfter = await _dbContext.UserStatistics.AsNoTracking().FirstAsync(s => s.UserId == 3);
         Assert.That(statsAfter.RoomsJoined - statsBefore.RoomsJoined == 1);
     }
 
@@ -658,7 +665,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task JoinMemberAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToJoinRoom
         {
             IssuerId = 404,
@@ -676,10 +683,10 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task KickMemberAsync_KicksUserFromRoom()
     {
         // Arrange
-        var room = _dbContext.Rooms
+        var room = await _dbContext.Rooms
             .AsNoTracking()
             .Include(nameof(Room.JoinedUsers))
-            .First(r => r.Id == 1);
+            .FirstAsync(r => r.Id == 1);
 
         var request = new RequestToKickMember
         {
@@ -692,15 +699,15 @@ public class RoomServiceTests : IRoomServiceTests
         await _roomService.KickMemberAsync(request);
 
         // Assert
-        var roomAfter = _dbContext.Rooms
+        var roomAfter = await _dbContext.Rooms
             .AsNoTracking()
             .Include(nameof(Room.JoinedUsers))
-            .First(r => r.Id == 1);
+            .FirstAsync(r => r.Id == 1);
 
-        var kickedUser = _dbContext.Users
+        var kickedUser = await _dbContext.Users
             .AsNoTracking()
             .Include(nameof(User.JoinedRooms))
-            .First(u => u.HexId == 0x000000);
+            .FirstAsync(u => u.HexId == 0x000000);
 
         Assert.That(roomAfter.JoinedUsers.Count == 1);
         Assert.That(kickedUser.JoinedRooms.Count == 1);
@@ -728,7 +735,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task KickMemberAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToKickMember
         {
             IssuerId = 404,
@@ -747,7 +754,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task KickMemberAsync_ThrowsUserNotFoundException_WhenTargetWasNotFound()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToKickMember
         {
             IssuerId = 1,
@@ -766,7 +773,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task KickMemberAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToKickMember
         {
             IssuerId = 3,
@@ -785,7 +792,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task KickMemberAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotOwnerOfRoom()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToKickMember
         {
             IssuerId = 2,
@@ -804,7 +811,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task LeaveAsync_RemovesUserFromRoom()
     {
         // Arrange
-        var room = _dbContext.Rooms.AsNoTracking().First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.AsNoTracking().FirstAsync(r => r.Id == 1);
         var request = new RequestToLeaveFromRoom()
         {
             IssuerId = 1,
@@ -815,8 +822,8 @@ public class RoomServiceTests : IRoomServiceTests
         await _roomService.LeaveAsync(request);
 
         // Assert
-        var roomAfter = _dbContext.Rooms.AsNoTracking().Include(nameof(Room.JoinedUsers)).First(r => r.Id == 1);
-        var userAfter = _dbContext.Users.AsNoTracking().Include((nameof(User.JoinedRooms))).First(u => u.Id == 1);
+        var roomAfter = await _dbContext.Rooms.AsNoTracking().Include(nameof(Room.JoinedUsers)).FirstAsync(r => r.Id == 1);
+        var userAfter = await _dbContext.Users.AsNoTracking().Include((nameof(User.JoinedRooms))).FirstAsync(u => u.Id == 1);
         Assert.That(roomAfter.JoinedUsers.Count == 1);
         Assert.That(userAfter.JoinedRooms.Count == 1);
     }
@@ -842,7 +849,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task LeaveAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
     {
         // Arrange
-        var room = _dbContext.Rooms.AsNoTracking().First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.AsNoTracking().FirstAsync(r => r.Id == 1);
         var request = new RequestToLeaveFromRoom()
         {
             IssuerId = 404,
@@ -860,7 +867,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task LeaveAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom()
     {
         // Arrange
-        var room = _dbContext.Rooms.AsNoTracking().First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.AsNoTracking().FirstAsync(r => r.Id == 1);
         var request = new RequestToLeaveFromRoom()
         {
             IssuerId = 3,
@@ -878,7 +885,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task ClearRoomAsync_ReturnsIRoomCleanerObject()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Guid == "cbaa8673-ea8b-43f8-b4cc-b8b0797b620e");
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Guid == "cbaa8673-ea8b-43f8-b4cc-b8b0797b620e");
         var request = new RequestToClearRoom
         {
             IssuerId = 1,
@@ -913,7 +920,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task ClearRoomAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToClearRoom
         {
             IssuerId = 404,
@@ -931,7 +938,7 @@ public class RoomServiceTests : IRoomServiceTests
     public async Task ClearRoomAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotOwnerOfRoom()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToClearRoom
         {
             IssuerId = 2,

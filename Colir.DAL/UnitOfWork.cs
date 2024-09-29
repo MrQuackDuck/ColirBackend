@@ -7,7 +7,7 @@ namespace DAL;
 
 public class UnitOfWork : IUnitOfWork
 {
-    private ColirDbContext _dbContext;
+    private readonly ColirDbContext _dbContext;
 
     private IAttachmentRepository _attachmentRepository;
     private IRoomRepository _roomRepository;
@@ -17,9 +17,9 @@ public class UnitOfWork : IUnitOfWork
     private IUserStatisticsRepository _userStatisticsRepository;
     private IUserSettingsRepository _userSettingsRepository;
     private ILastTimeUserReadChatRepository _lastTimeUserReadChatRepository;
-    private IConfiguration _configuration;
+    private readonly IConfiguration _configuration;
 
-    private IRoomFileManager _roomFileManager;
+    private readonly IRoomFileManager _roomFileManager;
 
     public UnitOfWork(ColirDbContext dbContext, IConfiguration configuration, IRoomFileManager roomFileManager)
     {

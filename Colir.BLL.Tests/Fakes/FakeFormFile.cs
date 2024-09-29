@@ -29,7 +29,7 @@ public class FakeFormFile : IFormFile
     public long Length { get; }
     public string Name { get; } = default!;
     public string FileName { get; }
-    private IFileSystem _fileSystem;
+    private readonly IFileSystem _fileSystem;
 
     public FakeFormFile(string fileName, long sizeInBytes, IFileSystem fileSystem)
     {

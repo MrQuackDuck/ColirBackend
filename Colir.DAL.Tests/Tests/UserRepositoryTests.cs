@@ -46,11 +46,11 @@ public class UserRepositoryTests : IUserRepositoryTests
     public async Task GetAllAsync_ReturnsAllUsers()
     {
         // Arrange
-        List<User> expected = _dbContext.Users
+        List<User> expected = await _dbContext.Users
                                         .Include(nameof(User.UserStatistics))
                                         .Include(nameof(User.UserSettings))
                                         .Include(nameof(User.JoinedRooms))
-                                        .ToList();
+                                        .ToListAsync();
 
         // Act
         var result = await _userRepository.GetAllAsync();
@@ -73,11 +73,11 @@ public class UserRepositoryTests : IUserRepositoryTests
     public async Task GetByIdAsync_ReturnsUser_WhenFound()
     {
         // Arrange
-        User expected = _dbContext.Users
+        User expected = await _dbContext.Users
             .Include(nameof(User.UserStatistics))
             .Include(nameof(User.UserSettings))
             .Include(nameof(User.JoinedRooms))
-            .First(u => u.Id == 1);
+            .FirstAsync(u => u.Id == 1);
 
         // Act
         var result = await _userRepository.GetByIdAsync(1);
@@ -103,11 +103,11 @@ public class UserRepositoryTests : IUserRepositoryTests
     public async Task GetByHexIdAsync_ReturnsUser_WhenFound()
     {
         // Arrange
-        User expected = _dbContext.Users
+        User expected = await _dbContext.Users
                                         .Include(nameof(User.UserStatistics))
                                         .Include(nameof(User.UserSettings))
                                         .Include(nameof(User.JoinedRooms))
-                                        .FirstOrDefault(u => u.Id == 1)!;
+                                        .FirstAsync(u => u.Id == 1);
 
         // Act
         var result = await _userRepository.GetByHexIdAsync(0xFFFFFF);
@@ -143,11 +143,11 @@ public class UserRepositoryTests : IUserRepositoryTests
     public async Task GetByGitHubIdAsync_ReturnsUser_WhenFound()
     {
         // Arrange
-        User expected = _dbContext.Users
+        User expected = await _dbContext.Users
             .Include(nameof(User.UserStatistics))
             .Include(nameof(User.UserSettings))
             .Include(nameof(User.JoinedRooms))
-            .FirstOrDefault(u => u.Id == 1)!;
+            .FirstAsync(u => u.Id == 1);
 
         // Act
         var result = await _userRepository.GetByGithudIdAsync("2024");
@@ -203,10 +203,10 @@ public class UserRepositoryTests : IUserRepositoryTests
 
         // Act
         await _userRepository.AddAsync(userToAdd);
-        _userRepository.SaveChanges();
+        await _userRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.Users.Count() == 4);
+        Assert.That(await _dbContext.Users.CountAsync() == 4);
     }
 
     [Test]
@@ -223,10 +223,10 @@ public class UserRepositoryTests : IUserRepositoryTests
 
         // Act
         await _userRepository.AddAsync(userToAdd);
-        _userRepository.SaveChanges();
+        await _userRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.UserSettings.Count() == 4);
+        Assert.That(await _dbContext.UserSettings.CountAsync() == 4);
     }
 
     [Test]
@@ -243,10 +243,10 @@ public class UserRepositoryTests : IUserRepositoryTests
 
         // Act
         await _userRepository.AddAsync(userToAdd);
-        _userRepository.SaveChanges();
+        await _userRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.UserStatistics.Count() == 4);
+        Assert.That(await _dbContext.UserStatistics.CountAsync() == 4);
     }
 
     [Test]
@@ -260,16 +260,16 @@ public class UserRepositoryTests : IUserRepositoryTests
             HexId = 0x123456,
             JoinedRooms = new List<Room>
             {
-                _dbContext.Rooms.First()
+                await _dbContext.Rooms.FirstAsync()
             }
         };
 
         // Act
         await _userRepository.AddAsync(userToAdd);
-        _userRepository.SaveChanges();
+        await _userRepository.SaveChangesAsync();
 
         // Assert
-        var addedUser = _dbContext.Users.Include(u => u.JoinedRooms).First(u => u.Id == userToAdd.Id);
+        var addedUser = await _dbContext.Users.Include(u => u.JoinedRooms).FirstAsync(u => u.Id == userToAdd.Id);
         Assert.That(addedUser.JoinedRooms.Count, Is.EqualTo(1));
     }
 
@@ -397,42 +397,42 @@ public class UserRepositoryTests : IUserRepositoryTests
     public async Task Delete_DeletesUser()
     {
         // Arrange
-        var userToDelete = _dbContext.Users.AsNoTracking().First();
+        var userToDelete = await _dbContext.Users.AsNoTracking().FirstAsync();
 
         // Act
         _userRepository.Delete(userToDelete);
-        _userRepository.SaveChanges();
+        await _userRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.Users.Count() == 2);
+        Assert.That(await _dbContext.Users.CountAsync() == 2);
     }
 
     [Test]
     public async Task Delete_DeletesUserSettings()
     {
         // Arrange
-        var userToDelete = _dbContext.Users.First();
+        var userToDelete = await _dbContext.Users.FirstAsync();
 
         // Act
         _userRepository.Delete(userToDelete);
-        _userRepository.SaveChanges();
+        await _userRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.UserSettings.Count() == 2);
+        Assert.That(await _dbContext.UserSettings.CountAsync() == 2);
     }
 
     [Test]
     public async Task Delete_DeletesUserStatistics()
     {
         // Arrange
-        var userToDelete = _dbContext.Users.AsNoTracking().First();
+        var userToDelete = await _dbContext.Users.AsNoTracking().FirstAsync();
 
         // Act
         _userRepository.Delete(userToDelete);
-        _userRepository.SaveChanges();
+        await _userRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.UserStatistics.Count() == 2);
+        Assert.That(await _dbContext.UserStatistics.CountAsync() == 2);
     }
 
     [Test]
@@ -452,14 +452,14 @@ public class UserRepositoryTests : IUserRepositoryTests
     public async Task DeleteByIdAsync_DeletesUser()
     {
         // Arrange
-        var userToDelete = _dbContext.Users.First();
+        var userToDelete = await _dbContext.Users.FirstAsync();
 
         // Act
         await _userRepository.DeleteByIdAsync(userToDelete.Id);
-        _userRepository.SaveChanges();
+        await _userRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.Users.Count() == 2);
+        Assert.That(await _dbContext.Users.CountAsync() == 2);
     }
 
     [Test]
@@ -467,10 +467,10 @@ public class UserRepositoryTests : IUserRepositoryTests
     {
         // Act
         await _userRepository.DeleteByIdAsync(1);
-        _userRepository.SaveChanges();
+        await _userRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.UserSettings.Count() == 2);
+        Assert.That(await _dbContext.UserSettings.CountAsync() == 2);
     }
 
     [Test]
@@ -478,10 +478,10 @@ public class UserRepositoryTests : IUserRepositoryTests
     {
         // Act
         await _userRepository.DeleteByIdAsync(1);
-        _userRepository.SaveChanges();
+        await _userRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.UserStatistics.Count() == 2);
+        Assert.That(await _dbContext.UserStatistics.CountAsync() == 2);
     }
 
     [Test]
@@ -498,15 +498,15 @@ public class UserRepositoryTests : IUserRepositoryTests
     public async Task Update_UpdatesUser()
     {
         // Arrange
-        var userToUpdate = _dbContext.Users.AsNoTracking().First();
+        var userToUpdate = await _dbContext.Users.AsNoTracking().FirstAsync();
         userToUpdate.Username = "UpdatedUser";
 
         // Act
         _userRepository.Update(userToUpdate);
-        _userRepository.SaveChanges();
+        await _userRepository.SaveChangesAsync();
 
         // Assert
-        var updatedUser = _dbContext.Users.First();
+        var updatedUser = await _dbContext.Users.FirstAsync();
         Assert.That(updatedUser.Username, Is.EqualTo("UpdatedUser"));
     }
 
@@ -514,7 +514,7 @@ public class UserRepositoryTests : IUserRepositoryTests
     public async Task Update_ThrowsStringTooLongException_WhenNameTooLong()
     {
         // Arrange
-        var userToUpdate = _dbContext.Users.First(u => u.Id == 1);
+        var userToUpdate = await _dbContext.Users.FirstAsync(u => u.Id == 1);
         userToUpdate.Username = new string('a', 51);
 
         // Act
@@ -528,7 +528,7 @@ public class UserRepositoryTests : IUserRepositoryTests
     public async Task Update_ThrowsStringTooShortException_WhenNameTooShort()
     {
         // Arrange
-        var userToUpdate = _dbContext.Users.First(u => u.Id == 1);
+        var userToUpdate = await _dbContext.Users.FirstAsync(u => u.Id == 1);
         userToUpdate.Username = new string('a', 1);
 
         // Act
@@ -542,7 +542,7 @@ public class UserRepositoryTests : IUserRepositoryTests
     public async Task Update_ThrowsArgumentException_WhenExistingHexIdProvided()
     {
         // Arrange
-        var userToUpdate = _dbContext.Users.AsNoTracking().First(u => u.Id == 2);
+        var userToUpdate = await _dbContext.Users.AsNoTracking().FirstAsync(u => u.Id == 2);
         userToUpdate.HexId = 0xFFFFFF;
 
         // Act

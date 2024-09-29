@@ -39,9 +39,9 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
     public async Task GetAllAsync_ReturnsAllAttachments()
     {
         // Arrange
-        var expected = _dbContext.Attachments
+        var expected = await _dbContext.Attachments
                                  .Include(nameof(Attachment.Message))
-                                 .ToList();
+                                 .ToListAsync();
 
         // Act
         var result = await _attachmentRepository.GetAllAsync();
@@ -58,9 +58,9 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
     public async Task GetByIdAsync_ReturnsAttachment_WhenFound()
     {
         // Arrange
-        var expected = _dbContext.Attachments
+        var expected = await _dbContext.Attachments
                                  .Include(nameof(Attachment.Message))
-                                 .First(a => a.Id == 1);
+                                 .FirstAsync(a => a.Id == 1);
 
         // Act
         var result = await _attachmentRepository.GetByIdAsync(1);
@@ -95,24 +95,24 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
 
         // Act
         await _attachmentRepository.AddAsync(attachmentToAdd);
-        _attachmentRepository.SaveChanges();
+        await _attachmentRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.Attachments.Count() == 2);
+        Assert.That(await _dbContext.Attachments.CountAsync() == 2);
     }
 
     [Test]
     public async Task Delete_DeletesAttachment()
     {
         // Arrange
-        var attachmentToDelete = _dbContext.Attachments.AsNoTracking().First();
+        var attachmentToDelete = await _dbContext.Attachments.AsNoTracking().FirstAsync();
 
         // Act
         _attachmentRepository.Delete(attachmentToDelete);
-        _attachmentRepository.SaveChanges();
+        await _attachmentRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.Attachments.Count() == 0);
+        Assert.That(await _dbContext.Attachments.CountAsync() == 0);
     }
 
     [Test]
@@ -140,10 +140,10 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
     {
         // Act
         await _attachmentRepository.DeleteByIdAsync(1);
-        _attachmentRepository.SaveChanges();
+        await _attachmentRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.Attachments.Count() == 0);
+        Assert.That(await _dbContext.Attachments.CountAsync() == 0);
     }
 
     [Test]
@@ -157,18 +157,39 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
     }
 
     [Test]
+    public async Task DeleteAttachmentByPathAsync_DeletesAttachment()
+    {
+        // Act
+        await _attachmentRepository.DeleteAttachmentByPathAsync("/tests/file.zip");
+        await _attachmentRepository.SaveChangesAsync();
+
+        // Assert
+        Assert.That(await _dbContext.Attachments.CountAsync() == 0);
+    }
+
+    [Test]
+    public async Task DeleteAttachmentByPathAsync_ThrowsAttachmentNotFoundException_WhenAttachmentWasNotFoundByFileName()
+    {
+        // Act
+        AsyncTestDelegate act = async () => await _attachmentRepository.DeleteAttachmentByPathAsync("404.zip");
+
+        // Assert
+        Assert.ThrowsAsync<AttachmentNotFoundException>(act);
+    }
+
+    [Test]
     public async Task Update_UpdatesAttachment()
     {
         // Arrange
-        var attachmentToUpdate = _dbContext.Attachments.AsNoTracking().First();
+        var attachmentToUpdate = await _dbContext.Attachments.AsNoTracking().FirstAsync();
 
         // Act
         attachmentToUpdate.SizeInBytes = 100;
         _attachmentRepository.Update(attachmentToUpdate);
-        _attachmentRepository.SaveChanges();
+        await _attachmentRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.Attachments.First().SizeInBytes == 100);
+        Assert.That((await _dbContext.Attachments.FirstAsync()).SizeInBytes == 100);
     }
 
     [Test]
