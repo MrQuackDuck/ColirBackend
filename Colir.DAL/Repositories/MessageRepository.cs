@@ -8,7 +8,7 @@ namespace DAL.Repositories;
 
 public class MessageRepository : IMessageRepository
 {
-    private ColirDbContext _dbContext;
+    private readonly ColirDbContext _dbContext;
 
     public MessageRepository(ColirDbContext dbContext)
     {

@@ -7,7 +7,7 @@ public class EventService : IEventService
 {
     public event Action<(int, string)> UserKicked = default!;
 
-    public void KickUser(int hexId, string roomGuid)
+    public void OnUserKicked(int hexId, string roomGuid)
     {
         UserKicked((hexId, roomGuid));
     }

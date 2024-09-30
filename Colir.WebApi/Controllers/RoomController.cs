@@ -258,7 +258,7 @@ public class RoomController : ControllerBase, IRoomController
                 _ = Task.Run(async () =>
                 {
                     await Task.Delay(TimeSpan.FromMilliseconds(700));
-                    _eventService.KickUser(request.TargetHexId, request.RoomGuid);
+                    _eventService.OnUserKicked(request.TargetHexId, request.RoomGuid);
                 });
             }
         }

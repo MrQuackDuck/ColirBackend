@@ -32,18 +32,17 @@ public class RoomFileManager : IRoomFileManager
     }
 
     /// <summary>
-    /// Gets free storage left for the room
+    /// Gets free storage left for the room in bytes
     /// </summary>
     /// <param name="roomGuid">Guid of the room</param>
     public long GetFreeStorageSize(string roomGuid)
     {
         var maxStorageCapacity = int.Parse(_config["AppSettings:MaxRoomStorageCapacityInBytes"]!);
-
         return maxStorageCapacity - GetOccupiedStorageSize(roomGuid);
     }
 
     /// <summary>
-    /// Gets total size of files
+    /// Gets total size of files in bytes
     /// </summary>
     /// <param name="roomGuid">Guid of the room</param>
     public long GetOccupiedStorageSize(string roomGuid)

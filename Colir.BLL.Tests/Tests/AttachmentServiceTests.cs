@@ -18,7 +18,7 @@ public class AttachmentServiceTests : IAttachmentServiceTests
 {
     private ColirDbContext _dbContext;
     private AttachmentService _attachmentService;
-    private IFormFile _fileToUpload = new FakeFormFile("UnitTest.txt", 1000);
+    private readonly IFormFile _fileToUpload = new FakeFormFile("UnitTest.txt", 1000);
 
     [SetUp]
     public void SetUp()
@@ -161,5 +161,41 @@ public class AttachmentServiceTests : IAttachmentServiceTests
 
         // Assert
         Assert.ThrowsAsync<IssuerNotInRoomException>(act);
+    }
+
+    [Test]
+    public async Task CheckIfAttachmentIsAttachedToAnyMessageAsync_ReturnsTrue_WhenAttachmentIsAttached()
+    {
+        // Arrange
+        var attachment = _dbContext.Attachments.First(a => a.Id == 1);
+
+        // Act
+        var result = await _attachmentService.CheckIfAttachmentIsAttachedToAnyMessageAsync(attachment.Id);
+
+        // Assert
+        Assert.That(result);
+    }
+
+    [Test]
+    public async Task CheckIfAttachmentIsAttachedToAnyMessageAsync_ReturnsFalse_WhenAttachmentIsNotAttached()
+    {
+        // Arrange
+        var attachment = _dbContext.Attachments.First(a => a.Id == 2);
+
+        // Act
+        var result = await _attachmentService.CheckIfAttachmentIsAttachedToAnyMessageAsync(attachment.Id);
+
+        // Assert
+        Assert.That(!result);
+    }
+
+    [Test]
+    public async Task CheckIfAttachmentIsAttachedToAnyMessageAsync_ThrowsAttachmentNotFoundException_WhenAttachmentNotFound()
+    {
+        // Act
+        AsyncTestDelegate act = async () => await _attachmentService.CheckIfAttachmentIsAttachedToAnyMessageAsync(404);
+
+        // Assert
+        Assert.ThrowsAsync<AttachmentNotFoundException>(act);
     }
 }

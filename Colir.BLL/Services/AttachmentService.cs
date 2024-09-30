@@ -63,4 +63,10 @@ public class AttachmentService : IAttachmentService
 
         return _mapper.Map<AttachmentModel>(attachment);
     }
+
+    /// <inheritdoc cref="IAttachmentService.CheckIfAttachmentIsAttachedToAnyMessageAsync"/>
+    public async Task<bool> CheckIfAttachmentIsAttachedToAnyMessageAsync(long attachmentId)
+    {
+        return (await _unitOfWork.AttachmentRepository.GetByIdAsync(attachmentId)).MessageId != null;
+    }
 }

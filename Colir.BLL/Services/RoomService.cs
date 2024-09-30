@@ -24,7 +24,7 @@ public class RoomService : IRoomService
     }
 
     /// <inheritdoc cref="IRoomService.GetRoomInfoAsync"/>
-    public async Task<RoomModel> GetRoomInfoAsync(RequestToGetRoomInfo request)
+    public async Task< RoomModel> GetRoomInfoAsync(RequestToGetRoomInfo request)
     {
         // Check if the issuer exists (otherwise, an exception will be thrown)
         await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);

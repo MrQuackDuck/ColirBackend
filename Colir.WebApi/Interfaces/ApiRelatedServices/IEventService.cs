@@ -6,5 +6,6 @@
 public interface IEventService
 {
     event Action<(int, string)> UserKicked;
-    void KickUser(int hexId, string roomGuid);
+
+    void OnUserKicked(int hexId, string roomGuid);
 }

@@ -5,6 +5,7 @@ using Colir.Communication.RequestModels.Upload;
 using Colir.Communication.ResponseModels;
 using Colir.Exceptions.NotEnoughPermissions;
 using Colir.Exceptions.NotFound;
+using Colir.Interfaces.ApiRelatedServices;
 using Colir.Interfaces.Controllers;
 using Colir.Misc.ExtensionMethods;
 using DAL.Interfaces;
@@ -43,6 +44,7 @@ public class UploadController : ControllerBase, IUploadController
                 throw new ArgumentException("Not enough space in the room!");
             }
 
+            // Upload the attachments
             var listOfAttachmentIds = new List<long>();
             foreach (var file in model.Files)
             {
@@ -56,6 +58,27 @@ public class UploadController : ControllerBase, IUploadController
                 var attachment = await _attachmentService.UploadAttachmentAsync(request);
                 listOfAttachmentIds.Add(attachment.Id);
             }
+
+            // Run the task that will check if these attachments are actually attached to any message after some time
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(TimeSpan.FromSeconds(10));
+                foreach (var attachmentId in listOfAttachmentIds)
+                {
+                    try
+                    {
+                        // If the attachment is not attached to any message, delete it
+                        if (!await _attachmentService.CheckIfAttachmentIsAttachedToAnyMessageAsync(attachmentId))
+                        {
+                            _unitOfWork.RoomRepository.RoomFileManager.DeleteFile(
+                                (await _unitOfWork.AttachmentRepository.GetByIdAsync(attachmentId)).Path);
+
+                            await _unitOfWork.AttachmentRepository.DeleteByIdAsync(attachmentId);
+                        }
+                    }
+                    catch (AttachmentNotFoundException) { /* ignored */ }
+                }
+            });
 
             return Ok(listOfAttachmentIds);
         }

@@ -172,7 +172,7 @@ public class MessageService : IMessageService
     /// <inheritdoc cref="IMessageService.SendAsync"/>
     public async Task<MessageModel> SendAsync(RequestToSendMessage request)
     {
-        // Check if not empty
+        // Check if the message is not empty
         if (request.Content.Length == 0 && (request.AttachmentsIds == null ? true : request.AttachmentsIds.Count == 0))
         {
             throw new ArgumentException("Message can't be empty!");
@@ -328,6 +328,12 @@ public class MessageService : IMessageService
 
         var transaction = _unitOfWork.BeginTransaction();
 
+        // Deleting the attachments from the file system
+        foreach (var attachment in message.Attachments)
+        {
+            _unitOfWork.RoomRepository.RoomFileManager.DeleteFile(attachment.Path);
+        }
+
         _unitOfWork.MessageRepository.Delete(message);
 
         await _unitOfWork.SaveChangesAsync();
@@ -342,7 +348,7 @@ public class MessageService : IMessageService
         var room = await _unitOfWork.RoomRepository.GetByIdAsync(message.RoomId);
 
         // If the reaction is already set
-        if (message.Reactions.Any(r => r.AuthorId == request.IssuerId && r.Symbol == request.Reaction))
+        if (message.Reactions.Exists(r => r.AuthorId == request.IssuerId && r.Symbol == request.Reaction))
         {
             throw new InvalidActionException();
         }

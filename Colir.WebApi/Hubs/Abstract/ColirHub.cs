@@ -1,10 +1,12 @@
-﻿using Colir.Communication.ResponseModels;
+﻿using System.Collections.Concurrent;
+using System.Reflection;
+using Colir.Communication.ResponseModels;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Colir.Hubs.Abstract;
 
 /// <summary>
-/// Abstraction over <see cref="Hub"/> that adds "Results API"-like methods
+/// Abstraction over <see cref="Hub"/> that adds "Results API"-like methods and other useful methods
 /// </summary>
 public abstract class ColirHub : Hub
 {
@@ -12,7 +14,7 @@ public abstract class ColirHub : Hub
     /// Returns a success result with content
     /// </summary>
     /// <param name="content">Content of the response</param>
-    protected SignalRHubResult Success(object content)
+    protected static SignalRHubResult Success(object content)
     {
         return new SuccessWithContentHubResult(content);
     }
@@ -21,7 +23,7 @@ public abstract class ColirHub : Hub
     /// Overload of <see cref="Success(object)"/> that takes no arguments
     /// <returns>Success <see cref="SignalRHubResult"/> without any content</returns>
     /// </summary>
-    protected SignalRHubResult Success()
+    protected static SignalRHubResult Success()
     {
         return new SuccessHubResult();
     }
@@ -48,7 +50,7 @@ public abstract class ColirHub : Hub
     /// </summary>
     /// <param name="model">A model to validate</param>
     /// <returns>A boolean is a model valid</returns>
-    protected bool IsModelValid(object? model)
+    protected static bool IsModelValid(object? model)
     {
         // Model itself should not be null
         if (model == null)
@@ -71,5 +73,27 @@ public abstract class ColirHub : Hub
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// Gets all connected clients
+    /// </summary>
+    protected ConcurrentDictionary<string, HubConnectionContext> GetConnectedClients()
+    {
+        try
+        {
+#pragma warning disable S3011
+            var lifetimeManagerPropInfo = this.Clients.All.GetType().GetField("_lifetimeManager", BindingFlags.NonPublic | BindingFlags.Instance);
+            var lifetimeManager = lifetimeManagerPropInfo!.GetValue(this.Clients.All);
+            var connectionsPropInfo = lifetimeManager!.GetType().GetField("_connections", BindingFlags.NonPublic | BindingFlags.Instance);
+            var connections = connectionsPropInfo!.GetValue(lifetimeManager);
+            var connectionsInnerPropInfo = connections!.GetType().GetField("_connections", BindingFlags.NonPublic | BindingFlags.Instance);
+            return (ConcurrentDictionary<string, HubConnectionContext>) connectionsInnerPropInfo!.GetValue(connections)!;
+#pragma warning restore S3011
+        }
+        catch (ObjectDisposedException)
+        {
+            return new();
+        }
     }
 }

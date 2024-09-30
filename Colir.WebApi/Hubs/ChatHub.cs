@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Reflection;
 using Colir.BLL.Interfaces;
 using Colir.BLL.RequestModels.Message;
 using Colir.BLL.RequestModels.Room;
@@ -14,6 +13,7 @@ using Colir.Hubs.Abstract;
 using Colir.Interfaces.ApiRelatedServices;
 using Colir.Interfaces.Hubs;
 using Colir.Misc.ExtensionMethods;
+using DAL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR;
@@ -28,14 +28,16 @@ public class ChatHub : ColirHub, IChatHub
 {
     private readonly IRoomService _roomService;
     private readonly IMessageService _messageService;
+    private readonly IUnitOfWork _unitOfWork;
 
     private static readonly ConcurrentDictionary<string, string> ConnectionsToGroupsMapping = new();
     private static readonly ConcurrentBag<ChatUser> ConnectedUsers = new();
 
-    public ChatHub(IRoomService roomService, IMessageService messageService, IEventService eventService)
+    public ChatHub(IRoomService roomService, IMessageService messageService, IEventService eventService, IUnitOfWork unitOfWork)
     {
         _roomService = roomService;
         _messageService = messageService;
+        _unitOfWork = unitOfWork;
         eventService.UserKicked += OnUserKicked;
     }
 
@@ -250,6 +252,10 @@ public class ChatHub : ColirHub, IChatHub
 
             // Notifying others
             await Clients.Group(roomGuid).SendAsync("ReceiveMessage", messageModel);
+
+            // Notify users about the new size of the room
+            await Clients.Group(roomGuid).SendAsync("RoomSizeChanged", _unitOfWork.RoomRepository.RoomFileManager.GetOccupiedStorageSize(roomGuid));
+
             return Success();
         }
         catch (ArgumentException)
@@ -327,6 +333,10 @@ public class ChatHub : ColirHub, IChatHub
 
             // Notifying others
             await Clients.Group(roomGuid).SendAsync("MessageDeleted", model.MessageId);
+
+            // Notify users about the new size of the room
+            await Clients.Group(roomGuid).SendAsync("RoomSizeChanged", _unitOfWork.RoomRepository.RoomFileManager.GetOccupiedStorageSize(roomGuid));
+
             return Success();
         }
         catch (RoomExpiredException)
@@ -440,26 +450,6 @@ public class ChatHub : ColirHub, IChatHub
         if (all.TryGetValue(connectionId, out var connection))
         {
             connection.Abort();
-        }
-    }
-
-    /// <summary>
-    /// Gets all connected clients
-    /// </summary>
-    private ConcurrentDictionary<string, HubConnectionContext> GetConnectedClients()
-    {
-        try
-        {
-            var lifetimeManagerPropInfo = this.Clients.All.GetType().GetField("_lifetimeManager", BindingFlags.NonPublic | BindingFlags.Instance);
-            var lifetimeManager = lifetimeManagerPropInfo!.GetValue(this.Clients.All);
-            var connectionsPropInfo = lifetimeManager!.GetType().GetField("_connections", BindingFlags.NonPublic | BindingFlags.Instance);
-            var connections = connectionsPropInfo!.GetValue(lifetimeManager);
-            var connectionsInnerPropInfo = connections!.GetType().GetField("_connections", BindingFlags.NonPublic | BindingFlags.Instance);
-            return (ConcurrentDictionary<string, HubConnectionContext>) connectionsInnerPropInfo!.GetValue(connections)!;
-        }
-        catch (ObjectDisposedException)
-        {
-            return new();
         }
     }
 }
