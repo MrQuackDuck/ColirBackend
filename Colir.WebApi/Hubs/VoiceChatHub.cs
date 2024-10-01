@@ -1,4 +1,5 @@
-﻿using Colir.BLL.Interfaces;
+﻿using System.Collections.Concurrent;
+using Colir.BLL.Interfaces;
 using Colir.BLL.RequestModels.Room;
 using Colir.Communication.Enums;
 using Colir.Communication.Models;
@@ -21,8 +22,8 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
 {
     private readonly IRoomService _roomService;
 
-    private static readonly Dictionary<string, string> ConnectionsToGroupsMapping = new();
-    private static readonly List<VoiceChatUser> VoiceChatUsers = new();
+    private static readonly ConcurrentDictionary<string, string> ConnectionsToGroupsMapping = new();
+    private static readonly ConcurrentBag<VoiceChatUser> VoiceChatUsers = new();
 
     public VoiceChatHub(IRoomService roomService)
     {
@@ -67,8 +68,8 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
 
     public override Task OnDisconnectedAsync(Exception? exception)
     {
-        var user = VoiceChatUsers.FirstOrDefault(u => u.ConnectionId == Context.ConnectionId)!;
-        VoiceChatUsers.Remove(user);
+        ConnectionsToGroupsMapping.Remove(Context.ConnectionId, out _);
+        VoiceChatUsers.RemoveWhere(u => u.ConnectionId == Context.ConnectionId);
 
         return Task.CompletedTask;
     }
@@ -85,9 +86,9 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
     {
         var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
 
-        // Removing the old user if connected already
-        var oldUser = VoiceChatUsers.FirstOrDefault(u => u.ConnectionId == Context.ConnectionId);
-        if (oldUser != null) VoiceChatUsers.Remove(oldUser);
+        // Removing the old user if is connected already
+        var oldUser = VoiceChatUsers.FirstOrDefault();
+        if (oldUser != null) VoiceChatUsers.RemoveWhere(u => u.ConnectionId == Context.ConnectionId);
 
         var user = new VoiceChatUser
         {
@@ -110,10 +111,10 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
     public async Task<SignalRHubResult> Leave()
     {
         var roomGuid = ConnectionsToGroupsMapping[Context.ConnectionId];
-        var issuer = VoiceChatUsers.First(u => u.ConnectionId == Context.ConnectionId);
+        var issuer = VoiceChatUsers.First();
 
         await Clients.Group(roomGuid).SendAsync("UserLeft", issuer.HexId);
-        VoiceChatUsers.Remove(issuer);
+        VoiceChatUsers.RemoveWhere(u => u.ConnectionId == Context.ConnectionId);
 
         return Success();
     }
