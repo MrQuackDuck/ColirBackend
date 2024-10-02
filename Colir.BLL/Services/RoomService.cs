@@ -41,8 +41,7 @@ public class RoomService : IRoomService
         var resultModel = _mapper.Map<RoomModel>(room);
 
         // Apply amount of occupied/free room storage
-        resultModel.FreeMemoryInBytes = _unitOfWork.RoomRepository.RoomFileManager.GetFreeStorageSize(room.Guid);
-        resultModel.UsedMemoryInBytes = _unitOfWork.RoomRepository.RoomFileManager.GetOccupiedStorageSize(room.Guid);
+        ApplyRoomStorage(resultModel);
 
         return resultModel;
     }
@@ -89,7 +88,12 @@ public class RoomService : IRoomService
 
         roomToCreate.JoinedUsers = roomToCreate.JoinedUsers.DistinctBy(u => u.Id).ToList();
 
-        return _mapper.Map<RoomModel>(roomToCreate);
+        var roomToCreateModel = _mapper.Map<RoomModel>(roomToCreate);
+
+        // Apply amount of occupied/free room storage
+        ApplyRoomStorage(roomToCreateModel);
+
+        return roomToCreateModel;
     }
 
     /// <inheritdoc cref="IRoomService.RenameAsync"/>
@@ -237,7 +241,13 @@ public class RoomService : IRoomService
 
         roomToJoin.JoinedUsers = roomToJoin.JoinedUsers.DistinctBy(u => u.Id).ToList();
 
-        return _mapper.Map<RoomModel>(roomToJoin);
+        var roomToJoinModel = _mapper.Map<RoomModel>(roomToJoin);
+
+        // Apply amount of occupied/free room storage
+        roomToJoinModel.FreeMemoryInBytes = _unitOfWork.RoomRepository.RoomFileManager.GetFreeStorageSize(roomToJoin.Guid);
+        roomToJoinModel.UsedMemoryInBytes = _unitOfWork.RoomRepository.RoomFileManager.GetOccupiedStorageSize(roomToJoin.Guid);
+
+        return roomToJoinModel;
     }
 
     /// <inheritdoc cref="IRoomService.KickMemberAsync"/>
@@ -311,5 +321,11 @@ public class RoomService : IRoomService
         }
 
         return _roomCleanerFactory.GetRoomCleaner(request.RoomGuid, _unitOfWork);
+    }
+
+    private void ApplyRoomStorage(RoomModel roomModel)
+    {
+        roomModel.FreeMemoryInBytes = _unitOfWork.RoomRepository.RoomFileManager.GetFreeStorageSize(roomModel.Guid);
+        roomModel.UsedMemoryInBytes = _unitOfWork.RoomRepository.RoomFileManager.GetOccupiedStorageSize(roomModel.Guid);
     }
 }
