@@ -39,12 +39,12 @@ public class RoomServiceTests : IRoomServiceTests
         var unitOfWork = new UnitOfWork(_dbContext, configMock.Object, roomFileMangerMock.Object);
 
         var roomCleanerFactoryMock = new Mock<IRoomCleanerFactory>();
-        roomCleanerFactoryMock.Setup(factory => factory.GetRoomCleaner("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e", unitOfWork))
+        roomCleanerFactoryMock.Setup(factory => factory.GetRoomCleaner("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e", unitOfWork, configMock.Object))
             .Returns(roomCleanerMock.Object);
 
         var mapper = AutomapperProfile.InitializeAutoMapper().CreateMapper();
 
-        _roomService = new RoomService(unitOfWork, mapper, roomCleanerFactoryMock.Object);
+        _roomService = new RoomService(unitOfWork, mapper, roomCleanerFactoryMock.Object, configMock.Object);
 
         // Add entities
         UnitTestHelper.SeedData(_dbContext);

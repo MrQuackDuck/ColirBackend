@@ -5,7 +5,6 @@ using Colir.Communication.RequestModels.Upload;
 using Colir.Communication.ResponseModels;
 using Colir.Exceptions.NotEnoughPermissions;
 using Colir.Exceptions.NotFound;
-using Colir.Interfaces.ApiRelatedServices;
 using Colir.Interfaces.Controllers;
 using Colir.Misc.ExtensionMethods;
 using DAL.Interfaces;

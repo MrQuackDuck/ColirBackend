@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
+using Colir.BLL.Interfaces;
 using Colir.BLL.RequestModels.Room;
-using Colir.BLL.Services;
 using Colir.Communication.ResponseModels;
 using Colir.Exceptions;
 using Colir.Exceptions.NotEnoughPermissions;
@@ -18,13 +18,15 @@ namespace Colir.Hubs;
 [SignalRHub]
 public class ClearRoomHub : ColirHub, IClearRoomHub
 {
-    private readonly RoomService _roomService;
+    private readonly IRoomService _roomService;
+    private readonly IHubContext<ChatHub> _chatHub;
 
     private static readonly ConcurrentDictionary<string, string> ConnectionsToGroupsMapping = new();
 
-    public ClearRoomHub(RoomService roomService)
+    public ClearRoomHub(IRoomService roomService, IHubContext<ChatHub> chatHub)
     {
         _roomService = roomService;
+        _chatHub = chatHub;
     }
 
     public override async Task OnConnectedAsync()
@@ -66,6 +68,14 @@ public class ClearRoomHub : ColirHub, IClearRoomHub
         }
     }
 
+    public override async Task OnDisconnectedAsync(Exception? exception)
+    {
+        if (ConnectionsToGroupsMapping.TryRemove(Context.ConnectionId, out var roomGuid))
+        {
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomGuid);
+        }
+    }
+
     /// <inheritdoc cref="IClearRoomHub.Clear"/>
     public async Task<SignalRHubResult> Clear()
     {
@@ -87,6 +97,10 @@ public class ClearRoomHub : ColirHub, IClearRoomHub
         roomCleaner.Finished += async () =>
         {
             await Clients.Client(issuerConnectionId).SendAsync("CleaningFinished");
+
+            // Notify all users in the room that the room has been cleared
+            await _chatHub.Clients.Group(request.RoomGuid).SendAsync("RoomCleared");
+
             // Abort the connection after 400 ms
             _ = Task.Run(async () =>
             {
@@ -95,13 +109,13 @@ public class ClearRoomHub : ColirHub, IClearRoomHub
             });
         };
 
-        // Start the cleaning process after 400 ms
-        _ = Task.Run(async () =>
-        {
-            await Task.Delay(400);
-            await roomCleaner.StartAsync();
-        });
+        await Clients.Client(issuerConnectionId).SendAsync("ReceiveFilesToDeleteCount", roomCleaner.FilesToDeleteCount);
+        await roomCleaner.StartAsync();
 
-        return Success(roomCleaner.FilesToDeleteCount);
+        // Wait for all events to be fired
+        await Task.Delay(100);
+
+        // Return success
+        return Success();
     }
 }

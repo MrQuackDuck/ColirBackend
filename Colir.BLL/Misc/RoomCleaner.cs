@@ -1,6 +1,7 @@
 ﻿using Colir.BLL.Interfaces;
 using Colir.Exceptions.NotFound;
 using DAL.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace Colir.BLL.Misc;
 
@@ -14,9 +15,10 @@ public class RoomCleaner : IRoomCleaner
     private readonly List<string> _filesToDelete;
     private readonly IUnitOfWork _unitOfWork;
 
-    public RoomCleaner(string roomGuid, IUnitOfWork unitOfWork)
+    public RoomCleaner(string roomGuid, IUnitOfWork unitOfWork, IConfiguration config)
     {
-        _filesToDelete = Directory.GetFiles(roomGuid).ToList();
+        var folderName = Path.Combine(config["AppSettings:RoomFilesFolderName"]!, roomGuid);
+        _filesToDelete = Directory.GetFiles(folderName).ToList();
         _unitOfWork = unitOfWork;
         FilesToDeleteCount = _filesToDelete.Count;
     }

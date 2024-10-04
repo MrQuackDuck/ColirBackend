@@ -7,6 +7,7 @@ using Colir.Exceptions.NotEnoughPermissions;
 using Colir.Exceptions.NotFound;
 using DAL.Entities;
 using DAL.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace Colir.BLL.Services;
 
@@ -15,12 +16,14 @@ public class RoomService : IRoomService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IRoomCleanerFactory _roomCleanerFactory;
+    private readonly IConfiguration _config;
 
-    public RoomService(IUnitOfWork unitOfWork, IMapper mapper, IRoomCleanerFactory roomCleanerFactory)
+    public RoomService(IUnitOfWork unitOfWork, IMapper mapper, IRoomCleanerFactory roomCleanerFactory, IConfiguration config)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _roomCleanerFactory = roomCleanerFactory;
+        _config = config;
     }
 
     /// <inheritdoc cref="IRoomService.GetRoomInfoAsync"/>
@@ -320,7 +323,7 @@ public class RoomService : IRoomService
             throw new NotEnoughPermissionsException();
         }
 
-        return _roomCleanerFactory.GetRoomCleaner(request.RoomGuid, _unitOfWork);
+        return _roomCleanerFactory.GetRoomCleaner(request.RoomGuid, _unitOfWork, _config);
     }
 
     private void ApplyRoomStorage(RoomModel roomModel)
