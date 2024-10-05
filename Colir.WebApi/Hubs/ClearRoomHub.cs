@@ -100,20 +100,10 @@ public class ClearRoomHub : ColirHub, IClearRoomHub
 
             // Notify all users in the room that the room has been cleared
             await _chatHub.Clients.Group(request.RoomGuid).SendAsync("RoomCleared");
-
-            // Abort the connection after 400 ms
-            _ = Task.Run(async () =>
-            {
-                await Task.Delay(400);
-                Context.Abort();
-            });
         };
 
         await Clients.Client(issuerConnectionId).SendAsync("ReceiveFilesToDeleteCount", roomCleaner.FilesToDeleteCount);
         await roomCleaner.StartAsync();
-
-        // Wait for all events to be fired
-        await Task.Delay(100);
 
         // Return success
         return Success();
