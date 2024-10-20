@@ -120,7 +120,7 @@ services.AddSignalR();
 
 var app = builder.Build();
 
-var logger = app.Services.GetService<ILogger<Program>>() ?? throw new ArgumentNullException();
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
 try
 {
@@ -129,10 +129,10 @@ try
     var dbContext = scope.ServiceProvider.GetRequiredService<ColirDbContext>();
     await dbContext.Database.MigrateAsync();
 }
-catch (SqlException)
+catch (SqlException e)
 {
-    logger.LogCritical("An error occurred during SQL Server connection establishment!");
-    throw;
+    logger.LogCritical(e, "An error occurred during SQL Server connection establishment!");
+    return;
 }
 
 app.UseCors();
@@ -170,4 +170,4 @@ if (app.Environment.IsDevelopment())
 
 app.MapControllerRoute("default", "API/{controller}/{action}/");
 
-app.Run();
+await app.RunAsync();
