@@ -90,7 +90,7 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
     }
 
     /// <inheritdoc cref="IVoiceChatHub.Join"/>
-    public async Task<SignalRHubResult> Join()
+    public async Task<SignalRHubResult> Join(bool isMuted, bool isDeafened)
     {
         if (!ConnectionsToGroupsMapping.TryGetValue(Context.ConnectionId, out var roomGuid))
         {
@@ -104,8 +104,8 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
             HexId = issuerHexId,
             ConnectionId = Context.ConnectionId,
             RoomGuid = roomGuid,
-            IsDeafened = false,
-            IsMuted = true,
+            IsMuted = isMuted,
+            IsDeafened = isDeafened,
             IsStreamEnabled = false,
             IsVideoEnabled = false
         };

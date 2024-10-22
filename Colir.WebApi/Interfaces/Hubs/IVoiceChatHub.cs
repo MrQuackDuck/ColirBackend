@@ -13,7 +13,7 @@ public interface IVoiceChatHub
     /// <summary>
     /// Joins the user to the voice channel. Notifies others with "UserJoined" signal
     /// </summary>
-    Task<SignalRHubResult> Join();
+    Task<SignalRHubResult> Join(bool isMuted, bool isDeafened);
 
     /// <summary>
     /// Disconnects the user from the voice channel. Notifies others with "UserLeft" signal
