@@ -116,7 +116,7 @@ services.AddSwaggerGenWithConventionalRoutes(options =>
     options.SkipDefaults = true;
 });
 
-services.AddSignalR();
+services.AddSignalR(e => e.MaximumReceiveMessageSize = 1024 * 1024 * 10);
 
 var app = builder.Build();
 
