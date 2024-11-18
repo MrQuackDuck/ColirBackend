@@ -5,13 +5,16 @@ using Colir.BLL;
 using Colir.BLL.Factories;
 using Colir.BLL.Interfaces;
 using Colir.BLL.Services;
+using Colir.HubFilters;
 using Colir.Hubs;
 using Colir.Interfaces.ApiRelatedServices;
-using Colir.Misc.ExceptionHandlers;
+using Colir.Logging;
+using Colir.Misc.ExtensionMethods;
 using DAL;
 using DAL.Interfaces;
 using DAL.Repositories.Related;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -22,11 +25,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Configuring logging
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
+builder.Services.AddLogging(loggingBuilder =>
+{
+    loggingBuilder.AddProvider(new FileLoggerProvider(Path.Combine(Directory.GetCurrentDirectory(), "Logs")));
+});
 
 var services = builder.Services;
 
 // Adding an exception handler
-services.AddExceptionHandler<UnhandledExceptionsHandler>();
 builder.Services.AddProblemDetails();
 
 // Adding sessions
@@ -116,7 +122,12 @@ services.AddSwaggerGenWithConventionalRoutes(options =>
     options.SkipDefaults = true;
 });
 
-services.AddSignalR(e => e.MaximumReceiveMessageSize = 1024 * 1024 * 10);
+services.AddSignalR(e =>
+{
+    e.MaximumReceiveMessageSize = 1024 * 1024 * 10;
+    e.AddFilter<ExceptionHandlingHubFilter>();
+    e.AddFilter<LoggingHubFilter>();
+});
 
 var app = builder.Build();
 
@@ -136,8 +147,8 @@ catch (SqlException e)
 }
 
 app.UseCors();
-
-app.UseExceptionHandler();
+app.UseRequestLogging();
+app.UseExceptionHandling();
 
 app.UseStaticFiles(new StaticFileOptions
 {
