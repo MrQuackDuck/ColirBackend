@@ -57,4 +57,4 @@ Besides that, **Colir** **has** a couple of **features**, which can interest you
 
 1. Install <a href="https://dotnet.microsoft.com/en-us/download/dotnet/8.0">.NET 8</a>
 2. Clone this repo
-3. Run `dotnet run` command
+3. Run `dotnet run --project Colir.WebApi` command

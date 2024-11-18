@@ -11,35 +11,35 @@ public interface IVoiceChatHub
     SignalRHubResult GetVoiceChatUsers();
 
     /// <summary>
-    /// Joins the user to the voice channel. Notifies others with "UserJoined" signal
+    /// Joins the user to the voice channel. Notifies others with the "UserJoined" signal
     /// </summary>
     Task<SignalRHubResult> Join(bool isMuted, bool isDeafened);
 
     /// <summary>
-    /// Disconnects the user from the voice channel. Notifies others with "UserLeft" signal
+    /// Disconnects the user from the voice channel. Notifies others with the "UserLeft" signal
     /// </summary>
     Task<SignalRHubResult> Leave();
 
     /// <summary>
-    /// Mutes the user's microphone. Notifies others with "UserMuted" signal
+    /// Mutes the user's microphone. Notifies others with the "UserMuted" signal
     /// An error with <see cref="ErrorCode.YouAreNotConnectedToVoiceChannel"/> code returned when the user is not connected to the voice channel yet
     /// </summary>
     Task<SignalRHubResult> MuteSelf();
 
     /// <summary>
-    /// Unmutes the user's microphone. Notifies others with "UserUnmuted" signal
+    /// Unmutes the user's microphone. Notifies others with the "UserUnmuted" signal
     /// An error with <see cref="ErrorCode.YouAreNotConnectedToVoiceChannel"/> code returned when the user is not connected to the voice channel yet
     /// </summary>
     Task<SignalRHubResult> UnmuteSelf();
 
     /// <summary>
-    /// Deafenes the user's headphones. Notifies others with "UserDeafened" signal
+    /// Deafenes the user's headphones. Notifies others with the "UserDeafened" signal
     /// An error with <see cref="ErrorCode.YouAreNotConnectedToVoiceChannel"/> code returned when the user is not connected to the voice channel yet
     /// </summary>
     Task<SignalRHubResult> DeafenSelf();
 
     /// <summary>
-    /// Undeafenes the user's headphones. Notifies others with "UserUndeafened" signal
+    /// Undeafenes the user's headphones. Notifies others with the "UserUndeafened" signal
     /// An error with <see cref="ErrorCode.YouAreNotConnectedToVoiceChannel"/> code returned when the user is not connected to the voice channel yet
     /// </summary>
     Task<SignalRHubResult> UndeafenSelf();
@@ -52,13 +52,13 @@ public interface IVoiceChatHub
     Task<SignalRHubResult> SendVoiceSignal(string audioData);
 
     /// <summary>
-    /// Enables the user's camera. Notifies others with "UserEnabledVideo" signal
+    /// Enables the user's camera. Notifies others with the "UserEnabledVideo" signal
     /// An error with <see cref="ErrorCode.YouAreNotConnectedToVoiceChannel"/> code returned when the user is not connected to the voice channel yet
     /// </summary>
     Task<SignalRHubResult> EnableVideo();
 
     /// <summary>
-    /// Disables the user's camera. Notifies others with "UserDisabledVideo" signal
+    /// Disables the user's camera. Notifies others with the "UserDisabledVideo" signal
     /// An error with <see cref="ErrorCode.YouAreNotConnectedToVoiceChannel"/> code returned when the user is not connected to the voice channel yet
     /// </summary>
     Task<SignalRHubResult> DisableVideo();
@@ -71,13 +71,13 @@ public interface IVoiceChatHub
     Task<SignalRHubResult> SendVideoSignal(string videoData);
 
     /// <summary>
-    /// Enables a screen share. Notifies others with "UserEnabledStream" signal
+    /// Enables a screen share. Notifies others with the "UserEnabledStream" signal
     /// An error with <see cref="ErrorCode.YouAreNotConnectedToVoiceChannel"/> code returned when the user is not connected to the voice channel yet
     /// </summary>
     Task<SignalRHubResult> EnableStream();
 
     /// <summary>
-    /// Disables the screen share. Notifies others with "UserDisabledStream" signal
+    /// Disables the screen share. Notifies others with the "UserDisabledStream" signal
     /// An error with <see cref="ErrorCode.YouAreNotConnectedToVoiceChannel"/> code returned when the user is not connected to the voice channel yet
     /// </summary>
     Task<SignalRHubResult> DisableStream();

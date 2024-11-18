@@ -3,7 +3,7 @@
 public interface IGoogleOAuth2Api
 {
     /// <summary>
-    /// Gets an access token to get info about the Google profile
+    /// Gets an access token that can be exchanged to get info about the Google user
     /// </summary>
     /// <param name="googleClientId">Google OAuth2 client id</param>
     /// <param name="googleAuthSecret">Google OAuth2 secret</param>

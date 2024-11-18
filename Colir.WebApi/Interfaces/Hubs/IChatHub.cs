@@ -42,8 +42,8 @@ public interface IChatHub
     Task<SignalRHubResult> GetMessageById(GetMessageByIdModel model);
 
     /// <summary>
-    /// Sends a message to the room. Notifies others with "ReceiveMessage" signal
-    /// Also notifies members of the room with "RoomSizeChanged" signal
+    /// Sends a message to the room. Notifies others with the "ReceiveMessage" signal
+    /// Also notifies members of the room with the "RoomSizeChanged" signal
     /// An error with <see cref="ErrorCode.ModelNotValid"/> code returned when the model is not valid
     /// An error with <see cref="ErrorCode.NotEnoughSpace"/> code returned when the room has not enough space to store attachments from the request
     /// An error with <see cref="ErrorCode.IssuerNotInTheRoom"/> code returned when the issuer is not in the room (+ disconnects from the hub)
@@ -52,7 +52,7 @@ public interface IChatHub
     Task<SignalRHubResult> SendMessage(SendMessageModel model);
 
     /// <summary>
-    /// Edits the message in the room. Notifies others with "MessageEdited" signal
+    /// Edits the message in the room. Notifies others with the "MessageEdited" signal
     /// An error with <see cref="ErrorCode.ModelNotValid"/> code returned when the model is not valid
     /// An error with <see cref="ErrorCode.EmptyMessage"/> code returned when the new message content is empty
     /// An error with <see cref="ErrorCode.IssuerNotInTheRoom"/> code returned when the issuer is not in the room (+ disconnects from the hub)
@@ -62,8 +62,8 @@ public interface IChatHub
     Task<SignalRHubResult> EditMessage(EditMessageModel model);
 
     /// <summary>
-    /// Deletes the message. Notifies others with "MessageDeleted" signal
-    /// Also notifies members of the room with "RoomSizeChanged" signal
+    /// Deletes the message. Notifies others with the "MessageDeleted" signal
+    /// Also notifies members of the room with the "RoomSizeChanged" signal
     /// An error with <see cref="ErrorCode.ModelNotValid"/> code returned when the model is not valid
     /// An error with <see cref="ErrorCode.IssuerNotInTheRoom"/> code returned when the issuer is not in the room (+ disconnects from the hub)
     /// An error with <see cref="ErrorCode.RoomExpired"/> code returned when the room is expired (+ disconnects from the hub)
@@ -72,7 +72,7 @@ public interface IChatHub
     Task<SignalRHubResult> DeleteMessage(DeleteMessageModel model);
 
     /// <summary>
-    /// Adds a reaction on the message. Notifies others with "MessageGotReaction" signal
+    /// Adds a reaction on the message. Notifies others with the "MessageGotReaction" signal
     /// An error with <see cref="ErrorCode.ModelNotValid"/> code returned when the model is not valid
     /// An error with <see cref="ErrorCode.IssuerNotInTheRoom"/> code returned when the issuer is not in the room (+ disconnects from the hub)
     /// An error with <see cref="ErrorCode.RoomExpired"/> code returned when the room is expired (+ disconnects from the hub)
@@ -80,7 +80,7 @@ public interface IChatHub
     Task<SignalRHubResult> AddReactionOnMessage(AddReactionOnMessageModel model);
 
     /// <summary>
-    /// Removes the reaction from the message. Notifies others with "MessageLostReaction" signal
+    /// Removes the reaction from the message. Notifies others with the "MessageLostReaction" signal
     /// An error with <see cref="ErrorCode.ModelNotValid"/> code returned when the model is not valid
     /// An error with <see cref="ErrorCode.IssuerNotInTheRoom"/> code returned when the issuer is not in the room (+ disconnects from the hub)
     /// An error with <see cref="ErrorCode.RoomExpired"/> code returned when the room is expired (+ disconnects from the hub)

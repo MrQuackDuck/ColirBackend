@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Colir.Misc.Utils;
 
-public static class Hasher
+public static class HashUtil
 {
     public static string ToSha256(string inputString)
     {

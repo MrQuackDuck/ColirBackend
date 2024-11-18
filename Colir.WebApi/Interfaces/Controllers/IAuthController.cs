@@ -14,12 +14,12 @@ public interface IAuthController
     ActionResult IsAuthenticated();
 
     /// <summary>
-    /// Redirects the user to the GitHub authentication page
+    /// Returns a link to the GitHub OAuth2 page
     /// </summary>
     ActionResult GitHubLogin();
 
     /// <summary>
-    /// Redirects the user to the Google authentication page
+    /// Returns a link to the Google OAuth2 page
     /// </summary>
     ActionResult GoogleLogin();
 
@@ -45,12 +45,12 @@ public interface IAuthController
     Task<ActionResult<DetailedUserModel>> AnonymousLogin(string name);
 
     /// <summary>
-    /// Refreshes the JWT token and returns new refresh token
+    /// Refreshes the JWT token and returns a new refresh token
     /// </summary>
     Task<IActionResult> RefreshToken(RefreshTokenRequestModel model);
 
     /// <summary>
-    /// Logs user out of his account
+    /// Logs the user out of his account
     /// </summary>
     Task<ActionResult> Logout();
 }

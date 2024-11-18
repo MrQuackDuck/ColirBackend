@@ -48,8 +48,8 @@ public class TokenService : ITokenService
     public string GenerateRefreshToken(string accessToken)
     {
         var refreshTokenKey = _config["Authentication:RefreshTokenKey"]!;
-        var encryptor = new StringEncryptor(Hasher.ToSha256Truncated(refreshTokenKey, 16),
-            Hasher.ToSha256Truncated(accessToken, 16));
+        var encryptor = new StringEncryptor(HashUtil.ToSha256Truncated(refreshTokenKey, 16),
+            HashUtil.ToSha256Truncated(accessToken, 16));
 
         var refreshToken = new RefreshToken()
         {
@@ -66,8 +66,8 @@ public class TokenService : ITokenService
         try
         {
             var refreshTokenKey = _config["Authentication:RefreshTokenKey"]!;
-            var encryptor = new StringEncryptor(Hasher.ToSha256Truncated(refreshTokenKey, 16),
-                Hasher.ToSha256Truncated(expiredAccessToken, 16));
+            var encryptor = new StringEncryptor(HashUtil.ToSha256Truncated(refreshTokenKey, 16),
+                HashUtil.ToSha256Truncated(expiredAccessToken, 16));
 
             var decryptedRefreshToken = JsonSerializer.Deserialize<RefreshToken>(encryptor.Decrypt(refreshToken))!;
 

@@ -18,37 +18,37 @@ public interface IRoomController
     Task<ActionResult<string>> CreateRoom(CreateRoomModel model);
 
     /// <summary>
-    /// Joins user a room. Notifies users in <see cref="ChatHub"/> with "UserJoined" signal
+    /// Joins the user in a room. Notifies users in <see cref="ChatHub"/> with the "UserJoined" signal
     /// </summary>
     Task<ActionResult<RoomModel>> JoinRoom(JoinRoomModel model);
 
     /// <summary>
-    /// Leaves the user from the room. Notifies users in <see cref="ChatHub"/> with "UserLeft" signal
+    /// Leaves the user from the room. Notifies users in <see cref="ChatHub"/> with the "UserLeft" signal
     /// </summary>
     Task<ActionResult> LeaveRoom(LeaveRoomModel model);
 
     /// <summary>
-    /// Gets the last time user read chat in certain room
+    /// Gets the last time a user read chat in certain room
     /// </summary>
     Task<ActionResult<DateTime>> GetLastTimeReadChatModel(GetLastTimeReadChatModel model);
 
     /// <summary>
-    /// Updates the last time user read chat in certain room
+    /// Updates the last time the user read chat in certain room
     /// </summary>
     Task<ActionResult> UpdateLastTimeReadChat(UpdateLastTimeReadChatModel model);
 
     /// <summary>
-    /// Kicks a member from the room. Notifies users in <see cref="ChatHub"/> with "UserKicked" signal
+    /// Kicks the member from the room. Notifies users in <see cref="ChatHub"/> with the "UserKicked" signal
     /// </summary>
     Task<ActionResult> KickMember(KickMemberModel model);
 
     /// <summary>
-    /// Renames the room. Notifies users in <see cref="ChatHub"/> with "RoomRenamed" signal
+    /// Renames the room. Notifies users in <see cref="ChatHub"/> with the "RoomRenamed" signal
     /// </summary>
     Task<ActionResult> RenameRoom(RenameRoomModel model);
 
     /// <summary>
-    /// Deletes the room. Notifies users in <see cref="ChatHub"/> with "RoomDeleted" signal
+    /// Deletes the room. Notifies users in <see cref="ChatHub"/> with the "RoomDeleted" signal
     /// </summary>
     Task<ActionResult> DeleteRoom(DeleteRoomModel model);
 }
