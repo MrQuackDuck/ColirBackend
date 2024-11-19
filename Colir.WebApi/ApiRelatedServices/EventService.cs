@@ -6,9 +6,21 @@ namespace Colir.ApiRelatedServices;
 public class EventService : IEventService
 {
     public event Action<(int, string)> UserKicked = default!;
+    public event Action<(int, string)> UserLeftRoom = default!;
+    public event Action<int> UserDeletedAccount = default!;
 
     public void OnUserKicked(int hexId, string roomGuid)
     {
         UserKicked((hexId, roomGuid));
+    }
+
+    public void OnUserLeftRoom(int hexId, string roomGuid)
+    {
+        UserLeftRoom((hexId, roomGuid));
+    }
+
+    public void OnUserDeletedAccount(int hexId)
+    {
+        UserDeletedAccount(hexId);
     }
 }

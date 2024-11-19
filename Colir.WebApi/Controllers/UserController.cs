@@ -8,6 +8,7 @@ using Colir.Communication.ResponseModels;
 using Colir.Exceptions;
 using Colir.Exceptions.NotFound;
 using Colir.Hubs;
+using Colir.Interfaces.ApiRelatedServices;
 using Colir.Interfaces.Controllers;
 using Colir.Misc.ExtensionMethods;
 using Microsoft.AspNetCore.Authorization;
@@ -24,13 +25,15 @@ public class UserController : ControllerBase, IUserController
     private readonly IUserService _userService;
     private readonly IUserStatisticsService _userStatisticsService;
     private readonly IHubContext<ChatHub> _chatHub;
+    private readonly IEventService _eventService;
 
     public UserController(IUserService userService, IUserStatisticsService userStatisticsService,
-        IHubContext<ChatHub> chatHub)
+        IHubContext<ChatHub> chatHub, IEventService eventService)
     {
         _userService = userService;
         _userStatisticsService = userStatisticsService;
         _chatHub = chatHub;
+        _eventService = eventService;
     }
 
     /// <inheritdoc cref="IUserController.GetAccountInfo"/>
@@ -142,6 +145,18 @@ public class UserController : ControllerBase, IUserController
             {
                 IssuerId = this.GetIssuerId()
             };
+
+            var joinedRooms = (await _userService
+                .GetAccountInfo(new() { IssuerId = request.IssuerId }))
+                .JoinedRooms;
+
+            // Notifying users in the Chat hub that the user was deleted
+            foreach (var room in joinedRooms)
+            {
+                await _chatHub.Clients.Group(room.Guid).SendAsync("UserDeleted", request.IssuerId);
+            }
+
+            _eventService.OnUserDeletedAccount(this.GetIssuerHexId());
 
             await _userService.DeleteAccount(request);
 

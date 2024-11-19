@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Reflection;
 using Colir.Communication.ResponseModels;
 using Microsoft.AspNetCore.SignalR;
 
@@ -10,6 +9,29 @@ namespace Colir.Hubs.Abstract;
 /// </summary>
 public abstract class ColirHub : Hub
 {
+    /// <summary>
+    /// Dictionary of connected clients (used to implement custom <see cref="Disconnect"/> method)
+    /// </summary>
+    protected static readonly ConcurrentDictionary<string, HubCallerContext> ConnectedClients = new();
+
+    /// <summary>
+    /// Adds a client to the <see cref="ConnectedClients"/> dictionary
+    /// </summary>
+    public override Task OnConnectedAsync()
+    {
+        ConnectedClients.TryAdd(Context.ConnectionId, Context);
+        return base.OnConnectedAsync();
+    }
+
+    /// <summary>
+    /// Removes a client from the <see cref="ConnectedClients"/> dictionary
+    /// </summary>
+    public override Task OnDisconnectedAsync(Exception? exception)
+    {
+        ConnectedClients.TryRemove(Context.ConnectionId, out _);
+        return base.OnDisconnectedAsync(exception);
+    }
+
     /// <summary>
     /// Returns a success result with content
     /// </summary>
@@ -76,24 +98,13 @@ public abstract class ColirHub : Hub
     }
 
     /// <summary>
-    /// Gets all connected clients
+    /// Disconnects the user
     /// </summary>
-    protected ConcurrentDictionary<string, HubConnectionContext> GetConnectedClients()
+    protected static void Disconnect(string connectionId)
     {
-        try
+        if (ConnectedClients.TryGetValue(connectionId, out var clientContext))
         {
-#pragma warning disable S3011
-            var lifetimeManagerPropInfo = this.Clients.All.GetType().GetField("_lifetimeManager", BindingFlags.NonPublic | BindingFlags.Instance);
-            var lifetimeManager = lifetimeManagerPropInfo!.GetValue(this.Clients.All);
-            var connectionsPropInfo = lifetimeManager!.GetType().GetField("_connections", BindingFlags.NonPublic | BindingFlags.Instance);
-            var connections = connectionsPropInfo!.GetValue(lifetimeManager);
-            var connectionsInnerPropInfo = connections!.GetType().GetField("_connections", BindingFlags.NonPublic | BindingFlags.Instance);
-            return (ConcurrentDictionary<string, HubConnectionContext>) connectionsInnerPropInfo!.GetValue(connections)!;
-#pragma warning restore S3011
-        }
-        catch (ObjectDisposedException)
-        {
-            return new();
+            clientContext.Abort();
         }
     }
 }

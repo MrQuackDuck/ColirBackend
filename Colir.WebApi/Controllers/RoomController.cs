@@ -155,6 +155,7 @@ public class RoomController : ControllerBase, IRoomController
 
             // Notifying users in the Chat hub that the user left
             await _chatHub.Clients.Group(request.RoomGuid).SendAsync("UserLeft", this.GetIssuerHexId());
+            _eventService.OnUserLeftRoom(this.GetIssuerHexId(), request.RoomGuid);
 
             return Ok();
         }

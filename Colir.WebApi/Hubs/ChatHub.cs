@@ -38,7 +38,9 @@ public class ChatHub : ColirHub, IChatHub
         _roomService = roomService;
         _messageService = messageService;
         _unitOfWork = unitOfWork;
-        eventService.UserKicked += OnUserKicked;
+        eventService.UserKicked += OnUserKickedOrLeft;
+        eventService.UserLeftRoom += OnUserKickedOrLeft;
+        eventService.UserDeletedAccount += OnUserDeletedAccount;
     }
 
     public override async Task OnConnectedAsync()
@@ -84,13 +86,15 @@ public class ChatHub : ColirHub, IChatHub
         {
             Context.Abort();
         }
+
+        await base.OnConnectedAsync();
     }
 
     public override Task OnDisconnectedAsync(Exception? exception)
     {
         ConnectionsToGroupsMapping.Remove(Context.ConnectionId, out _);
         ConnectedUsers.RemoveWhere(x => x.ConnectionId == Context.ConnectionId);
-        return Task.CompletedTask;
+        return base.OnDisconnectedAsync(exception);
     }
 
     /// <inheritdoc cref="IChatHub.GetMessages"/>
@@ -312,6 +316,10 @@ public class ChatHub : ColirHub, IChatHub
         {
             return Error(new(ErrorCode.IssuerNotInTheRoom), true);
         }
+        catch (MessageNotFoundException)
+        {
+            return Error(new(ErrorCode.MessageNotFound));
+        }
         catch (NotEnoughPermissionsException)
         {
             return Error(new(ErrorCode.YouAreNotAuthorOfMessage));
@@ -347,6 +355,10 @@ public class ChatHub : ColirHub, IChatHub
         catch (IssuerNotInRoomException)
         {
             return Error(new(ErrorCode.IssuerNotInTheRoom), true);
+        }
+        catch (MessageNotFoundException)
+        {
+            return Error(new(ErrorCode.MessageNotFound));
         }
         catch (NotEnoughPermissionsException)
         {
@@ -431,7 +443,7 @@ public class ChatHub : ColirHub, IChatHub
         }
     }
 
-    private void OnUserKicked((int hexId, string roomGuid) data)
+    private static void OnUserKickedOrLeft((int hexId, string roomGuid) data)
     {
         var connectionIds = ConnectedUsers.Where(x => x.HexId == data.hexId && x.RoomGuid == data.roomGuid).Select(c => c.ConnectionId);
 
@@ -441,15 +453,13 @@ public class ChatHub : ColirHub, IChatHub
         }
     }
 
-    /// <summary>
-    /// Disconnects the user
-    /// </summary>
-    private void Disconnect(string connectionId)
+    private static void OnUserDeletedAccount(int hexId)
     {
-        var all = GetConnectedClients();
-        if (all.TryGetValue(connectionId, out var connection))
+        var connectionIds = ConnectedUsers.Where(x => x.HexId == hexId).Select(c => c.ConnectionId);
+
+        foreach (var connectionId in connectionIds)
         {
-            connection.Abort();
+            Disconnect(connectionId);
         }
     }
 }

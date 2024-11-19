@@ -8,6 +8,7 @@ using Colir.Exceptions;
 using Colir.Exceptions.NotEnoughPermissions;
 using Colir.Exceptions.NotFound;
 using Colir.Hubs.Abstract;
+using Colir.Interfaces.ApiRelatedServices;
 using Colir.Interfaces.Hubs;
 using Colir.Misc.ExtensionMethods;
 using Microsoft.AspNetCore.Authorization;
@@ -25,9 +26,12 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
     private static readonly ConcurrentDictionary<string, string> ConnectionsToGroupsMapping = new();
     private static readonly ConcurrentDictionary<string, VoiceChatUser> VoiceChatUsers = new();
 
-    public VoiceChatHub(IRoomService roomService)
+    public VoiceChatHub(IRoomService roomService, IEventService eventService)
     {
         _roomService = roomService;
+        eventService.UserKicked += OnUserKickedOrLeft;
+        eventService.UserLeftRoom += OnUserKickedOrLeft;
+        eventService.UserDeletedAccount += OnUserDeletedAccount;
     }
 
     public override async Task OnConnectedAsync()
@@ -63,6 +67,8 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
         {
             Context.Abort();
         }
+
+        await base.OnConnectedAsync();
     }
 
     public override Task OnDisconnectedAsync(Exception? exception)
@@ -76,7 +82,7 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
         ConnectionsToGroupsMapping.TryRemove(Context.ConnectionId, out _);
         VoiceChatUsers.TryRemove(Context.ConnectionId, out _);
 
-        return Task.CompletedTask;
+        return base.OnDisconnectedAsync(exception);
     }
 
     /// <inheritdoc cref="IVoiceChatHub.GetVoiceChatUsers"/>
@@ -314,5 +320,25 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
 
         user.WatchedStreams.Remove(userHexId);
         return Success();
+    }
+
+    private static void OnUserKickedOrLeft((int hexId, string roomGuid) data)
+    {
+        var connectionIds = VoiceChatUsers.Values.Where(u => u.HexId == data.hexId && u.RoomGuid == data.roomGuid);
+
+        foreach (var user in connectionIds)
+        {
+            Disconnect(user.ConnectionId);
+        }
+    }
+
+    private static void OnUserDeletedAccount(int hexId)
+    {
+        var connectionIds = VoiceChatUsers.Values.Where(u => u.HexId == hexId);
+
+        foreach (var user in connectionIds)
+        {
+            Disconnect(user.ConnectionId);
+        }
     }
 }
