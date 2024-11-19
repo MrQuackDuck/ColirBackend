@@ -12,7 +12,7 @@ public class LoggingHubFilter(ILogger<LoggingHubFilter> logger) : IHubFilter
     /// <summary>
     /// List of methods that should be ignored due to their high frequency
     /// </summary>
-    private static string[] MethodNameblackList = new[]
+    private static string[] _methodNameblackList = new[]
     {
         nameof(VoiceChatHub.SendVoiceSignal),
         nameof(VoiceChatHub.SendVideoSignal),
@@ -21,7 +21,7 @@ public class LoggingHubFilter(ILogger<LoggingHubFilter> logger) : IHubFilter
 
     public async ValueTask<object?> InvokeMethodAsync(HubInvocationContext invocationContext, Func<HubInvocationContext, ValueTask<object?>> next)
     {
-        if (MethodNameblackList.Contains(invocationContext.HubMethodName))
+        if (_methodNameblackList.Contains(invocationContext.HubMethodName))
         {
             return await next(invocationContext);
         }

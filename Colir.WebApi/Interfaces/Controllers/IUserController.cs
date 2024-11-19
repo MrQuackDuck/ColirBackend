@@ -1,4 +1,5 @@
 ﻿using Colir.BLL.Models;
+using Colir.Communication.RequestModels.User;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Colir.Interfaces.Controllers;
@@ -20,6 +21,12 @@ public interface IUserController
     /// </summary>
     /// <param name="newSettings">New settings to set</param>
     Task<ActionResult> ChangeSettings(UserSettingsModel newSettings);
+
+    /// <summary>
+    /// Changes the name of the user and notifies users in common rooms with the "UserRenamed" signal
+    /// </summary>
+    /// <param name="model">New name to set</param>
+    Task<ActionResult> ChangeUsername(ChangeUsernameModel model);
 
     /// <summary>
     /// Deletes the account
