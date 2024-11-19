@@ -30,7 +30,7 @@ public interface IRoomController
     /// <summary>
     /// Gets the last time a user read chat in certain room
     /// </summary>
-    Task<ActionResult<DateTime>> GetLastTimeReadChatModel(GetLastTimeReadChatModel model);
+    Task<ActionResult<DateTime>> GetLastTimeReadChat(GetLastTimeReadChatModel model);
 
     /// <summary>
     /// Updates the last time the user read chat in certain room

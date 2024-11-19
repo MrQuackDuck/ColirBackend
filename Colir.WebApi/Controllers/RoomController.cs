@@ -172,9 +172,9 @@ public class RoomController : ControllerBase, IRoomController
         }
     }
 
-    /// <inheritdoc cref="IRoomController.GetLastTimeReadChatModel"/>
+    /// <inheritdoc cref="IRoomController.GetLastTimeReadChat"/>
     [HttpGet]
-    public async Task<ActionResult<DateTime>> GetLastTimeReadChatModel(GetLastTimeReadChatModel model)
+    public async Task<ActionResult<DateTime>> GetLastTimeReadChat([FromQuery]GetLastTimeReadChatModel model)
     {
         try
         {
