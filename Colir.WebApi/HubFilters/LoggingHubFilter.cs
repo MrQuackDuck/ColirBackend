@@ -30,11 +30,14 @@ public class LoggingHubFilter(ILogger<LoggingHubFilter> logger) : IHubFilter
         var result = await next(invocationContext);
         stopwatch.Stop();
 
+        var ramUsageInMb = Process.GetCurrentProcess().PrivateMemorySize64 / 1024 / 1024;
+
         logger.LogInformation(
-            "Hub: {Hub} - Method: {Method} - Elapsed time: {Duration}ms",
+            "Hub: {Hub} - Method: {Method} - Elapsed time: {Duration}ms - RAM Usage: {RamUsage} Mb",
             invocationContext.Hub.GetType().Name,
             invocationContext.HubMethodName,
-            stopwatch.ElapsedMilliseconds);
+            stopwatch.ElapsedMilliseconds,
+            ramUsageInMb);
 
         return result;
     }

@@ -47,8 +47,10 @@ public class RequestLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggi
             responseBody.Position = 0;
             await responseBody.CopyToAsync(originalBodyStream);
 
+            var ramUsageInMb = Process.GetCurrentProcess().PrivateMemorySize64 / 1024 / 1024;
+
             logger.LogInformation(
-                "Request: [{Method}] {Url} - Status: {StatusCode} - Elapsed time: {Duration}ms\n" +
+                "Request: [{Method}] {Url} - Status: {StatusCode} - Elapsed time: {Duration}ms - RAM Usage: {RamUsage} Mb\n" +
                 "Request Body: {RequestBody}\n" +
                 "Request Size: {RequestSize} Kb\n" +
                 "Response Size: {ResponseSize} Kb",
@@ -56,6 +58,7 @@ public class RequestLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggi
                 context.Request.Path,
                 context.Response.StatusCode,
                 stopwatch.ElapsedMilliseconds,
+                ramUsageInMb,
                 requestBody.Length == 0 ? "<empty>" : requestBody,
                 requestSizeKb,
                 responseSizeKb);
