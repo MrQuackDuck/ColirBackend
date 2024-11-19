@@ -11,6 +11,7 @@ public abstract class ColirHub : Hub
 {
     /// <summary>
     /// Dictionary of connected clients (used to implement custom <see cref="Disconnect"/> method)
+    /// The key is a connection ID and the value is a <see cref="HubCallerContext"/>
     /// </summary>
     protected static readonly ConcurrentDictionary<string, HubCallerContext> ConnectedClients = new();
 
@@ -98,7 +99,7 @@ public abstract class ColirHub : Hub
     }
 
     /// <summary>
-    /// Disconnects the user
+    /// Disconnects the user from the hub by connection ID
     /// </summary>
     protected static void Disconnect(string connectionId)
     {
