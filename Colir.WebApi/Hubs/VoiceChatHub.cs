@@ -31,7 +31,8 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
         _roomService = roomService;
         eventService.UserKicked += OnUserKickedOrLeft;
         eventService.UserLeftRoom += OnUserKickedOrLeft;
-        eventService.UserDeletedAccount += OnUserDeletedAccount;
+        eventService.UserDeletedAccount += OnUserDeletedAccountOrLoggedOut;
+        eventService.UserLoggedOut += OnUserDeletedAccountOrLoggedOut;
     }
 
     public override async Task OnConnectedAsync()
@@ -332,7 +333,7 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
         }
     }
 
-    private static void OnUserDeletedAccount(int hexId)
+    private static void OnUserDeletedAccountOrLoggedOut(int hexId)
     {
         var connectionIds = VoiceChatUsers.Values.Where(u => u.HexId == hexId);
 

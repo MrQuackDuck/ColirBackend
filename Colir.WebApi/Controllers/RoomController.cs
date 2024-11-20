@@ -210,7 +210,8 @@ public class RoomController : ControllerBase, IRoomController
             var request = new RequestToUpdateLastTimeUserReadChat
             {
                 IssuerId = this.GetIssuerId(),
-                RoomGuid = model.RoomGuid
+                RoomGuid = model.RoomGuid,
+                LastTimeRead = model.LastTimeRead
             };
 
             await _roomService.UpdateLastTimeUserReadChatAsync(request);
@@ -258,7 +259,7 @@ public class RoomController : ControllerBase, IRoomController
                 // Start a task to abort the connection with target user after some time
                 _ = Task.Run(async () =>
                 {
-                    await Task.Delay(TimeSpan.FromMilliseconds(700));
+                    await Task.Delay(TimeSpan.FromMilliseconds(400));
                     _eventService.OnUserKicked(request.TargetHexId, request.RoomGuid);
                 });
             }

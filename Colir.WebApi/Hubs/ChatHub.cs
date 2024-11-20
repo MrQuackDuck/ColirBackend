@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Colir.BLL.Interfaces;
+using Colir.BLL.Models;
 using Colir.BLL.RequestModels.Message;
 using Colir.BLL.RequestModels.Room;
 using Colir.Communication.Enums;
@@ -40,7 +41,8 @@ public class ChatHub : ColirHub, IChatHub
         _unitOfWork = unitOfWork;
         eventService.UserKicked += OnUserKickedOrLeft;
         eventService.UserLeftRoom += OnUserKickedOrLeft;
-        eventService.UserDeletedAccount += OnUserDeletedAccount;
+        eventService.UserDeletedAccount += OnUserDeletedAccountOrLoggedOut;
+        eventService.UserLoggedOut += OnUserDeletedAccountOrLoggedOut;
     }
 
     public override async Task OnConnectedAsync()
@@ -112,16 +114,8 @@ public class ChatHub : ColirHub, IChatHub
             RoomGuid = roomGuid
         };
 
-        var requestToUpdateLastTimeUserReadChat = new RequestToUpdateLastTimeUserReadChat
-        {
-            IssuerId = this.GetIssuerId(),
-            RoomGuid = roomGuid
-        };
-
         try
         {
-            await _roomService.UpdateLastTimeUserReadChatAsync(requestToUpdateLastTimeUserReadChat);
-
             return Success(await _messageService.GetLastMessagesAsync(requestToGetLastMessages));
         }
         catch (IssuerNotInRoomException)
@@ -199,6 +193,40 @@ public class ChatHub : ColirHub, IChatHub
         catch (ArgumentException)
         {
             return Error(new(ErrorCode.MessageNotFound));
+        }
+    }
+
+    /// <inheritdoc cref="IChatHub.GetUnreadRepliesAsync"/>
+    public async Task<SignalRHubResult> GetUnreadRepliesAsync()
+    {
+        var request = new RequestToGetUnreadReplies
+        {
+            IssuerId = this.GetIssuerId(),
+            RoomGuid = ConnectionsToGroupsMapping[Context.ConnectionId]
+        };
+
+        try
+        {
+            return Success(await _messageService.GetUnreadRepliesAsync(request));
+        }
+        catch (NotFoundException)
+        {
+            return Success(new List<MessageModel>());
+        }
+        catch (IssuerNotInRoomException)
+        {
+            return Error(new(ErrorCode.IssuerNotInTheRoom), true);
+        }
+        catch (RoomExpiredException)
+        {
+            try
+            {
+                return Error(new(ErrorCode.RoomExpired), true);
+            }
+            finally
+            {
+                await _roomService.DeleteAllExpiredAsync();
+            }
         }
     }
 
@@ -453,7 +481,7 @@ public class ChatHub : ColirHub, IChatHub
         }
     }
 
-    private static void OnUserDeletedAccount(int hexId)
+    private static void OnUserDeletedAccountOrLoggedOut(int hexId)
     {
         var connectionIds = ConnectedUsers.Where(x => x.HexId == hexId).Select(c => c.ConnectionId);
 

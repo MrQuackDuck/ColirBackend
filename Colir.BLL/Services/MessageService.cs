@@ -2,6 +2,7 @@
 using Colir.BLL.Interfaces;
 using Colir.BLL.Models;
 using Colir.BLL.RequestModels.Message;
+using Colir.BLL.RequestModels.Room;
 using Colir.Exceptions;
 using Colir.Exceptions.NotEnoughPermissions;
 using Colir.Exceptions.NotFound;
@@ -47,9 +48,9 @@ public class MessageService : IMessageService
             .Select(m =>
             {
                 var mapped = _mapper.Map<MessageModel>(m);
-                if (mapped.RepliedMessage != null && m.RepliedTo != null)
+                if (mapped.RepliedMessage != null && m.RepliedTo != null && m.RepliedTo.Author != null)
                 {
-                    mapped.RepliedMessage.AuthorHexId = m.RepliedTo.Author!.HexId;
+                    mapped.RepliedMessage.AuthorHexId = m.RepliedTo.Author.HexId;
                 }
                 mapped.RoomGuid = room.Guid;
                 return mapped;
@@ -86,9 +87,9 @@ public class MessageService : IMessageService
             {
                 var mapped = _mapper.Map<MessageModel>(m);
                 mapped.RoomGuid = room.Guid;
-                if (mapped.RepliedMessage != null && m.RepliedTo != null)
+                if (mapped.RepliedMessage != null && m.RepliedTo != null && m.RepliedTo.Author != null)
                 {
-                    mapped.RepliedMessage.AuthorHexId = m.RepliedTo.Author!.HexId;
+                    mapped.RepliedMessage.AuthorHexId = m.RepliedTo.Author.HexId;
                 }
                 return mapped;
             })
@@ -135,13 +136,69 @@ public class MessageService : IMessageService
             {
                 var mapped = _mapper.Map<MessageModel>(m);
                 mapped.RoomGuid = room.Guid;
-                if (mapped.RepliedMessage != null && m.RepliedTo != null)
+                if (mapped.RepliedMessage != null && m.RepliedTo != null && m.RepliedTo.Author != null)
                 {
-                    mapped.RepliedMessage.AuthorHexId = m.RepliedTo.Author!.HexId;
+                    mapped.RepliedMessage.AuthorHexId = m.RepliedTo.Author.HexId;
                 }
                 return mapped;
             })
             .ToList();
+    }
+
+    /// <inheritdoc cref="IMessageService.GetUnreadRepliesAsync"/>
+    public async Task<List<MessageModel>> GetUnreadRepliesAsync(RequestToGetUnreadReplies request)
+    {
+        // Check if the issuer exists. Otherwise, an exception will be thrown
+        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
+
+        var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
+
+        // If the room is expired
+        if (room.IsExpired())
+        {
+            throw new RoomExpiredException();
+        }
+
+        // If the issuer is not in the room
+        if (!room.JoinedUsers.Any(u => u.Id == request.IssuerId))
+        {
+            throw new IssuerNotInRoomException();
+        }
+
+        LastTimeUserReadChat lastTimeUserReadChat;
+        try
+        {
+            lastTimeUserReadChat = await _unitOfWork
+                .LastTimeUserReadChatRepository
+                .GetAsync(request.IssuerId, room.Id);
+        }
+        // If not found, create
+        catch (NotFoundException)
+        {
+            lastTimeUserReadChat = new LastTimeUserReadChat
+            {
+                UserId = request.IssuerId,
+                RoomId = room.Id,
+                Timestamp = DateTime.Now
+            };
+
+            await _unitOfWork.LastTimeUserReadChatRepository.AddAsync(lastTimeUserReadChat);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        return (await _unitOfWork
+            .MessageRepository
+            .GetAllRepliesToUserAfterDateAsync(request.RoomGuid, request.IssuerId, lastTimeUserReadChat.Timestamp))
+            .Select(m =>
+            {
+                var mapped = _mapper.Map<MessageModel>(m);
+                mapped.RoomGuid = room.Guid;
+                if (mapped.RepliedMessage != null && m.RepliedTo != null && m.RepliedTo.Author != null)
+                {
+                    mapped.RepliedMessage.AuthorHexId = m.RepliedTo.Author.HexId;
+                }
+                return mapped;
+            }).ToList();
     }
 
     /// <inheritdoc cref="IMessageService.GetMessageById"/>

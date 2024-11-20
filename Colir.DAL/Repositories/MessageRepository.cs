@@ -213,6 +213,38 @@ public class MessageRepository : IMessageRepository
     }
 
     /// <summary>
+    /// Gets all unread messages that have a reply to messages of the provided user
+    /// </summary>
+    /// <param name="roomGuid">Room GUID to get messages in</param>
+    /// <param name="userId">Id of the user to get replies to</param>
+    /// <param name="date">Date to get messages after</param>
+    /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found by provided GUID</exception>
+    /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
+    public async Task<List<Message>> GetAllRepliesToUserAfterDateAsync(string roomGuid, long userId, DateTime date)
+    {
+        var room = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Guid == roomGuid) ?? throw new RoomNotFoundException();
+
+        if (room.IsExpired())
+        {
+            throw new RoomExpiredException();
+        }
+
+        return await _dbContext.Messages
+            .AsNoTracking()
+            .Include(nameof(Message.Author))
+            .Include(nameof(Message.Attachments))
+            .Include(nameof(Message.RepliedTo))
+            .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Author))
+            .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Attachments))
+            .Include(nameof(Message.Reactions))
+            .Include(nameof(Message.Reactions) + "." + nameof(Reaction.Author))
+            .Where(m => m.RoomId == room.Id && m.RepliedMessageId != null && m.RepliedTo!.AuthorId == userId && m.PostDate > date)
+            .OrderBy(m => m.Id)
+            .AsSplitQuery()
+            .ToListAsync();
+    }
+
+    /// <summary>
     /// Adds the message to the DB
     /// </summary>
     /// <param name="message">Message to add</param>

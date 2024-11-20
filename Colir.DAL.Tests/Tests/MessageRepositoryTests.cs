@@ -90,7 +90,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     }
 
     [Test]
-    public async Task GetLastMessages_ThrowsMessageNotFoundException_WhenRoomWasNotFound()
+    public async Task GetLastMessages_ThrowsRoomNotFoundException_WhenRoomWasNotFound()
     {
         // Act
         AsyncTestDelegate act = async () =>
@@ -159,7 +159,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     }
 
     [Test]
-    public async Task GetMessagesRange_ThrowsMessageNotFoundException_WhenRoomWasNotFound()
+    public async Task GetMessagesRange_ThrowsRoomNotFoundException_WhenRoomWasNotFound()
     {
         // Act
         AsyncTestDelegate act = async () =>
@@ -230,6 +230,49 @@ public class MessageRepositoryTests : IMessageRepositoryTests
         // Act
         AsyncTestDelegate act = async () =>
             await _messageRepository.GetSurroundingMessages("12ffb712-aca7-416f-b899-8f9aaac6770f", 1, 1);
+
+        // Assert
+        Assert.ThrowsAsync<RoomExpiredException>(act);
+    }
+
+    [Test]
+    public async Task GetAllRepliesToUserAfterDateAsync_ReturnsAllReplies()
+    {
+        // Arrange
+        var expected = new List<Message>
+        {
+            _dbContext.Messages
+                .Include(nameof(Message.Author))
+                .Include(nameof(Message.Reactions))
+                .Include(nameof(Message.Attachments))
+                .FirstOrDefault(message => message.Id == 2)!
+        };
+
+        // Act
+        var result = await _messageRepository.GetAllRepliesToUserAfterDateAsync("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e", 1, DateTime.Now - new TimeSpan(1, 0, 0));
+
+        // Assert
+        Assert.That(result, Is.EqualTo(expected).Using(new MessageEqualityComparer()));
+    }
+
+    [Test]
+    public async Task GetAllRepliesToUserAfterDateAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound()
+    {
+        // Act
+        AsyncTestDelegate act = async () =>
+            await _messageRepository.GetAllRepliesToUserAfterDateAsync("00000000-0000-0000-0000-000000000000", 1, DateTime.Now);
+
+        // Assert
+        Assert.ThrowsAsync<RoomNotFoundException>(act);
+    }
+
+
+    [Test]
+    public async Task GetAllRepliesToUserAfterDateAsync_ThrowsRoomExpiredException_WhenRoomExpired()
+    {
+        // Act
+        AsyncTestDelegate act = async () =>
+            await _messageRepository.GetAllRepliesToUserAfterDateAsync("12ffb712-aca7-416f-b899-8f9aaac6770f", 1, DateTime.Now);
 
         // Assert
         Assert.ThrowsAsync<RoomExpiredException>(act);

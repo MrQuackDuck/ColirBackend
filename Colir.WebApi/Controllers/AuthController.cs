@@ -31,10 +31,11 @@ public class AuthController : ControllerBase, IAuthController
     private readonly IGoogleOAuth2Api _googleOAuth2Api;
     private readonly ITokenService _tokenService;
     private readonly IHubContext<ChatHub> _chatHub;
+    private readonly IEventService _eventService;
 
     public AuthController(IUserService userService, IConfiguration config, IOAuth2RegistrationQueueService registrationQueueService,
         IUnitOfWork unitOfWork, IGitHubOAuth2Api gitHubOAuth2Api, IGoogleOAuth2Api googleOAuth2Api, ITokenService tokenService,
-        IHubContext<ChatHub> chatHub)
+        IHubContext<ChatHub> chatHub, IEventService eventService)
     {
         _userService = userService;
         _config = config;
@@ -44,6 +45,7 @@ public class AuthController : ControllerBase, IAuthController
         _googleOAuth2Api = googleOAuth2Api;
         _tokenService = tokenService;
         _chatHub = chatHub;
+        _eventService = eventService;
     }
 
     [HttpGet]
@@ -138,8 +140,6 @@ public class AuthController : ControllerBase, IAuthController
             // Getting credentials from the configuration
             var googleClientId = _config["OAuth2:GoogleClientId"]!;
             var googleAuthSecret = _config["OAuth2:GoogleClientSecret"]!;
-
-            using var httpClient = new HttpClient();
 
             // Getting an access token
             var token = await _googleOAuth2Api.GetUserGoogleAccessTokenAsync(googleClientId, googleAuthSecret, code);
@@ -244,18 +244,35 @@ public class AuthController : ControllerBase, IAuthController
         try
         {
             // Delete the account if the request was issued by a user with anonymous auth type
-            var userId = this.GetIssuerId();
-            var user = await _userService.GetAccountInfo(new() { IssuerId = userId });
+            var issuerId = this.GetIssuerId();
+            var user = await _userService.GetAccountInfo(new() { IssuerId = issuerId });
             var authType = HttpContext.User.Claims.First(c => c.Type == "AuthType").Value;
+
+            // Getting the rooms the user joined
+            var joinedRooms = (await _userService
+                    .GetAccountInfo(new() { IssuerId = issuerId }))
+                .JoinedRooms;
+
             if (authType == UserAuthType.Anonymous.ToString())
             {
-                await _userService.DeleteAccount(new() { IssuerId = userId });
+                await _userService.DeleteAccount(new() { IssuerId = issuerId });
+
+                // Notifying users in the Chat hub that the user was deleted
+                foreach (var room in joinedRooms)
+                {
+                    await _chatHub.Clients.Group(room.Guid).SendAsync("UserDeleted", issuerId);
+                }
+                _eventService.OnUserDeletedAccount(this.GetIssuerHexId());
 
                 // Notifying that the user left from everywhere
                 foreach (var room in user.JoinedRooms)
                 {
                     await _chatHub.Clients.Group(room.Guid).SendAsync("UserLeft", this.GetIssuerHexId());
                 }
+            }
+            else
+            {
+                _eventService.OnUserLoggedOut(this.GetIssuerHexId());
             }
 
             Response.Cookies.Delete("jwt");

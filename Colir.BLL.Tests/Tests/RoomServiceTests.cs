@@ -545,6 +545,31 @@ public class RoomServiceTests : IRoomServiceTests
     }
 
     [Test]
+    public async Task UpdateLastTimeUserReadChatAsync_UpdatesLastTimeUserReadChatWithNewDateProvided()
+    {
+        // Arrange
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
+        var request = new RequestToUpdateLastTimeUserReadChat
+        {
+            IssuerId = 1,
+            RoomGuid = room.Guid,
+            LastTimeRead = new DateTime(2022, 1, 1)
+        };
+
+        // Act
+        await _roomService.UpdateLastTimeUserReadChatAsync(request);
+
+        var lastTimeUserReadChat =
+            (await _dbContext
+                .LastTimeUserReadChats
+                .FirstAsync(l => l.UserId == 1 && l.RoomId == room.Id))
+            .Timestamp;
+
+        // Assert
+        Assert.That(lastTimeUserReadChat == new DateTime(2022, 1, 1));
+    }
+
+    [Test]
     public async Task UpdateLastTimeUserReadChatAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound()
     {
         // Arrange

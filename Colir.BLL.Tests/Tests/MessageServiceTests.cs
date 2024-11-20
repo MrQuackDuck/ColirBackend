@@ -1,5 +1,6 @@
 ﻿using Colir.BLL.Models;
 using Colir.BLL.RequestModels.Message;
+using Colir.BLL.RequestModels.Room;
 using Colir.BLL.Services;
 using Colir.BLL.Tests.Interfaces;
 using Colir.BLL.Tests.Utils;
@@ -404,6 +405,88 @@ public class MessageServiceTests : IMessageServiceTests
 
         // Act
         AsyncTestDelegate act = async () => await _messageService.GetMessagesRangeAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<IssuerNotInRoomException>(act);
+    }
+
+    public async Task GetUnreadRepliesAsync_ReturnsUnreadReplies()
+    {
+        // Arrange
+        var expected = new List<MessageModel>
+        {
+            _dbContext.Messages
+                .AsNoTracking()
+                .Include(nameof(Message.Room))
+                .Include(nameof(Message.Author))
+                .Include(nameof(Message.RepliedTo))
+                .Include(nameof(Message.Attachments))
+                .Include(nameof(Message.Reactions))
+                .First(m => m.Id == 2).ToMessageModel()
+        };
+
+        (await _dbContext.LastTimeUserReadChats.FirstAsync(l => l.UserId == 1)).Timestamp = DateTime.Now - TimeSpan.FromDays(1);
+        await _dbContext.SaveChangesAsync();
+
+        var request = new RequestToGetUnreadReplies
+        {
+            IssuerId = 1,
+            RoomGuid = "cbaa8673-ea8b-43f8-b4cc-b8b0797b620e"
+        };
+
+        // Act
+        var result = await _messageService.GetUnreadRepliesAsync(request);
+
+        // Assert
+        Assert.That(result, Is.EqualTo(expected).Using(new MessageModelEqualityComparer()));
+    }
+
+    [Test]
+    public async Task GetUnreadRepliesAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
+    {
+        // Arrange
+        var request = new RequestToGetUnreadReplies
+        {
+            IssuerId = 404,
+            RoomGuid = "cbaa8673-ea8b-43f8-b4cc-b8b0797b620e"
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.GetUnreadRepliesAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<UserNotFoundException>(act);
+    }
+
+    [Test]
+    public async Task GetUnreadRepliesAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound()
+    {
+        // Arrange
+        var request = new RequestToGetUnreadReplies
+        {
+            IssuerId = 1,
+            RoomGuid = "404"
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.GetUnreadRepliesAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<RoomNotFoundException>(act);
+    }
+
+    [Test]
+    public async Task GetUnreadRepliesAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom()
+    {
+        // Arrange
+        var request = new RequestToGetUnreadReplies
+        {
+            IssuerId = 3,
+            RoomGuid = "cbaa8673-ea8b-43f8-b4cc-b8b0797b620e"
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.GetUnreadRepliesAsync(request);
 
         // Assert
         Assert.ThrowsAsync<IssuerNotInRoomException>(act);

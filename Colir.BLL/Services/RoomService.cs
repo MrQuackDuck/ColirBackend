@@ -195,7 +195,8 @@ public class RoomService : IRoomService
         {
             var lastTimeUserReadChat =
                 await _unitOfWork.LastTimeUserReadChatRepository.GetAsync(request.IssuerId, room.Id);
-            lastTimeUserReadChat.Timestamp = DateTime.Now;
+
+            lastTimeUserReadChat.Timestamp = request.LastTimeRead ?? DateTime.Now;
             _unitOfWork.LastTimeUserReadChatRepository.Update(lastTimeUserReadChat);
         }
         // If not found, create

@@ -22,6 +22,11 @@ public interface IMessageServiceTests
 	Task GetMessagesRangeAsync_ThrowsMessageNotFoundException_WhenEndIdIsNotInRoom();
 	Task GetMessagesRangeAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom();
 
+	Task GetUnreadRepliesAsync_ReturnsUnreadReplies();
+	Task GetUnreadRepliesAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
+	Task GetUnreadRepliesAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
+	Task GetUnreadRepliesAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom();
+
 	Task GetMessageById_ReturnsCorrectMessage();
 	Task GetMessageById_ThrowsMessageNotFoundException_WhenNotFound();
 	Task GetMessageById_ThrowsRoomExpiredException_WhenRoomExpired();

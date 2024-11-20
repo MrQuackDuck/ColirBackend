@@ -1,5 +1,6 @@
 ﻿using Colir.BLL.Models;
 using Colir.BLL.RequestModels.Message;
+using Colir.BLL.RequestModels.Room;
 using Colir.Exceptions;
 using Colir.Exceptions.NotEnoughPermissions;
 using Colir.Exceptions.NotFound;
@@ -42,6 +43,16 @@ public interface IMessageService
     /// <exception cref="MessageNotFoundException">Thrown when the message wasn't found or the startId or endId is not in the room</exception>
     /// <exception cref="ArgumentException">Thrown when the startId or endId is less than zero</exception>
     Task <List<MessageModel>> GetMessagesRangeAsync(RequestToGetMessagesRange request);
+
+    /// <summary>
+    /// Gets all unread messages that have a reply to messages of the issuer
+    /// Unreadness is determined by the last time the issuer read the chat
+    /// </summary>
+    /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
+    /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
+    /// <exception cref="NotFoundException">Thrown the issuer haven't ever read the chat</exception>
+    Task<List<MessageModel>> GetUnreadRepliesAsync(RequestToGetUnreadReplies request);
 
     /// <summary>
     /// Gets the message by id
