@@ -193,8 +193,7 @@ public class RoomService : IRoomService
 
         try
         {
-            var lastTimeUserReadChat =
-                await _unitOfWork.LastTimeUserReadChatRepository.GetAsync(request.IssuerId, room.Id);
+            var lastTimeUserReadChat = await _unitOfWork.LastTimeUserReadChatRepository.GetAsync(request.IssuerId, room.Id);
 
             lastTimeUserReadChat.Timestamp = request.LastTimeRead ?? DateTime.Now;
             _unitOfWork.LastTimeUserReadChatRepository.Update(lastTimeUserReadChat);
