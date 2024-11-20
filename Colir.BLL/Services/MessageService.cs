@@ -47,9 +47,9 @@ public class MessageService : IMessageService
             .Select(m =>
             {
                 var mapped = _mapper.Map<MessageModel>(m);
-                if (mapped.RepliedMessage != null)
+                if (mapped.RepliedMessage != null && m.RepliedTo != null)
                 {
-                    mapped.RepliedMessage.AuthorHexId = m.RepliedTo!.Author!.HexId;
+                    mapped.RepliedMessage.AuthorHexId = m.RepliedTo.Author!.HexId;
                 }
                 mapped.RoomGuid = room.Guid;
                 return mapped;
@@ -86,9 +86,9 @@ public class MessageService : IMessageService
             {
                 var mapped = _mapper.Map<MessageModel>(m);
                 mapped.RoomGuid = room.Guid;
-                if (mapped.RepliedMessage != null)
+                if (mapped.RepliedMessage != null && m.RepliedTo != null)
                 {
-                    mapped.RepliedMessage.AuthorHexId = m.RepliedTo!.Author!.HexId;
+                    mapped.RepliedMessage.AuthorHexId = m.RepliedTo.Author!.HexId;
                 }
                 return mapped;
             })
@@ -135,9 +135,9 @@ public class MessageService : IMessageService
             {
                 var mapped = _mapper.Map<MessageModel>(m);
                 mapped.RoomGuid = room.Guid;
-                if (mapped.RepliedMessage != null)
+                if (mapped.RepliedMessage != null && m.RepliedTo != null)
                 {
-                    mapped.RepliedMessage.AuthorHexId = m.RepliedTo!.Author!.HexId;
+                    mapped.RepliedMessage.AuthorHexId = m.RepliedTo.Author!.HexId;
                 }
                 return mapped;
             })
@@ -173,7 +173,7 @@ public class MessageService : IMessageService
     public async Task<MessageModel> SendAsync(RequestToSendMessage request)
     {
         // Check if the message is not empty
-        if (request.Content.Length == 0 && (request.AttachmentsIds == null ? true : request.AttachmentsIds.Count == 0))
+        if (request.Content.Length == 0 && (request.AttachmentsIds == null || request.AttachmentsIds.Count == 0))
         {
             throw new ArgumentException("Message can't be empty!");
         }
