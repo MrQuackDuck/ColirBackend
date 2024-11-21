@@ -114,9 +114,10 @@ public class UserController : ControllerBase, IUserController
                 .JoinedRooms;
 
             // Notifying users in the Chat hub that the user was renamed
+            var hexId = this.GetIssuerHexId();
             foreach (var room in joinedRooms)
             {
-                await _chatHub.Clients.Group(room.Guid).SendAsync("UserRenamed", (issuerId, model.NewName));
+                await _chatHub.Clients.Group(room.Guid).SendAsync("UserRenamed", new { hexId, model.NewName });
             }
 
             return Ok(await _userService.ChangeUsernameAsync(request));
