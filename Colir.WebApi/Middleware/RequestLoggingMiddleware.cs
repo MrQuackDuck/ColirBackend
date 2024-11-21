@@ -14,7 +14,7 @@ public class RequestLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggi
             await next(context);
             return;
         }
-        
+
         var stopwatch = Stopwatch.StartNew();
 
         double requestSizeKb = Math.Round((context.Request.ContentLength ?? 0) / 1024.0, 2);
@@ -62,7 +62,7 @@ public class RequestLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggi
 
         var path = context.Request.Path.Value?.ToLowerInvariant();
         if (path != null && (path.Contains("/api/chat") || path.Contains("/api/voicechat"))) return true;
-        
+
         return false;
     }
 }

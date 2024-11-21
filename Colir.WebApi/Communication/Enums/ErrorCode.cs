@@ -7,7 +7,7 @@ public enum ErrorCode
 {
     AttachmentNotFound,
     EmptyMessage,
-    InvalidActionException,
+    InvalidAction,
     InvalidDate,
     IssuerNotInTheRoom,
     MessageNotFound,

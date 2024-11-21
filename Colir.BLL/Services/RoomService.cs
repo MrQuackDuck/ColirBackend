@@ -175,8 +175,8 @@ public class RoomService : IRoomService
         return result.Timestamp;
     }
 
-    /// <inheritdoc cref="IRoomService.UpdateLastTimeUserReadChatAsync"/>
-    public async Task UpdateLastTimeUserReadChatAsync(RequestToUpdateLastTimeUserReadChat request)
+    /// <inheritdoc cref="IRoomService.UpdateLastReadMessageByUser"/>
+    public async Task UpdateLastReadMessageByUser(RequestToUpdateLastReadMessageByUser request)
     {
         // Check if the issuer exists (otherwise, an exception will be thrown)
         await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
@@ -191,14 +191,31 @@ public class RoomService : IRoomService
 
         var transaction = _unitOfWork.BeginTransaction();
 
+        DateTime newDate;
+
+        if (request.MessageId == null)
+        {
+            newDate = DateTime.Now;
+        }
+        else
+        {
+            var message = await _unitOfWork.MessageRepository.GetByIdAsync(request.MessageId.Value);
+            newDate = message.PostDate;
+        }
+
         try
         {
             var lastTimeUserReadChat = await _unitOfWork.LastTimeUserReadChatRepository.GetAsync(request.IssuerId, room.Id);
 
-            lastTimeUserReadChat.Timestamp = request.LastTimeRead ?? DateTime.Now;
+            if (lastTimeUserReadChat.Timestamp > newDate)
+            {
+                throw new InvalidActionException();
+            }
+
+            lastTimeUserReadChat.Timestamp = newDate;
             _unitOfWork.LastTimeUserReadChatRepository.Update(lastTimeUserReadChat);
         }
-        // If not found, create
+        // If the last time was not found, create it
         catch (NotFoundException)
         {
             var lastTimeUserReadChat = new LastTimeUserReadChat

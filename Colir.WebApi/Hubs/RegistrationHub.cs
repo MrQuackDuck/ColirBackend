@@ -104,7 +104,7 @@ public class RegistrationHub : ColirHub, IRegistrationHub
     public SignalRHubResult ChooseHex(int hex)
     {
         if (!HexsToOffer[Context.ConnectionId].Contains(hex))
-            return Error(new(ErrorCode.InvalidActionException));
+            return Error(new(ErrorCode.InvalidAction));
 
         ChosenHexs[Context.ConnectionId] = hex;
         return Success();
@@ -121,10 +121,10 @@ public class RegistrationHub : ColirHub, IRegistrationHub
     public async Task<SignalRHubResult> FinishRegistration()
     {
         if (!ChosenHexs.ContainsKey(Context.ConnectionId))
-            return Error(new(ErrorCode.InvalidActionException, "You haven't chosen the hex id yet!"));
+            return Error(new(ErrorCode.InvalidAction, "You haven't chosen the hex id yet!"));
 
         if (!ChosenUsernames.ContainsKey(Context.ConnectionId))
-            return Error(new(ErrorCode.InvalidActionException, "You haven't chosen the username yet!"));
+            return Error(new(ErrorCode.InvalidAction, "You haven't chosen the username yet!"));
 
         var userOAuthId = UsersData[Context.ConnectionId].OAuth2UserId;
         var userAuthType = UsersData[Context.ConnectionId].AuthType;
@@ -157,7 +157,7 @@ public class RegistrationHub : ColirHub, IRegistrationHub
         }
 
         if (resultUserModel == null)
-            return Error(new ErrorResponse(ErrorCode.InvalidActionException, "Something went wrong!"));
+            return Error(new ErrorResponse(ErrorCode.InvalidAction, "Something went wrong!"));
 
         var jwtToken = _tokenService.GenerateJwtToken(resultUserModel.Id, resultUserModel.HexId, resultUserModel.AuthType);
         var refreshToken = _tokenService.GenerateRefreshToken(jwtToken);

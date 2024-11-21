@@ -201,22 +201,30 @@ public class RoomController : ControllerBase, IRoomController
         }
     }
 
-    /// <inheritdoc cref="IRoomController.UpdateLastTimeReadChat"/>
+    /// <inheritdoc cref="IRoomController.UpdateLastReadMessage"/>
     [HttpPut]
-    public async Task<ActionResult> UpdateLastTimeReadChat(UpdateLastTimeReadChatModel model)
+    public async Task<ActionResult> UpdateLastReadMessage(UpdateLastReadMessageModel model)
     {
         try
         {
-            var request = new RequestToUpdateLastTimeUserReadChat
+            var request = new RequestToUpdateLastReadMessageByUser
             {
                 IssuerId = this.GetIssuerId(),
                 RoomGuid = model.RoomGuid,
-                LastTimeRead = model.LastTimeRead
+                MessageId = model.MessageId
             };
 
-            await _roomService.UpdateLastTimeUserReadChatAsync(request);
+            await _roomService.UpdateLastReadMessageByUser(request);
 
             return Ok();
+        }
+        catch (MessageNotFoundException)
+        {
+            return BadRequest(new ErrorResponse(ErrorCode.MessageNotFound));
+        }
+        catch (InvalidActionException)
+        {
+            return BadRequest(new ErrorResponse(ErrorCode.InvalidAction));
         }
         catch (RoomNotFoundException)
         {

@@ -197,10 +197,19 @@ public static class UnitTestHelper
             Id = 1,
             Room = defaultRoom, // "Room #1"
             User = user1, // "First User"
+            Timestamp = DateTime.Now - new TimeSpan(1, 0, 0),
+        };
+
+        var lastTimeSecondUserReadChat = new LastTimeUserReadChat
+        {
+            Id = 2,
+            Room = defaultRoom, // "Room #1"
+            User = user2, // "Second User"
             Timestamp = DateTime.Now
         };
 
         context.LastTimeUserReadChats.Add(lastTimeFirstUserReadChat);
+        context.LastTimeUserReadChats.Add(lastTimeSecondUserReadChat);
 
         // Save changes
         context.SaveChanges();

@@ -521,43 +521,20 @@ public class RoomServiceTests : IRoomServiceTests
     }
 
     [Test]
-    public async Task UpdateLastTimeUserReadChatAsync_UpdatesLastTimeUserReadChat()
+    public async Task UpdateLastReadMessageByUser_UpdatesLastTimeUserReadChatWithMessageProvided()
     {
         // Arrange
         var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
-        var request = new RequestToUpdateLastTimeUserReadChat
-        {
-            IssuerId = 1,
-            RoomGuid = room.Guid
-        };
-
-        // Act
-        await _roomService.UpdateLastTimeUserReadChatAsync(request);
-
-        var lastTimeUserReadChat =
-            (await _dbContext
-                .LastTimeUserReadChats
-                .FirstAsync(l => l.UserId == 1 && l.RoomId == room.Id))
-            .Timestamp;
-
-        // Assert (approximately)
-        Assert.That(DateTime.Now - lastTimeUserReadChat < TimeSpan.FromSeconds(1));
-    }
-
-    [Test]
-    public async Task UpdateLastTimeUserReadChatAsync_UpdatesLastTimeUserReadChatWithNewDateProvided()
-    {
-        // Arrange
-        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
-        var request = new RequestToUpdateLastTimeUserReadChat
+        var message = await _dbContext.Messages.FirstAsync(m => m.Id == 2);
+        var request = new RequestToUpdateLastReadMessageByUser
         {
             IssuerId = 1,
             RoomGuid = room.Guid,
-            LastTimeRead = new DateTime(2022, 1, 1)
+            MessageId = message.Id
         };
 
         // Act
-        await _roomService.UpdateLastTimeUserReadChatAsync(request);
+        await _roomService.UpdateLastReadMessageByUser(request);
 
         var lastTimeUserReadChat =
             (await _dbContext
@@ -566,57 +543,96 @@ public class RoomServiceTests : IRoomServiceTests
             .Timestamp;
 
         // Assert
-        Assert.That(lastTimeUserReadChat == new DateTime(2022, 1, 1));
+        Assert.That(lastTimeUserReadChat == message.PostDate);
     }
 
     [Test]
-    public async Task UpdateLastTimeUserReadChatAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound()
+    public async Task UpdateLastReadMessageByUser_ThrowsInvalidActionException_WhenOlderMessageWasProvided()
     {
         // Arrange
-        var request = new RequestToUpdateLastTimeUserReadChat
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
+        var message = await _dbContext.Messages.FirstAsync(m => m.Id == 1);
+        var request = new RequestToUpdateLastReadMessageByUser
+        {
+            IssuerId = 2,
+            RoomGuid = room.Guid,
+            MessageId = message.Id
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _roomService.UpdateLastReadMessageByUser(request);
+
+        // Assert
+        Assert.ThrowsAsync<InvalidActionException>(act);
+    }
+
+    [Test]
+    public async Task UpdateLastReadMessageByUser_ThrowsMessageNotFoundException_WhenMessageWasNotFound()
+    {
+        // Arrange
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
+        var request = new RequestToUpdateLastReadMessageByUser
+        {
+            IssuerId = 1,
+            RoomGuid = room.Guid,
+            MessageId = 404
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _roomService.UpdateLastReadMessageByUser(request);
+
+        // Assert
+        Assert.ThrowsAsync<MessageNotFoundException>(act);
+    }
+
+    [Test]
+    public async Task UpdateLastReadMessageByUser_ThrowsRoomNotFoundException_WhenRoomWasNotFound()
+    {
+        // Arrange
+        var request = new RequestToUpdateLastReadMessageByUser
         {
             IssuerId = 1,
             RoomGuid = "404"
         };
 
         // Act
-        AsyncTestDelegate act = async () => await _roomService.UpdateLastTimeUserReadChatAsync(request);
+        AsyncTestDelegate act = async () => await _roomService.UpdateLastReadMessageByUser(request);
 
         // Assert
         Assert.ThrowsAsync<RoomNotFoundException>(act);
     }
 
     [Test]
-    public async Task UpdateLastTimeUserReadChatAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom()
+    public async Task UpdateLastReadMessageByUser_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom()
     {
         // Arrange
         var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
-        var request = new RequestToUpdateLastTimeUserReadChat
+        var request = new RequestToUpdateLastReadMessageByUser
         {
             IssuerId = 3,
             RoomGuid = room.Guid
         };
 
         // Act
-        AsyncTestDelegate act = async () => await _roomService.UpdateLastTimeUserReadChatAsync(request);
+        AsyncTestDelegate act = async () => await _roomService.UpdateLastReadMessageByUser(request);
 
         // Assert
         Assert.ThrowsAsync<IssuerNotInRoomException>(act);
     }
 
     [Test]
-    public async Task UpdateLastTimeUserReadChatAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
+    public async Task UpdateLastReadMessageByUser_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
     {
         // Arrange
         var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
-        var request = new RequestToUpdateLastTimeUserReadChat
+        var request = new RequestToUpdateLastReadMessageByUser
         {
             IssuerId = 404,
             RoomGuid = room.Guid
         };
 
         // Act
-        AsyncTestDelegate act = async () => await _roomService.UpdateLastTimeUserReadChatAsync(request);
+        AsyncTestDelegate act = async () => await _roomService.UpdateLastReadMessageByUser(request);
 
         // Assert
         Assert.ThrowsAsync<UserNotFoundException>(act);

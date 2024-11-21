@@ -35,7 +35,7 @@ public interface IRoomController
     /// <summary>
     /// Updates the last time the user read chat in certain room
     /// </summary>
-    Task<ActionResult> UpdateLastTimeReadChat(UpdateLastTimeReadChatModel model);
+    Task<ActionResult> UpdateLastReadMessage(UpdateLastReadMessageModel model);
 
     /// <summary>
     /// Kicks the member from the room. Notifies users in <see cref="ChatHub"/> with the "UserKicked" signal

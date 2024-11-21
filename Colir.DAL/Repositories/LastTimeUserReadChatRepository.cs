@@ -150,7 +150,7 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
             throw new ArgumentException("You can't update last time user read chat with different room id!");
         }
 
-        if (originalEntity.Room.IsExpired())
+        if (originalEntity.Room!.IsExpired())
         {
             throw new RoomExpiredException();
         }

@@ -1,8 +1,8 @@
 ﻿namespace Colir.BLL.RequestModels.Room;
 
-public class RequestToUpdateLastTimeUserReadChat
+public class RequestToUpdateLastReadMessageByUser
 {
     public long IssuerId { get; set; }
     public string RoomGuid { get; set; } = default!;
-    public DateTime? LastTimeRead { get; set; }
+    public long? MessageId { get; set; }
 }

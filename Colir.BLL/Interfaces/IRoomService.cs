@@ -60,12 +60,14 @@ public interface IRoomService
     Task<DateTime> GetLastTimeUserReadChatAsync(RequestToGetLastTimeUserReadChat request);
 
     /// <summary>
-    /// Updates the last time user read the chat
+    /// Updates the last time user read the chat by message
     /// </summary>
+    /// <exception cref="InvalidActionException">Thrown when the older message was provided than the last read message</exception>
     /// <exception cref="RoomNotFoundException">Thrown when the room was not found</exception>
     /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
+    /// <exception cref="MessageNotFoundException">Thrown when the message was not found</exception>
     /// <exception cref="IssuerNotInRoomException">Thrown when issuer is not in the room</exception>
-    Task UpdateLastTimeUserReadChatAsync(RequestToUpdateLastTimeUserReadChat request);
+    Task UpdateLastReadMessageByUser(RequestToUpdateLastReadMessageByUser request);
 
     /// <summary>
     /// Joins a user to the room
