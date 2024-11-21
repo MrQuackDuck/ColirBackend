@@ -245,6 +245,7 @@ public class AuthController : ControllerBase, IAuthController
         {
             // Delete the account if the request was issued by a user with anonymous auth type
             var issuerId = this.GetIssuerId();
+            var issuerHexId = this.GetIssuerHexId();
             var user = await _userService.GetAccountInfo(new() { IssuerId = issuerId });
             var authType = HttpContext.User.Claims.First(c => c.Type == "AuthType").Value;
 
@@ -260,7 +261,7 @@ public class AuthController : ControllerBase, IAuthController
                 // Notifying users in the Chat hub that the user was deleted
                 foreach (var room in joinedRooms)
                 {
-                    await _chatHub.Clients.Group(room.Guid).SendAsync("UserDeleted", issuerId);
+                    await _chatHub.Clients.Group(room.Guid).SendAsync("UserDeleted", issuerHexId);
                 }
                 _eventService.OnUserDeletedAccount(this.GetIssuerHexId());
 

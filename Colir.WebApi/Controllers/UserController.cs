@@ -154,7 +154,7 @@ public class UserController : ControllerBase, IUserController
             // Notifying users in the Chat hub that the user was deleted
             foreach (var room in joinedRooms)
             {
-                await _chatHub.Clients.Group(room.Guid).SendAsync("UserDeleted", request.IssuerId);
+                await _chatHub.Clients.Group(room.Guid).SendAsync("UserDeleted", this.GetIssuerHexId());
             }
 
             _eventService.OnUserDeletedAccount(this.GetIssuerHexId());
