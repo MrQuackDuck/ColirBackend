@@ -260,8 +260,6 @@ public class MessageService : IMessageService
             repliedMessage = await _unitOfWork.MessageRepository.GetByIdAsync(request.ReplyMessageId ?? -1);
         }
 
-        var transaction = _unitOfWork.BeginTransaction();
-
         var messageToSend = new Message
         {
             Content = request.Content,
@@ -270,6 +268,8 @@ public class MessageService : IMessageService
             AuthorId = request.IssuerId,
             RepliedMessageId = request.ReplyMessageId
         };
+
+        var transaction = _unitOfWork.BeginTransaction();
 
         await _unitOfWork.MessageRepository.AddAsync(messageToSend);
 
@@ -298,8 +298,16 @@ public class MessageService : IMessageService
             _unitOfWork.UserStatisticsRepository.Update(issuer.UserStatistics);
         }
 
-        await _unitOfWork.SaveChangesAsync();
-        await transaction.CommitAsync();
+        try
+        {
+            await _unitOfWork.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
 
         var result = _mapper.Map<MessageModel>(messageToSend);
         result.AuthorHexId = issuer.HexId;
@@ -345,13 +353,10 @@ public class MessageService : IMessageService
             throw new NotEnoughPermissionsException();
         }
 
-        var transaction = _unitOfWork.BeginTransaction();
-
         message.Content = request.NewContent;
         _unitOfWork.MessageRepository.Update(message);
 
         await _unitOfWork.SaveChangesAsync();
-        await transaction.CommitAsync();
 
         return _mapper.Map<MessageModel>(message);
     }
@@ -393,8 +398,16 @@ public class MessageService : IMessageService
 
         _unitOfWork.MessageRepository.Delete(message);
 
-        await _unitOfWork.SaveChangesAsync();
-        await transaction.CommitAsync();
+        try
+        {
+            await _unitOfWork.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
     /// <inheritdoc cref="IMessageService.AddReaction"/>
@@ -422,8 +435,6 @@ public class MessageService : IMessageService
             throw new RoomExpiredException();
         }
 
-        var transaction = _unitOfWork.BeginTransaction();
-
         var reactionToAdd = new Reaction
         {
             AuthorId = issuer.Id,
@@ -431,21 +442,30 @@ public class MessageService : IMessageService
             Symbol = request.Reaction
         };
 
-        if (issuer.UserSettings.StatisticsEnabled)
+        var transaction = _unitOfWork.BeginTransaction();
+        try
         {
-            // Adding the info about sent message to statistics
-            issuer.UserStatistics.ReactionsSet += 1;
-            _unitOfWork.UserStatisticsRepository.Update(issuer.UserStatistics);
+            if (issuer.UserSettings.StatisticsEnabled)
+            {
+                // Adding the info about sent message to statistics
+                issuer.UserStatistics.ReactionsSet += 1;
+                _unitOfWork.UserStatisticsRepository.Update(issuer.UserStatistics);
+            }
+
+            await _unitOfWork.ReactionRepository.AddAsync(reactionToAdd);
+            await _unitOfWork.SaveChangesAsync();
+
+            message.Reactions.Add(reactionToAdd);
+            _unitOfWork.MessageRepository.Update(message);
+
+            await _unitOfWork.SaveChangesAsync();
+            await transaction.CommitAsync();
         }
-
-        await _unitOfWork.ReactionRepository.AddAsync(reactionToAdd);
-        await _unitOfWork.SaveChangesAsync();
-
-        message.Reactions.Add(reactionToAdd);
-        _unitOfWork.MessageRepository.Update(message);
-
-        await _unitOfWork.SaveChangesAsync();
-        await transaction.CommitAsync();
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
 
         reactionToAdd.Author = issuer;
         return _mapper.Map<MessageModel>(message);
@@ -478,22 +498,28 @@ public class MessageService : IMessageService
         }
 
         var transaction = _unitOfWork.BeginTransaction();
-
-        if (issuer.UserSettings.StatisticsEnabled)
+        try
         {
-            // Adding the info about sent message to statistics
-            issuer.UserStatistics.ReactionsSet += 1;
-            _unitOfWork.UserStatisticsRepository.Update(issuer.UserStatistics);
+            if (issuer.UserSettings.StatisticsEnabled)
+            {
+                // Adding the info about sent message to statistics
+                issuer.UserStatistics.ReactionsSet += 1;
+                _unitOfWork.UserStatisticsRepository.Update(issuer.UserStatistics);
+            }
+
+            message.Reactions.Remove(message.Reactions.First(r => r.Id == reaction.Id));
+
+            await _unitOfWork.ReactionRepository.DeleteByIdAsync(reaction.Id);
+            await _unitOfWork.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+
+            return _mapper.Map<MessageModel>(message);
         }
-
-        message.Reactions.Remove(message.Reactions.First(r => r.Id == reaction.Id));
-
-        await _unitOfWork.ReactionRepository.DeleteByIdAsync(reaction.Id);
-        await _unitOfWork.SaveChangesAsync();
-
-        await _unitOfWork.SaveChangesAsync();
-        await transaction.CommitAsync();
-
-        return _mapper.Map<MessageModel>(message);
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 }

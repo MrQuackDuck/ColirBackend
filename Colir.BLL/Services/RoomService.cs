@@ -52,58 +52,63 @@ public class RoomService : IRoomService
     /// <inheritdoc cref="IRoomService.CreateAsync"/>
     public async Task<RoomModel> CreateAsync(RequestToCreateRoom request)
     {
-        var transaction = _unitOfWork.BeginTransaction();
-
         var issuer = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
 
-        if (issuer.UserSettings.StatisticsEnabled)
+        var transaction = _unitOfWork.BeginTransaction();
+        try
         {
-            issuer.UserStatistics.RoomsCreated += 1;
-            _unitOfWork.UserStatisticsRepository.Update(issuer.UserStatistics);
+            if (issuer.UserSettings.StatisticsEnabled)
+            {
+                issuer.UserStatistics.RoomsCreated += 1;
+                _unitOfWork.UserStatisticsRepository.Update(issuer.UserStatistics);
+            }
+
+            if (request.ExpiryDate < DateTime.Now)
+            {
+                throw new ArgumentException("You can't create a room with an expiry date that is earlier than now!");
+            }
+
+            var roomToCreate = new Room
+            {
+                Name = request.Name,
+                Guid = Guid.NewGuid().ToString(),
+                OwnerId = request.IssuerId,
+                ExpiryDate = request.ExpiryDate
+            };
+
+            await _unitOfWork.RoomRepository.AddAsync(roomToCreate);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            // Joining the issuer to the room
+            issuer.JoinedRooms.Add(roomToCreate);
+            _unitOfWork.UserRepository.Update(issuer);
+
+            roomToCreate.JoinedUsers.Add(issuer);
+            _unitOfWork.RoomRepository.Update(roomToCreate);
+
+            await _unitOfWork.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            roomToCreate.JoinedUsers = roomToCreate.JoinedUsers.DistinctBy(u => u.Id).ToList();
+
+            var roomToCreateModel = _mapper.Map<RoomModel>(roomToCreate);
+
+            // Apply amount of occupied/free room storage
+            ApplyRoomStorage(roomToCreateModel);
+
+            return roomToCreateModel;
         }
-
-        if (request.ExpiryDate < DateTime.Now)
+        catch
         {
-            throw new ArgumentException("You can't create a room with an expiry date that is earlier than now!");
+            await transaction.RollbackAsync();
+            throw;
         }
-
-        var roomToCreate = new Room
-        {
-            Name = request.Name,
-            Guid = Guid.NewGuid().ToString(),
-            OwnerId = request.IssuerId,
-            ExpiryDate = request.ExpiryDate
-        };
-
-        await _unitOfWork.RoomRepository.AddAsync(roomToCreate);
-
-        await _unitOfWork.SaveChangesAsync();
-
-        // Joining the issuer to the room
-        issuer.JoinedRooms.Add(roomToCreate);
-        _unitOfWork.UserRepository.Update(issuer);
-
-        roomToCreate.JoinedUsers.Add(issuer);
-        _unitOfWork.RoomRepository.Update(roomToCreate);
-
-        await _unitOfWork.SaveChangesAsync();
-        await transaction.CommitAsync();
-
-        roomToCreate.JoinedUsers = roomToCreate.JoinedUsers.DistinctBy(u => u.Id).ToList();
-
-        var roomToCreateModel = _mapper.Map<RoomModel>(roomToCreate);
-
-        // Apply amount of occupied/free room storage
-        ApplyRoomStorage(roomToCreateModel);
-
-        return roomToCreateModel;
     }
 
     /// <inheritdoc cref="IRoomService.RenameAsync"/>
     public async Task RenameAsync(RequestToRenameRoom request)
     {
-        var transaction = _unitOfWork.BeginTransaction();
-
         // Check if the issuer exists (otherwise, an exception will be thrown)
         await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
 
@@ -114,18 +119,25 @@ public class RoomService : IRoomService
             throw new NotEnoughPermissionsException();
         }
 
-        room.Name = request.NewName;
-        _unitOfWork.RoomRepository.Update(room);
-        await _unitOfWork.SaveChangesAsync();
+        var transaction = _unitOfWork.BeginTransaction();
+        try
+        {
+            room.Name = request.NewName;
+            _unitOfWork.RoomRepository.Update(room);
+            await _unitOfWork.SaveChangesAsync();
 
-        await transaction.CommitAsync();
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
     /// <inheritdoc cref="IRoomService.DeleteAsync"/>
     public async Task DeleteAsync(RequestToDeleteRoom request)
     {
-        var transaction = _unitOfWork.BeginTransaction();
-
         // Check if the issuer exists (otherwise, an exception will be thrown)
         await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
 
@@ -137,10 +149,19 @@ public class RoomService : IRoomService
             throw new NotEnoughPermissionsException();
         }
 
-        _unitOfWork.RoomRepository.Delete(room);
-        await _unitOfWork.SaveChangesAsync();
+        var transaction = _unitOfWork.BeginTransaction();
+        try
+        {
+            _unitOfWork.RoomRepository.Delete(room);
+            await _unitOfWork.SaveChangesAsync();
 
-        await transaction.CommitAsync();
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
     /// <inheritdoc cref="IRoomService.DeleteAllExpiredAsync"/>
@@ -250,14 +271,22 @@ public class RoomService : IRoomService
 
         var transaction = _unitOfWork.BeginTransaction();
 
-        issuer.JoinedRooms.Add(roomToJoin);
-        _unitOfWork.UserRepository.Update(issuer);
+        try
+        {
+            issuer.JoinedRooms.Add(roomToJoin);
+            _unitOfWork.UserRepository.Update(issuer);
 
-        roomToJoin.JoinedUsers.Add(issuer);
-        _unitOfWork.RoomRepository.Update(roomToJoin);
+            roomToJoin.JoinedUsers.Add(issuer);
+            _unitOfWork.RoomRepository.Update(roomToJoin);
 
-        await _unitOfWork.SaveChangesAsync();
-        await transaction.CommitAsync();
+            await _unitOfWork.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
 
         roomToJoin.JoinedUsers = roomToJoin.JoinedUsers.DistinctBy(u => u.Id).ToList();
 
@@ -292,15 +321,22 @@ public class RoomService : IRoomService
         var roomToKickFrom = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
 
         var transaction = _unitOfWork.BeginTransaction();
+        try
+        {
+            userToKick.JoinedRooms.Remove(userToKick.JoinedRooms.First(r => r.Id == roomToKickFrom.Id));
+            _unitOfWork.UserRepository.Update(userToKick);
 
-        userToKick.JoinedRooms.Remove(userToKick.JoinedRooms.First(r => r.Id == roomToKickFrom.Id));
-        _unitOfWork.UserRepository.Update(userToKick);
+            roomToKickFrom.JoinedUsers.Remove(roomToKickFrom.JoinedUsers.First(u => u.Id == userToKick.Id));
+            _unitOfWork.RoomRepository.Update(roomToKickFrom);
 
-        roomToKickFrom.JoinedUsers.Remove(roomToKickFrom.JoinedUsers.First(u => u.Id == userToKick.Id));
-        _unitOfWork.RoomRepository.Update(roomToKickFrom);
-
-        await _unitOfWork.SaveChangesAsync();
-        await transaction.CommitAsync();
+            await _unitOfWork.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
     /// <inheritdoc cref="IRoomService.LeaveAsync"/>
@@ -318,15 +354,22 @@ public class RoomService : IRoomService
         var roomToKickFrom = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
 
         var transaction = _unitOfWork.BeginTransaction();
+        try
+        {
+            issuer.JoinedRooms.Remove(issuer.JoinedRooms.First(r => r.Id == roomToKickFrom.Id));
+            _unitOfWork.UserRepository.Update(issuer);
 
-        issuer.JoinedRooms.Remove(issuer.JoinedRooms.First(r => r.Id == roomToKickFrom.Id));
-        _unitOfWork.UserRepository.Update(issuer);
+            roomToKickFrom.JoinedUsers.Remove(roomToKickFrom.JoinedUsers.First(u => u.Id == issuer.Id));
+            _unitOfWork.RoomRepository.Update(roomToKickFrom);
 
-        roomToKickFrom.JoinedUsers.Remove(roomToKickFrom.JoinedUsers.First(u => u.Id == issuer.Id));
-        _unitOfWork.RoomRepository.Update(roomToKickFrom);
-
-        await _unitOfWork.SaveChangesAsync();
-        await transaction.CommitAsync();
+            await _unitOfWork.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
     /// <inheritdoc cref="IRoomService.ClearRoomAsync"/>

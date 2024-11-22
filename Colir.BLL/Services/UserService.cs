@@ -105,8 +105,6 @@ public class UserService : IUserService
     /// <inheritdoc cref="IUserService.AuthorizeAsAnnoymousAsync"/>
     public async Task<DetailedUserModel> AuthorizeAsAnnoymousAsync(RequestToAuthorizeAsAnnoymous request)
     {
-        var transaction = _unitOfWork.BeginTransaction();
-
         var user = new User
         {
             Username = request.DesiredUsername,
@@ -116,7 +114,6 @@ public class UserService : IUserService
 
         await _unitOfWork.UserRepository.AddAsync(user);
         await _unitOfWork.SaveChangesAsync();
-        await transaction.CommitAsync();
 
         return _mapper.Map<DetailedUserModel>(user);
     }
@@ -124,14 +121,11 @@ public class UserService : IUserService
     /// <inheritdoc cref="IUserService.ChangeUsernameAsync"/>
     public async Task<DetailedUserModel> ChangeUsernameAsync(RequestToChangeUsername request)
     {
-        var transaction = _unitOfWork.BeginTransaction();
-
         var user = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
         user.Username = request.DesiredUsername;
 
         _unitOfWork.UserRepository.Update(user);
         await _unitOfWork.SaveChangesAsync();
-        await transaction.CommitAsync();
 
         return _mapper.Map<DetailedUserModel>(user);
     }
@@ -139,8 +133,6 @@ public class UserService : IUserService
     /// <inheritdoc cref="IUserService.ChangeSettingsAsync"/>
     public async Task ChangeSettingsAsync(RequestToChangeSettings request)
     {
-        var transaction = _unitOfWork.BeginTransaction();
-
         var user = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
         var settingsToUpdate = _mapper.Map<UserSettings>(request.NewSettings);
         settingsToUpdate.Id = user.UserSettings.Id;
@@ -148,15 +140,12 @@ public class UserService : IUserService
 
         _unitOfWork.UserSettingsRepository.Update(settingsToUpdate);
         await _unitOfWork.SaveChangesAsync();
-        await transaction.CommitAsync();
     }
 
     /// <inheritdoc cref="IUserService.DeleteAccount"/>
     public async Task DeleteAccount(RequestToDeleteAccount request)
     {
-        var transaction = _unitOfWork.BeginTransaction();
         await _unitOfWork.UserRepository.DeleteByIdAsync(request.IssuerId);
         await _unitOfWork.SaveChangesAsync();
-        await transaction.CommitAsync();
     }
 }

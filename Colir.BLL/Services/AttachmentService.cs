@@ -53,13 +53,10 @@ public class AttachmentService : IAttachmentService
             SizeInBytes = request.File.Length,
         };
 
-        var transaction = _unitOfWork.BeginTransaction();
-
         // Adding the attachment to the DB
         await _unitOfWork.AttachmentRepository.AddAsync(attachment);
 
         await _unitOfWork.SaveChangesAsync();
-        await transaction.CommitAsync();
 
         return _mapper.Map<AttachmentModel>(attachment);
     }
