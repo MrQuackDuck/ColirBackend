@@ -26,11 +26,15 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
     private static readonly ConcurrentDictionary<string, string> ConnectionsToGroupsMapping = new();
     private static readonly ConcurrentDictionary<string, VoiceChatUser> VoiceChatUsers = new();
 
+    // TODO: Fix in the future. This is a temporary solution to keep track of all connected users (not only those who are in the voice chat)
+    private static readonly ConcurrentBag<ChatUser> ConnectedUsers = new();
+
     public VoiceChatHub(IRoomService roomService, IEventService eventService)
     {
         _roomService = roomService;
         eventService.UserKicked += OnUserKickedOrLeft;
         eventService.UserLeftRoom += OnUserKickedOrLeft;
+        eventService.RoomDeleted += OnRoomDeleted;
         eventService.UserDeletedAccount += OnUserDeletedAccountOrLoggedOut;
         eventService.UserLoggedOut += OnUserDeletedAccountOrLoggedOut;
     }
@@ -53,6 +57,15 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
             });
 
             await Groups.AddToGroupAsync(Context.ConnectionId, roomGuid);
+
+            // Adding the user to the list of connected users
+            ConnectedUsers.Add(new ChatUser
+            {
+                ConnectionId = Context.ConnectionId,
+                HexId = this.GetIssuerHexId(),
+                RoomGuid = roomGuid
+            });
+
             ConnectionsToGroupsMapping[Context.ConnectionId] = roomGuid;
         }
         catch (RoomExpiredException)
@@ -82,6 +95,7 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
 
         ConnectionsToGroupsMapping.TryRemove(Context.ConnectionId, out _);
         VoiceChatUsers.TryRemove(Context.ConnectionId, out _);
+        ConnectedUsers.RemoveWhere(x => x.ConnectionId == Context.ConnectionId);
 
         return base.OnDisconnectedAsync(exception);
     }
@@ -325,21 +339,31 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
 
     private static void OnUserKickedOrLeft((int hexId, string roomGuid) data)
     {
-        var connectionIds = VoiceChatUsers.Values.Where(u => u.HexId == data.hexId && u.RoomGuid == data.roomGuid);
+        var connectionIds = ConnectedUsers.Where(x => x.HexId == data.hexId && x.RoomGuid == data.roomGuid).Select(c => c.ConnectionId);
 
-        foreach (var user in connectionIds)
+        foreach (var connectionId in connectionIds)
         {
-            Disconnect(user.ConnectionId);
+            Disconnect(connectionId);
+        }
+    }
+
+    private static void OnRoomDeleted(string roomGuid)
+    {
+        var connectionIds = ConnectedUsers.Where(x => x.RoomGuid == roomGuid).Select(c => c.ConnectionId);
+
+        foreach (var connectionId in connectionIds)
+        {
+            Disconnect(connectionId);
         }
     }
 
     private static void OnUserDeletedAccountOrLoggedOut(int hexId)
     {
-        var connectionIds = VoiceChatUsers.Values.Where(u => u.HexId == hexId);
+        var connectionIds = ConnectedUsers.Where(x => x.HexId == hexId).Select(c => c.ConnectionId);
 
-        foreach (var user in connectionIds)
+        foreach (var connectionId in connectionIds)
         {
-            Disconnect(user.ConnectionId);
+            Disconnect(connectionId);
         }
     }
 }

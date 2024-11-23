@@ -364,6 +364,13 @@ public class RoomController : ControllerBase, IRoomController
             {
                 // Notifying users in the Chat hub that the room was deleted
                 await _chatHub.Clients.Group(request.RoomGuid).SendAsync("RoomDeleted", request.RoomGuid);
+
+                // Start a task to abort the connection with all users in the room after some time
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(TimeSpan.FromMilliseconds(400));
+                    _eventService.OnRoomDeleted(request.RoomGuid);
+                });
             }
         }
         catch (RoomNotFoundException)

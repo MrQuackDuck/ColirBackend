@@ -7,12 +7,15 @@ public interface IEventService
 {
     event Action<(int, string)> UserKicked;
     event Action<(int, string)> UserLeftRoom;
+    event Action<string> RoomDeleted;
     event Action<int> UserDeletedAccount;
     event Action<int> UserLoggedOut;
 
     void OnUserKicked(int hexId, string roomGuid);
 
     void OnUserLeftRoom(int hexId, string roomGuid);
+
+    void OnRoomDeleted(string roomGuid);
 
     void OnUserLoggedOut(int hexId);
 

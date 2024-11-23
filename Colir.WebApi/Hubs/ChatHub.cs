@@ -41,6 +41,7 @@ public class ChatHub : ColirHub, IChatHub
         _unitOfWork = unitOfWork;
         eventService.UserKicked += OnUserKickedOrLeft;
         eventService.UserLeftRoom += OnUserKickedOrLeft;
+        eventService.RoomDeleted += OnRoomDeleted;
         eventService.UserDeletedAccount += OnUserDeletedAccountOrLoggedOut;
         eventService.UserLoggedOut += OnUserDeletedAccountOrLoggedOut;
     }
@@ -286,7 +287,8 @@ public class ChatHub : ColirHub, IChatHub
             await Clients.Group(roomGuid).SendAsync("ReceiveMessage", messageModel);
 
             // Notify users about the new size of the room
-            await Clients.Group(roomGuid).SendAsync("RoomSizeChanged", _unitOfWork.RoomRepository.RoomFileManager.GetOccupiedStorageSize(roomGuid));
+            await Clients.Group(roomGuid).SendAsync("RoomSizeChanged",
+                _unitOfWork.RoomRepository.RoomFileManager.GetOccupiedStorageSize(roomGuid));
 
             return Success();
         }
@@ -297,6 +299,10 @@ public class ChatHub : ColirHub, IChatHub
         catch (AttachmentNotFoundException)
         {
             return Error(new(ErrorCode.AttachmentNotFound));
+        }
+        catch (RoomNotFoundException)
+        {
+            return Error(new(ErrorCode.RoomNotFound), true);
         }
         catch (RoomExpiredException)
         {
@@ -474,6 +480,16 @@ public class ChatHub : ColirHub, IChatHub
     private static void OnUserKickedOrLeft((int hexId, string roomGuid) data)
     {
         var connectionIds = ConnectedUsers.Where(x => x.HexId == data.hexId && x.RoomGuid == data.roomGuid).Select(c => c.ConnectionId);
+
+        foreach (var connectionId in connectionIds)
+        {
+            Disconnect(connectionId);
+        }
+    }
+
+    private static void OnRoomDeleted(string roomGuid)
+    {
+        var connectionIds = ConnectedUsers.Where(x => x.RoomGuid == roomGuid).Select(c => c.ConnectionId);
 
         foreach (var connectionId in connectionIds)
         {

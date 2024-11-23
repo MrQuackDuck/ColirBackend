@@ -7,6 +7,7 @@ public class EventService : IEventService
 {
     public event Action<(int, string)> UserKicked = default!;
     public event Action<(int, string)> UserLeftRoom = default!;
+    public event Action<string> RoomDeleted = default!;
     public event Action<int> UserDeletedAccount = default!;
     public event Action<int> UserLoggedOut = default!;
 
@@ -18,6 +19,11 @@ public class EventService : IEventService
     public void OnUserLeftRoom(int hexId, string roomGuid)
     {
         UserLeftRoom((hexId, roomGuid));
+    }
+
+    public void OnRoomDeleted(string roomGuid)
+    {
+        RoomDeleted(roomGuid);
     }
 
     public void OnUserLoggedOut(int hexId)
