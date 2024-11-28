@@ -8,7 +8,7 @@ public class RefreshToken
     public string Content { get; set; } = default!;
 
     /// <summary>
-    /// Expiry date of a refresh token
+    /// Expiry date of the refresh token
     /// </summary>
     public DateTime ExpiryDate { get; set; }
 }

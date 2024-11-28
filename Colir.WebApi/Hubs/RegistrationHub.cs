@@ -78,7 +78,7 @@ public class RegistrationHub : ColirHub, IRegistrationHub
         }
 
         // Generate list of possible Hexs and send it to the client
-        HexsToOffer[Context.ConnectionId] = await _hexGenerator.GetUniqueHexColorAsyncsListAsync(5);
+        HexsToOffer[Context.ConnectionId] = await _hexGenerator.GetUniqueHexColorListAsync(5);
         await Clients.Caller.SendAsync("ReceiveHexsList", HexsToOffer[Context.ConnectionId]);
     }
 
@@ -96,7 +96,7 @@ public class RegistrationHub : ColirHub, IRegistrationHub
     /// <inheritdoc cref="IRegistrationHub.RegenerateHexs"/>
     public async Task<SignalRHubResult> RegenerateHexs()
     {
-        HexsToOffer[Context.ConnectionId] = await _hexGenerator.GetUniqueHexColorAsyncsListAsync(5);
+        HexsToOffer[Context.ConnectionId] = await _hexGenerator.GetUniqueHexColorListAsync(5);
         return Success(HexsToOffer[Context.ConnectionId]);
     }
 

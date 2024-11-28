@@ -38,7 +38,7 @@ public class AttachmentService : IAttachmentService
             throw new IssuerNotInRoomException();
         }
 
-        // Check if enough free space is available
+        // Check if there is enough free space is available
         if (request.File.Length > _unitOfWork.RoomRepository.RoomFileManager.GetFreeStorageSize(room.Guid))
         {
             throw new ArgumentException("No more room storage left!");

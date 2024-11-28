@@ -11,9 +11,9 @@ public interface IAttachmentService
     /// <summary>
     /// Uploads an attachment
     /// </summary>
-    /// <exception cref="ArgumentException">Thrown when no free space left</exception>
+    /// <exception cref="ArgumentException">Thrown when no free space is left</exception>
     /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
-    /// <exception cref="RoomNotFoundException">Thrown when the wasn't found</exception>
+    /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found</exception>
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
     /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
     Task<AttachmentModel> UploadAttachmentAsync(RequestToUploadAttachment request);

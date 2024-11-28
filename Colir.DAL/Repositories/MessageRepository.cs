@@ -35,7 +35,7 @@ public class MessageRepository : IMessageRepository
     /// <summary>
     /// Gets the message by id
     /// </summary>
-    /// <param name="id">Id of message to get</param>
+    /// <param name="id">Id of the message to get</param>
     /// <exception cref="MessageNotFoundException">Thrown when the message wasn't found by provided id</exception>
     public async Task<Message> GetByIdAsync(long id)
     {
@@ -54,7 +54,7 @@ public class MessageRepository : IMessageRepository
     }
 
     /// <summary>
-    /// Gets last sent messages from certain room
+    /// Gets last sent messages from a certain room
     /// </summary>
     /// <param name="roomGuid">Room GUID to get messages in</param>
     /// <param name="count">Count of messages to take</param>
@@ -150,7 +150,7 @@ public class MessageRepository : IMessageRepository
     /// <param name="count">Count of messages to take</param>
     /// <exception cref="ArgumentException">Thrown when count is less than zero</exception>
     /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found by provided GUID</exception>
-    /// <exception cref="MessageNotFoundException">Thrown when the message wasn't found by provided id</exception>
+    /// <exception cref="MessageNotFoundException">Thrown when the message wasn't found by the provided id</exception>
     public async Task<List<Message>> GetSurroundingMessages(string roomGuid, long messageId, int count)
     {
         if (count < 0)
@@ -248,7 +248,7 @@ public class MessageRepository : IMessageRepository
     /// Adds the message to the DB
     /// </summary>
     /// <param name="message">Message to add</param>
-    /// <exception cref="MessageNotFoundException">Thrown when replied message wasn't found</exception>
+    /// <exception cref="MessageNotFoundException">Thrown when the replied message wasn't found</exception>
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
     /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found</exception>
     /// <exception cref="UserNotFoundException">Thrown when the author wasn't found</exception>

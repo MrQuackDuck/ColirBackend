@@ -14,7 +14,7 @@ public interface IRoomService
     /// <exception cref="RoomExpiredException">Thrown when specified room is expired</exception>
     /// <exception cref="RoomNotFoundException">Thrown when specified room wasn't found</exception>
     /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
-    /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room he is trying to get info</exception>
+    /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room he's trying to get info about</exception>
     Task<RoomModel> GetRoomInfoAsync(RequestToGetRoomInfo request);
 
     /// <summary>

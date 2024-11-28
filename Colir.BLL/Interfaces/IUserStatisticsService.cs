@@ -7,7 +7,7 @@ namespace Colir.BLL.Interfaces;
 public interface IUserStatisticsService
 {
     /// <summary>
-    /// Gets user statistics
+    /// Gets user's statistics
     /// </summary>
     /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
     Task<UserStatisticsModel> GetStatisticsAsync(RequestToGetStatistics request);

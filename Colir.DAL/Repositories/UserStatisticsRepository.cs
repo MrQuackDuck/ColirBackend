@@ -7,7 +7,7 @@ namespace DAL.Repositories;
 
 public class UserStatisticsRepository : IUserStatisticsRepository
 {
-    private ColirDbContext _dbContext;
+    private readonly ColirDbContext _dbContext;
 
     public UserStatisticsRepository(ColirDbContext dbContext)
     {
@@ -26,7 +26,7 @@ public class UserStatisticsRepository : IUserStatisticsRepository
     }
 
     /// <summary>
-    /// Gets user statistics by its id
+    /// Gets user statistics by their id
     /// </summary>
     /// <param name="id">Id of user statistics</param>
     /// <exception cref="NotFoundException">Thrown when not found by id</exception>
@@ -42,9 +42,9 @@ public class UserStatisticsRepository : IUserStatisticsRepository
     /// Gets user statistics by user's hex id
     /// </summary>
     /// <param name="hexId">Hex Id of the user</param>
-    /// <exception cref="ArgumentException">Thrown when invalid Hex Id provided</exception>
+    /// <exception cref="ArgumentException">Thrown when an invalid Hex Id is provided</exception>
     /// <exception cref="UserNotFoundException">Thrown when the user wasn't found</exception>
-    /// <exception cref="NotFoundException">Thrown when user statistics wasn't found</exception>
+    /// <exception cref="NotFoundException">Thrown when user statistics weren't found</exception>
     public async Task<UserStatistics> GetByUserHexIdAsync(int hexId)
     {
         if (hexId < 0 || hexId > 16_777_216)
@@ -59,7 +59,7 @@ public class UserStatisticsRepository : IUserStatisticsRepository
 
         return await _dbContext.UserStatistics
             .AsNoTracking()
-            .Include(nameof(UserSettings.User))
+            .Include(nameof(UserStatistics.User))
             .FirstOrDefaultAsync(s => s.User.HexId == hexId) ?? throw new NotFoundException();
     }
 
@@ -73,7 +73,7 @@ public class UserStatisticsRepository : IUserStatisticsRepository
     {
         if (await _dbContext.UserStatistics.AnyAsync(s => s.UserId == statistics.UserId))
         {
-            throw new ArgumentException();
+            throw new ArgumentException("Statistics for this user already exist!");
         }
 
         if (!await _dbContext.Users.AnyAsync(u => u.Id == statistics.UserId))
@@ -88,7 +88,7 @@ public class UserStatisticsRepository : IUserStatisticsRepository
     /// Deletes user statistics
     /// </summary>
     /// <param name="statistics">User statistics to delete</param>
-    /// <exception cref="NotFoundException">Thrown when user statistics wasn't found</exception>
+    /// <exception cref="NotFoundException">Thrown when user statistics weren't found</exception>
     public void Delete(UserStatistics statistics)
     {
         var target = _dbContext.UserStatistics.FirstOrDefault(s => s.Id == statistics.Id) ?? throw new NotFoundException();
@@ -123,10 +123,10 @@ public class UserStatisticsRepository : IUserStatisticsRepository
             throw new NotFoundException();
         }
 
-        // Check if another UserId provided
+        // Check if another UserId is provided
         if (originalEntity.UserId != statistics.UserId)
         {
-            throw new ArgumentException("You can't update statistics with different user id!");
+            throw new ArgumentException("You can't update statistics with a different user id!");
         }
 
         _dbContext.Entry(originalEntity).State = EntityState.Detached;

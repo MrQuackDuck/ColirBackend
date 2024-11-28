@@ -2,7 +2,7 @@
 namespace Colir.Middleware;
 
 /// <summary>
-/// A middleware that logs the request and response of the API
+/// A middleware that logs info about requests and responses of the API
 /// </summary>
 public class RequestLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggingMiddleware> logger)
 {

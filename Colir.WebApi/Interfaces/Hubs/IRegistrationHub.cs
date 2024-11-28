@@ -5,7 +5,7 @@ namespace Colir.Interfaces.Hubs;
 
 /// <summary>
 /// SignalR Hub to provide full registration process with choosing the Hex Id from a random list and the username
-/// Intended to be used by users who register their accounts via OAuth2 services such as Google, GitHub etc..
+/// Intended to be used by users who register their accounts via OAuth2 services such as Google, GitHub etc
 /// </summary>
 public interface IRegistrationHub
 {
@@ -16,9 +16,9 @@ public interface IRegistrationHub
 
     /// <summary>
     /// Chooses the Hex Id for the user
-    /// An error with <see cref="ErrorCode.InvalidAction"/> code returned when the chosen hex is not present in the offered list
+    /// An error with <see cref="ErrorCode.InvalidAction"/> code is returned when the chosen hex is not present in the offered list
     /// </summary>
-    /// <param name="hex">The hex id from previously given list</param>
+    /// <param name="hex">The hex id from the previously given list</param>
     SignalRHubResult ChooseHex(int hex);
 
     /// <summary>
@@ -28,8 +28,8 @@ public interface IRegistrationHub
     SignalRHubResult ChooseUsername(string username);
 
     /// <summary>
-    /// Finishes the registration and sends JWT token to the user
-    /// An error with <see cref="ErrorCode.InvalidAction"/> code returned either when the hex or the username wasn't chosen yet (or an unhandled exception occurred)
+    /// Finishes the registration and sends a JWT token to the user
+    /// An error with <see cref="ErrorCode.InvalidAction"/> code is returned either when the hex or the username wasn't chosen yet (or an unhandled exception occurred)
     /// </summary>
     Task<SignalRHubResult> FinishRegistration();
 }

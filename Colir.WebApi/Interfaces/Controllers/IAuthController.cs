@@ -26,14 +26,14 @@ public interface IAuthController
     /// <summary>
     /// Exchanges the GitHub OAuth2 code for a registration queue token
     /// Details: <see cref="IOAuth2RegistrationQueueService"/>
-    /// IMPORTANT: If the user was already registered, a JWT & refresh tokens are generated and returned
+    /// IMPORTANT: If the user is already registered, JWT & refresh tokens are generated and returned
     /// </summary>
     Task<ActionResult> ExchangeGitHubCode([FromQuery] string code, [FromQuery] string state);
 
     /// <summary>
     /// Exchanges the Google OAuth2 code for a registration queue token
     /// Details: <see cref="IOAuth2RegistrationQueueService"/>
-    /// IMPORTANT: If the user was already registered, a JWT & refresh tokens are generated and returned
+    /// IMPORTANT: If the user is already registered, JWT & refresh tokens are generated and returned
     /// </summary>
     Task<ActionResult> ExchangeGoogleCode([FromQuery] string code, [FromQuery] string state);
 
@@ -50,7 +50,7 @@ public interface IAuthController
     Task<IActionResult> RefreshToken(RefreshTokenRequestModel model);
 
     /// <summary>
-    /// Logs the user out of his account
+    /// Logs the user out of their account
     /// </summary>
     Task<ActionResult> Logout();
 }

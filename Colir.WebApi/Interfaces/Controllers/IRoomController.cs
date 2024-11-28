@@ -18,22 +18,22 @@ public interface IRoomController
     Task<ActionResult<string>> CreateRoom(CreateRoomModel model);
 
     /// <summary>
-    /// Joins the user in a room. Notifies users in <see cref="ChatHub"/> with the "UserJoined" signal
+    /// Joins the user to a room. Notifies users in <see cref="ChatHub"/> with the "UserJoined" signal
     /// </summary>
     Task<ActionResult<RoomModel>> JoinRoom(JoinRoomModel model);
 
     /// <summary>
-    /// Leaves the user from the room. Notifies users in <see cref="ChatHub"/> with the "UserLeft" signal
+    /// Removes the user from the room. Notifies users in <see cref="ChatHub"/> with the "UserLeft" signal
     /// </summary>
     Task<ActionResult> LeaveRoom(LeaveRoomModel model);
 
     /// <summary>
-    /// Gets the last time a user read chat in certain room
+    /// Gets the last time a user read the chat in a certain room
     /// </summary>
     Task<ActionResult<DateTime>> GetLastTimeReadChat(GetLastTimeReadChatModel model);
 
     /// <summary>
-    /// Updates the last time the user read chat in certain room
+    /// Updates the last time the user read the chat in a certain room
     /// </summary>
     Task<ActionResult> UpdateLastReadMessage(UpdateLastReadMessageModel model);
 

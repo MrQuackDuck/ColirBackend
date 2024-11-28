@@ -29,7 +29,7 @@ public class RoomService : IRoomService
     /// <inheritdoc cref="IRoomService.GetRoomInfoAsync"/>
     public async Task< RoomModel> GetRoomInfoAsync(RequestToGetRoomInfo request)
     {
-        // Check if the issuer exists (otherwise, an exception will be thrown)
+        // Check if the issuer exists. Otherwise, an exception will be thrown
         await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
 
         var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
@@ -43,7 +43,7 @@ public class RoomService : IRoomService
 
         var resultModel = _mapper.Map<RoomModel>(room);
 
-        // Apply amount of occupied/free room storage
+        // Apply the amount of occupied/free room storage to the result model
         ApplyRoomStorage(resultModel);
 
         return resultModel;
@@ -109,7 +109,7 @@ public class RoomService : IRoomService
     /// <inheritdoc cref="IRoomService.RenameAsync"/>
     public async Task RenameAsync(RequestToRenameRoom request)
     {
-        // Check if the issuer exists (otherwise, an exception will be thrown)
+        // Check if the issuer exists. Otherwise, an exception will be thrown
         await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
 
         var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
@@ -138,7 +138,7 @@ public class RoomService : IRoomService
     /// <inheritdoc cref="IRoomService.DeleteAsync"/>
     public async Task DeleteAsync(RequestToDeleteRoom request)
     {
-        // Check if the issuer exists (otherwise, an exception will be thrown)
+        // Check if the issuer exists. Otherwise, an exception will be thrown
         await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
 
         var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
@@ -181,7 +181,7 @@ public class RoomService : IRoomService
     /// <inheritdoc cref="IRoomService.GetLastTimeUserReadChatAsync"/>
     public async Task<DateTime> GetLastTimeUserReadChatAsync(RequestToGetLastTimeUserReadChat request)
     {
-        // Check if the issuer exists (otherwise, an exception will be thrown)
+        // Check if the issuer exists. Otherwise, an exception will be thrown
         await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
 
         var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
@@ -199,7 +199,7 @@ public class RoomService : IRoomService
     /// <inheritdoc cref="IRoomService.UpdateLastReadMessageByUser"/>
     public async Task UpdateLastReadMessageByUser(RequestToUpdateLastReadMessageByUser request)
     {
-        // Check if the issuer exists (otherwise, an exception will be thrown)
+        // Check if the issuer exists. Otherwise, an exception will be thrown
         await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
 
         var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
@@ -259,7 +259,7 @@ public class RoomService : IRoomService
         var issuer = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
         var roomToJoin = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
 
-        // If user already is in the room
+        // Throw an exception if the user is already in the room
         if (roomToJoin.JoinedUsers.Any(u => u.Id == request.IssuerId))
             throw new InvalidActionException();
 
@@ -292,7 +292,7 @@ public class RoomService : IRoomService
 
         var roomToJoinModel = _mapper.Map<RoomModel>(roomToJoin);
 
-        // Apply amount of occupied/free room storage
+        // Apply the amount of occupied/free room storage to the result model
         roomToJoinModel.FreeMemoryInBytes = _unitOfWork.RoomRepository.RoomFileManager.GetFreeStorageSize(roomToJoin.Guid);
         roomToJoinModel.UsedMemoryInBytes = _unitOfWork.RoomRepository.RoomFileManager.GetOccupiedStorageSize(roomToJoin.Guid);
 

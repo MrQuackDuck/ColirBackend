@@ -50,7 +50,7 @@ public class UserService : IUserService
                 AuthType = UserAuthType.Github
             };
 
-            // Check if an user with the same HexId already exists
+            // Check if the user with the same HexId already exists
             if (await _unitOfWork.UserRepository.ExistsAsync(request.HexId))
             {
                 throw new ArgumentException("Hex Id is not unique!");
@@ -86,7 +86,7 @@ public class UserService : IUserService
                 AuthType = UserAuthType.Google
             };
 
-            // Check if an user with the same HexId already exists
+            // Check if the user with the same HexId already exists
             if (await _unitOfWork.UserRepository.ExistsAsync(request.HexId))
             {
                 throw new ArgumentException("Hex Id is not unique!");

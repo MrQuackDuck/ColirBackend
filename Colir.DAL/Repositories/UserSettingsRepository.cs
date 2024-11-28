@@ -7,7 +7,7 @@ namespace DAL.Repositories;
 
 public class UserSettingsRepository : IUserSettingsRepository
 {
-    private ColirDbContext _dbContext;
+    private readonly ColirDbContext _dbContext;
 
     public UserSettingsRepository(ColirDbContext dbContext)
     {
@@ -26,7 +26,7 @@ public class UserSettingsRepository : IUserSettingsRepository
     }
 
     /// <summary>
-    /// Gets user setinngs by its id
+    /// Gets user settings by their id
     /// </summary>
     /// <param name="id">Id of user settings</param>
     /// <exception cref="NotFoundException">Thrown when not found by id</exception>
@@ -42,7 +42,7 @@ public class UserSettingsRepository : IUserSettingsRepository
     /// Gets user settings by user's hex id
     /// </summary>
     /// <param name="hexId">Hex Id of the user</param>
-    /// <exception cref="ArgumentException">Thrown when invalid Hex Id provided</exception>
+    /// <exception cref="ArgumentException">Thrown when an invalid Hex Id is provided</exception>
     /// <exception cref="UserNotFoundException">Thrown when the user wasn't found</exception>
     /// <exception cref="NotFoundException">Thrown when user settings weren't found</exception>
     public async Task<UserSettings> GetByUserHexIdAsync(int hexId)
@@ -73,7 +73,7 @@ public class UserSettingsRepository : IUserSettingsRepository
     {
         if (await _dbContext.UserSettings.AnyAsync(s => s.UserId == settings.UserId))
         {
-            throw new ArgumentException();
+            throw new ArgumentException("Settings for this user already exist!");
         }
 
         if (!await _dbContext.Users.AnyAsync(u => u.Id == settings.UserId))
@@ -123,10 +123,10 @@ public class UserSettingsRepository : IUserSettingsRepository
             throw new NotFoundException();
         }
 
-        // Check if another UserId provided
+        // Check if another UserId is provided
         if (originalEntity.UserId != settings.UserId)
         {
-            throw new ArgumentException("You can't update settings with different user id!");
+            throw new ArgumentException("You can't update settings with a different user id!");
         }
 
         _dbContext.Entry(originalEntity).State = EntityState.Detached;

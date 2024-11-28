@@ -55,7 +55,7 @@ public abstract class ColirHub : Hub
     /// Error result that indicates that an error occurred
     /// </summary>
     /// <param name="error">Error response object</param>
-    /// <param name="disconnect">Is user supposted to be disconnected after receiving an error</param>
+    /// <param name="disconnect">Is user supposed to be disconnected after receiving an error</param>
     protected SignalRHubResult Error(ErrorResponse error, bool disconnect = false)
     {
         try
@@ -72,7 +72,7 @@ public abstract class ColirHub : Hub
     /// Validates that each non-nullable property of a model is actually not set to null
     /// </summary>
     /// <param name="model">A model to validate</param>
-    /// <returns>A boolean is a model valid</returns>
+    /// <returns>A boolean indicating if the model is valid</returns>
     protected static bool IsModelValid(object? model)
     {
         // Model itself should not be null

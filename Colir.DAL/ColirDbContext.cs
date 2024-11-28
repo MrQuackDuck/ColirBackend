@@ -120,8 +120,7 @@ public class ColirDbContext : DbContext
     }
 
     /// <summary>
-    /// When an attachment is marked to be removed,
-    /// deletes it from the file system also
+    /// When an attachment is marked to be removed, it needs to be deleted from the storage
     /// </summary>
     private void HandleDeletedAttachments()
     {

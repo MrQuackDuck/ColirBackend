@@ -3,7 +3,7 @@
 namespace Colir.Middleware;
 
 /// <summary>
-/// In case of unhandled exception, returns a 500 response with a message and logs the exception
+/// In case of an unhandled exception, returns a 500 response with a message and logs the exception
 /// </summary>
 public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<RequestLoggingMiddleware> logger)
 {

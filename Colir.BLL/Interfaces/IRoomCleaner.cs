@@ -2,7 +2,7 @@
 
 /// <summary>
 /// Represents the room cleaning process
-/// Each time a file deleted, the "FileDeleted" event is trigerred (in order to move the progress on the client)
+/// Each time a file is deleted, the "FileDeleted" event is triggered (in order to update the progress on the client)
 /// </summary>
 public interface IRoomCleaner
 {
@@ -11,7 +11,7 @@ public interface IRoomCleaner
     public int FilesToDeleteCount { get; }
 
     /// <summary>
-    /// Starts the cleaning process
+    /// Starts the cleaning process.
     /// </summary>
     Task StartAsync();
 }

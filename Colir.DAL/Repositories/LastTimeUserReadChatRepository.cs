@@ -8,7 +8,7 @@ namespace DAL.Repositories;
 
 public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
 {
-    private ColirDbContext _dbContext;
+    private readonly ColirDbContext _dbContext;
 
     public LastTimeUserReadChatRepository(ColirDbContext dbContext)
     {
@@ -28,7 +28,7 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
     }
 
     /// <summary>
-    /// Gets last time user read the chat in certain room by userId and roomId
+    /// Gets last time user read the chat in a certain room by userId and roomId
     /// </summary>
     /// <param name="userId">Id of the user</param>
     /// <param name="roomId">Id of the room</param>
@@ -55,7 +55,7 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
     }
 
     /// <summary>
-    /// Gets last time user read the chat in certain room by id
+    /// Gets last time user read the chat in a certain room by id
     /// </summary>
     /// <param name="id">Id of the entry</param>
     /// <exception cref="NotFoundException">Thrown when the entity wasn't found</exception>
@@ -69,13 +69,13 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
     }
 
     /// <summary>
-    /// Add last time user read chat in certain room
+    /// Adds last time user read chat in a certain room
     /// </summary>
-    /// <param name="entity"></param>
+    /// <param name="entity">Entity to add</param>
     /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found</exception>
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
     /// <exception cref="UserNotFoundException">Thrown when the user wasn't found</exception>
-    /// <exception cref="InvalidActionException">Thrown when the entry with same userId and roomId already exists</exception>
+    /// <exception cref="InvalidActionException">Thrown when an entry with the same userId and roomId already exists</exception>
     public async Task AddAsync(LastTimeUserReadChat entity)
     {
         var room = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Id == entity.RoomId);
@@ -103,7 +103,7 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
     }
 
     /// <summary>
-    /// Deletes the last time user read chat in certain room
+    /// Deletes the last time user read chat in a certain room
     /// </summary>
     /// <param name="entity">Entity to delete</param>
     /// <exception cref="NotFoundException">Thrown when the entity wasn't found</exception>
@@ -114,9 +114,9 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
     }
 
     /// <summary>
-    /// Deletes the last time user read chat in certain room by id
+    /// Deletes the last time user read chat in a certain room by id
     /// </summary>
-    /// <param name="id">Id of entity to delete</param>
+    /// <param name="id">Id of the entity to delete</param>
     /// <exception cref="NotFoundException">Thrown when the entity wasn't found</exception>
     public async Task DeleteByIdAsync(long id)
     {
@@ -129,25 +129,25 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
     /// </summary>
     /// <param name="entity">Last time user read chat to update</param>
     /// <exception cref="NotFoundException">Thrown when last time user read chat wasn't found</exception>
-    /// <exception cref="ArgumentException">Thrown when another room id provided</exception>
-    /// <exception cref="ArgumentException">Thrown when another user id provided</exception>
-    /// <exception cref="RoomExpiredException">Thrown when expired room's id provided</exception>
+    /// <exception cref="ArgumentException">Thrown when another room id is provided</exception>
+    /// <exception cref="ArgumentException">Thrown when another user id is provided</exception>
+    /// <exception cref="RoomExpiredException">Thrown when an expired room's id is provided</exception>
     public void Update(LastTimeUserReadChat entity)
     {
         var originalEntity = _dbContext.LastTimeUserReadChats
             .Include(nameof(LastTimeUserReadChat.Room))
             .FirstOrDefault(l => l.Id == entity.Id) ?? throw new NotFoundException();
 
-        // Check if another UserId provided
+        // Check if another UserId is provided
         if (originalEntity.UserId != entity.UserId)
         {
-            throw new ArgumentException("You can't update last time user read chat with different user id!");
+            throw new ArgumentException("You can't update last time user read chat with a different user id!");
         }
 
-        // Check if another RoomId provided
+        // Check if another RoomId is provided
         if (originalEntity.RoomId != entity.RoomId)
         {
-            throw new ArgumentException("You can't update last time user read chat with different room id!");
+            throw new ArgumentException("You can't update last time user read chat with a different room id!");
         }
 
         if (originalEntity.Room!.IsExpired())

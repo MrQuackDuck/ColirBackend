@@ -25,8 +25,8 @@ public class HexColorGenerator : IHexColorGenerator
         return hex;
     }
 
-    /// <inheritdoc cref="IHexColorGenerator.GetUniqueHexColorAsyncsListAsync"/>
-    public async Task<List<int>> GetUniqueHexColorAsyncsListAsync(int count)
+    /// <inheritdoc cref="IHexColorGenerator.GetUniqueHexColorListAsync"/>
+    public async Task<List<int>> GetUniqueHexColorListAsync(int count)
     {
         if (count < 0)
         {

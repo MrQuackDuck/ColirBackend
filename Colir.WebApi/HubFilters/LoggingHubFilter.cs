@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.SignalR;
 namespace Colir.HubFilters;
 
 /// <summary>
-/// Filter to log the SignalR hub signals with IP address and response size
+/// Filter that logs SignalR performance info about hub signal calls
 /// </summary>
 public class LoggingHubFilter(ILogger<LoggingHubFilter> logger) : IHubFilter
 {

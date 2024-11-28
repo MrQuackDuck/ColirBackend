@@ -7,7 +7,7 @@ public static class HubExtensions
 {
     /// <summary>
     /// Extension method to get an id from the issuer of the request
-    /// Warning: Use ONLY with <see cref="AuthorizeAttribute"/> set on method/hub!
+    /// Warning: Use ONLY with <see cref="AuthorizeAttribute"/> set on the method/hub!
     /// </summary>
     public static long GetIssuerId(this Hub hub)
     {
@@ -16,10 +16,10 @@ public static class HubExtensions
 
     /// <summary>
     /// Extension method to get the hex id from the issuer of the request
-    /// Warning: Use ONLY with <see cref="AuthorizeAttribute"/> set on action/controller!
+    /// Warning: Use ONLY with <see cref="AuthorizeAttribute"/> set on the method/hub!
     /// </summary>
     public static int GetIssuerHexId(this Hub hub)
     {
-        return int.Parse(@hub.Context.User!.Claims.First(c => c.Type == "HexId").Value);
+        return int.Parse(hub.Context.User!.Claims.First(c => c.Type == "HexId").Value);
     }
 }

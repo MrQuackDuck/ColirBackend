@@ -14,14 +14,12 @@ public static class ConcurrentBagExtensions
             T? result;
             bag.TryTake(out result);
 
-            // Check if result is null
+            // Check if the result is null
             if (result == null || !predicate(result))
             {
                 // If result is null or predicate is false, add the item back to the bag
-                if (result != null)
-                {
-                    bag.Add(result);
-                }
+                if (result == null) continue;
+                bag.Add(result);
             }
         }
     }

@@ -10,7 +10,7 @@ public class RegistrationUserData
     public string OAuth2UserId { get; }
 
     /// <summary>
-    /// Type of user authentication
+    /// The type of user's authentication
     /// </summary>
     public UserAuthType AuthType { get; }
 

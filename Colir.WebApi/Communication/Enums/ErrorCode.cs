@@ -1,7 +1,7 @@
 ﻿namespace Colir.Communication.Enums;
 
 /// <summary>
-/// Lists all possible errors a client can get in error response
+/// Lists all possible errors a client can get in an error response
 /// </summary>
 public enum ErrorCode
 {

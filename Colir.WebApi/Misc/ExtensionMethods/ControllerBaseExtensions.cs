@@ -7,7 +7,7 @@ public static class ControllerBaseExtensions
 {
     /// <summary>
     /// Extension method to get the id from the issuer of the request
-    /// Warning: Use ONLY with <see cref="AuthorizeAttribute"/> set on action/controller!
+    /// Warning: Use ONLY with <see cref="AuthorizeAttribute"/> set on the action/controller!
     /// </summary>
     public static long GetIssuerId(this ControllerBase @base)
     {
@@ -16,7 +16,7 @@ public static class ControllerBaseExtensions
 
     /// <summary>
     /// Extension method to get the hex id from the issuer of the request
-    /// Warning: Use ONLY with <see cref="AuthorizeAttribute"/> set on action/controller!
+    /// Warning: Use ONLY with <see cref="AuthorizeAttribute"/> set on the action/controller!
     /// </summary>
     public static int GetIssuerHexId(this ControllerBase @base)
     {

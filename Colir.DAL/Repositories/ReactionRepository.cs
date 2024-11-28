@@ -7,7 +7,7 @@ namespace DAL.Repositories;
 
 public class ReactionRepository : IReactionRepository
 {
-    private ColirDbContext _dbContext;
+    private readonly ColirDbContext _dbContext;
 
     public ReactionRepository(ColirDbContext dbContext)
     {
@@ -29,8 +29,8 @@ public class ReactionRepository : IReactionRepository
     /// <summary>
     /// Gets the reaction by id
     /// </summary>
-    /// <param name="id">Id of reaction to get</param>
-    /// <exception cref="ReactionNotFoundException">Thrown when the reaction wasn't found by provided id</exception>
+    /// <param name="id">Id of the reaction to get</param>
+    /// <exception cref="ReactionNotFoundException">Thrown when the reaction wasn't found by the provided id</exception>
     public async Task<Reaction> GetByIdAsync(long id)
     {
         return await _dbContext.Reactions
@@ -41,9 +41,9 @@ public class ReactionRepository : IReactionRepository
     }
 
     /// <summary>
-    /// Gets all reactions on certain message
+    /// Gets all reactions on a certain message
     /// </summary>
-    /// <param name="messageId">Id of message to find reactions on</param>
+    /// <param name="messageId">Id of the message to find reactions on</param>
     /// <exception cref="MessageNotFoundException">Thrown when the message wasn't found</exception>
     public async Task<List<Reaction>> GetReactionsOnMessage(long messageId)
     {
@@ -104,7 +104,7 @@ public class ReactionRepository : IReactionRepository
     }
 
     /// <summary>
-    /// Updates the raection
+    /// Updates the reaction
     /// </summary>
     /// <param name="reaction">The reaction to update</param>
     /// <exception cref="ReactionNotFoundException">Thrown when the reaction wasn't found</exception>

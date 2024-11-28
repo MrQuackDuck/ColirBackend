@@ -18,7 +18,7 @@ public class RoomFileManager : IRoomFileManager
         _filesFolderName = Path.Combine(config["AppSettings:RoomFilesFolderName"]!);
         ArgumentNullException.ThrowIfNull(_filesFolderName);
 
-        // Create the directory where rooms files will be stored
+        // Create the directory where rooms' files will be stored
         _fileSystem.Directory.CreateDirectory(_filesFolderName);
     }
 
@@ -49,7 +49,7 @@ public class RoomFileManager : IRoomFileManager
     {
         string pathToDirectory = Path.Combine(_filesFolderName, roomGuid);
 
-        // Create the directory if not exists
+        // Create the directory if it doesn't exist
         _fileSystem.Directory.CreateDirectory(Path.Combine(_filesFolderName, roomGuid));
 
         var files = _fileSystem.DirectoryInfo.New(pathToDirectory).GetFiles();
@@ -75,7 +75,7 @@ public class RoomFileManager : IRoomFileManager
 
         string pathToDirectory = Path.Combine(_filesFolderName, roomGuid);
 
-        // Create the directory if not exists
+        // Create the directory if it doesn't exist
         _fileSystem.Directory.CreateDirectory(pathToDirectory);
 
         var path = Path.Combine(_filesFolderName, roomGuid, fileName);
@@ -105,7 +105,7 @@ public class RoomFileManager : IRoomFileManager
     {
         string pathToDirectory = Path.Combine(_filesFolderName, roomGuid);
 
-        // Create the directory if not exists
+        // Create the directory if it doesn't exist
         _fileSystem.Directory.CreateDirectory(pathToDirectory);
 
         var filesPaths = _fileSystem.Directory.GetFiles(pathToDirectory);

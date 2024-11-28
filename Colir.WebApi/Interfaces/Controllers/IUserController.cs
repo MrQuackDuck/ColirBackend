@@ -29,7 +29,7 @@ public interface IUserController
     Task<ActionResult> ChangeUsername(ChangeUsernameModel model);
 
     /// <summary>
-    /// Deletes the account
+    /// Deletes the user's account
     /// </summary>
     Task<ActionResult> DeleteAccount();
 }

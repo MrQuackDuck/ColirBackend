@@ -34,10 +34,10 @@ public class UserRepository : IUserRepository
     }
 
     /// <summary>
-    /// Gets the user by its id
+    /// Gets the user by their id
     /// </summary>
     /// <param name="id">Id of the user</param>
-    /// <exception cref="UserNotFoundException">Thrown when the user wasn't found by provided id</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the user wasn't found by the provided id</exception>
     public async Task<User> GetByIdAsync(long id)
     {
         return await _dbContext.Users
@@ -50,11 +50,11 @@ public class UserRepository : IUserRepository
     }
 
     /// <summary>
-    /// Gets the user by its hex id
+    /// Gets the user by their hex id
     /// </summary>
     /// <param name="hexId">Hex Id of the user</param>
-    /// <exception cref="ArgumentException">Thrown when invalid hex id provided</exception>
-    /// <exception cref="UserNotFoundException">Thrown when the user wasn't found by provided hex id</exception>
+    /// <exception cref="ArgumentException">Thrown when an invalid hex id is provided</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the user wasn't found by the provided hex id</exception>
     public async Task<User> GetByHexIdAsync(int hexId)
     {
         if (hexId < 0 || hexId > 16_777_216)
@@ -75,7 +75,7 @@ public class UserRepository : IUserRepository
     /// Gets the user by their GitHub Id
     /// </summary>
     /// <param name="githubId">GitHub Id of the user</param>
-    /// <exception cref="UserNotFoundException">Thrown when the user wasn't found by provided hex id</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the user wasn't found by the provided GitHub id</exception>
     public async Task<User> GetByGithudIdAsync(string githubId)
     {
         return await _dbContext.Users
@@ -91,7 +91,7 @@ public class UserRepository : IUserRepository
     /// Gets the user by their Google Id
     /// </summary>
     /// <param name="googleId">Google Id of the user</param>
-    /// <exception cref="UserNotFoundException">Thrown when the user wasn't found by provided hex id</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the user wasn't found by the provided Google id</exception>
     public async Task<User> GetByGoogleIdAsync(string googleId)
     {
         return await _dbContext.Users
@@ -104,7 +104,7 @@ public class UserRepository : IUserRepository
     }
 
     /// <summary>
-    /// Determines if a user with provided Hex Id exists already
+    /// Determines if a user with the provided Hex Id exists already
     /// </summary>
     public async Task<bool> ExistsAsync(int hexId)
     {
@@ -114,13 +114,13 @@ public class UserRepository : IUserRepository
     /// <summary>
     /// Adds a user to the DB
     /// </summary>
-    /// <param name="user"></param>
-    /// <exception cref="ArgumentException">Thrown when invalid hex id provided</exception>
-    /// <exception cref="ArgumentException">Thrown when the user with the same hex id exists already</exception>
-    /// <exception cref="StringTooShortException">Thrown when username is too short</exception>
-    /// <exception cref="StringTooLongException">Thrown when username is too long</exception>
-    /// <exception cref="RoomExpiredException">Thrown when one of JoinedRooms is expired</exception>
-    /// <exception cref="RoomNotFoundException">Thrown when one of JoinedRooms wasn't found</exception>
+    /// <param name="user">The user to add</param>
+    /// <exception cref="ArgumentException">Thrown when an invalid hex id is provided</exception>
+    /// <exception cref="ArgumentException">Thrown when a user with the same hex id already exists</exception>
+    /// <exception cref="StringTooShortException">Thrown when the username is too short</exception>
+    /// <exception cref="StringTooLongException">Thrown when the username is too long</exception>
+    /// <exception cref="RoomExpiredException">Thrown when one of the JoinedRooms is expired</exception>
+    /// <exception cref="RoomNotFoundException">Thrown when one of the JoinedRooms wasn't found</exception>
     public async Task AddAsync(User user)
     {
         if (user.HexId < 0 || user.HexId > 16_777_216)
@@ -131,7 +131,7 @@ public class UserRepository : IUserRepository
         // Check if a user with the same Hex ID exists
         if (await _dbContext.Users.CountAsync(u => u.HexId == user.HexId) > 0)
         {
-            throw new ArgumentException("User with the same Hex ID exists already!");
+            throw new ArgumentException("A user with the same Hex ID already exists!");
         }
 
         var minUsernameLength = int.Parse(_config["AppSettings:MinUsernameLength"]!);
@@ -192,7 +192,7 @@ public class UserRepository : IUserRepository
     /// Deletes the user by id
     /// </summary>
     /// <param name="id">The id of the user to delete</param>
-    /// <exception cref="UserNotFoundException">Thrown when the user wasn't found by provided id in the DB</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the user wasn't found by the provided id in the DB</exception>
     public async Task DeleteByIdAsync(long id)
     {
         var target = await _dbContext.Users
@@ -209,11 +209,11 @@ public class UserRepository : IUserRepository
     /// <summary>
     /// Updates the user
     /// </summary>
-    /// <param name="user"></param>
-    /// <exception cref="StringTooShortException">Thrown when username is too short</exception>
-    /// <exception cref="StringTooLongException">Thrown when username is too long</exception>
-    /// <exception cref="UserNotFoundException">Thrown when the user wasn't found by its id in the DB</exception>
-    /// <exception cref="ArgumentException">Thrown when the user with the same hex id exists already</exception>
+    /// <param name="user">The user to update</param>
+    /// <exception cref="StringTooShortException">Thrown when the username is too short</exception>
+    /// <exception cref="StringTooLongException">Thrown when the username is too long</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the user wasn't found by their id in the DB</exception>
+    /// <exception cref="ArgumentException">Thrown when a user with the same hex id already exists</exception>
     public void Update(User user)
     {
         var minUsernameLength = int.Parse(_config["AppSettings:MinUsernameLength"]!);
@@ -238,10 +238,10 @@ public class UserRepository : IUserRepository
         // Check if a user with the same Hex ID exists
         if (originalEntity.HexId != user.HexId && _dbContext.Users.Count(u => u.HexId == user.HexId) >= 1)
         {
-            throw new ArgumentException("User with the same Hex ID exists already!");
+            throw new ArgumentException("A user with the same Hex ID already exists!");
         }
 
-        // Check if joined rooms list has changed to delete rooms where user is not present at
+        // Check if joined rooms list has changed to delete rooms where the user is not present
         if ((List<Room>?)originalEntity.JoinedRooms != null)
         {
             for (int i = originalEntity.JoinedRooms.Count - 1; i >= 0; i--)
@@ -266,7 +266,6 @@ public class UserRepository : IUserRepository
     {
         _dbContext.SaveChanges();
     }
-
 
     /// <summary>
     /// Saves changes to the DB asynchronously

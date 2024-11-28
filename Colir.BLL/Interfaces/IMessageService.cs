@@ -10,7 +10,7 @@ namespace Colir.BLL.Interfaces;
 public interface IMessageService
 {
     /// <summary>
-    /// Gets last sent messages from certain room
+    /// Gets last sent messages from a certain room
     /// </summary>
     /// <param name="request">The request object</param>
     /// <param name="request.Count">Count of messages to take</param>
@@ -21,7 +21,7 @@ public interface IMessageService
     Task<List<MessageModel>> GetLastMessagesAsync(RequestToGetLastMessages request);
 
     /// <summary>
-    /// Gets surrounding messages from certain message
+    /// Gets surrounding messages from a certain message
     /// </summary>
     /// <param name="request">The request object</param>
     /// <param name="request.Count">Count of messages to take</param>
@@ -32,7 +32,7 @@ public interface IMessageService
     Task <List<MessageModel>> GetSurroundingMessagesAsync(RequestToGetSurroundingMessages request);
 
     /// <summary>
-    /// Gets messages range from certain room
+    /// Gets messages range from a certain room
     /// </summary>
     /// <param name="request">The request object</param>
     /// <param name="request.StartId">Id of the first message in the range</param>
@@ -51,7 +51,7 @@ public interface IMessageService
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
     /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
     /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>
-    /// <exception cref="NotFoundException">Thrown the issuer haven't ever read the chat</exception>
+    /// <exception cref="NotFoundException">Thrown when the issuer hasn't ever read the chat</exception>
     Task<List<MessageModel>> GetUnreadRepliesAsync(RequestToGetUnreadReplies request);
 
     /// <summary>

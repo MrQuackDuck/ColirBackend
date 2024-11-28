@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 namespace Colir.BLL.Factories;
 
 /// <summary>
-/// Factory to get IRoomCleaner instance
+/// The factory to get <see cref="IRoomCleaner"/> instances
 /// </summary>
 public class RoomCleanerFactory : IRoomCleanerFactory
 {

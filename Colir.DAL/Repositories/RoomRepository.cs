@@ -68,9 +68,9 @@ public class RoomRepository : IRoomRepository
     /// </summary>
     /// <param name="room">The room to add</param>
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
-    /// <exception cref="StringTooShortException">Thrown when the name for the room it too short</exception>
-    /// <exception cref="StringTooLongException">Thrown when the name for the room it too long</exception>
-    /// <exception cref="UserNotFoundException">Thrown when provided owner wasn't found by id</exception>
+    /// <exception cref="StringTooShortException">Thrown when the name for the room is too short</exception>
+    /// <exception cref="StringTooLongException">Thrown when the name for the room is too long</exception>
+    /// <exception cref="UserNotFoundException">Thrown when the provided owner wasn't found by id</exception>
     public async Task AddAsync(Room room)
     {
         // Check for provided date
@@ -128,7 +128,7 @@ public class RoomRepository : IRoomRepository
     /// Deletes the room by id
     /// </summary>
     /// <param name="id">The id of the room to delete</param>
-    /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found by provided id in the DB</exception>
+    /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found by the provided id in the DB</exception>
     public async Task DeleteByIdAsync(long id)
     {
         var target = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Id == id) ?? throw new RoomNotFoundException();
@@ -146,7 +146,7 @@ public class RoomRepository : IRoomRepository
     /// <summary>
     /// Deletes all expired rooms
     /// </summary>
-    /// <exception cref="RoomNotFoundException">Thrown when no expired rooms found</exception>
+    /// <exception cref="RoomNotFoundException">Thrown when no expired rooms are found</exception>
     public void DeleteAllExpired()
     {
         var expiredRooms = _dbContext.Rooms.Where(r => r.ExpiryDate < DateTime.Now);
@@ -167,8 +167,8 @@ public class RoomRepository : IRoomRepository
     /// </summary>
     /// <param name="room">The room to update</param>
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
-    /// <exception cref="StringTooShortException">Thrown when the name for the room it too short</exception>
-    /// <exception cref="StringTooLongException">Thrown when the name for the room it too long</exception>
+    /// <exception cref="StringTooShortException">Thrown when the name for the room is too short</exception>
+    /// <exception cref="StringTooLongException">Thrown when the name for the room is too long</exception>
     /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found by its id</exception>
     public void Update(Room room)
     {
