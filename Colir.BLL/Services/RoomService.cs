@@ -263,16 +263,17 @@ public class RoomService : IRoomService
         if (roomToJoin.JoinedUsers.Any(u => u.Id == request.IssuerId))
             throw new InvalidActionException();
 
-        if (issuer.UserSettings.StatisticsEnabled)
-        {
-            issuer.UserStatistics.RoomsJoined += 1;
-            _unitOfWork.UserStatisticsRepository.Update(issuer.UserStatistics);
-        }
-
         var transaction = _unitOfWork.BeginTransaction();
 
         try
         {
+            if (issuer.UserSettings.StatisticsEnabled)
+            {
+                issuer.UserStatistics.RoomsJoined += 1;
+                _unitOfWork.UserStatisticsRepository.Update(issuer.UserStatistics);
+                await _unitOfWork.SaveChangesAsync();
+            }
+
             issuer.JoinedRooms.Add(roomToJoin);
             _unitOfWork.UserRepository.Update(issuer);
 
