@@ -25,7 +25,7 @@ internal class ColirWebAppFactory : WebApplicationFactory<Program>
             services.RemoveAll(typeof(DbContextOptions<ColirDbContext>));
 
             var connectionString = GetConnectionString(services);
-            services.AddSqlServer<ColirDbContext>(connectionString);
+            services.AddNpgsql<ColirDbContext>(connectionString);
 
             _dbContext = CreateDbContext(services);
         });

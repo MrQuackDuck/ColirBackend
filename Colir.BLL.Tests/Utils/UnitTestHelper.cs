@@ -19,8 +19,6 @@ public static class UnitTestHelper
             .ConfigureWarnings(config =>
             {
                 config.Ignore(InMemoryEventId.TransactionIgnoredWarning);
-                config.Ignore(SqlServerEventId.SavepointsDisabledBecauseOfMARS);
-                config.Ignore(SqlServerEventId.SavepointsDisabledBecauseOfMARS);
                 config.Ignore(CoreEventId.ForeignKeyAttributesOnBothNavigationsWarning);
                 config.Ignore(CoreEventId.ForeignKeyAttributesOnBothPropertiesWarning);
             })

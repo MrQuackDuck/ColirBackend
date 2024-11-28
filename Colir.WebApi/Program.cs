@@ -15,7 +15,6 @@ using DAL.Interfaces;
 using DAL.Repositories.Related;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.SwaggerGen.ConventionalRouting;
@@ -41,7 +40,7 @@ builder.Services.AddSession();
 
 // Addding the DB context
 services.AddDbContext<ColirDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Adding DAL services
 services.AddTransient<IFileSystem, FileSystem>();
@@ -140,7 +139,7 @@ try
     var dbContext = scope.ServiceProvider.GetRequiredService<ColirDbContext>();
     await dbContext.Database.MigrateAsync();
 }
-catch (SqlException e)
+catch (Exception e)
 {
     logger.LogCritical(e, "An error occurred during SQL Server connection establishment!");
     return;

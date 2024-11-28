@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -16,11 +17,13 @@ namespace DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    HexId = table.Column<int>(type: "int", nullable: false),
-                    GitHubId = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Username = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    AuthType = table.Column<int>(type: "int", nullable: false),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    HexId = table.Column<int>(type: "integer", nullable: false),
+                    GitHubId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    GoogleId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    Username = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    RegistrationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    AuthType = table.Column<int>(type: "integer", nullable: false),
                     UserStatisticsId = table.Column<long>(type: "bigint", nullable: false),
                     UserSettingsId = table.Column<long>(type: "bigint", nullable: false)
                 },
@@ -34,11 +37,11 @@ namespace DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Guid = table.Column<string>(type: "nvarchar(36)", maxLength: 36, nullable: true),
-                    Name = table.Column<string>(type: "nvarchar(max)", maxLength: 2147483647, nullable: true),
-                    ExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    OwnerId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Guid = table.Column<string>(type: "character varying(36)", maxLength: 36, nullable: false),
+                    Name = table.Column<string>(type: "text", maxLength: 2147483647, nullable: false),
+                    ExpiryDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    OwnerId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -48,7 +51,7 @@ namespace DAL.Migrations
                         column: x => x.OwnerId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -56,9 +59,9 @@ namespace DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UserId = table.Column<long>(type: "bigint", nullable: false),
-                    StatisticsEnabled = table.Column<bool>(type: "bit", nullable: false)
+                    StatisticsEnabled = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -76,7 +79,7 @@ namespace DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UserId = table.Column<long>(type: "bigint", nullable: false),
                     SecondsSpentInVoice = table.Column<long>(type: "bigint", nullable: false),
                     ReactionsSet = table.Column<long>(type: "bigint", nullable: false),
@@ -100,10 +103,10 @@ namespace DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    RoomId = table.Column<long>(type: "bigint", nullable: false),
-                    UserId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Timestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    RoomId = table.Column<long>(type: "bigint", nullable: true),
+                    UserId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -112,12 +115,14 @@ namespace DAL.Migrations
                         name: "FK_LastTimeUserReadChats_Rooms_RoomId",
                         column: x => x.RoomId,
                         principalTable: "Rooms",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_LastTimeUserReadChats_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -125,12 +130,12 @@ namespace DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Content = table.Column<string>(type: "nvarchar(max)", maxLength: 4096, nullable: false),
-                    PostDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EditDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Content = table.Column<string>(type: "character varying(4096)", maxLength: 4096, nullable: false),
+                    PostDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EditDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     RoomId = table.Column<long>(type: "bigint", nullable: false),
-                    AuthorId = table.Column<long>(type: "bigint", nullable: false),
+                    AuthorId = table.Column<long>(type: "bigint", nullable: true),
                     RepliedMessageId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
@@ -140,21 +145,24 @@ namespace DAL.Migrations
                         name: "FK_Messages_Messages_RepliedMessageId",
                         column: x => x.RepliedMessageId,
                         principalTable: "Messages",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Messages_Rooms_RoomId",
                         column: x => x.RoomId,
                         principalTable: "Rooms",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Messages_Users_AuthorId",
                         column: x => x.AuthorId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserToRoom",
+                name: "UsersToRooms",
                 columns: table => new
                 {
                     UserId = table.Column<long>(type: "bigint", nullable: false),
@@ -162,14 +170,14 @@ namespace DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserToRoom", x => new { x.RoomId, x.UserId });
+                    table.PrimaryKey("PK_UsersToRooms", x => new { x.RoomId, x.UserId });
                     table.ForeignKey(
-                        name: "FK_UserToRoom_Rooms_RoomId",
+                        name: "FK_UsersToRooms_Rooms_RoomId",
                         column: x => x.RoomId,
                         principalTable: "Rooms",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_UserToRoom_Users_UserId",
+                        name: "FK_UsersToRooms_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id");
@@ -180,9 +188,9 @@ namespace DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Filename = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    Path = table.Column<string>(type: "nvarchar(1024)", maxLength: 1024, nullable: false),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Filename = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    Path = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: false),
                     SizeInBytes = table.Column<long>(type: "bigint", nullable: false),
                     MessageId = table.Column<long>(type: "bigint", nullable: true)
                 },
@@ -201,8 +209,8 @@ namespace DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Symbol = table.Column<string>(type: "nvarchar(4)", maxLength: 4, nullable: true),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Symbol = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     AuthorId = table.Column<long>(type: "bigint", nullable: false),
                     MessageId = table.Column<long>(type: "bigint", nullable: false)
                 },
@@ -227,6 +235,12 @@ namespace DAL.Migrations
                 name: "IX_Attachments_MessageId",
                 table: "Attachments",
                 column: "MessageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Attachments_Path",
+                table: "Attachments",
+                column: "Path",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_LastTimeUserReadChats_RoomId",
@@ -267,8 +281,7 @@ namespace DAL.Migrations
                 name: "IX_Rooms_Guid",
                 table: "Rooms",
                 column: "Guid",
-                unique: true,
-                filter: "[Guid] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Rooms_OwnerId",
@@ -294,8 +307,8 @@ namespace DAL.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserToRoom_UserId",
-                table: "UserToRoom",
+                name: "IX_UsersToRooms_UserId",
+                table: "UsersToRooms",
                 column: "UserId");
         }
 
@@ -318,7 +331,7 @@ namespace DAL.Migrations
                 name: "UserStatistics");
 
             migrationBuilder.DropTable(
-                name: "UserToRoom");
+                name: "UsersToRooms");
 
             migrationBuilder.DropTable(
                 name: "Messages");

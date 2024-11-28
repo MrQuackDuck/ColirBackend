@@ -19,6 +19,8 @@ public class ColirDbContext : DbContext
         _roomFileManager = roomFileManager;
     }
 
+    static ColirDbContext() => AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
     public DbSet<Attachment> Attachments { get; set; }
     public DbSet<LastTimeUserReadChat> LastTimeUserReadChats { get; set; }
     public DbSet<Message> Messages { get; set; }
@@ -33,7 +35,6 @@ public class ColirDbContext : DbContext
     {
         optionsBuilder.ConfigureWarnings(warnings =>
         {
-            warnings.Ignore(SqlServerEventId.SavepointsDisabledBecauseOfMARS);
             warnings.Ignore(CoreEventId.ForeignKeyAttributesOnBothNavigationsWarning);
             warnings.Ignore(CoreEventId.ForeignKeyAttributesOnBothPropertiesWarning);
         });
