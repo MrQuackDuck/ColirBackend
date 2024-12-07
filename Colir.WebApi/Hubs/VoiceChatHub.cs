@@ -11,6 +11,7 @@ using Colir.Hubs.Abstract;
 using Colir.Interfaces.ApiRelatedServices;
 using Colir.Interfaces.Hubs;
 using Colir.Misc.ExtensionMethods;
+using DAL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using SignalRSwaggerGen.Attributes;
@@ -22,16 +23,22 @@ namespace Colir.Hubs;
 public class VoiceChatHub : ColirHub, IVoiceChatHub
 {
     private readonly IRoomService _roomService;
+    private readonly IUnitOfWork _unitOfWork;
 
     private static readonly ConcurrentDictionary<string, string> ConnectionsToGroupsMapping = new();
+
+    /// <summary>
+    /// Dictionary to store users' data needed for voice chat
+    /// The connection id is a key and the value is user's data
+    /// The user is added to the dictionary when they connect to the Hub
+    /// The user considered to be conncected to the voice chat if the 'IsConnectedToVoice' property is set to true
+    /// </summary>
     private static readonly ConcurrentDictionary<string, VoiceChatUser> VoiceChatUsers = new();
 
-    // TODO: Fix in the future. This is a temporary solution to keep track of all connected users (not only those who are in the voice chat)
-    private static readonly ConcurrentBag<ChatUser> ConnectedUsers = new();
-
-    public VoiceChatHub(IRoomService roomService, IEventService eventService)
+    public VoiceChatHub(IRoomService roomService, IUnitOfWork unitOfWork, IEventService eventService)
     {
         _roomService = roomService;
+        _unitOfWork = unitOfWork;
         eventService.UserKicked += OnUserKickedOrLeft;
         eventService.UserLeftRoom += OnUserKickedOrLeft;
         eventService.RoomDeleted += OnRoomDeleted;
@@ -58,14 +65,15 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
 
             await Groups.AddToGroupAsync(Context.ConnectionId, roomGuid);
 
-            // Adding the user to the list of connected users
-            ConnectedUsers.Add(new ChatUser
+            // Create and add the user to the voice chat
+            var user = new VoiceChatUser
             {
                 ConnectionId = Context.ConnectionId,
                 HexId = this.GetIssuerHexId(),
-                RoomGuid = roomGuid
-            });
+                RoomGuid = roomGuid,
+            };
 
+            VoiceChatUsers[Context.ConnectionId] = user;
             ConnectionsToGroupsMapping[Context.ConnectionId] = roomGuid;
         }
         catch (RoomExpiredException)
@@ -85,32 +93,37 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
         await base.OnConnectedAsync();
     }
 
-    public override Task OnDisconnectedAsync(Exception? exception)
+    public async override Task OnDisconnectedAsync(Exception? exception)
     {
-        // Notify other users that the user has left
-        if (VoiceChatUsers.TryGetValue(Context.ConnectionId, out var user))
+        if (VoiceChatUsers.TryGetValue(Context.ConnectionId, out var user) && user.IsConnectedToVoice)
         {
-            Clients.Group(user.RoomGuid).SendAsync("UserLeft", user.HexId);
+            // Notify other users that the user has left
+            await Clients.Group(user.RoomGuid).SendAsync("UserLeft", user.HexId);
+
+            if (user.IsMuted)
+            {
+                await UpdateUserStatisticsAsync(user);
+            }
+
+            // Mark user as disconnected and remove
+            user.IsConnectedToVoice = false;
+            VoiceChatUsers.TryRemove(Context.ConnectionId, out _);
         }
 
         ConnectionsToGroupsMapping.TryRemove(Context.ConnectionId, out _);
-        VoiceChatUsers.TryRemove(Context.ConnectionId, out _);
-        ConnectedUsers.RemoveWhere(x => x.ConnectionId == Context.ConnectionId);
-
-        return base.OnDisconnectedAsync(exception);
+        await base.OnDisconnectedAsync(exception);
     }
 
-    /// <inheritdoc cref="IVoiceChatHub.GetVoiceChatUsers"/>
     public SignalRHubResult GetVoiceChatUsers()
     {
         if (!ConnectionsToGroupsMapping.TryGetValue(Context.ConnectionId, out var issuerRoomGuid))
         {
             return Error(new(ErrorCode.YouAreNotConnectedToVoiceChannel));
         }
-        return Success(VoiceChatUsers.Values.Where(u => u.RoomGuid == issuerRoomGuid).ToList());
+        var usersInRoom = VoiceChatUsers.Values.Where(u => u.RoomGuid == issuerRoomGuid && u.IsConnectedToVoice).ToList();
+        return Success(usersInRoom);
     }
 
-    /// <inheritdoc cref="IVoiceChatHub.Join"/>
     public async Task<SignalRHubResult> Join(bool isMuted, bool isDeafened)
     {
         if (!ConnectionsToGroupsMapping.TryGetValue(Context.ConnectionId, out var roomGuid))
@@ -118,31 +131,26 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
             return Error(new(ErrorCode.YouAreNotConnectedToVoiceChannel));
         }
 
-        var issuerHexId = this.GetIssuerHexId();
+        var user = VoiceChatUsers[Context.ConnectionId];
 
-        var user = new VoiceChatUser
-        {
-            HexId = issuerHexId,
-            ConnectionId = Context.ConnectionId,
-            RoomGuid = roomGuid,
-            IsMuted = isMuted,
-            IsDeafened = isDeafened,
-            IsStreamEnabled = false,
-            IsVideoEnabled = false
-        };
-
-        if (VoiceChatUsers.TryAdd(Context.ConnectionId, user))
-        {
-            await Clients.Group(roomGuid).SendAsync("UserJoined", user);
-            return Success();
-        }
-        else
+        if (user.IsConnectedToVoice)
         {
             return Error(new(ErrorCode.YouAreAlreadyConnectedToVoiceChannel));
         }
+
+        // Check if user has connections from multiple devices/clients
+        if (VoiceChatUsers.Values.Any(u => u.HexId == user.HexId && u.RoomGuid == roomGuid && u.IsConnectedToVoice))
+        {
+            return Error(new(ErrorCode.YouAreAlreadyConnectedToVoiceChannel));
+        }
+
+        user.IsMuted = isMuted;
+        user.IsDeafened = isDeafened;
+        user.IsConnectedToVoice = true;
+        await Clients.Group(roomGuid).SendAsync("UserJoined", user);
+        return Success();
     }
 
-    /// <inheritdoc cref="IVoiceChatHub.Leave"/>
     public async Task<SignalRHubResult> Leave()
     {
         if (!ConnectionsToGroupsMapping.TryGetValue(Context.ConnectionId, out var roomGuid))
@@ -150,15 +158,21 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
             return Error(new(ErrorCode.YouAreNotConnectedToVoiceChannel));
         }
 
-        if (VoiceChatUsers.TryRemove(Context.ConnectionId, out var user))
-        {
-            await Clients.Group(roomGuid).SendAsync("UserLeft", user.HexId);
-            return Success();
-        }
-        else
+        var user = VoiceChatUsers[Context.ConnectionId];
+
+        if (!user.IsConnectedToVoice)
         {
             return Error(new(ErrorCode.YouAreNotConnectedToVoiceChannel));
         }
+
+        if (!user.IsMuted)
+        {
+            await UpdateUserStatisticsAsync(user);
+        }
+
+        user.IsConnectedToVoice = false;
+        await Clients.Group(roomGuid).SendAsync("UserLeft", user.HexId);
+        return Success();
     }
 
     /// <inheritdoc cref="IVoiceChatHub.MuteSelf"/>
@@ -167,6 +181,11 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
         if (!VoiceChatUsers.TryGetValue(Context.ConnectionId, out var user))
         {
             return Error(new(ErrorCode.YouAreNotConnectedToVoiceChannel));
+        }
+
+        if (!user.IsMuted)
+        {
+            await UpdateUserStatisticsAsync(user);
         }
 
         user.IsMuted = true;
@@ -183,6 +202,7 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
         }
 
         user.IsMuted = false;
+        user.LastTimeUnmuted = DateTime.UtcNow;
         await Clients.Group(user.RoomGuid).SendAsync("UserUnmuted", user.HexId);
         return Success();
     }
@@ -222,10 +242,11 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
         }
 
         var idsToSendTo = VoiceChatUsers.Values
-            .Where(u => u.RoomGuid == user.RoomGuid && !u.IsDeafened)
+            .Where(u => u.RoomGuid == user.RoomGuid && !u.IsDeafened && u.IsConnectedToVoice)
             .Select(u => u.ConnectionId);
 
         await Clients.Clients(idsToSendTo).SendAsync("ReceiveVoiceSignal", new Signal(user.HexId, audioData));
+
         return Success();
     }
 
@@ -264,7 +285,7 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
         }
 
         var idsToSendTo = VoiceChatUsers.Values
-            .Where(u => u.RoomGuid == user.RoomGuid)
+            .Where(u => u.RoomGuid == user.RoomGuid && u.IsConnectedToVoice)
             .Select(u => u.ConnectionId);
 
         await Clients.Clients(idsToSendTo).SendAsync("ReceiveVideoSignal", new Signal(user.HexId, videoData));
@@ -306,7 +327,7 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
         }
 
         var idsToSendTo = VoiceChatUsers.Values
-            .Where(u => u.RoomGuid == user.RoomGuid && u.WatchedStreams.Contains(user.HexId))
+            .Where(u => u.RoomGuid == user.RoomGuid && u.WatchedStreams.Contains(user.HexId) && u.IsConnectedToVoice)
             .Select(u => u.ConnectionId);
 
         await Clients.Clients(idsToSendTo).SendAsync("ReceiveStreamData", new Signal(user.HexId, pictureData));
@@ -337,9 +358,25 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
         return Success();
     }
 
+    private async Task UpdateUserStatisticsAsync(VoiceChatUser user)
+    {
+        var userSettings = await _unitOfWork.UserSettingsRepository.GetByUserHexIdAsync(user.HexId);
+        if (!userSettings.StatisticsEnabled)
+        {
+            return;
+        }
+
+        var userStatistics = await _unitOfWork.UserStatisticsRepository.GetByUserHexIdAsync(user.HexId);
+        userStatistics.SecondsSpentInVoice += (int)(DateTime.UtcNow - user.LastTimeUnmuted).TotalSeconds;
+        _unitOfWork.UserStatisticsRepository.Update(userStatistics);
+        await _unitOfWork.SaveChangesAsync();
+    }
+
     private static void OnUserKickedOrLeft((int hexId, string roomGuid) data)
     {
-        var connectionIds = ConnectedUsers.Where(x => x.HexId == data.hexId && x.RoomGuid == data.roomGuid).Select(c => c.ConnectionId);
+        var connectionIds = VoiceChatUsers.Values
+            .Where(x => x.HexId == data.hexId && x.RoomGuid == data.roomGuid)
+            .Select(c => c.ConnectionId);
 
         foreach (var connectionId in connectionIds)
         {
@@ -349,7 +386,9 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
 
     private static void OnRoomDeleted(string roomGuid)
     {
-        var connectionIds = ConnectedUsers.Where(x => x.RoomGuid == roomGuid).Select(c => c.ConnectionId);
+        var connectionIds = VoiceChatUsers.Values
+            .Where(x => x.RoomGuid == roomGuid)
+            .Select(c => c.ConnectionId);
 
         foreach (var connectionId in connectionIds)
         {
@@ -359,7 +398,9 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
 
     private static void OnUserDeletedAccountOrLoggedOut(int hexId)
     {
-        var connectionIds = ConnectedUsers.Where(x => x.HexId == hexId).Select(c => c.ConnectionId);
+        var connectionIds = VoiceChatUsers.Values
+            .Where(x => x.HexId == hexId)
+            .Select(c => c.ConnectionId);
 
         foreach (var connectionId in connectionIds)
         {
