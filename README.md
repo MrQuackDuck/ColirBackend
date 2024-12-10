@@ -10,7 +10,7 @@
 
 <b>Colir — fast & secure <ins>messaging platform</ins> </b>with<b> end-to-end</b> encryption. <br>
 
-🛠 **FrontEnd in progress...** 🛠
+<b>Web Client</b> can be found <a href="https://github.com/MrQuackDuck/ColirWebClient/">here</a>.
 
 ## 🌈 The idea
 The main goal of **Colir** is to provide an ability to **communicate securely**. <br>
