@@ -367,7 +367,13 @@ public class VoiceChatHub : ColirHub, IVoiceChatHub
         }
 
         var userStatistics = await _unitOfWork.UserStatisticsRepository.GetByUserHexIdAsync(user.HexId);
-        userStatistics.SecondsSpentInVoice += (int)(DateTime.UtcNow - user.LastTimeUnmuted).TotalSeconds;
+        var newSeconds = (int)(DateTime.UtcNow - user.LastTimeUnmuted).TotalSeconds;
+        if (newSeconds <= 0)
+        {
+            return;
+        }
+
+        userStatistics.SecondsSpentInVoice += newSeconds;
         _unitOfWork.UserStatisticsRepository.Update(userStatistics);
         await _unitOfWork.SaveChangesAsync();
     }
