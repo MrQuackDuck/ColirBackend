@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using Colir.Misc.ExtensionMethods;
+
 namespace Colir.Middleware;
 
 /// <summary>
@@ -56,12 +58,13 @@ public class RequestLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggi
         }
     }
 
-    private bool IsWebsocketRequest(HttpContext context)
+    private static bool IsWebsocketRequest(HttpContext context)
     {
         if (context.WebSockets.IsWebSocketRequest) return true;
 
         var path = context.Request.Path.Value?.ToLowerInvariant();
-        if (path != null && (path.Contains("/api/chat") || path.Contains("/api/voicechat"))) return true;
+        if (path == null) return false;
+        if (path.ContainsOneOf("/api/chat", "/api/voicechat", "/api/clearroom", "/api/registration")) return true;
 
         return false;
     }
