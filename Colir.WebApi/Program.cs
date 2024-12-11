@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IO.Abstractions;
 using System.Text;
 using Colir.ApiRelatedServices;
@@ -153,7 +154,12 @@ app.UseStaticFiles(new StaticFileOptions
 {
     RequestPath = "/wwwroot",
     ServeUnknownFileTypes = true,
-    DefaultContentType = "text/plain"
+    DefaultContentType = "text/plain",
+    OnPrepareResponse = ctx =>
+    {
+        ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=86400");
+        ctx.Context.Response.Headers.Append("Expires", DateTime.UtcNow.AddDays(1).ToString("R", CultureInfo.InvariantCulture));
+    }
 });
 app.UseAuthentication();
 app.UseAuthorization();
