@@ -15,9 +15,9 @@ public class FileLogger : ILogger
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state,
         Exception? exception, Func<TState, Exception?, string> formatter)
     {
-        var logFile = Path.Combine(_folderPath, $"colir-{DateTime.UtcNow:yyyy-MM-dd}.log");
+        var logFile = Path.Combine(_folderPath, $"colir-{DateTime.Now:yyyy-MM-dd}.log");
         var message = formatter(state, exception);
-        var logEntry = $"{Environment.NewLine}[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} {logLevel}] - {_category}: \n{message}";
+        var logEntry = $"{Environment.NewLine}[{DateTime.Now:yyyy-MM-dd HH:mm:ss} {logLevel}] - {_category}: \n{message}";
 
         // Ensure only one thread writes at a time
         lock (Lock)

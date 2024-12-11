@@ -35,10 +35,11 @@ public class TokenService : ITokenService
         };
 
         // Getting the key and generating a token
+        var jwtTokenExpiryInMinutes = int.Parse(_config["Authentication:JwtTokenExpiryInMinutes"]!);
         var encrpyionKey =
             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("Authentication:JwtKey").Value!));
         var jwtToken = new JwtSecurityToken(claims: claims,
-            expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(15)),
+            expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(jwtTokenExpiryInMinutes)),
             signingCredentials: new SigningCredentials(encrpyionKey, SecurityAlgorithms.HmacSha256));
 
         return new JwtSecurityTokenHandler().WriteToken(jwtToken);
@@ -48,13 +49,14 @@ public class TokenService : ITokenService
     public string GenerateRefreshToken(string accessToken)
     {
         var refreshTokenKey = _config["Authentication:RefreshTokenKey"]!;
+        var refreshTokenExpiryInMinutes = int.Parse(_config["Authentication:RefreshTokenExpiryInMinutes"]!);
         var encryptor = new StringEncryptor(HashUtil.ToSha256Truncated(refreshTokenKey, 16),
             HashUtil.ToSha256Truncated(accessToken, 16));
 
         var refreshToken = new RefreshToken()
         {
             Content = accessToken,
-            ExpiryDate = DateTime.Now.Add(TimeSpan.FromDays(7))
+            ExpiryDate = DateTime.UtcNow.Add(TimeSpan.FromMinutes(refreshTokenExpiryInMinutes))
         };
 
         return encryptor.Encrypt(JsonSerializer.Serialize(refreshToken));
@@ -72,7 +74,7 @@ public class TokenService : ITokenService
             var decryptedRefreshToken = JsonSerializer.Deserialize<RefreshToken>(encryptor.Decrypt(refreshToken))!;
 
             // If the refresh token is expired
-            if (DateTime.Now > decryptedRefreshToken.ExpiryDate) return false;
+            if (DateTime.UtcNow > decryptedRefreshToken.ExpiryDate) return false;
             var claims = GetClaimsFromExpiredToken(decryptedRefreshToken.Content);
             var userHexId = int.Parse(claims.First(c => c.Type == "HexId").Value);
 
