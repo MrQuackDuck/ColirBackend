@@ -36,6 +36,7 @@ public interface IMessageServiceTests
 	Task SendAsync_AddsToStatistics_WhenItsEnabled();
 	Task SendAsync_ThorwsAttachmentNotFoundException_WhenAttachmentWasNotFound();
 	Task SendAsync_ThrowsAttachmentNotFoundException_WhenAttachmentIsNotInRoom();
+	Task SendAsync_ThrowsStringTooLongException_WhenMessageContentIsTooLong();
 	Task SendAsync_ThrowsArgumentException_WhenMessageIsEmpty();
 	Task SendAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound();
 	Task SendAsync_ThrowsMessageNotFoundException_WhenNotExistingReplyMessageIdProvided();
@@ -46,6 +47,7 @@ public interface IMessageServiceTests
 
 	Task EditAsync_EditsMessage();
 	Task EditAsync_ThrowsArgumentException_WhenMessageIsEmpty();
+	Task EditAsync_ThrowsStringTooLongException_WhenMessageContentIsTooLong();
 	Task EditAsync_ThrowsMessageNotFoundException_WhenMessageWasNotFound();
 	Task EditAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom();
 	Task EditAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotAuthorOfMessage();

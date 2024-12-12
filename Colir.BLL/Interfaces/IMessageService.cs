@@ -69,6 +69,7 @@ public interface IMessageService
     /// </summary>
     /// <exception cref="AttachmentNotFoundException">Thrown when the attachment wasn't found or it's not in the room the message is being sent to</exception>
     /// <exception cref="ArgumentException">Thrown when the message content is empty</exception>
+    /// <exception cref="StringTooLongException">Thrown when the message content is too long</exception>
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
     /// <exception cref="IssuerNotInRoomException">Thrown when the issuer is not in the room</exception>
     /// <exception cref="UserNotFoundException">Thrown when the issuer wasn't found</exception>

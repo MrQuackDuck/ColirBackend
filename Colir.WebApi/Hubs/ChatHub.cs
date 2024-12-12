@@ -300,6 +300,10 @@ public class ChatHub : ColirHub, IChatHub
         {
             return Error(new(ErrorCode.AttachmentNotFound));
         }
+        catch (StringTooLongException)
+        {
+            return Error(new(ErrorCode.StringWasTooLong));
+        }
         catch (RoomNotFoundException)
         {
             return Error(new(ErrorCode.RoomNotFound), true);
@@ -340,6 +344,10 @@ public class ChatHub : ColirHub, IChatHub
         catch (ArgumentException)
         {
             return Error(new (ErrorCode.EmptyMessage));
+        }
+        catch (StringTooLongException)
+        {
+            return Error(new(ErrorCode.StringWasTooLong));
         }
         catch (RoomExpiredException)
         {

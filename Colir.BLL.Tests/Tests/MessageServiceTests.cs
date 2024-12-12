@@ -29,10 +29,12 @@ public class MessageServiceTests : IMessageServiceTests
 
         // Initialize the service
         var configMock = new Mock<IConfiguration>();
+        configMock.Setup(c => c["AppSettings:MaxMessageLength"]).Returns("4096");
+
         var roomFileMangerMock = new Mock<IRoomFileManager>();
         var unitOfWork = new UnitOfWork(_dbContext, configMock.Object, roomFileMangerMock.Object);
         var mapper = AutomapperProfile.InitializeAutoMapper().CreateMapper();
-        _messageService = new MessageService(unitOfWork, mapper);
+        _messageService = new MessageService(unitOfWork, mapper, configMock.Object);
 
         // Add entities
         UnitTestHelper.SeedData(_dbContext);
@@ -675,6 +677,25 @@ public class MessageServiceTests : IMessageServiceTests
     }
 
     [Test]
+    public async Task SendAsync_ThrowsStringTooLongException_WhenMessageContentIsTooLong()
+    {
+        // Arrange
+        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var request = new RequestToSendMessage
+        {
+            IssuerId = 1,
+            Content = new string('a', 4097),
+            RoomGuid = room.Guid
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.SendAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<StringTooLongException>(act);
+    }
+
+    [Test]
     public async Task SendAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
     {
         // Arrange
@@ -824,6 +845,24 @@ public class MessageServiceTests : IMessageServiceTests
 
         // Assert
         Assert.ThrowsAsync<ArgumentException>(act);
+    }
+
+    [Test]
+    public async Task EditAsync_ThrowsStringTooLongException_WhenMessageContentIsTooLong()
+    {
+        // Arrange
+        var request = new RequestToEditMessage
+        {
+            IssuerId = 1,
+            MessageId = 1,
+            NewContent = new string('a', 4097)
+        };
+
+        // Act
+        AsyncTestDelegate act = async () => await _messageService.EditAsync(request);
+
+        // Assert
+        Assert.ThrowsAsync<StringTooLongException>(act);
     }
 
     [Test]

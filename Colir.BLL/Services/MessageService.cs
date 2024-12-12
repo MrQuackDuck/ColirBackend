@@ -8,6 +8,7 @@ using Colir.Exceptions.NotEnoughPermissions;
 using Colir.Exceptions.NotFound;
 using DAL.Entities;
 using DAL.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace Colir.BLL.Services;
 
@@ -15,11 +16,13 @@ public class MessageService : IMessageService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly IConfiguration _config;
 
-    public MessageService(IUnitOfWork unitOfWork, IMapper mapper)
+    public MessageService(IUnitOfWork unitOfWork, IMapper mapper, IConfiguration config)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _config = config;
     }
 
     /// <inheritdoc cref="IMessageService.GetLastMessagesAsync"/>
@@ -235,6 +238,12 @@ public class MessageService : IMessageService
             throw new ArgumentException("Message can't be empty!");
         }
 
+        var maxMessageLength = int.Parse(_config["AppSettings:MaxMessageLength"]!);
+        if (request.Content.Length > maxMessageLength)
+        {
+            throw new StringTooLongException();
+        }
+
         var issuer = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
 
         var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
@@ -331,6 +340,13 @@ public class MessageService : IMessageService
         if (request.NewContent.Length == 0 && message.Attachments.Count == 0)
         {
             throw new ArgumentException("Message content can't be empty!");
+        }
+
+        // Check if the message is not too long
+        var maxMessageLength = int.Parse(_config["AppSettings:MaxMessageLength"]!);
+        if (request.NewContent.Length > maxMessageLength)
+        {
+            throw new StringTooLongException();
         }
 
         var room = await _unitOfWork.RoomRepository.GetByIdAsync(message.RoomId);
