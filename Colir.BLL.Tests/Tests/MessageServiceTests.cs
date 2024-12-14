@@ -827,6 +827,7 @@ public class MessageServiceTests : IMessageServiceTests
         // Assert
         var messageAfter = _dbContext.Messages.AsNoTracking().First(m => m.Id == 1);
         Assert.That(messageAfter.Content == request.NewContent);
+        Assert.That(messageAfter.EditDate != null);
     }
 
     [Test]

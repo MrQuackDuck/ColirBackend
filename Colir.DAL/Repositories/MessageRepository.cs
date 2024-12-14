@@ -328,8 +328,6 @@ public class MessageRepository : IMessageRepository
 
         if (originalEntity.Room!.IsExpired()) throw new RoomExpiredException();
 
-        message.EditDate = DateTime.Now;
-
         _dbContext.Entry(originalEntity).State = EntityState.Detached;
         _dbContext.Entry(message).State = EntityState.Modified;
     }

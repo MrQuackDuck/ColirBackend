@@ -370,8 +370,9 @@ public class MessageService : IMessageService
         }
 
         message.Content = request.NewContent;
-        _unitOfWork.MessageRepository.Update(message);
+        message.EditDate = DateTime.Now;
 
+        _unitOfWork.MessageRepository.Update(message);
         await _unitOfWork.SaveChangesAsync();
 
         return _mapper.Map<MessageModel>(message);
