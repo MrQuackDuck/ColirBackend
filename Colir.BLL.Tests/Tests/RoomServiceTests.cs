@@ -39,7 +39,8 @@ public class RoomServiceTests : IRoomServiceTests
         var unitOfWork = new UnitOfWork(_dbContext, configMock.Object, roomFileMangerMock.Object);
 
         var roomCleanerFactoryMock = new Mock<IRoomCleanerFactory>();
-        roomCleanerFactoryMock.Setup(factory => factory.GetRoomCleaner("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e", unitOfWork, configMock.Object))
+        roomCleanerFactoryMock.Setup(factory =>
+                factory.GetRoomCleaner("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e", unitOfWork, configMock.Object))
             .Returns(roomCleanerMock.Object);
 
         var mapper = AutomapperProfile.InitializeAutoMapper().CreateMapper();
@@ -451,7 +452,7 @@ public class RoomServiceTests : IRoomServiceTests
         // Arrange
         var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var expectedTime = (await _dbContext.LastTimeUserReadChats
-            .FirstAsync(u => u.UserId == 1))
+                .FirstAsync(u => u.UserId == 1))
             .Timestamp;
 
         var request = new RequestToGetLastTimeUserReadChat
@@ -863,8 +864,12 @@ public class RoomServiceTests : IRoomServiceTests
         await _roomService.LeaveAsync(request);
 
         // Assert
-        var roomAfter = await _dbContext.Rooms.AsNoTracking().Include(nameof(Room.JoinedUsers)).FirstAsync(r => r.Id == 1);
-        var userAfter = await _dbContext.Users.AsNoTracking().Include((nameof(User.JoinedRooms))).FirstAsync(u => u.Id == 1);
+        var roomAfter = await _dbContext.Rooms.AsNoTracking().Include(nameof(Room.JoinedUsers))
+            .FirstAsync(r => r.Id == 1);
+
+        var userAfter = await _dbContext.Users.AsNoTracking().Include((nameof(User.JoinedRooms)))
+            .FirstAsync(u => u.Id == 1);
+
         Assert.That(roomAfter.JoinedUsers.Count == 1);
         Assert.That(userAfter.JoinedRooms.Count == 1);
     }

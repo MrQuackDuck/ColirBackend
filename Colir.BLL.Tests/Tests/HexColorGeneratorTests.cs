@@ -66,7 +66,7 @@ public class HexColorGeneratorTests : IHexColorGeneratorTests
         var result = await _hexGenerator.GetUniqueHexColorListAsync(5);
 
         // Assert
-        Assert.That(result.Count() == 5);
+        Assert.That(result.Count == 5);
     }
 
     [Test]

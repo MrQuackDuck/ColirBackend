@@ -39,10 +39,10 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
     public async Task GetAllAsync_ReturnsAllReactions()
     {
         // Arrange
-        List<Reaction> expected = _dbContext.Reactions
-                                  .Include(nameof(Reaction.Author))
-                                  .Include(nameof(Reaction.Message))
-                                  .ToList();
+        List<Reaction> expected = await _dbContext.Reactions
+            .Include(nameof(Reaction.Author))
+            .Include(nameof(Reaction.Message))
+            .ToListAsync();
 
         // Act
         var result = await _reactionRepository.GetAllAsync();
@@ -62,10 +62,10 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
     public async Task GetByIdAsync_ReturnsReaction_WhenFound()
     {
         // Arrange
-        Reaction expected = _dbContext.Reactions
-                                      .Include(nameof(Reaction.Author))
-                                      .Include(nameof(Reaction.Message))
-                                      .First(r => r.Id == 1);
+        Reaction expected = await _dbContext.Reactions
+            .Include(nameof(Reaction.Author))
+            .Include(nameof(Reaction.Message))
+            .FirstAsync(r => r.Id == 1);
 
         // Act
         var result = await _reactionRepository.GetByIdAsync(1);
@@ -92,10 +92,10 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
         // Arrange
         var expected = new List<Reaction>
         {
-            _dbContext.Reactions
+            (await _dbContext.Reactions
                 .Include(nameof(Reaction.Author))
                 .Include(nameof(Reaction.Message))
-                .FirstOrDefault(r => r.MessageId == 1)!
+                .FirstOrDefaultAsync(r => r.MessageId == 1))!
         };
 
         // Act
@@ -135,10 +135,10 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
 
         // Act
         await _reactionRepository.AddAsync(reactionToAdd);
-        _reactionRepository.SaveChanges();
+        await _reactionRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.Reactions.Count() == 2);
+        Assert.That(await _dbContext.Reactions.CountAsync() == 2);
     }
 
     [Test]
@@ -183,14 +183,14 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
     public async Task Delete_DeletesReaction()
     {
         // Arrange
-        var reactionToDelete = _dbContext.Reactions.AsNoTracking().First();
+        var reactionToDelete = await _dbContext.Reactions.AsNoTracking().FirstAsync();
 
         // Act
         _reactionRepository.Delete(reactionToDelete);
-        _reactionRepository.SaveChanges();
+        await _reactionRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.Reactions.Count() == 0);
+        Assert.That(await _dbContext.Reactions.CountAsync() == 0);
     }
 
     [Test]
@@ -211,10 +211,10 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
     {
         // Act
         await _reactionRepository.DeleteByIdAsync(1);
-        _reactionRepository.SaveChanges();
+        await _reactionRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.Reactions.Count() == 0);
+        Assert.That(await _dbContext.Reactions.CountAsync() == 0);
     }
 
     [Test]
@@ -244,13 +244,13 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
     public async Task Update_UpdatesReaction()
     {
         // Arrange
-        var reactionToUpdate = _dbContext.Reactions.AsNoTracking().First();
+        var reactionToUpdate = await _dbContext.Reactions.AsNoTracking().FirstAsync();
         reactionToUpdate.Symbol = "😎";
 
         // Act
         _reactionRepository.Update(reactionToUpdate);
-        _reactionRepository.SaveChanges();
-        var updatedReaction = _dbContext.Reactions.First(r => r.Id == reactionToUpdate.Id);
+        await _reactionRepository.SaveChangesAsync();
+        var updatedReaction = await _dbContext.Reactions.FirstAsync(r => r.Id == reactionToUpdate.Id);
 
         // Assert
         Assert.That(updatedReaction.Symbol, Is.EqualTo("😎"));

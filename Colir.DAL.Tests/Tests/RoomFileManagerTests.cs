@@ -82,10 +82,11 @@ public class RoomFileManagerTests : IRoomFileManagerTests
         var fileSize = 100;
 
         // Act
-        var resultPath = await _roomFileManager.UploadFileAsync("00000000-0000-0000-0000-000000000000", new FakeFormFile(fileName, fileSize, _mockFileSystem));
+        var resultPath = await _roomFileManager.UploadFileAsync("00000000-0000-0000-0000-000000000000",
+            new FakeFormFile(fileName, fileSize, _mockFileSystem));
 
         // Assert
-        _mockFileSystem.File.Exists(resultPath);
+        Assert.That(_mockFileSystem.File.Exists(resultPath));
     }
 
     [Test]
@@ -100,7 +101,7 @@ public class RoomFileManagerTests : IRoomFileManagerTests
         _roomFileManager.DeleteFile(path);
 
         // Assert
-        Assert.That(_mockFileSystem.FileExists(path) == false);
+        Assert.That(!_mockFileSystem.FileExists(path));
     }
 
     [Test]

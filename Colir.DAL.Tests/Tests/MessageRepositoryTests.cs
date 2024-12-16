@@ -40,11 +40,11 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     public async Task GetAllAsync_ReturnsAllMessages()
     {
         // Arrange
-        List<Message> expected = _dbContext.Messages
-                                           .Include(nameof(Message.Author))
-                                           .Include(nameof(Message.Reactions))
-                                           .Include(nameof(Message.Attachments))
-                                           .ToList();
+        List<Message> expected = await _dbContext.Messages
+            .Include(nameof(Message.Author))
+            .Include(nameof(Message.Reactions))
+            .Include(nameof(Message.Attachments))
+            .ToListAsync();
 
         // Act
         var result = await _messageRepository.GetAllAsync();
@@ -60,7 +60,8 @@ public class MessageRepositoryTests : IMessageRepositoryTests
             Is.EqualTo(expected.SelectMany(r => r.Reactions).OrderBy(r => r.Id)).Using(new ReactionEqualityComparer()));
 
         Assert.That(result.SelectMany(r => r.Attachments).OrderBy(r => r.Id),
-            Is.EqualTo(expected.SelectMany(r => r.Attachments).OrderBy(r => r.Id)).Using(new AttachmentEqualityComparer()));
+            Is.EqualTo(expected.SelectMany(r => r.Attachments).OrderBy(r => r.Id))
+                .Using(new AttachmentEqualityComparer()));
     }
 
     [Test]
@@ -69,11 +70,11 @@ public class MessageRepositoryTests : IMessageRepositoryTests
         // Arrange
         var expected = new List<Message>
         {
-            _dbContext.Messages
+            (await _dbContext.Messages
                 .Include(nameof(Message.Author))
                 .Include(nameof(Message.Reactions))
                 .Include(nameof(Message.Attachments))
-                .FirstOrDefault(message => message.Id == 2)!
+                .FirstOrDefaultAsync(message => message.Id == 2))!
         };
 
         // Act
@@ -86,7 +87,8 @@ public class MessageRepositoryTests : IMessageRepositoryTests
             Is.EqualTo(expected.SelectMany(r => r.Reactions).OrderBy(r => r.Id)).Using(new ReactionEqualityComparer()));
 
         Assert.That(result.SelectMany(r => r.Attachments).OrderBy(r => r.Id),
-            Is.EqualTo(expected.SelectMany(r => r.Attachments).OrderBy(r => r.Id)).Using(new AttachmentEqualityComparer()));
+            Is.EqualTo(expected.SelectMany(r => r.Attachments).OrderBy(r => r.Id))
+                .Using(new AttachmentEqualityComparer()));
     }
 
     [Test]
@@ -139,16 +141,16 @@ public class MessageRepositoryTests : IMessageRepositoryTests
         // Arrange
         var expected = new List<Message>
         {
-            _dbContext.Messages
+            (await _dbContext.Messages
                 .Include(nameof(Message.Author))
                 .Include(nameof(Message.Reactions))
                 .Include(nameof(Message.Attachments))
-                .FirstOrDefault(message => message.Id == 1)!,
-            _dbContext.Messages
+                .FirstOrDefaultAsync(message => message.Id == 1))!,
+            (await _dbContext.Messages
                 .Include(nameof(Message.Author))
                 .Include(nameof(Message.Reactions))
                 .Include(nameof(Message.Attachments))
-                .FirstOrDefault(message => message.Id == 2)!
+                .FirstOrDefaultAsync(message => message.Id == 2))!
         };
 
         // Act
@@ -241,15 +243,16 @@ public class MessageRepositoryTests : IMessageRepositoryTests
         // Arrange
         var expected = new List<Message>
         {
-            _dbContext.Messages
+            (await _dbContext.Messages
                 .Include(nameof(Message.Author))
                 .Include(nameof(Message.Reactions))
                 .Include(nameof(Message.Attachments))
-                .FirstOrDefault(message => message.Id == 2)!
+                .FirstOrDefaultAsync(message => message.Id == 2))!
         };
 
         // Act
-        var result = await _messageRepository.GetAllRepliesToUserAfterDateAsync("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e", 1, DateTime.Now - new TimeSpan(1, 0, 0));
+        var result = await _messageRepository.GetAllRepliesToUserAfterDateAsync("cbaa8673-ea8b-43f8-b4cc-b8b0797b620e",
+            1, DateTime.Now - new TimeSpan(1, 0, 0));
 
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new MessageEqualityComparer()));
@@ -260,7 +263,8 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     {
         // Act
         AsyncTestDelegate act = async () =>
-            await _messageRepository.GetAllRepliesToUserAfterDateAsync("00000000-0000-0000-0000-000000000000", 1, DateTime.Now);
+            await _messageRepository.GetAllRepliesToUserAfterDateAsync("00000000-0000-0000-0000-000000000000", 1,
+                DateTime.Now);
 
         // Assert
         Assert.ThrowsAsync<RoomNotFoundException>(act);
@@ -272,7 +276,8 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     {
         // Act
         AsyncTestDelegate act = async () =>
-            await _messageRepository.GetAllRepliesToUserAfterDateAsync("12ffb712-aca7-416f-b899-8f9aaac6770f", 1, DateTime.Now);
+            await _messageRepository.GetAllRepliesToUserAfterDateAsync("12ffb712-aca7-416f-b899-8f9aaac6770f", 1,
+                DateTime.Now);
 
         // Assert
         Assert.ThrowsAsync<RoomExpiredException>(act);
@@ -282,11 +287,11 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     public async Task GetByIdAsync_ReturnsMessage_WhenFound()
     {
         // Arrange
-        Message expected = _dbContext.Messages
-                                     .Include(nameof(Message.Author))
-                                     .Include(nameof(Message.Reactions))
-                                     .Include(nameof(Message.Attachments))
-                                     .First(m => m.Id == 1);
+        Message expected = await _dbContext.Messages
+            .Include(nameof(Message.Author))
+            .Include(nameof(Message.Reactions))
+            .Include(nameof(Message.Attachments))
+            .FirstAsync(m => m.Id == 1);
 
         // Act
         var result = await _messageRepository.GetByIdAsync(1);
@@ -323,10 +328,10 @@ public class MessageRepositoryTests : IMessageRepositoryTests
 
         // Act
         await _messageRepository.AddAsync(messageToAdd);
-        _messageRepository.SaveChanges();
+        await _messageRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.Messages.Count() == 4);
+        Assert.That(await _dbContext.Messages.CountAsync() == 4);
     }
 
     [Test]
@@ -354,11 +359,11 @@ public class MessageRepositoryTests : IMessageRepositoryTests
 
         // Act
         await _messageRepository.AddAsync(messageToAdd);
-        _messageRepository.SaveChanges();
+        await _messageRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.Messages.Count() == 4);
-        Assert.That(_dbContext.Attachments.Count() == 2);
+        Assert.That(await _dbContext.Messages.CountAsync() == 4);
+        Assert.That(await _dbContext.Attachments.CountAsync() == 2);
     }
 
     [Test]
@@ -386,11 +391,11 @@ public class MessageRepositoryTests : IMessageRepositoryTests
 
         // Act
         await _messageRepository.AddAsync(messageToAdd);
-        _messageRepository.SaveChanges();
+        await _messageRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.Messages.Count() == 4);
-        Assert.That(_dbContext.Reactions.Count() == 2);
+        Assert.That(await _dbContext.Messages.CountAsync() == 4);
+        Assert.That(await _dbContext.Reactions.CountAsync() == 2);
     }
 
     [Test]
@@ -478,56 +483,56 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     public async Task Delete_DeletesMessage()
     {
         // Arrange
-        var messageToDelete = _dbContext.Messages.AsNoTracking().First(m => m.Id == 1);
+        var messageToDelete = await _dbContext.Messages.AsNoTracking().FirstAsync(m => m.Id == 1);
 
         // Act
         _messageRepository.Delete(messageToDelete);
-        _messageRepository.SaveChanges();
+        await _messageRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.Messages.Count() == 2);
+        Assert.That(await _dbContext.Messages.CountAsync() == 2);
     }
 
     [Test]
     public async Task Delete_DeletesAllRelatedReactions()
     {
         // Arrange
-        var messageToDelete = _dbContext.Messages.AsNoTracking().First(m => m.Id == 1);
+        var messageToDelete = await _dbContext.Messages.AsNoTracking().FirstAsync(m => m.Id == 1);
 
         // Act
         _messageRepository.Delete(messageToDelete);
-        _messageRepository.SaveChanges();
+        await _messageRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.Reactions.Count() == 0);
+        Assert.That(await _dbContext.Reactions.CountAsync() == 0);
     }
 
     [Test]
     public async Task Delete_DeletesAllRelatedAttachments()
     {
         // Arrange
-        var messageToDelete = _dbContext.Messages.First(m => m.Id == 1);
+        var messageToDelete = await _dbContext.Messages.FirstAsync(m => m.Id == 1);
 
         // Act
         _messageRepository.Delete(messageToDelete);
-        _messageRepository.SaveChanges();
+        await _messageRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.Attachments.Count() == 0);
+        Assert.That(await _dbContext.Attachments.CountAsync() == 0);
     }
 
     [Test]
     public async Task Delete_NotDeletesAnyOtherMessages()
     {
         // Arrange
-        var messageToDelete = _dbContext.Messages.First(m => m.Id == 1);
+        var messageToDelete = await _dbContext.Messages.FirstAsync(m => m.Id == 1);
 
         // Act
         _messageRepository.Delete(messageToDelete);
-        _messageRepository.SaveChanges();
+        await _messageRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.Messages.Any(m => m.Id == 2), Is.True);
+        Assert.That(await _dbContext.Messages.AnyAsync(m => m.Id == 2), Is.True);
     }
 
     [Test]
@@ -547,7 +552,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     public async Task Delete_ThrowsRoomExpiredException_WhenRoomExpired()
     {
         // Arrange
-        var messageToDelete = _dbContext.Messages.First(m => m.RoomId == 2);
+        var messageToDelete = await _dbContext.Messages.FirstAsync(m => m.RoomId == 2);
 
         // Act
         TestDelegate act = () => _messageRepository.Delete(messageToDelete);
@@ -561,10 +566,10 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     {
         // Act
         await _messageRepository.DeleteByIdAsync(1);
-        _messageRepository.SaveChanges();
+        await _messageRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.Messages.Count() == 2);
+        Assert.That(await _dbContext.Messages.CountAsync() == 2);
     }
 
     [Test]
@@ -572,10 +577,10 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     {
         // Act
         await _messageRepository.DeleteByIdAsync(1);
-        _messageRepository.SaveChanges();
+        await _messageRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.Reactions.Count() == 0);
+        Assert.That(await _dbContext.Reactions.CountAsync() == 0);
     }
 
     [Test]
@@ -583,10 +588,10 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     {
         // Act
         await _messageRepository.DeleteByIdAsync(1);
-        _messageRepository.SaveChanges();
+        await _messageRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.Attachments.Count() == 0);
+        Assert.That(await _dbContext.Attachments.CountAsync() == 0);
     }
 
     [Test]
@@ -603,7 +608,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     public async Task DeleteByIdAsync_ThrowsRoomExpiredException_WhenRoomExpired()
     {
         // Arrange
-        var expiredMessageId = _dbContext.Messages.First(m => m.RoomId == 2).Id;
+        var expiredMessageId = await _dbContext.Messages.Where(m => m.RoomId == 2).Select(m => m.Id).FirstAsync();
 
         // Act
         AsyncTestDelegate act = async () => await _messageRepository.DeleteByIdAsync(expiredMessageId);
@@ -616,15 +621,15 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     public async Task Update_UpdatesMessage()
     {
         // Arrange
-        var messageToUpdate = _dbContext.Messages.AsNoTracking().First(m => m.Id == 1);
+        var messageToUpdate = await _dbContext.Messages.AsNoTracking().FirstAsync(m => m.Id == 1);
         messageToUpdate.Content = "Updated content";
 
         // Act
         _messageRepository.Update(messageToUpdate);
-        _messageRepository.SaveChanges();
+        await _messageRepository.SaveChangesAsync();
 
         // Assert
-        var updatedMessage = _dbContext.Messages.First(m => m.Id == 1);
+        var updatedMessage = await _dbContext.Messages.FirstAsync(m => m.Id == 1);
         Assert.That(updatedMessage.Content, Is.EqualTo("Updated content"));
     }
 
@@ -645,7 +650,7 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     public async Task Update_ThrowsRoomExpiredException_WhenRoomExpired()
     {
         // Arrange
-        var messageToUpdate = _dbContext.Messages.First(m => m.RoomId == 2);
+        var messageToUpdate = await _dbContext.Messages.FirstAsync(m => m.RoomId == 2);
         messageToUpdate.Content = "Updated content";
 
         // Act

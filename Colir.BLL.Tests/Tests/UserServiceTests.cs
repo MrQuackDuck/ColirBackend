@@ -55,7 +55,7 @@ public class UserServiceTests : IUserServiceTests
     public async Task GetAccountInfo_ReturnsUser()
     {
         // Arrange
-        var userToGet = _dbContext.Users.First(u => u.Id == 1);
+        var userToGet = await _dbContext.Users.FirstAsync(u => u.Id == 1);
         var request = new RequestToGetAccountInfo
         {
             IssuerId = 1
@@ -101,7 +101,7 @@ public class UserServiceTests : IUserServiceTests
         await _userService.AuthorizeViaGitHubAsync(request);
 
         // Assert
-        Assert.That(_dbContext.Users.Count() == 4);
+        Assert.That(await _dbContext.Users.CountAsync() == 4);
     }
 
     [Test]
@@ -191,7 +191,7 @@ public class UserServiceTests : IUserServiceTests
         await _userService.AuthorizeAsAnnoymousAsync(request);
 
         // Assert
-        Assert.That(_dbContext.Users.Count() == 4);
+        Assert.That(await _dbContext.Users.CountAsync() == 4);
     }
 
     [Test]
@@ -257,7 +257,7 @@ public class UserServiceTests : IUserServiceTests
         await _userService.ChangeUsernameAsync(request);
 
         // Assert
-        var userAfter = _dbContext.Users.First(u => u.Id == 1);
+        var userAfter = await _dbContext.Users.FirstAsync(u => u.Id == 1);
         Assert.That(request.DesiredUsername == userAfter.Username);
     }
 
@@ -309,8 +309,8 @@ public class UserServiceTests : IUserServiceTests
         await _userService.ChangeSettingsAsync(request);
 
         // Assert
-        var userAfter = _dbContext.Users.Include(nameof(User.UserSettings)).First(u => u.Id == 1);
-        Assert.That(userAfter.UserSettings.StatisticsEnabled == false);
+        var userAfter = await _dbContext.Users.Include(nameof(User.UserSettings)).FirstAsync(u => u.Id == 1);
+        Assert.That(!userAfter.UserSettings.StatisticsEnabled);
     }
 
     [Test]
@@ -333,8 +333,8 @@ public class UserServiceTests : IUserServiceTests
     [Test]
     public async Task DeleteAccount_DeletesAccount()
     {
-        // Arrnge
-        var userCountBefore = _dbContext.Users.Count();
+        // Arrange
+        var userCountBefore = await _dbContext.Users.CountAsync();
         var request = new RequestToDeleteAccount
         {
             IssuerId = 1,
@@ -344,14 +344,14 @@ public class UserServiceTests : IUserServiceTests
         await _userService.DeleteAccount(request);
 
         // Assert
-        var userCountAfter = _dbContext.Users.Count();
+        var userCountAfter = await _dbContext.Users.CountAsync();
         Assert.That(userCountBefore - userCountAfter == 1);
     }
 
     [Test]
     public async Task DeleteAccount_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
     {
-        // Arrnge
+        // Arrange
         var request = new RequestToDeleteAccount
         {
             IssuerId = 404,

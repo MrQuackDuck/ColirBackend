@@ -47,10 +47,10 @@ public class UserRepositoryTests : IUserRepositoryTests
     {
         // Arrange
         List<User> expected = await _dbContext.Users
-                                        .Include(nameof(User.UserStatistics))
-                                        .Include(nameof(User.UserSettings))
-                                        .Include(nameof(User.JoinedRooms))
-                                        .ToListAsync();
+            .Include(nameof(User.UserStatistics))
+            .Include(nameof(User.UserSettings))
+            .Include(nameof(User.JoinedRooms))
+            .ToListAsync();
 
         // Act
         var result = await _userRepository.GetAllAsync();
@@ -60,10 +60,12 @@ public class UserRepositoryTests : IUserRepositoryTests
         Assert.That(result, Is.EqualTo(expected).Using(new UserEqualityComparer()));
 
         Assert.That(result.Select(r => r.UserStatistics).OrderBy(r => r.Id),
-            Is.EqualTo(expected.Select(r => r.UserStatistics).OrderBy(r => r.Id)).Using(new UserStatisticsEqualityComparer()));
+            Is.EqualTo(expected.Select(r => r.UserStatistics).OrderBy(r => r.Id))
+                .Using(new UserStatisticsEqualityComparer()));
 
         Assert.That(result.Select(r => r.UserSettings).OrderBy(r => r.Id),
-            Is.EqualTo(expected.Select(r => r.UserSettings).OrderBy(r => r.Id)).Using(new UserSettingsEqualityComparer()));
+            Is.EqualTo(expected.Select(r => r.UserSettings).OrderBy(r => r.Id))
+                .Using(new UserSettingsEqualityComparer()));
 
         Assert.That(result.SelectMany(r => r.JoinedRooms).OrderBy(r => r.Id),
             Is.EqualTo(expected.SelectMany(r => r.JoinedRooms).OrderBy(r => r.Id)).Using(new RoomEqualityComparer()));
@@ -84,7 +86,9 @@ public class UserRepositoryTests : IUserRepositoryTests
 
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new UserEqualityComparer()));
-        Assert.That(result.UserStatistics, Is.EqualTo(expected.UserStatistics).Using(new UserStatisticsEqualityComparer()));
+        Assert.That(result.UserStatistics,
+            Is.EqualTo(expected.UserStatistics).Using(new UserStatisticsEqualityComparer()));
+
         Assert.That(result.UserSettings, Is.EqualTo(expected.UserSettings).Using(new UserSettingsEqualityComparer()));
         Assert.That(result.JoinedRooms, Is.EqualTo(expected.JoinedRooms).Using(new RoomEqualityComparer()));
     }
@@ -104,17 +108,19 @@ public class UserRepositoryTests : IUserRepositoryTests
     {
         // Arrange
         User expected = await _dbContext.Users
-                                        .Include(nameof(User.UserStatistics))
-                                        .Include(nameof(User.UserSettings))
-                                        .Include(nameof(User.JoinedRooms))
-                                        .FirstAsync(u => u.Id == 1);
+            .Include(nameof(User.UserStatistics))
+            .Include(nameof(User.UserSettings))
+            .Include(nameof(User.JoinedRooms))
+            .FirstAsync(u => u.Id == 1);
 
         // Act
         var result = await _userRepository.GetByHexIdAsync(0xFFFFFF);
 
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new UserEqualityComparer()));
-        Assert.That(result.UserStatistics, Is.EqualTo(expected.UserStatistics).Using(new UserStatisticsEqualityComparer()));
+        Assert.That(result.UserStatistics,
+            Is.EqualTo(expected.UserStatistics).Using(new UserStatisticsEqualityComparer()));
+
         Assert.That(result.UserSettings, Is.EqualTo(expected.UserSettings).Using(new UserSettingsEqualityComparer()));
         Assert.That(result.JoinedRooms, Is.EqualTo(expected.JoinedRooms).Using(new RoomEqualityComparer()));
     }
@@ -154,7 +160,9 @@ public class UserRepositoryTests : IUserRepositoryTests
 
         // Assert
         Assert.That(result, Is.EqualTo(expected).Using(new UserEqualityComparer()));
-        Assert.That(result.UserStatistics, Is.EqualTo(expected.UserStatistics).Using(new UserStatisticsEqualityComparer()));
+        Assert.That(result.UserStatistics,
+            Is.EqualTo(expected.UserStatistics).Using(new UserStatisticsEqualityComparer()));
+
         Assert.That(result.UserSettings, Is.EqualTo(expected.UserSettings).Using(new UserSettingsEqualityComparer()));
         Assert.That(result.JoinedRooms, Is.EqualTo(expected.JoinedRooms).Using(new RoomEqualityComparer()));
     }
@@ -442,10 +450,10 @@ public class UserRepositoryTests : IUserRepositoryTests
         var userToDelete = new User() { Id = 404 };
 
         // Act
-        AsyncTestDelegate act = async () => _userRepository.Delete(userToDelete);
+        TestDelegate act = () => _userRepository.Delete(userToDelete);
 
         // Assert
-        Assert.ThrowsAsync<UserNotFoundException>(act);
+        Assert.Throws<UserNotFoundException>(act);
     }
 
     [Test]

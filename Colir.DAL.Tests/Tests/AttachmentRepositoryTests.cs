@@ -40,8 +40,8 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
     {
         // Arrange
         var expected = await _dbContext.Attachments
-                                 .Include(nameof(Attachment.Message))
-                                 .ToListAsync();
+            .Include(nameof(Attachment.Message))
+            .ToListAsync();
 
         // Act
         var result = await _attachmentRepository.GetAllAsync();
@@ -59,8 +59,8 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
     {
         // Arrange
         var expected = await _dbContext.Attachments
-                                 .Include(nameof(Attachment.Message))
-                                 .FirstAsync(a => a.Id == 1);
+            .Include(nameof(Attachment.Message))
+            .FirstAsync(a => a.Id == 1);
 
         // Act
         var result = await _attachmentRepository.GetByIdAsync(1);
@@ -168,7 +168,8 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
     }
 
     [Test]
-    public async Task DeleteAttachmentByPathAsync_ThrowsAttachmentNotFoundException_WhenAttachmentWasNotFoundByFileName()
+    public async Task
+        DeleteAttachmentByPathAsync_ThrowsAttachmentNotFoundException_WhenAttachmentWasNotFoundByFileName()
     {
         // Act
         AsyncTestDelegate act = async () => await _attachmentRepository.DeleteAttachmentByPathAsync("404.zip");

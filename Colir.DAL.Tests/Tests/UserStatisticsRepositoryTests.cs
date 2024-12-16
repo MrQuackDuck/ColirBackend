@@ -39,9 +39,9 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
     public async Task GetAllAsync_ReturnsAllUsersStatistics()
     {
         // Arrange
-        var expected = _dbContext.UserStatistics
-                                  .Include(nameof(UserStatistics.User))
-                                  .ToList();
+        var expected = await _dbContext.UserStatistics
+            .Include(nameof(UserStatistics.User))
+            .ToListAsync();
 
         // Act
         var result = await _userStatisticsRepository.GetAllAsync();
@@ -57,9 +57,9 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
     public async Task GetByUserHexIdAsync_ReturnsUserStatistics()
     {
         // Arrange
-        var expected = _dbContext.UserStatistics
-                                  .Include(nameof(UserStatistics.User))
-                                  .First(u => u.UserId == 1);
+        var expected = await _dbContext.UserStatistics
+            .Include(nameof(UserStatistics.User))
+            .FirstAsync(u => u.UserId == 1);
 
         // Act
         var result = await _userStatisticsRepository.GetByUserHexIdAsync(0xFFFFFF);
@@ -93,9 +93,9 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
     public async Task GetByIdAsync_ReturnsUserStatistics_WhenFound()
     {
         // Arrange
-        var expected = _dbContext.UserStatistics
-                                  .Include(nameof(UserStatistics.User))
-                                  .First(us => us.Id == 1);
+        var expected = await _dbContext.UserStatistics
+            .Include(nameof(UserStatistics.User))
+            .FirstAsync(us => us.Id == 1);
 
         // Act
         var result = await _userStatisticsRepository.GetByIdAsync(1);
@@ -120,7 +120,7 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
     {
         // Arrange
         await _userStatisticsRepository.DeleteByIdAsync(3);
-        _userStatisticsRepository.SaveChanges();
+        await _userStatisticsRepository.SaveChangesAsync();
 
         var statisticsToAdd = new UserStatistics
         {
@@ -134,10 +134,10 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
 
         // Act
         await _userStatisticsRepository.AddAsync(statisticsToAdd);
-        _userStatisticsRepository.SaveChanges();
+        await _userStatisticsRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.UserStatistics.Count() == 3);
+        Assert.That(await _dbContext.UserStatistics.CountAsync() == 3);
     }
 
     [Test]
@@ -186,14 +186,14 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
     public async Task Delete_DeletesUserStatistics()
     {
         // Arrange
-        var statisticsToDelete = _dbContext.UserStatistics.AsNoTracking().First();
+        var statisticsToDelete = await _dbContext.UserStatistics.AsNoTracking().FirstAsync();
 
         // Act
         _userStatisticsRepository.Delete(statisticsToDelete);
-        _userStatisticsRepository.SaveChanges();
+        await _userStatisticsRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.UserStatistics.Count() == 2);
+        Assert.That(await _dbContext.UserStatistics.CountAsync() == 2);
     }
 
     [Test]
@@ -223,10 +223,10 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
     {
         // Act
         await _userStatisticsRepository.DeleteByIdAsync(1);
-        _userStatisticsRepository.SaveChanges();
+        await _userStatisticsRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.UserStatistics.Count() == 2);
+        Assert.That(await _dbContext.UserStatistics.CountAsync() == 2);
     }
 
     [Test]
@@ -243,21 +243,22 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
     public async Task Update_UpdatesUserStatistics()
     {
         // Arrange
-        var statsToUpdate = _dbContext.UserStatistics.AsNoTracking().First();
+        var statsToUpdate = await _dbContext.UserStatistics.AsNoTracking().FirstAsync();
         statsToUpdate.ReactionsSet = 50;
 
         // Act
         _userStatisticsRepository.Update(statsToUpdate);
+        await _userStatisticsRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.UserStatistics.First().ReactionsSet == 50);
+        Assert.That((await _dbContext.UserStatistics.FirstAsync()).ReactionsSet == 50);
     }
 
     [Test]
     public async Task Update_ThrowsArgumentException_WhenProvidedAnotherUserId()
     {
         // Arrange
-        var statsToUpdate = _dbContext.UserStatistics.AsNoTracking().First();
+        var statsToUpdate = await _dbContext.UserStatistics.AsNoTracking().FirstAsync();
         statsToUpdate.UserId = 3;
 
         // Act

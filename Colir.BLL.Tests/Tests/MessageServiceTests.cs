@@ -53,25 +53,25 @@ public class MessageServiceTests : IMessageServiceTests
         // Arrange
         var expected = new List<MessageModel>
         {
-            _dbContext.Messages
+            (await _dbContext.Messages
                 .AsNoTracking()
                 .Include(nameof(Message.Room))
                 .Include(nameof(Message.Author))
                 .Include(nameof(Message.RepliedTo))
                 .Include(nameof(Message.Attachments))
                 .Include(nameof(Message.Reactions))
-                .First(m => m.Id == 3).ToMessageModel(),
-            _dbContext.Messages
+                .FirstAsync(m => m.Id == 3)).ToMessageModel(),
+            (await _dbContext.Messages
                 .AsNoTracking()
                 .Include(nameof(Message.Room))
                 .Include(nameof(Message.Author))
                 .Include(nameof(Message.RepliedTo))
                 .Include(nameof(Message.Attachments))
                 .Include(nameof(Message.Reactions))
-                .First(m => m.Id == 2).ToMessageModel()
+                .FirstAsync(m => m.Id == 2)).ToMessageModel()
         };
 
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToGetLastMessages
         {
             IssuerId = 1,
@@ -91,7 +91,7 @@ public class MessageServiceTests : IMessageServiceTests
     public async Task GetLastMessagesAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToGetLastMessages
         {
             IssuerId = 404,
@@ -130,7 +130,7 @@ public class MessageServiceTests : IMessageServiceTests
     public async Task GetLastMessagesAsync_ThrowsArgumentException_WhenCountLessThanZero()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToGetLastMessages
         {
             IssuerId = 1,
@@ -150,7 +150,7 @@ public class MessageServiceTests : IMessageServiceTests
     public async Task GetLastMessagesAsync_ThrowsArgumentException_WhenSkipLessThanZero()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToGetLastMessages
         {
             IssuerId = 1,
@@ -170,7 +170,7 @@ public class MessageServiceTests : IMessageServiceTests
     public async Task GetLastMessagesAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToGetLastMessages
         {
             IssuerId = 3,
@@ -190,7 +190,7 @@ public class MessageServiceTests : IMessageServiceTests
     public async Task GetLastMessagesAsync_ThrowsRoomExpiredException_WhenRoomIsExpired()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 2);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 2);
         var request = new RequestToGetLastMessages
         {
             IssuerId = 3,
@@ -284,22 +284,22 @@ public class MessageServiceTests : IMessageServiceTests
         // Arrange
         var expected = new List<MessageModel>
         {
-            _dbContext.Messages
+            (await _dbContext.Messages
                 .AsNoTracking()
                 .Include(nameof(Message.Room))
                 .Include(nameof(Message.Author))
                 .Include(nameof(Message.RepliedTo))
                 .Include(nameof(Message.Attachments))
                 .Include(nameof(Message.Reactions))
-                .First(m => m.Id == 2).ToMessageModel(),
-            _dbContext.Messages
+                .FirstAsync(m => m.Id == 2)).ToMessageModel(),
+            (await _dbContext.Messages
                 .AsNoTracking()
                 .Include(nameof(Message.Room))
                 .Include(nameof(Message.Author))
                 .Include(nameof(Message.RepliedTo))
                 .Include(nameof(Message.Attachments))
                 .Include(nameof(Message.Reactions))
-                .First(m => m.Id == 3).ToMessageModel()
+                .FirstAsync(m => m.Id == 3)).ToMessageModel()
         };
 
         var request = new RequestToGetMessagesRange
@@ -417,17 +417,19 @@ public class MessageServiceTests : IMessageServiceTests
         // Arrange
         var expected = new List<MessageModel>
         {
-            _dbContext.Messages
+            (await _dbContext.Messages
                 .AsNoTracking()
                 .Include(nameof(Message.Room))
                 .Include(nameof(Message.Author))
                 .Include(nameof(Message.RepliedTo))
                 .Include(nameof(Message.Attachments))
                 .Include(nameof(Message.Reactions))
-                .First(m => m.Id == 2).ToMessageModel()
+                .FirstAsync(m => m.Id == 2)).ToMessageModel()
         };
 
-        (await _dbContext.LastTimeUserReadChats.FirstAsync(l => l.UserId == 1)).Timestamp = DateTime.Now - TimeSpan.FromDays(1);
+        (await _dbContext.LastTimeUserReadChats.FirstAsync(l => l.UserId == 1)).Timestamp =
+            DateTime.Now - TimeSpan.FromDays(1);
+
         await _dbContext.SaveChangesAsync();
 
         var request = new RequestToGetUnreadReplies
@@ -498,14 +500,14 @@ public class MessageServiceTests : IMessageServiceTests
     public async Task GetMessageById_ReturnsCorrectMessage()
     {
         // Arrange
-        var expected = _dbContext.Messages
+        var expected = (await _dbContext.Messages
             .AsNoTracking()
             .Include(nameof(Message.Room))
             .Include(nameof(Message.Author))
             .Include(nameof(Message.RepliedTo))
             .Include(nameof(Message.Attachments))
             .Include(nameof(Message.Reactions))
-            .First(m => m.Id == 2).ToMessageModel();
+            .FirstAsync(m => m.Id == 2)).ToMessageModel();
 
         var request = new RequestToGetMessage
         {
@@ -531,7 +533,7 @@ public class MessageServiceTests : IMessageServiceTests
         };
 
         // Act
-        AsyncTestDelegate act = async ()=> await _messageService.GetMessageById(request);
+        AsyncTestDelegate act = async () => await _messageService.GetMessageById(request);
 
         // Assert
         Assert.ThrowsAsync<MessageNotFoundException>(act);
@@ -575,7 +577,7 @@ public class MessageServiceTests : IMessageServiceTests
     public async Task SendAsync_SendsMessage()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToSendMessage
         {
             IssuerId = 1,
@@ -588,20 +590,20 @@ public class MessageServiceTests : IMessageServiceTests
         await _messageService.SendAsync(request);
 
         // Assert
-        var message = _dbContext.Messages
-            .Include(nameof(Message.Attachments)).OrderByDescending(m => m.Id).First();
+        var message = await _dbContext.Messages
+            .Include(nameof(Message.Attachments)).OrderByDescending(m => m.Id).FirstAsync();
 
-        Assert.That(_dbContext.Messages.Count() == 6);
+        Assert.That(await _dbContext.Messages.CountAsync() == 6);
         Assert.That(message.Attachments.Count == 1);
-        Assert.That(message.Attachments.First().Id == 1);
+        Assert.That(message.Attachments[0].Id == 1);
     }
 
     [Test]
     public async Task SendAsync_AddsToStatistics_WhenItsEnabled()
     {
         // Arrange
-        var statsBefore = _dbContext.UserStatistics.AsNoTracking().First(s => s.UserId == 1);
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var statsBefore = await _dbContext.UserStatistics.AsNoTracking().FirstAsync(s => s.UserId == 1);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToSendMessage
         {
             IssuerId = 1,
@@ -613,7 +615,7 @@ public class MessageServiceTests : IMessageServiceTests
         await _messageService.SendAsync(request);
 
         // Assert
-        var statsAfter = _dbContext.UserStatistics.AsNoTracking().First(s => s.UserId == 1);
+        var statsAfter = await _dbContext.UserStatistics.AsNoTracking().FirstAsync(s => s.UserId == 1);
         Assert.That(statsAfter.MessagesSent - statsBefore.MessagesSent == 1);
     }
 
@@ -621,7 +623,7 @@ public class MessageServiceTests : IMessageServiceTests
     public async Task SendAsync_ThrowsArgumentException_WhenMessageIsEmpty()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToSendMessage
         {
             IssuerId = 1,
@@ -640,7 +642,7 @@ public class MessageServiceTests : IMessageServiceTests
     public async Task SendAsync_ThorwsAttachmentNotFoundException_WhenAttachmentWasNotFound()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToSendMessage
         {
             IssuerId = 1,
@@ -660,7 +662,7 @@ public class MessageServiceTests : IMessageServiceTests
     public async Task SendAsync_ThrowsAttachmentNotFoundException_WhenAttachmentIsNotInRoom()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToSendMessage
         {
             IssuerId = 1,
@@ -680,7 +682,7 @@ public class MessageServiceTests : IMessageServiceTests
     public async Task SendAsync_ThrowsStringTooLongException_WhenMessageContentIsTooLong()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToSendMessage
         {
             IssuerId = 1,
@@ -699,7 +701,7 @@ public class MessageServiceTests : IMessageServiceTests
     public async Task SendAsync_ThrowsUserNotFoundException_WhenIssuerWasNotFound()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToSendMessage
         {
             IssuerId = 404,
@@ -718,7 +720,7 @@ public class MessageServiceTests : IMessageServiceTests
     public async Task SendAsync_ThrowsMessageNotFoundException_WhenNotExistingReplyMessageIdProvided()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToSendMessage
         {
             IssuerId = 1,
@@ -738,7 +740,7 @@ public class MessageServiceTests : IMessageServiceTests
     public async Task SendAsync_ThrowsAttachmentNotFoundException_WhenNotExistingAttachmentIdProvided()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToSendMessage
         {
             IssuerId = 1,
@@ -776,7 +778,7 @@ public class MessageServiceTests : IMessageServiceTests
     public async Task SendAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 1);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         var request = new RequestToSendMessage
         {
             IssuerId = 3,
@@ -795,7 +797,7 @@ public class MessageServiceTests : IMessageServiceTests
     public async Task SendAsync_ThrowsRoomExpiredException_WhenRoomIsExpired()
     {
         // Arrange
-        var room = _dbContext.Rooms.First(r => r.Id == 2);
+        var room = await _dbContext.Rooms.FirstAsync(r => r.Id == 2);
         var request = new RequestToSendMessage
         {
             IssuerId = 1,
@@ -825,7 +827,7 @@ public class MessageServiceTests : IMessageServiceTests
         await _messageService.EditAsync(request);
 
         // Assert
-        var messageAfter = _dbContext.Messages.AsNoTracking().First(m => m.Id == 1);
+        var messageAfter = await _dbContext.Messages.AsNoTracking().FirstAsync(m => m.Id == 1);
         Assert.That(messageAfter.Content == request.NewContent);
         Assert.That(messageAfter.EditDate != null);
     }
@@ -952,7 +954,7 @@ public class MessageServiceTests : IMessageServiceTests
         await _messageService.DeleteAsync(request);
 
         // Assert
-        Assert.That(_dbContext.Messages.Count() == 4);
+        Assert.That(await _dbContext.Messages.CountAsync() == 4);
     }
 
     [Test]
@@ -1038,8 +1040,11 @@ public class MessageServiceTests : IMessageServiceTests
         await _messageService.AddReaction(request);
 
         // Assert
-        var messageAfter = _dbContext.Messages.AsNoTracking().Include(nameof(Message.Reactions)).First(m => m.Id == 1);
-        Assert.That(messageAfter.Reactions.Count() == 3);
+        var messageAfter = await _dbContext.Messages.AsNoTracking()
+            .Include(nameof(Message.Reactions))
+            .FirstAsync(m => m.Id == 1);
+
+        Assert.That(messageAfter.Reactions.Count == 3);
         Assert.That(messageAfter.Reactions.OrderByDescending(r => r.Id).First().Symbol == request.Reaction);
     }
 
@@ -1065,7 +1070,7 @@ public class MessageServiceTests : IMessageServiceTests
     public async Task AddReaction_AddsToStatistics_WhenItsEnabled()
     {
         // Arrange
-        var statsBefore = _dbContext.UserStatistics.AsNoTracking().First(s => s.UserId == 1);
+        var statsBefore = await _dbContext.UserStatistics.AsNoTracking().FirstAsync(s => s.UserId == 1);
         var request = new RequestToAddReactionOnMessage
         {
             IssuerId = 1,
@@ -1077,7 +1082,7 @@ public class MessageServiceTests : IMessageServiceTests
         await _messageService.AddReaction(request);
 
         // Assert
-        var statsAfter = _dbContext.UserStatistics.AsNoTracking().First(s => s.UserId == 1);
+        var statsAfter = await _dbContext.UserStatistics.AsNoTracking().FirstAsync(s => s.UserId == 1);
         Assert.That(statsAfter.ReactionsSet - statsBefore.ReactionsSet == 1);
     }
 
@@ -1149,9 +1154,11 @@ public class MessageServiceTests : IMessageServiceTests
         await _messageService.RemoveReaction(request);
 
         // Assert
-        var messageAfter = _dbContext.Messages.AsNoTracking().Include(nameof(Message.Reactions)).First(m => m.Id == 1);
+        var messageAfter = await _dbContext.Messages.AsNoTracking().Include(nameof(Message.Reactions))
+            .FirstAsync(m => m.Id == 1);
+
         Assert.That(messageAfter.Reactions.Count == 1);
-        Assert.That(_dbContext.Reactions.Count() == 2);
+        Assert.That(await _dbContext.Reactions.CountAsync() == 2);
     }
 
     [Test]

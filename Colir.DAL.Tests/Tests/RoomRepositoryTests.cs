@@ -49,10 +49,10 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     public async Task GetAllAsync_ReturnsAllRooms()
     {
         // Arrange
-        List<Room> expected = _dbContext.Rooms
-                                        .Include(nameof(Room.Owner))
-                                        .Include(nameof(Room.JoinedUsers))
-                                        .ToList();
+        List<Room> expected = await _dbContext.Rooms
+            .Include(nameof(Room.Owner))
+            .Include(nameof(Room.JoinedUsers))
+            .ToListAsync();
 
         // Act
         var result = await _roomRepository.GetAllAsync();
@@ -73,10 +73,10 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     public async Task GetByIdAsync_ReturnsRoom_WhenFound(long id)
     {
         // Arrange
-        Room expected = _dbContext.Rooms
-                                  .Include(nameof(Room.Owner))
-                                  .Include(nameof(Room.JoinedUsers))
-                                  .First(r => r.Id == id);
+        Room expected = await _dbContext.Rooms
+            .Include(nameof(Room.Owner))
+            .Include(nameof(Room.JoinedUsers))
+            .FirstAsync(r => r.Id == id);
 
         // Act
         var result = await _roomRepository.GetByIdAsync(id);
@@ -104,10 +104,10 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     public async Task GetByGuidAsync_ReturnsRoom_WhenFound(string guid)
     {
         // Arrange
-        Room expected = _dbContext.Rooms
+        Room expected = await _dbContext.Rooms
             .Include(nameof(Room.Owner))
             .Include(nameof(Room.JoinedUsers))
-            .First(r => r.Guid == guid);
+            .FirstAsync(r => r.Guid == guid);
 
         // Act
         var result = await _roomRepository.GetByGuidAsync(guid);
@@ -144,17 +144,17 @@ public class RoomRepositoryTests : IRoomRepositoryTests
 
         // Act
         await _roomRepository.AddAsync(roomToAdd);
-        _roomRepository.SaveChanges();
+        await _roomRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.Rooms.Count() == 3);
+        Assert.That(await _dbContext.Rooms.CountAsync() == 3);
     }
 
     [Test]
     public async Task AddAsync_AppliesJoinedUsersToRoom()
     {
         // Arrange
-        var users = _dbContext.Users.ToList();
+        var users = await _dbContext.Users.ToListAsync();
 
         var roomToAdd = new Room()
         {
@@ -167,10 +167,10 @@ public class RoomRepositoryTests : IRoomRepositoryTests
 
         // Act
         await _roomRepository.AddAsync(roomToAdd);
-        _roomRepository.SaveChanges();
+        await _roomRepository.SaveChangesAsync();
 
         // Assert
-        var result = _dbContext.Rooms.First(r => r.Guid == roomToAdd.Guid);
+        var result = await _dbContext.Rooms.FirstAsync(r => r.Guid == roomToAdd.Guid);
         Assert.NotNull(result.JoinedUsers);
         Assert.That(result.JoinedUsers, Is.EqualTo(roomToAdd.JoinedUsers).Using(new UserEqualityComparer()));
     }
@@ -227,7 +227,6 @@ public class RoomRepositoryTests : IRoomRepositoryTests
 
         // Act
         AsyncTestDelegate act = async () => await _roomRepository.AddAsync(roomToAdd);
-        _roomRepository.SaveChanges();
 
         // Assert
         Assert.ThrowsAsync<RoomExpiredException>(act);
@@ -247,7 +246,6 @@ public class RoomRepositoryTests : IRoomRepositoryTests
 
         // Act
         AsyncTestDelegate act = async () => await _roomRepository.AddAsync(roomToAdd);
-        _roomRepository.SaveChanges();
 
         // Assert
         Assert.ThrowsAsync<UserNotFoundException>(act);
@@ -257,62 +255,62 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     public async Task Delete_DeletesRoom()
     {
         // Arrange
-        var roomCount = _dbContext.Rooms.Count();
-        var roomToDelete = _dbContext.Rooms.AsNoTracking().First();
+        var roomCount = await _dbContext.Rooms.CountAsync();
+        var roomToDelete = await _dbContext.Rooms.AsNoTracking().FirstAsync();
 
         // Act
         _roomRepository.Delete(roomToDelete);
-        _roomRepository.SaveChanges();
+        await _roomRepository.SaveChangesAsync();
 
         // Assert
         // Ensure that room is now couldn't be found
-        var room = _dbContext.Rooms.FirstOrDefault(r => r.Id == roomToDelete.Id);
+        var room = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Id == roomToDelete.Id);
         Assert.Null(room);
 
         // Ensure that room count was reduced
-        Assert.That(_dbContext.Rooms.Count() == (roomCount - 1));
+        Assert.That(await _dbContext.Rooms.CountAsync() == (roomCount - 1));
     }
 
     [Test]
     public async Task Delete_DeletesAllRelatedAttachments()
     {
         // Arrange
-        var roomToDelete = _dbContext.Rooms.AsNoTracking().First();
+        var roomToDelete = await _dbContext.Rooms.AsNoTracking().FirstAsync();
 
         // Act
         _roomRepository.Delete(roomToDelete);
-        _roomRepository.SaveChanges();
+        await _roomRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.Attachments.Count() == 0);
+        Assert.That(await _dbContext.Attachments.CountAsync() == 0);
     }
 
     [Test]
     public async Task Delete_DeletesAllRelatedMessages()
     {
         // Arrange
-        var roomToDelete = _dbContext.Rooms.AsNoTracking().First();
+        var roomToDelete = await _dbContext.Rooms.AsNoTracking().FirstAsync();
 
         // Act
         _roomRepository.Delete(roomToDelete);
-        _roomRepository.SaveChanges();
+        await _roomRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.Messages.Count() == 1);
+        Assert.That(await _dbContext.Messages.CountAsync() == 1);
     }
 
     [Test]
     public async Task Delete_DeletesAllRelatedReactions()
     {
         // Arrange
-        var roomToDelete = _dbContext.Rooms.First();
+        var roomToDelete = await _dbContext.Rooms.FirstAsync();
 
         // Act
         _roomRepository.Delete(roomToDelete);
-        _roomRepository.SaveChanges();
+        await _roomRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.Reactions.Count() == 0);
+        Assert.That(await _dbContext.Reactions.CountAsync() == 0);
     }
 
     [Test]
@@ -339,62 +337,62 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     public async Task DeleteByIdAsync_DeletesRoom()
     {
         // Arrange
-        var roomCount = _dbContext.Rooms.Count();
-        var roomToDelete = _dbContext.Rooms.First();
+        var roomCount = await _dbContext.Rooms.CountAsync();
+        var roomToDelete = await _dbContext.Rooms.FirstAsync();
 
         // Act
-        _roomRepository.Delete(roomToDelete);
-        _roomRepository.SaveChanges();
+        await _roomRepository.DeleteByIdAsync(roomToDelete.Id);
+        await _roomRepository.SaveChangesAsync();
 
         // Assert
         // Ensure that room is now couldn't be found
-        var room = _dbContext.Rooms.FirstOrDefault(r => r.Id == roomToDelete.Id);
+        var room = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Id == roomToDelete.Id);
         Assert.Null(room);
 
         // Ensure that room count was reduced
-        Assert.That(_dbContext.Rooms.Count() == (roomCount - 1));
+        Assert.That(await _dbContext.Rooms.CountAsync() == (roomCount - 1));
     }
 
     [Test]
     public async Task DeleteByIdAsync_DeletesAllRelatedAttachments()
     {
         // Arrange
-        var roomIdToDelete = _dbContext.Rooms.First().Id;
+        var roomIdToDelete = (await _dbContext.Rooms.FirstAsync()).Id;
 
         // Act
         await _roomRepository.DeleteByIdAsync(roomIdToDelete);
-        _roomRepository.SaveChanges();
+        await _roomRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.Attachments.Count() == 0);
+        Assert.That(await _dbContext.Attachments.CountAsync() == 0);
     }
 
     [Test]
     public async Task DeleteByIdAsync_DeletesAllRelatedMessages()
     {
         // Arrange
-        var roomIdToDelete = _dbContext.Rooms.First().Id;
+        var roomIdToDelete = (await _dbContext.Rooms.FirstAsync()).Id;
 
         // Act
         await _roomRepository.DeleteByIdAsync(roomIdToDelete);
-        _roomRepository.SaveChanges();
+        await _roomRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.Messages.Count() == 1);
+        Assert.That(await _dbContext.Messages.CountAsync() == 1);
     }
 
     [Test]
     public async Task DeleteByIdAsync_DeletesAllRelatedReactions()
     {
         // Arrange
-        var roomIdToDelete = _dbContext.Rooms.First().Id;
+        var roomIdToDelete = (await _dbContext.Rooms.FirstAsync()).Id;
 
         // Act
         await _roomRepository.DeleteByIdAsync(roomIdToDelete);
-        _roomRepository.SaveChanges();
+        await _roomRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.Reactions.Count() == 0);
+        Assert.That(await _dbContext.Reactions.CountAsync() == 0);
     }
 
     [Test]
@@ -429,7 +427,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
 
         // Act
         _roomRepository.Update(room);
-        _roomRepository.SaveChanges();
+        await _roomRepository.SaveChangesAsync();
 
         // Assert
         Assert.That(room, Is.EqualTo(new Room()
@@ -446,7 +444,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     public async Task Update_ThrowsStringTooLongException_WhenNameTooLong()
     {
         // Arrange
-        var roomToUpdate = _dbContext.Rooms.AsNoTracking().First(r => r.Id == 1);
+        var roomToUpdate = await _dbContext.Rooms.AsNoTracking().FirstAsync(r => r.Id == 1);
         roomToUpdate.Name = new string('a', 51);
 
         // Act
@@ -460,7 +458,7 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     public async Task Update_ThrowsStringTooShortException_WhenNameTooShort()
     {
         // Arrange
-        var roomToUpdate = _dbContext.Rooms.First(r => r.Id == 1);
+        var roomToUpdate = await _dbContext.Rooms.FirstAsync(r => r.Id == 1);
         roomToUpdate.Name = new string('a', 1);
 
         // Act
@@ -494,15 +492,15 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     public async Task DeleteAllExpiredAsync_DeletesAllExpiredRooms()
     {
         // Arrange
-        var roomCount = _dbContext.Rooms.Count();
+        var roomCount = await _dbContext.Rooms.CountAsync();
 
         // Act
         _roomRepository.DeleteAllExpired();
-        _roomRepository.SaveChanges();
+        await _roomRepository.SaveChangesAsync();
 
         // Assert
-        var newRoomCount = _dbContext.Rooms.Count();
-        var expiredRoom = _dbContext.Rooms.FirstOrDefault(r => r.Id == 2);
+        var newRoomCount = await _dbContext.Rooms.CountAsync();
+        var expiredRoom = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Id == 2);
         Assert.Null(expiredRoom);
         Assert.That(roomCount != newRoomCount);
     }
@@ -512,12 +510,12 @@ public class RoomRepositoryTests : IRoomRepositoryTests
     {
         // Arrange
         _roomRepository.DeleteAllExpired();
-        _roomRepository.SaveChanges();
+        await _roomRepository.SaveChangesAsync();
 
         // Act
-        TestDelegate act = () => _roomRepository.DeleteAllExpired();
+        AsyncTestDelegate act = async () => _roomRepository.DeleteAllExpired();
 
         // Assert
-        Assert.Throws<RoomNotFoundException>(act);
+        Assert.ThrowsAsync<RoomNotFoundException>(act);
     }
 }

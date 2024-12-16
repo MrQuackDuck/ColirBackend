@@ -40,10 +40,10 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
     public async Task GetAllAsync_ReturnsAllTimesUsersReadChats()
     {
         // Arrange
-        List<LastTimeUserReadChat> expected = _dbContext.LastTimeUserReadChats
-                                                        .Include(nameof(LastTimeUserReadChat.Room))
-                                                        .Include(nameof(LastTimeUserReadChat.User))
-                                                        .ToList();
+        List<LastTimeUserReadChat> expected = await _dbContext.LastTimeUserReadChats
+            .Include(nameof(LastTimeUserReadChat.Room))
+            .Include(nameof(LastTimeUserReadChat.User))
+            .ToListAsync();
 
         // Act
         var result = await _lastTimeUserReadChatRepository.GetAllAsync();
@@ -62,10 +62,10 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
     public async Task GetAsync_ReturnsEntity()
     {
         // Arrange
-        var expected = _dbContext.LastTimeUserReadChats
-                                 .Include(nameof(LastTimeUserReadChat.Room))
-                                 .Include(nameof(LastTimeUserReadChat.User))
-                                 .First(l => l.UserId == 1 && l.RoomId == 1);
+        var expected = await _dbContext.LastTimeUserReadChats
+            .Include(nameof(LastTimeUserReadChat.Room))
+            .Include(nameof(LastTimeUserReadChat.User))
+            .FirstAsync(l => l.UserId == 1 && l.RoomId == 1);
 
         // Act
         var result = await _lastTimeUserReadChatRepository.GetAsync(1, 1);
@@ -100,10 +100,10 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
     public async Task GetByIdAsync_ReturnsEntity_WhenFound()
     {
         // Arrange
-        var expected = _dbContext.LastTimeUserReadChats
-                                 .Include(nameof(LastTimeUserReadChat.Room))
-                                 .Include(nameof(LastTimeUserReadChat.User))
-                                 .First(l => l.Id == 1);
+        var expected = await _dbContext.LastTimeUserReadChats
+            .Include(nameof(LastTimeUserReadChat.Room))
+            .Include(nameof(LastTimeUserReadChat.User))
+            .FirstAsync(l => l.Id == 1);
 
         // Act
         var result = await _lastTimeUserReadChatRepository.GetByIdAsync(1);
@@ -137,10 +137,10 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
 
         // Act
         await _lastTimeUserReadChatRepository.AddAsync(lastTimeUserReadChatToAdd);
-        _lastTimeUserReadChatRepository.SaveChanges();
+        await _lastTimeUserReadChatRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.LastTimeUserReadChats.Count() == 2);
+        Assert.That(await _dbContext.LastTimeUserReadChats.CountAsync() == 2);
     }
 
     [Test]
@@ -219,14 +219,14 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
     public async Task Delete_DeletesEntity()
     {
         // Arrange
-        var entityToDelete = _dbContext.LastTimeUserReadChats.AsNoTracking().First();
+        var entityToDelete = await _dbContext.LastTimeUserReadChats.AsNoTracking().FirstAsync();
 
         // Act
         _lastTimeUserReadChatRepository.Delete(entityToDelete);
-        _lastTimeUserReadChatRepository.SaveChanges();
+        await _lastTimeUserReadChatRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.LastTimeUserReadChats.Count() == 0);
+        Assert.That(await _dbContext.LastTimeUserReadChats.CountAsync() == 0);
     }
 
     [Test]
@@ -253,10 +253,10 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
     {
         // Act
         await _lastTimeUserReadChatRepository.DeleteByIdAsync(1);
-        _lastTimeUserReadChatRepository.SaveChanges();
+        await _lastTimeUserReadChatRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.LastTimeUserReadChats.Count() == 0);
+        Assert.That(await _dbContext.LastTimeUserReadChats.CountAsync() == 0);
     }
 
     [Test]
@@ -273,7 +273,7 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
     public async Task Update_UpdatesEntity()
     {
         // Arrange
-        var entityToUpdate = _dbContext.LastTimeUserReadChats.AsNoTracking().First();
+        var entityToUpdate = await _dbContext.LastTimeUserReadChats.AsNoTracking().FirstAsync();
         var newTimeStamp = DateTime.Now.Add(new TimeSpan(200));
         entityToUpdate.Timestamp = newTimeStamp;
 
@@ -281,14 +281,14 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
         _lastTimeUserReadChatRepository.Update(entityToUpdate);
 
         // Assert
-        Assert.That(_dbContext.LastTimeUserReadChats.First().Timestamp == newTimeStamp);
+        Assert.That((await _dbContext.LastTimeUserReadChats.FirstAsync()).Timestamp == newTimeStamp);
     }
 
     [Test]
     public async Task Update_ThrowsArgumentException_WhenProvidedAnotherUserId()
     {
         // Arrange
-        var entityToUpdate = _dbContext.LastTimeUserReadChats.AsNoTracking().First();
+        var entityToUpdate = await _dbContext.LastTimeUserReadChats.AsNoTracking().FirstAsync();
         entityToUpdate.UserId = 500;
 
         // Act
@@ -302,7 +302,7 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
     public async Task Update_ThrowsArgumentException_WhenProvidedAnotherRoomId()
     {
         // Arrange
-        var entityToUpdate = _dbContext.LastTimeUserReadChats.AsNoTracking().First();
+        var entityToUpdate = await _dbContext.LastTimeUserReadChats.AsNoTracking().FirstAsync();
         entityToUpdate.RoomId = 500;
 
         // Act
@@ -343,7 +343,7 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
         };
 
         _dbContext.LastTimeUserReadChats.Add(entityToTest);
-        _lastTimeUserReadChatRepository.SaveChanges();
+        await _lastTimeUserReadChatRepository.SaveChangesAsync();
 
         // Act
         TestDelegate act = () => _lastTimeUserReadChatRepository.Update(entityToTest);

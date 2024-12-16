@@ -39,9 +39,9 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
     public async Task GetAllAsync_ReturnsAllUsersSettings()
     {
         // Arrange
-        List<UserSettings> expected = _dbContext.UserSettings
-                                                .Include(nameof(UserSettings.User))
-                                                .ToList();
+        List<UserSettings> expected = await _dbContext.UserSettings
+            .Include(nameof(UserSettings.User))
+            .ToListAsync();
 
         // Act
         var result = await _userSettingsRepository.GetAllAsync();
@@ -58,9 +58,9 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
     public async Task GetByUserHexIdAsync_ReturnsUserSettings()
     {
         // Arrange
-        UserSettings expected = _dbContext.UserSettings
-                                           .Include(nameof(UserSettings.User))
-                                           .First(us => us.Id == 1);
+        UserSettings expected = await _dbContext.UserSettings
+            .Include(nameof(UserSettings.User))
+            .FirstAsync(us => us.Id == 1);
 
         // Act
         var result = await _userSettingsRepository.GetByUserHexIdAsync(0xFFFFFF);
@@ -94,9 +94,9 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
     public async Task GetByIdAsync_ReturnsUserSettings_WhenFound()
     {
         // Arrange
-        UserSettings expected = _dbContext.UserSettings
-                                                .Include(nameof(UserSettings.User))
-                                                .First(us => us.Id == 1);
+        UserSettings expected = await _dbContext.UserSettings
+            .Include(nameof(UserSettings.User))
+            .FirstAsync(us => us.Id == 1);
 
         // Act
         var result = await _userSettingsRepository.GetByIdAsync(1);
@@ -121,7 +121,7 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
     {
         // Arrange
         await _userSettingsRepository.DeleteByIdAsync(3);
-        _userSettingsRepository.SaveChanges();
+        await _userSettingsRepository.SaveChangesAsync();
 
         var userSettingsToAdd = new UserSettings
         {
@@ -131,10 +131,10 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
 
         // Act
         await _userSettingsRepository.AddAsync(userSettingsToAdd);
-        _userSettingsRepository.SaveChanges();
+        await _userSettingsRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.UserSettings.Count() == 3);
+        Assert.That(await _dbContext.UserSettings.CountAsync() == 3);
     }
 
     [Test]
@@ -177,14 +177,14 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
     public async Task Delete_DeletesUserSettings()
     {
         // Arrange
-        var userSettingsToDelete = _dbContext.UserSettings.AsNoTracking().First();
+        var userSettingsToDelete = await _dbContext.UserSettings.AsNoTracking().FirstAsync();
 
         // Act
         _userSettingsRepository.Delete(userSettingsToDelete);
-        _userSettingsRepository.SaveChanges();
+        await _userSettingsRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.UserSettings.Count() == 2);
+        Assert.That(await _dbContext.UserSettings.CountAsync() == 2);
     }
 
     [Test]
@@ -210,10 +210,10 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
     {
         // Act
         await _userSettingsRepository.DeleteByIdAsync(1);
-        _userSettingsRepository.SaveChanges();
+        await _userSettingsRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.UserSettings.Count() == 2);
+        Assert.That(await _dbContext.UserSettings.CountAsync() == 2);
     }
 
     [Test]
@@ -230,21 +230,22 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
     public async Task Update_UpdatesUserSettings()
     {
         // Arrange
-        var userSettingsToUpdate = _dbContext.UserSettings.AsNoTracking().First();
+        var userSettingsToUpdate = await _dbContext.UserSettings.AsNoTracking().FirstAsync();
         userSettingsToUpdate.StatisticsEnabled = false;
 
         // Act
         _userSettingsRepository.Update(userSettingsToUpdate);
+        await _userSettingsRepository.SaveChangesAsync();
 
         // Assert
-        Assert.That(_dbContext.UserSettings.First().StatisticsEnabled == false);
+        Assert.That(!(await _dbContext.UserSettings.FirstAsync()).StatisticsEnabled);
     }
 
     [Test]
     public async Task Update_ThrowsArgumentException_WhenProvidedAnotherUserId()
     {
         // Arrange
-        var userSettingsToUpdate = _dbContext.UserSettings.AsNoTracking().First();
+        var userSettingsToUpdate = await _dbContext.UserSettings.AsNoTracking().FirstAsync();
         userSettingsToUpdate.UserId = 3;
 
         // Act
