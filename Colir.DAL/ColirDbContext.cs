@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 
+#nullable disable
+
 namespace DAL;
 
 public class ColirDbContext : DbContext
@@ -43,8 +45,8 @@ public class ColirDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         var stringEncryptor = new StringEncryptor(
-            _config["DatabaseEncryption:EncryptionPassword"],
-            _config["DatabaseEncryption:InitializationVector"]);
+            _config["DatabaseEncryption:EncryptionPassword"]!,
+            _config["DatabaseEncryption:InitializationVector"]!);
 
         modelBuilder.Entity<Room>()
             .HasOne<User>(nameof(Room.Owner));

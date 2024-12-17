@@ -3,6 +3,8 @@ using DAL.Repositories;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 
+#nullable disable
+
 namespace DAL;
 
 public class UnitOfWork : IUnitOfWork

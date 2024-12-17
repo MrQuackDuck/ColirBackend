@@ -30,7 +30,7 @@ public class RoomService : IRoomService
     public async Task< RoomModel> GetRoomInfoAsync(RequestToGetRoomInfo request)
     {
         // Check if the issuer exists. Otherwise, an exception will be thrown
-        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
+        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId, []);
 
         var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
         if (room.IsExpired()) throw new RoomExpiredException();
@@ -110,7 +110,7 @@ public class RoomService : IRoomService
     public async Task RenameAsync(RequestToRenameRoom request)
     {
         // Check if the issuer exists. Otherwise, an exception will be thrown
-        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
+        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId, []);
 
         var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
 
@@ -139,7 +139,7 @@ public class RoomService : IRoomService
     public async Task DeleteAsync(RequestToDeleteRoom request)
     {
         // Check if the issuer exists. Otherwise, an exception will be thrown
-        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
+        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId, []);
 
         var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
 
@@ -182,7 +182,7 @@ public class RoomService : IRoomService
     public async Task<DateTime> GetLastTimeUserReadChatAsync(RequestToGetLastTimeUserReadChat request)
     {
         // Check if the issuer exists. Otherwise, an exception will be thrown
-        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
+        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId, []);
 
         var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
 
@@ -200,9 +200,9 @@ public class RoomService : IRoomService
     public async Task UpdateLastReadMessageByUser(RequestToUpdateLastReadMessageByUser request)
     {
         // Check if the issuer exists. Otherwise, an exception will be thrown
-        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
+        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId, []);
 
-        var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
+        var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid, [nameof(Room.JoinedUsers)]);
 
         // Check if the issuer's in the room
         if (!room.JoinedUsers.Any(u => u.Id == request.IssuerId))

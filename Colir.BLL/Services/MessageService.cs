@@ -29,7 +29,7 @@ public class MessageService : IMessageService
     public async Task<List<MessageModel>> GetLastMessagesAsync(RequestToGetLastMessages request)
     {
         // Check if the issuer exists. Otherwise, an exception will be thrown
-        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
+        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId, []);
 
         var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
 
@@ -66,7 +66,7 @@ public class MessageService : IMessageService
     public async Task<List<MessageModel>> GetSurroundingMessagesAsync(RequestToGetSurroundingMessages request)
     {
         // Check if the issuer exists. Otherwise, an exception will be thrown
-        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
+        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId, []);
 
         var message = await _unitOfWork.MessageRepository.GetByIdAsync(request.MessageId);
 
@@ -110,7 +110,7 @@ public class MessageService : IMessageService
         }
 
         // Check if the issuer exists. Otherwise, an exception will be thrown
-        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
+        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId, []);
 
         var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
 
@@ -155,7 +155,7 @@ public class MessageService : IMessageService
     public async Task<List<MessageModel>> GetUnreadRepliesAsync(RequestToGetUnreadReplies request)
     {
         // Check if the issuer exists. Otherwise, an exception will be thrown
-        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
+        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId, []);
 
         var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
 
@@ -212,7 +212,7 @@ public class MessageService : IMessageService
     public async Task<MessageModel> GetMessageById(RequestToGetMessage request)
     {
         // Check if the issuer exists. Otherwise, an exception will be thrown
-        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
+        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId, []);
 
         var messageToGet = await _unitOfWork.MessageRepository.GetByIdAsync(request.MessageId);
 
@@ -248,12 +248,9 @@ public class MessageService : IMessageService
             throw new StringTooLongException();
         }
 
-        var issuer = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
+        var issuer = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId, [nameof(User.UserSettings), nameof(User.UserStatistics)]);
 
-        var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid,
-        [
-            nameof(Room.JoinedUsers),
-        ]);
+        var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid, [nameof(Room.JoinedUsers),]);
 
         // If the room is expired
         if (room.IsExpired())
@@ -394,7 +391,7 @@ public class MessageService : IMessageService
     public async Task DeleteAsync(RequestToDeleteMessage request)
     {
         // Check if the issuer exists. Otherwise, an exception will be thrown
-        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
+        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId, []);
 
         var message =
             await _unitOfWork.MessageRepository.GetByIdAsync(request.MessageId, [nameof(Message.Attachments)]);
