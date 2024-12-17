@@ -4,8 +4,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Entities;
 
-#nullable enable
-
 [Index(nameof(Guid), IsUnique = true)]
 public class Room : BaseEntity
 {

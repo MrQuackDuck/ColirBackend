@@ -2,10 +2,10 @@
 
 public interface IRepository<TEntity>
 {
-    Task<IEnumerable<TEntity>> GetAllAsync();
-    Task<TEntity> GetByIdAsync(long id);
+    Task<IEnumerable<TEntity>> GetAllAsync(string[]? overriddenIncludes = default);
+    Task<TEntity> GetByIdAsync(long id, string[]? overriddenIncludes = default);
     Task AddAsync(TEntity entity);
-    void Delete(TEntity entity);
+    Task DeleteAsync(TEntity entity);
     Task DeleteByIdAsync(long id);
     void Update(TEntity entity);
     void SaveChanges();

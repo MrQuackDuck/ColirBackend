@@ -1,5 +1,6 @@
 ﻿using Colir.Exceptions.NotFound;
 using DAL.Entities;
+using DAL.Extensions;
 using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,12 +18,12 @@ public class ReactionRepository : IReactionRepository
     /// <summary>
     /// Gets all reactions
     /// </summary>
-    public async Task<IEnumerable<Reaction>> GetAllAsync()
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
+    public async Task<IEnumerable<Reaction>> GetAllAsync(string[]? overriddenIncludes = default)
     {
         return await _dbContext.Reactions
             .AsNoTracking()
-            .Include(nameof(Reaction.Author))
-            .Include(nameof(Reaction.Message))
+            .IncludeMultiple(overriddenIncludes ?? [nameof(Reaction.Author), nameof(Reaction.Message)])
             .ToListAsync();
     }
 
@@ -30,13 +31,13 @@ public class ReactionRepository : IReactionRepository
     /// Gets the reaction by id
     /// </summary>
     /// <param name="id">Id of the reaction to get</param>
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
     /// <exception cref="ReactionNotFoundException">Thrown when the reaction wasn't found by the provided id</exception>
-    public async Task<Reaction> GetByIdAsync(long id)
+    public async Task<Reaction> GetByIdAsync(long id, string[]? overriddenIncludes = default)
     {
         return await _dbContext.Reactions
             .AsNoTracking()
-            .Include(nameof(Reaction.Author))
-            .Include(nameof(Reaction.Message))
+            .IncludeMultiple(overriddenIncludes ?? [nameof(Reaction.Author), nameof(Reaction.Message)])
             .FirstOrDefaultAsync(r => r.Id == id) ?? throw new ReactionNotFoundException();
     }
 
@@ -44,8 +45,9 @@ public class ReactionRepository : IReactionRepository
     /// Gets all reactions on a certain message
     /// </summary>
     /// <param name="messageId">Id of the message to find reactions on</param>
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
     /// <exception cref="MessageNotFoundException">Thrown when the message wasn't found</exception>
-    public async Task<List<Reaction>> GetReactionsOnMessage(long messageId)
+    public async Task<List<Reaction>> GetReactionsOnMessage(long messageId, string[]? overriddenIncludes = default)
     {
         if (!await _dbContext.Messages.AnyAsync(m => m.Id == messageId))
         {
@@ -54,8 +56,7 @@ public class ReactionRepository : IReactionRepository
 
         return await _dbContext.Reactions
             .AsNoTracking()
-            .Include(nameof(Reaction.Author))
-            .Include(nameof(Reaction.Message))
+            .IncludeMultiple(overriddenIncludes ?? [nameof(Reaction.Author), nameof(Reaction.Message)])
             .Where(r => r.MessageId == messageId)
             .ToListAsync();
     }
@@ -86,9 +87,9 @@ public class ReactionRepository : IReactionRepository
     /// </summary>
     /// <param name="reaction">The reaction to delete</param>
     /// <exception cref="ReactionNotFoundException">Thrown when the reaction wasn't found</exception>
-    public void Delete(Reaction reaction)
+    public async Task DeleteAsync(Reaction reaction)
     {
-        var target = _dbContext.Reactions.FirstOrDefault(r => r.Id == reaction.Id) ?? throw new ReactionNotFoundException();
+        var target = await _dbContext.Reactions.FindAsync(reaction.Id) ?? throw new ReactionNotFoundException();
         _dbContext.Reactions.Remove(target);
     }
 
@@ -99,7 +100,7 @@ public class ReactionRepository : IReactionRepository
     /// <exception cref="ReactionNotFoundException">Thrown when the reaction wasn't found</exception>
     public async Task DeleteByIdAsync(long id)
     {
-        var target = await _dbContext.Reactions.FirstOrDefaultAsync(r => r.Id == id) ?? throw new ReactionNotFoundException();
+        var target = await _dbContext.Reactions.FindAsync(id) ?? throw new ReactionNotFoundException();
         _dbContext.Reactions.Remove(target);
     }
 

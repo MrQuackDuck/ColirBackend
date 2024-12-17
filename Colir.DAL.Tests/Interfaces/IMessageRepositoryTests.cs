@@ -35,18 +35,16 @@ public interface IMessageRepositoryTests
     Task AddAsync_ThrowsMessageNotFoundException_WhenRepliedMessageWasNotFound();
     Task AddAsync_ThrowsRoomExpiredException_WhenRoomExpired();
 
-    Task Delete_DeletesMessage();
-    Task Delete_DeletesAllRelatedReactions();
-    Task Delete_DeletesAllRelatedAttachments();
-    Task Delete_NotDeletesAnyOtherMessages();
-    Task Delete_ThrowsMessageNotFoundException_WhenMessageDoesNotExist();
-    Task Delete_ThrowsRoomExpiredException_WhenRoomExpired();
+    Task DeleteAsync_DeletesMessage();
+    Task DeleteAsync_DeletesAllRelatedReactions();
+    Task DeleteAsync_DeletesAllRelatedAttachments();
+    Task DeleteAsync_NotDeletesAnyOtherMessages();
+    Task DeleteAsync_ThrowsMessageNotFoundException_WhenMessageDoesNotExist();
 
     Task DeleteByIdAsync_DeletesMessage();
     Task DeleteByIdAsync_DeletesAllRelatedReactions();
     Task DeleteByIdAsync_DeletesAllRelatedAttachments();
     Task DeleteByIdAsync_ThrowsMessageNotFoundException_WhenMessageWasNotFoundById();
-    Task DeleteByIdAsync_ThrowsRoomExpiredException_WhenRoomExpired();
 
     Task Update_UpdatesMessage();
     Task Update_ThrowsMessageNotFoundException_WhenMessageDoesNotExist();

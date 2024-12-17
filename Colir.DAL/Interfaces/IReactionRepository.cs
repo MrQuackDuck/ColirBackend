@@ -4,5 +4,5 @@ namespace DAL.Interfaces;
 
 public interface IReactionRepository : IRepository<Reaction>
 {
-    Task<List<Reaction>> GetReactionsOnMessage(long messageId);
+    Task<List<Reaction>> GetReactionsOnMessage(long messageId, string[]? overriddenIncludes = default);
 }

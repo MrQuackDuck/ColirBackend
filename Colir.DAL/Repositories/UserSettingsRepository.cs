@@ -1,5 +1,6 @@
 ﻿using Colir.Exceptions.NotFound;
 using DAL.Entities;
+using DAL.Extensions;
 using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,11 +18,12 @@ public class UserSettingsRepository : IUserSettingsRepository
     /// <summary>
     /// Gets all users' settings
     /// </summary>
-    public async Task<IEnumerable<UserSettings>> GetAllAsync()
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
+    public async Task<IEnumerable<UserSettings>> GetAllAsync(string[]? overriddenIncludes = default)
     {
         return await _dbContext.UserSettings
             .AsNoTracking()
-            .Include(nameof(UserSettings.User))
+            .IncludeMultiple(overriddenIncludes ?? [nameof(UserSettings.User)])
             .ToListAsync();
     }
 
@@ -29,12 +31,13 @@ public class UserSettingsRepository : IUserSettingsRepository
     /// Gets user settings by their id
     /// </summary>
     /// <param name="id">Id of user settings</param>
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
     /// <exception cref="NotFoundException">Thrown when not found by id</exception>
-    public async Task<UserSettings> GetByIdAsync(long id)
+    public async Task<UserSettings> GetByIdAsync(long id, string[]? overriddenIncludes = default)
     {
         return await _dbContext.UserSettings
             .AsNoTracking()
-            .Include(nameof(UserSettings.User))
+            .IncludeMultiple(overriddenIncludes ?? [nameof(UserSettings.User)])
             .FirstOrDefaultAsync(s => s.Id == id) ?? throw new NotFoundException();
     }
 
@@ -42,10 +45,11 @@ public class UserSettingsRepository : IUserSettingsRepository
     /// Gets user settings by user's hex id
     /// </summary>
     /// <param name="hexId">Hex Id of the user</param>
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
     /// <exception cref="ArgumentException">Thrown when an invalid Hex Id is provided</exception>
     /// <exception cref="UserNotFoundException">Thrown when the user wasn't found</exception>
     /// <exception cref="NotFoundException">Thrown when user settings weren't found</exception>
-    public async Task<UserSettings> GetByUserHexIdAsync(int hexId)
+    public async Task<UserSettings> GetByUserHexIdAsync(int hexId, string[]? overriddenIncludes = default)
     {
         if (hexId < 0 || hexId > 16_777_216)
         {
@@ -59,7 +63,7 @@ public class UserSettingsRepository : IUserSettingsRepository
 
         return await _dbContext.UserSettings
             .AsNoTracking()
-            .Include(nameof(UserSettings.User))
+            .IncludeMultiple(overriddenIncludes ?? [nameof(UserSettings.User)])
             .FirstOrDefaultAsync(s => s.User.HexId == hexId) ?? throw new NotFoundException();
     }
 
@@ -89,9 +93,9 @@ public class UserSettingsRepository : IUserSettingsRepository
     /// </summary>
     /// <param name="settings">User settings to delete</param>
     /// <exception cref="NotFoundException">Thrown when user settings weren't found</exception>
-    public void Delete(UserSettings settings)
+    public async Task DeleteAsync(UserSettings settings)
     {
-        var target = _dbContext.UserSettings.FirstOrDefault(s => s.Id == settings.Id) ?? throw new NotFoundException();
+        var target = await _dbContext.UserSettings.FindAsync(settings.Id) ?? throw new NotFoundException();
 
         _dbContext.UserSettings.Remove(target);
     }
@@ -103,7 +107,7 @@ public class UserSettingsRepository : IUserSettingsRepository
     /// <exception cref="NotFoundException">Thrown when user settings weren't found</exception>
     public async Task DeleteByIdAsync(long id)
     {
-        var target = await _dbContext.UserSettings.FirstOrDefaultAsync(s => s.Id == id) ?? throw new NotFoundException();
+        var target = await _dbContext.UserSettings.FindAsync(id) ?? throw new NotFoundException();
 
         _dbContext.UserSettings.Remove(target);
     }

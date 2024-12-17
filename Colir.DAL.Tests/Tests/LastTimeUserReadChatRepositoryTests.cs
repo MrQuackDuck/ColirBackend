@@ -216,13 +216,13 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
     }
 
     [Test]
-    public async Task Delete_DeletesEntity()
+    public async Task DeleteAsync_DeletesEntity()
     {
         // Arrange
         var entityToDelete = await _dbContext.LastTimeUserReadChats.AsNoTracking().FirstAsync();
 
         // Act
-        _lastTimeUserReadChatRepository.Delete(entityToDelete);
+        await _lastTimeUserReadChatRepository.DeleteAsync(entityToDelete);
         await _lastTimeUserReadChatRepository.SaveChangesAsync();
 
         // Assert
@@ -230,7 +230,7 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
     }
 
     [Test]
-    public async Task Delete_ThrowsNotFoundException_WhenEntityDoesNotExist()
+    public async Task DeleteAsync_ThrowsNotFoundException_WhenEntityDoesNotExist()
     {
         // Arrange
         var entityToDelete = new LastTimeUserReadChat
@@ -242,10 +242,10 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
         };
 
         // Act
-        TestDelegate act = () => _lastTimeUserReadChatRepository.Delete(entityToDelete);
+        AsyncTestDelegate act = async () => await _lastTimeUserReadChatRepository.DeleteAsync(entityToDelete);
 
         // Assert
-        Assert.Throws<NotFoundException>(act);
+        Assert.ThrowsAsync<NotFoundException>(act);
     }
 
     [Test]
@@ -260,7 +260,7 @@ public class LastTimeUserReadChatRepositoryTests : ILastTimeUserReadChatReposito
     }
 
     [Test]
-    public async Task Delete_ThrowsNotFoundException_WhenEntityWasNotFoundById()
+    public async Task DeleteAsync_ThrowsNotFoundException_WhenEntityWasNotFoundById()
     {
         // Act
         AsyncTestDelegate act = async () => await _lastTimeUserReadChatRepository.DeleteByIdAsync(404);

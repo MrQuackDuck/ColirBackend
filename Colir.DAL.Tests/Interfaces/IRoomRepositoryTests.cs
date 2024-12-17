@@ -14,11 +14,11 @@ public interface IRoomRepositoryTests
     Task AddAsync_ThrowsRoomExpiredException_WhenWrongExpiryDateWasProvided();
     Task AddAsync_ThrowsUserNotFoundException_WhenOwnerWasNotFound();
 
-    Task Delete_DeletesRoom();
-    Task Delete_DeletesAllRelatedAttachments();
-    Task Delete_DeletesAllRelatedMessages();
-    Task Delete_DeletesAllRelatedReactions();
-    Task Delete_ThrowsRoomNotFoundException_WhenRoomDoesNotExist();
+    Task DeleteAsync_DeletesRoom();
+    Task DeleteAsync_DeletesAllRelatedAttachments();
+    Task DeleteAsync_DeletesAllRelatedMessages();
+    Task DeleteAsync_DeletesAllRelatedReactions();
+    Task DeleteAsync_ThrowsRoomNotFoundException_WhenRoomDoesNotExist();
 
     Task DeleteByIdAsync_DeletesRoom();
     Task DeleteByIdAsync_DeletesAllRelatedAttachments();

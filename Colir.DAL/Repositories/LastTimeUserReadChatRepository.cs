@@ -1,6 +1,7 @@
 ﻿using Colir.Exceptions;
 using Colir.Exceptions.NotFound;
 using DAL.Entities;
+using DAL.Extensions;
 using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,12 +19,12 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
     /// <summary>
     /// Gets all times users read any chats recently
     /// </summary>
-    public async Task<IEnumerable<LastTimeUserReadChat>> GetAllAsync()
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
+    public async Task<IEnumerable<LastTimeUserReadChat>> GetAllAsync(string[]? overriddenIncludes = default)
     {
         return await _dbContext.LastTimeUserReadChats
             .AsNoTracking()
-            .Include(nameof(LastTimeUserReadChat.Room))
-            .Include(nameof(LastTimeUserReadChat.User))
+            .IncludeMultiple(overriddenIncludes ?? [nameof(LastTimeUserReadChat.Room), nameof(LastTimeUserReadChat.User)])
             .ToListAsync();
     }
 
@@ -32,10 +33,11 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
     /// </summary>
     /// <param name="userId">Id of the user</param>
     /// <param name="roomId">Id of the room</param>
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
     /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found</exception>
     /// <exception cref="UserNotFoundException">Thrown when the user wasn't found</exception>
     /// <exception cref="NotFoundException">Thrown when the record wasn't found</exception>
-    public async Task<LastTimeUserReadChat> GetAsync(long userId, long roomId)
+    public async Task<LastTimeUserReadChat> GetAsync(long userId, long roomId, string[]? overriddenIncludes = default)
     {
         if (!await _dbContext.Rooms.AnyAsync(r => r.Id == roomId))
         {
@@ -49,8 +51,7 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
 
         return await _dbContext.LastTimeUserReadChats
             .AsNoTracking()
-            .Include(nameof(LastTimeUserReadChat.Room))
-            .Include(nameof(LastTimeUserReadChat.User))
+            .IncludeMultiple(overriddenIncludes ?? [nameof(LastTimeUserReadChat.Room), nameof(LastTimeUserReadChat.User)])
             .FirstOrDefaultAsync(l => l.RoomId == roomId && l.UserId == userId) ?? throw new NotFoundException();
     }
 
@@ -58,13 +59,13 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
     /// Gets last time user read the chat in a certain room by id
     /// </summary>
     /// <param name="id">Id of the entry</param>
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
     /// <exception cref="NotFoundException">Thrown when the entity wasn't found</exception>
-    public async Task<LastTimeUserReadChat> GetByIdAsync(long id)
+    public async Task<LastTimeUserReadChat> GetByIdAsync(long id, string[]? overriddenIncludes = default)
     {
         return await _dbContext.LastTimeUserReadChats
             .AsNoTracking()
-            .Include(nameof(LastTimeUserReadChat.Room))
-            .Include(nameof(LastTimeUserReadChat.User))
+            .IncludeMultiple(overriddenIncludes ?? [nameof(LastTimeUserReadChat.Room), nameof(LastTimeUserReadChat.User)])
             .FirstOrDefaultAsync(l => l.Id == id) ?? throw new NotFoundException();
     }
 
@@ -107,9 +108,9 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
     /// </summary>
     /// <param name="entity">Entity to delete</param>
     /// <exception cref="NotFoundException">Thrown when the entity wasn't found</exception>
-    public void Delete(LastTimeUserReadChat entity)
+    public async Task DeleteAsync(LastTimeUserReadChat entity)
     {
-        var target = _dbContext.LastTimeUserReadChats.FirstOrDefault(l => l.Id == entity.Id) ?? throw new NotFoundException();
+        var target = await _dbContext.LastTimeUserReadChats.FindAsync(entity.Id) ?? throw new NotFoundException();
         _dbContext.LastTimeUserReadChats.Remove(target);
     }
 
@@ -120,7 +121,7 @@ public class LastTimeUserReadChatRepository : ILastTimeUserReadChatRepository
     /// <exception cref="NotFoundException">Thrown when the entity wasn't found</exception>
     public async Task DeleteByIdAsync(long id)
     {
-        var target = await _dbContext.LastTimeUserReadChats.FirstOrDefaultAsync(l => l.Id == id) ?? throw new NotFoundException();
+        var target = await _dbContext.LastTimeUserReadChats.FindAsync(id) ?? throw new NotFoundException();
         _dbContext.LastTimeUserReadChats.Remove(target);
     }
 

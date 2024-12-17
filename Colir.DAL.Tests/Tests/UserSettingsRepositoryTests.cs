@@ -174,13 +174,13 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
     }
 
     [Test]
-    public async Task Delete_DeletesUserSettings()
+    public async Task DeleteAsync_DeletesUserSettings()
     {
         // Arrange
         var userSettingsToDelete = await _dbContext.UserSettings.AsNoTracking().FirstAsync();
 
         // Act
-        _userSettingsRepository.Delete(userSettingsToDelete);
+        await _userSettingsRepository.DeleteAsync(userSettingsToDelete);
         await _userSettingsRepository.SaveChangesAsync();
 
         // Assert
@@ -188,7 +188,7 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
     }
 
     [Test]
-    public async Task Delete_ThrowsNotFoundException_WhenUserSettingsDoesNotExist()
+    public async Task DeleteAsync_ThrowsNotFoundException_WhenUserSettingsDoesNotExist()
     {
         // Arrange
         var userSettingsToDelete = new UserSettings
@@ -199,10 +199,10 @@ public class UserSettingsRepositoryTests : IUserSettingsRepositoryTests
         };
 
         // Act
-        TestDelegate act = () => _userSettingsRepository.Delete(userSettingsToDelete);
+        AsyncTestDelegate act = async () => await _userSettingsRepository.DeleteAsync(userSettingsToDelete);
 
         // Assert
-        Assert.Throws<NotFoundException>(act);
+        Assert.ThrowsAsync<NotFoundException>(act);
     }
 
     [Test]

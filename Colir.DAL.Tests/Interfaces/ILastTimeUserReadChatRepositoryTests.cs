@@ -17,11 +17,11 @@ public interface ILastTimeUserReadChatRepositoryTests
     Task AddAsync_ThrowsRoomNotFoundException_WhenRoomWasNotFound();
     Task AddAsync_ThrowsRoomExpiredException_WhenRoomExpired();
 
-    Task Delete_DeletesEntity();
-    Task Delete_ThrowsNotFoundException_WhenEntityDoesNotExist();
+    Task DeleteAsync_DeletesEntity();
+    Task DeleteAsync_ThrowsNotFoundException_WhenEntityDoesNotExist();
 
     Task DeleteByIdAsync_DeletesEntity();
-    Task Delete_ThrowsNotFoundException_WhenEntityWasNotFoundById();
+    Task DeleteAsync_ThrowsNotFoundException_WhenEntityWasNotFoundById();
 
     Task Update_UpdatesEntity();
     Task Update_ThrowsArgumentException_WhenProvidedAnotherUserId();

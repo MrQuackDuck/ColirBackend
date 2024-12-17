@@ -28,10 +28,10 @@ public interface IUserRepositoryTests
     Task AddAsync_ThrowsRoomNotFoundException_WhenOneOfJoinedRoomsWasNotFound();
     Task AddAsync_ThrowsRoomExpiredException_WhenOneOfJoinedRoomsIsExpired();
 
-    Task Delete_DeletesUser();
-    Task Delete_DeletesUserSettings();
-    Task Delete_DeletesUserStatistics();
-    Task Delete_ThrowsUserNotFoundException_WhenUserDoesNotExist();
+    Task DeleteAsync_DeletesUser();
+    Task DeleteAsync_DeletesUserSettings();
+    Task DeleteAsync_DeletesUserStatistics();
+    Task DeleteAsync_ThrowsUserNotFoundException_WhenUserDoesNotExist();
 
     Task DeleteByIdAsync_DeletesUser();
     Task DeleteByIdAsync_DeletesUserSettings();

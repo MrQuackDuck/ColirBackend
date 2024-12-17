@@ -15,8 +15,8 @@ public interface IUserSettingsRepositoryTests
     Task AddAsync_ThrowsArgumentException_WhenUserSettingsAlreadyExist();
     Task AddAsync_ThrowsUserNotFoundException_WhenUserWasNotFound();
 
-    Task Delete_DeletesUserSettings();
-    Task Delete_ThrowsNotFoundException_WhenUserSettingsDoesNotExist();
+    Task DeleteAsync_DeletesUserSettings();
+    Task DeleteAsync_ThrowsNotFoundException_WhenUserSettingsDoesNotExist();
 
     Task DeleteByIdAsync_DeletesUserSettings();
     Task DeleteByIdAsync_ThrowsNotFoundException_WhenUserSettingsWereNotFoundById();

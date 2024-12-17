@@ -53,11 +53,11 @@ public interface IMessageServiceTests
 	Task EditAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotAuthorOfMessage();
 	Task EditAsync_ThrowsRoomExpiredException_WhenRoomIsExpired();
 
-	Task Delete_DeletesMessage();
-	Task Delete_ThrowsMessageNotFoundException_WhenMessageWasNotFound();
-	Task Delete_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom();
-	Task Delete_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotAuthorOfMessage();
-	Task Delete_ThrowsRoomExpiredException_WhenRoomIsExpired();
+	Task DeleteAsync_DeletesMessage();
+	Task DeleteAsync_ThrowsMessageNotFoundException_WhenMessageWasNotFound();
+	Task DeleteAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom();
+	Task DeleteAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotAuthorOfMessage();
+	Task DeleteAsync_ThrowsRoomExpiredException_WhenRoomIsExpired();
 
 	Task AddReaction_AddsReaction();
 	Task AddReaction_AddsToStatistics_WhenItsEnabled();

@@ -4,11 +4,11 @@ namespace DAL.Interfaces;
 
 public interface IUserRepository : IRepository<User>
 {
-    Task<User> GetByHexIdAsync(int hexId);
+    Task<User> GetByHexIdAsync(int hexId, string[]? overriddenIncludes = default);
 
-    Task<User> GetByGithudIdAsync(string githubId);
+    Task<User> GetByGithudIdAsync(string githubId, string[]? overriddenIncludes = default);
 
-    Task<User> GetByGoogleIdAsync(string googleId);
+    Task<User> GetByGoogleIdAsync(string googleId, string[]? overriddenIncludes = default);
 
     Task<bool> ExistsAsync(int hexId);
 }

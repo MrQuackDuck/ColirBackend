@@ -102,13 +102,13 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
     }
 
     [Test]
-    public async Task Delete_DeletesAttachment()
+    public async Task DeleteAsync_DeletesAttachment()
     {
         // Arrange
         var attachmentToDelete = await _dbContext.Attachments.AsNoTracking().FirstAsync();
 
         // Act
-        _attachmentRepository.Delete(attachmentToDelete);
+        await _attachmentRepository.DeleteAsync(attachmentToDelete);
         await _attachmentRepository.SaveChangesAsync();
 
         // Assert
@@ -116,7 +116,7 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
     }
 
     [Test]
-    public async Task Delete_ThrowsAttachmentNotFoundException_WhenAttachmentDoesNotExist()
+    public async Task DeleteAsync_ThrowsAttachmentNotFoundException_WhenAttachmentDoesNotExist()
     {
         // Arrange
         var attachmentToDelete = new Attachment
@@ -129,10 +129,10 @@ public class AttachmentRepositoryTests : IAttachmentRepositoryTests
         };
 
         // Act
-        TestDelegate act = () => _attachmentRepository.Delete(attachmentToDelete);
+        AsyncTestDelegate act = async () => await _attachmentRepository.DeleteAsync(attachmentToDelete);
 
         // Assert
-        Assert.Throws<AttachmentNotFoundException>(act);
+        Assert.ThrowsAsync<AttachmentNotFoundException>(act);
     }
 
     [Test]

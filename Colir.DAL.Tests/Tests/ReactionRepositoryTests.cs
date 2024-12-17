@@ -180,13 +180,13 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
     }
 
     [Test]
-    public async Task Delete_DeletesReaction()
+    public async Task DeleteAsync_DeletesReaction()
     {
         // Arrange
         var reactionToDelete = await _dbContext.Reactions.AsNoTracking().FirstAsync();
 
         // Act
-        _reactionRepository.Delete(reactionToDelete);
+        await _reactionRepository.DeleteAsync(reactionToDelete);
         await _reactionRepository.SaveChangesAsync();
 
         // Assert
@@ -194,16 +194,16 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
     }
 
     [Test]
-    public async Task Delete_ThrowsReactionNotFoundException_WhenReactionDoesNotExist()
+    public async Task DeleteAsync_ThrowsReactionNotFoundException_WhenReactionDoesNotExist()
     {
         // Arrange
         var reactionToDelete = new Reaction() { Id = 404 };
 
         // Act
-        TestDelegate act = () => _reactionRepository.Delete(reactionToDelete);
+        AsyncTestDelegate act = async () => await _reactionRepository.DeleteAsync(reactionToDelete);
 
         // Assert
-        Assert.Throws<ReactionNotFoundException>(act);
+        Assert.ThrowsAsync<ReactionNotFoundException>(act);
     }
 
     [Test]
@@ -218,16 +218,16 @@ public class ReactionRepositoryTests : IReactionRepositoryTests
     }
 
     [Test]
-    public async Task Delete_ThrowsReactionNotFoundException_WhenReactionWasNotFoundById()
+    public async Task DeleteAsync_ThrowsReactionNotFoundException_WhenReactionWasNotFoundById()
     {
         // Arrange
         var reactionToDelete = new Reaction() { Id = 404, Symbol = "😎" };
 
         // Act
-        TestDelegate act = () => _reactionRepository.Delete(reactionToDelete);
+        AsyncTestDelegate act = async () => await _reactionRepository.DeleteAsync(reactionToDelete);
 
         // Assert
-        Assert.Throws<ReactionNotFoundException>(act);
+        Assert.ThrowsAsync<ReactionNotFoundException>(act);
     }
 
     [Test]

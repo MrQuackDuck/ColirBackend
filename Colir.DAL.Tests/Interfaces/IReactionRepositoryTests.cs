@@ -14,11 +14,11 @@ public interface IReactionRepositoryTests
     Task AddAsync_ThrowsUserNotFoundException_WhenAuthorWasNotFound();
     Task AddAsync_ThrowsMessageNotFoundException_WhenMessageWasNotFound();
 
-    Task Delete_DeletesReaction();
-    Task Delete_ThrowsReactionNotFoundException_WhenReactionDoesNotExist();
+    Task DeleteAsync_DeletesReaction();
+    Task DeleteAsync_ThrowsReactionNotFoundException_WhenReactionDoesNotExist();
 
     Task DeleteByIdAsync_DeletesReaction();
-    Task Delete_ThrowsReactionNotFoundException_WhenReactionWasNotFoundById();
+    Task DeleteAsync_ThrowsReactionNotFoundException_WhenReactionWasNotFoundById();
 
     Task Update_UpdatesReaction();
     Task Update_ThrowsReactionNotFoundException_WhenReactionDoesNotExist();

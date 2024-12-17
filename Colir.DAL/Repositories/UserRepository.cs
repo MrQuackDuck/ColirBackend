@@ -1,13 +1,12 @@
 ﻿using Colir.Exceptions;
 using Colir.Exceptions.NotFound;
 using DAL.Entities;
+using DAL.Extensions;
 using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 namespace DAL.Repositories;
-
-#nullable enable
 
 public class UserRepository : IUserRepository
 {
@@ -23,13 +22,12 @@ public class UserRepository : IUserRepository
     /// <summary>
     /// Gets all users
     /// </summary>
-    public async Task<IEnumerable<User>> GetAllAsync()
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
+    public async Task<IEnumerable<User>> GetAllAsync(string[]? overriddenIncludes = default)
     {
         return await _dbContext.Users
             .AsNoTracking()
-            .Include(nameof(User.UserStatistics))
-            .Include(nameof(User.UserSettings))
-            .Include(nameof(User.JoinedRooms))
+            .IncludeMultiple(overriddenIncludes ?? GetDefaultIncludes())
             .ToListAsync();
     }
 
@@ -37,14 +35,13 @@ public class UserRepository : IUserRepository
     /// Gets the user by their id
     /// </summary>
     /// <param name="id">Id of the user</param>
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
     /// <exception cref="UserNotFoundException">Thrown when the user wasn't found by the provided id</exception>
-    public async Task<User> GetByIdAsync(long id)
+    public async Task<User> GetByIdAsync(long id, string[]? overriddenIncludes = default)
     {
         return await _dbContext.Users
             .AsNoTracking()
-            .Include(nameof(User.UserStatistics))
-            .Include(nameof(User.UserSettings))
-            .Include(nameof(User.JoinedRooms))
+            .IncludeMultiple(overriddenIncludes ?? GetDefaultIncludes())
             .AsSplitQuery()
             .FirstOrDefaultAsync(u => u.Id == id) ?? throw new UserNotFoundException();
     }
@@ -53,9 +50,10 @@ public class UserRepository : IUserRepository
     /// Gets the user by their hex id
     /// </summary>
     /// <param name="hexId">Hex Id of the user</param>
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
     /// <exception cref="ArgumentException">Thrown when an invalid hex id is provided</exception>
     /// <exception cref="UserNotFoundException">Thrown when the user wasn't found by the provided hex id</exception>
-    public async Task<User> GetByHexIdAsync(int hexId)
+    public async Task<User> GetByHexIdAsync(int hexId, string[]? overriddenIncludes = default)
     {
         if (hexId < 0 || hexId > 16_777_216)
         {
@@ -64,9 +62,7 @@ public class UserRepository : IUserRepository
 
         return await _dbContext.Users
             .AsNoTracking()
-            .Include(nameof(User.UserStatistics))
-            .Include(nameof(User.UserSettings))
-            .Include(nameof(User.JoinedRooms))
+            .IncludeMultiple(overriddenIncludes ?? GetDefaultIncludes())
             .AsSplitQuery()
             .FirstOrDefaultAsync(u => u.HexId == hexId) ?? throw new UserNotFoundException();
     }
@@ -75,14 +71,13 @@ public class UserRepository : IUserRepository
     /// Gets the user by their GitHub Id
     /// </summary>
     /// <param name="githubId">GitHub Id of the user</param>
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
     /// <exception cref="UserNotFoundException">Thrown when the user wasn't found by the provided GitHub id</exception>
-    public async Task<User> GetByGithudIdAsync(string githubId)
+    public async Task<User> GetByGithudIdAsync(string githubId, string[]? overriddenIncludes = default)
     {
         return await _dbContext.Users
             .AsNoTracking()
-            .Include(nameof(User.UserStatistics))
-            .Include(nameof(User.UserSettings))
-            .Include(nameof(User.JoinedRooms))
+            .IncludeMultiple(overriddenIncludes ?? GetDefaultIncludes())
             .AsSplitQuery()
             .FirstOrDefaultAsync(u => u.GitHubId == githubId) ?? throw new UserNotFoundException();
     }
@@ -91,14 +86,13 @@ public class UserRepository : IUserRepository
     /// Gets the user by their Google Id
     /// </summary>
     /// <param name="googleId">Google Id of the user</param>
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
     /// <exception cref="UserNotFoundException">Thrown when the user wasn't found by the provided Google id</exception>
-    public async Task<User> GetByGoogleIdAsync(string googleId)
+    public async Task<User> GetByGoogleIdAsync(string googleId, string[]? overriddenIncludes = default)
     {
         return await _dbContext.Users
             .AsNoTracking()
-            .Include(nameof(User.UserStatistics))
-            .Include(nameof(User.UserSettings))
-            .Include(nameof(User.JoinedRooms))
+            .IncludeMultiple(overriddenIncludes ?? GetDefaultIncludes())
             .AsSplitQuery()
             .FirstOrDefaultAsync(u => u.GoogleId == googleId) ?? throw new UserNotFoundException();
     }
@@ -175,12 +169,12 @@ public class UserRepository : IUserRepository
     /// </summary>
     /// <param name="user">The user to delete</param>
     /// <exception cref="UserNotFoundException">Thrown when the user wasn't found in the DB</exception>
-    public void Delete(User user)
+    public async Task DeleteAsync(User user)
     {
-        var target = _dbContext.Users
+        var target = await _dbContext.Users
             .Include(nameof(User.UserStatistics))
             .Include(nameof(User.UserSettings))
-            .FirstOrDefault(u => u.Id == user.Id) ?? throw new UserNotFoundException();
+            .FirstOrDefaultAsync(u => u.Id == user.Id) ?? throw new UserNotFoundException();
 
         _dbContext.UsersToRooms.RemoveRange(_dbContext.UsersToRooms.Where(userToRoom => userToRoom.UserId == user.Id));
         _dbContext.Users.Remove(target);
@@ -273,5 +267,15 @@ public class UserRepository : IUserRepository
     public async Task SaveChangesAsync()
     {
         await _dbContext.SaveChangesAsync();
+    }
+
+    private static string[] GetDefaultIncludes()
+    {
+        return new[]
+        {
+            nameof(User.UserStatistics),
+            nameof(User.UserSettings),
+            nameof(User.JoinedRooms)
+        };
     }
 }

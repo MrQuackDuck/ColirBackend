@@ -5,8 +5,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Entities;
 
-#nullable enable
-
 [Index(nameof(HexId), IsUnique = true)]
 public class User : BaseEntity
 {

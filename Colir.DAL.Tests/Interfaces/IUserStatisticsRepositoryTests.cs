@@ -15,8 +15,8 @@ public interface IUserStatisticsRepositoryTests
     Task AddAsync_ThrowsArgumentException_WhenUserStatisticsAlreadyExist();
     Task AddAsync_ThrowsUserNotFoundException_WhenUserWasNotFound();
 
-    Task Delete_DeletesUserStatistics();
-    Task Delete_ThrowsNotFoundException_WhenUserStatisticsDoesNotExist();
+    Task DeleteAsync_DeletesUserStatistics();
+    Task DeleteAsync_ThrowsNotFoundException_WhenUserStatisticsDoesNotExist();
 
     Task DeleteByIdAsync_DeletesUserStatistics();
     Task DeleteByIdAsync_ThrowsNotFoundException_WhenUserStatisticsWasNotFoundById();

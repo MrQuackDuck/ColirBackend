@@ -402,13 +402,13 @@ public class UserRepositoryTests : IUserRepositoryTests
     }
 
     [Test]
-    public async Task Delete_DeletesUser()
+    public async Task DeleteAsync_DeletesUser()
     {
         // Arrange
         var userToDelete = await _dbContext.Users.AsNoTracking().FirstAsync();
 
         // Act
-        _userRepository.Delete(userToDelete);
+        await _userRepository.DeleteAsync(userToDelete);
         await _userRepository.SaveChangesAsync();
 
         // Assert
@@ -416,13 +416,13 @@ public class UserRepositoryTests : IUserRepositoryTests
     }
 
     [Test]
-    public async Task Delete_DeletesUserSettings()
+    public async Task DeleteAsync_DeletesUserSettings()
     {
         // Arrange
         var userToDelete = await _dbContext.Users.FirstAsync();
 
         // Act
-        _userRepository.Delete(userToDelete);
+        await _userRepository.DeleteAsync(userToDelete);
         await _userRepository.SaveChangesAsync();
 
         // Assert
@@ -430,13 +430,13 @@ public class UserRepositoryTests : IUserRepositoryTests
     }
 
     [Test]
-    public async Task Delete_DeletesUserStatistics()
+    public async Task DeleteAsync_DeletesUserStatistics()
     {
         // Arrange
         var userToDelete = await _dbContext.Users.AsNoTracking().FirstAsync();
 
         // Act
-        _userRepository.Delete(userToDelete);
+        await _userRepository.DeleteAsync(userToDelete);
         await _userRepository.SaveChangesAsync();
 
         // Assert
@@ -444,16 +444,16 @@ public class UserRepositoryTests : IUserRepositoryTests
     }
 
     [Test]
-    public async Task Delete_ThrowsUserNotFoundException_WhenUserDoesNotExist()
+    public async Task DeleteAsync_ThrowsUserNotFoundException_WhenUserDoesNotExist()
     {
         // Arrange
         var userToDelete = new User() { Id = 404 };
 
         // Act
-        TestDelegate act = () => _userRepository.Delete(userToDelete);
+        AsyncTestDelegate act = async () => await _userRepository.DeleteAsync(userToDelete);
 
         // Assert
-        Assert.Throws<UserNotFoundException>(act);
+        Assert.ThrowsAsync<UserNotFoundException>(act);
     }
 
     [Test]

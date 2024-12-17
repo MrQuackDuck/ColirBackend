@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Entities;
 
-#nullable enable
-
 public class LastTimeUserReadChat : BaseEntity
 {
     public DateTime Timestamp { get; set; }

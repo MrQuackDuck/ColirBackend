@@ -152,7 +152,7 @@ public class RoomService : IRoomService
         var transaction = _unitOfWork.BeginTransaction();
         try
         {
-            _unitOfWork.RoomRepository.Delete(room);
+            await _unitOfWork.RoomRepository.DeleteAsync(room);
             await _unitOfWork.SaveChangesAsync();
 
             await transaction.CommitAsync();
@@ -171,7 +171,7 @@ public class RoomService : IRoomService
 
         try
         {
-            _unitOfWork.RoomRepository.DeleteAllExpired();
+            await _unitOfWork.RoomRepository.DeleteAllExpiredAsync();
             await _unitOfWork.SaveChangesAsync();
             await transaction.CommitAsync();
         }

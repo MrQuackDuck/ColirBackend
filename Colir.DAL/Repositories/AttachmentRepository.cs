@@ -1,5 +1,6 @@
 ﻿using Colir.Exceptions.NotFound;
 using DAL.Entities;
+using DAL.Extensions;
 using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,11 +18,12 @@ public class AttachmentRepository : IAttachmentRepository
     /// <summary>
     /// Gets all attachments
     /// </summary>
-    public async Task<IEnumerable<Attachment>> GetAllAsync()
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
+    public async Task<IEnumerable<Attachment>> GetAllAsync(string[]? overriddenIncludes = default)
     {
         return await _dbContext.Attachments
             .AsNoTracking()
-            .Include(nameof(Attachment.Message))
+            .IncludeMultiple(overriddenIncludes ?? [nameof(Attachment.Message)])
             .ToListAsync();
     }
 
@@ -29,12 +31,13 @@ public class AttachmentRepository : IAttachmentRepository
     /// Gets the attachment by id
     /// </summary>
     /// <param name="id">Id of the attachment to get</param>
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
     /// <exception cref="AttachmentNotFoundException">Thrown when the attachment wasn't found</exception>
-    public async Task<Attachment> GetByIdAsync(long id)
+    public async Task<Attachment> GetByIdAsync(long id, string[]? overriddenIncludes = default)
     {
         return await _dbContext.Attachments
             .AsNoTracking()
-            .Include(nameof(Attachment.Message))
+            .IncludeMultiple(overriddenIncludes ?? [nameof(Attachment.Message)])
             .FirstOrDefaultAsync(a => a.Id == id) ?? throw new AttachmentNotFoundException();
     }
 
@@ -53,9 +56,9 @@ public class AttachmentRepository : IAttachmentRepository
     /// </summary>
     /// <param name="attachment">An attachment to delete</param>
     /// <exception cref="AttachmentNotFoundException">Thrown when the attachment wasn't found</exception>
-    public void Delete(Attachment attachment)
+    public async Task DeleteAsync(Attachment attachment)
     {
-        var target = _dbContext.Attachments.FirstOrDefault(a => a.Id == attachment.Id) ?? throw new AttachmentNotFoundException();
+        var target = await _dbContext.Attachments.FindAsync(attachment.Id) ?? throw new AttachmentNotFoundException();
         _dbContext.Attachments.Remove(target);
     }
 
@@ -76,7 +79,7 @@ public class AttachmentRepository : IAttachmentRepository
     /// <param name="id">Id of the attachment to delete</param>
     public async Task DeleteByIdAsync(long id)
     {
-        var target = await _dbContext.Attachments.FirstOrDefaultAsync(a => a.Id == id) ?? throw new AttachmentNotFoundException();
+        var target = await _dbContext.Attachments.FindAsync(id) ?? throw new AttachmentNotFoundException();
         _dbContext.Attachments.Remove(target);
     }
 

@@ -4,8 +4,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Entities;
 
-#nullable enable
-
 [Index(nameof(Path), IsUnique = true)]
 public class Attachment : BaseEntity
 {

@@ -480,13 +480,13 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     }
 
     [Test]
-    public async Task Delete_DeletesMessage()
+    public async Task DeleteAsync_DeletesMessage()
     {
         // Arrange
         var messageToDelete = await _dbContext.Messages.AsNoTracking().FirstAsync(m => m.Id == 1);
 
         // Act
-        _messageRepository.Delete(messageToDelete);
+        await _messageRepository.DeleteAsync(messageToDelete);
         await _messageRepository.SaveChangesAsync();
 
         // Assert
@@ -494,13 +494,13 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     }
 
     [Test]
-    public async Task Delete_DeletesAllRelatedReactions()
+    public async Task DeleteAsync_DeletesAllRelatedReactions()
     {
         // Arrange
         var messageToDelete = await _dbContext.Messages.AsNoTracking().FirstAsync(m => m.Id == 1);
 
         // Act
-        _messageRepository.Delete(messageToDelete);
+        await _messageRepository.DeleteAsync(messageToDelete);
         await _messageRepository.SaveChangesAsync();
 
         // Assert
@@ -508,13 +508,13 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     }
 
     [Test]
-    public async Task Delete_DeletesAllRelatedAttachments()
+    public async Task DeleteAsync_DeletesAllRelatedAttachments()
     {
         // Arrange
         var messageToDelete = await _dbContext.Messages.FirstAsync(m => m.Id == 1);
 
         // Act
-        _messageRepository.Delete(messageToDelete);
+        await _messageRepository.DeleteAsync(messageToDelete);
         await _messageRepository.SaveChangesAsync();
 
         // Assert
@@ -522,13 +522,13 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     }
 
     [Test]
-    public async Task Delete_NotDeletesAnyOtherMessages()
+    public async Task DeleteAsync_NotDeletesAnyOtherMessages()
     {
         // Arrange
         var messageToDelete = await _dbContext.Messages.FirstAsync(m => m.Id == 1);
 
         // Act
-        _messageRepository.Delete(messageToDelete);
+        await _messageRepository.DeleteAsync(messageToDelete);
         await _messageRepository.SaveChangesAsync();
 
         // Assert
@@ -536,29 +536,16 @@ public class MessageRepositoryTests : IMessageRepositoryTests
     }
 
     [Test]
-    public async Task Delete_ThrowsMessageNotFoundException_WhenMessageDoesNotExist()
+    public async Task DeleteAsync_ThrowsMessageNotFoundException_WhenMessageDoesNotExist()
     {
         // Arrange
         var messageToDelete = new Message { Id = 404 };
 
         // Act
-        TestDelegate act = () => _messageRepository.Delete(messageToDelete);
+        AsyncTestDelegate act = async () => await _messageRepository.DeleteAsync(messageToDelete);
 
         // Assert
-        Assert.Throws<MessageNotFoundException>(act);
-    }
-
-    [Test]
-    public async Task Delete_ThrowsRoomExpiredException_WhenRoomExpired()
-    {
-        // Arrange
-        var messageToDelete = await _dbContext.Messages.FirstAsync(m => m.RoomId == 2);
-
-        // Act
-        TestDelegate act = () => _messageRepository.Delete(messageToDelete);
-
-        // Assert
-        Assert.Throws<RoomExpiredException>(act);
+        Assert.ThrowsAsync<MessageNotFoundException>(act);
     }
 
     [Test]
@@ -602,19 +589,6 @@ public class MessageRepositoryTests : IMessageRepositoryTests
 
         // Assert
         Assert.ThrowsAsync<MessageNotFoundException>(act);
-    }
-
-    [Test]
-    public async Task DeleteByIdAsync_ThrowsRoomExpiredException_WhenRoomExpired()
-    {
-        // Arrange
-        var expiredMessageId = await _dbContext.Messages.Where(m => m.RoomId == 2).Select(m => m.Id).FirstAsync();
-
-        // Act
-        AsyncTestDelegate act = async () => await _messageRepository.DeleteByIdAsync(expiredMessageId);
-
-        // Assert
-        Assert.ThrowsAsync<RoomExpiredException>(act);
     }
 
     [Test]

@@ -46,8 +46,8 @@ public class MessageService : IMessageService
         }
 
         return (await _unitOfWork
-            .MessageRepository
-            .GetLastMessagesAsync(request.RoomGuid, request.Count, request.SkipCount))
+                .MessageRepository
+                .GetLastMessagesAsync(request.RoomGuid, request.Count, request.SkipCount))
             .Select(m =>
             {
                 var mapped = _mapper.Map<MessageModel>(m);
@@ -55,6 +55,7 @@ public class MessageService : IMessageService
                 {
                     mapped.RepliedMessage.AuthorHexId = m.RepliedTo.Author.HexId;
                 }
+
                 mapped.RoomGuid = room.Guid;
                 return mapped;
             })
@@ -84,8 +85,8 @@ public class MessageService : IMessageService
         }
 
         return (await _unitOfWork
-            .MessageRepository
-            .GetSurroundingMessages(room.Guid, request.MessageId, request.Count))
+                .MessageRepository
+                .GetSurroundingMessages(room.Guid, request.MessageId, request.Count))
             .Select(m =>
             {
                 var mapped = _mapper.Map<MessageModel>(m);
@@ -94,6 +95,7 @@ public class MessageService : IMessageService
                 {
                     mapped.RepliedMessage.AuthorHexId = m.RepliedTo.Author.HexId;
                 }
+
                 return mapped;
             })
             .ToList();
@@ -133,8 +135,8 @@ public class MessageService : IMessageService
         }
 
         return (await _unitOfWork
-            .MessageRepository
-            .GetMessagesRangeAsync(request.RoomGuid, request.StartId, request.EndId))
+                .MessageRepository
+                .GetMessagesRangeAsync(request.RoomGuid, request.StartId, request.EndId))
             .Select(m =>
             {
                 var mapped = _mapper.Map<MessageModel>(m);
@@ -143,6 +145,7 @@ public class MessageService : IMessageService
                 {
                     mapped.RepliedMessage.AuthorHexId = m.RepliedTo.Author.HexId;
                 }
+
                 return mapped;
             })
             .ToList();
@@ -190,8 +193,8 @@ public class MessageService : IMessageService
         }
 
         return (await _unitOfWork
-            .MessageRepository
-            .GetAllRepliesToUserAfterDateAsync(request.RoomGuid, request.IssuerId, lastTimeUserReadChat.Timestamp))
+                .MessageRepository
+                .GetAllRepliesToUserAfterDateAsync(request.RoomGuid, request.IssuerId, lastTimeUserReadChat.Timestamp))
             .Select(m =>
             {
                 var mapped = _mapper.Map<MessageModel>(m);
@@ -200,6 +203,7 @@ public class MessageService : IMessageService
                 {
                     mapped.RepliedMessage.AuthorHexId = m.RepliedTo.Author.HexId;
                 }
+
                 return mapped;
             }).ToList();
     }
@@ -246,7 +250,10 @@ public class MessageService : IMessageService
 
         var issuer = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
 
-        var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid);
+        var room = await _unitOfWork.RoomRepository.GetByGuidAsync(request.RoomGuid,
+        [
+            nameof(Room.JoinedUsers),
+        ]);
 
         // If the room is expired
         if (room.IsExpired())
@@ -260,7 +267,7 @@ public class MessageService : IMessageService
             throw new IssuerNotInRoomException();
         }
 
-        Message repliedMessage = null!;
+        Message? repliedMessage = null;
 
         // If the ReplyMessageId is not null, check if the message to reply exists
         // Otherwise, an exception will be thrown
@@ -287,7 +294,7 @@ public class MessageService : IMessageService
             // Adding attachments to the message
             foreach (var attachmentId in request.AttachmentsIds)
             {
-                var attachment = await _unitOfWork.AttachmentRepository.GetByIdAsync(attachmentId);
+                var attachment = await _unitOfWork.AttachmentRepository.GetByIdAsync(attachmentId, []);
 
                 // Verifying that attachment is in the room the message is being sent to
                 if (!attachment.IsInRoom(request.RoomGuid))
@@ -332,9 +339,14 @@ public class MessageService : IMessageService
     public async Task<MessageModel> EditAsync(RequestToEditMessage request)
     {
         // Check if the issuer exists. Otherwise, an exception will be thrown
-        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
+        await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId, []);
 
-        var message = await _unitOfWork.MessageRepository.GetByIdAsync(request.MessageId);
+        var message = await _unitOfWork.MessageRepository.GetByIdAsync(request.MessageId,
+        [
+            nameof(Message.Attachments),
+            nameof(Message.Room),
+            nameof(Message.Room) + "." + nameof(Room.JoinedUsers)
+        ]);
 
         // Check if not empty
         if (request.NewContent.Length == 0 && message.Attachments.Count == 0)
@@ -349,7 +361,7 @@ public class MessageService : IMessageService
             throw new StringTooLongException();
         }
 
-        var room = await _unitOfWork.RoomRepository.GetByIdAsync(message.RoomId);
+        var room = message.Room;
 
         // If the room is expired
         if (room.IsExpired())
@@ -384,8 +396,10 @@ public class MessageService : IMessageService
         // Check if the issuer exists. Otherwise, an exception will be thrown
         await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
 
-        var message = await _unitOfWork.MessageRepository.GetByIdAsync(request.MessageId);
-        var room = await _unitOfWork.RoomRepository.GetByIdAsync(message.RoomId);
+        var message =
+            await _unitOfWork.MessageRepository.GetByIdAsync(request.MessageId, [nameof(Message.Attachments)]);
+
+        var room = await _unitOfWork.RoomRepository.GetByIdAsync(message.RoomId, [nameof(Room.JoinedUsers)]);
 
         // If the room is expired
         if (room.IsExpired())
@@ -413,7 +427,7 @@ public class MessageService : IMessageService
             _unitOfWork.RoomRepository.RoomFileManager.DeleteFile(attachment.Path);
         }
 
-        _unitOfWork.MessageRepository.Delete(message);
+        await _unitOfWork.MessageRepository.DeleteAsync(message);
 
         try
         {
@@ -492,9 +506,22 @@ public class MessageService : IMessageService
     public async Task<MessageModel> RemoveReaction(RequestToRemoveReactionFromMessage request)
     {
         var issuer = await _unitOfWork.UserRepository.GetByIdAsync(request.IssuerId);
-        var reaction = await _unitOfWork.ReactionRepository.GetByIdAsync(request.ReactionId);
-        var message = await _unitOfWork.MessageRepository.GetByIdAsync(reaction.MessageId);
-        var room = await _unitOfWork.RoomRepository.GetByIdAsync(reaction.Message.RoomId);
+        var reaction = await _unitOfWork.ReactionRepository.GetByIdAsync(request.ReactionId, []);
+
+        var message = await _unitOfWork.MessageRepository.GetByIdAsync(reaction.MessageId,
+        [
+            nameof(Message.Author),
+            nameof(Message.Attachments),
+            nameof(Message.Room),
+            nameof(Message.Room) + "." + nameof(Room.JoinedUsers),
+            nameof(Message.RepliedTo),
+            nameof(Message.RepliedTo) + "." + nameof(Message.Author),
+            nameof(Message.RepliedTo) + "." + nameof(Message.Attachments),
+            nameof(Message.Reactions),
+            nameof(Message.Reactions) + "." + nameof(Reaction.Author)
+        ]);
+
+        var room = message.Room;
 
         // If the room is expired
         if (room.IsExpired())

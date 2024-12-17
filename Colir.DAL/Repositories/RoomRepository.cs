@@ -1,13 +1,12 @@
 ﻿using Colir.Exceptions;
 using Colir.Exceptions.NotFound;
 using DAL.Entities;
+using DAL.Extensions;
 using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 namespace DAL.Repositories;
-
-#nullable enable
 
 public class RoomRepository : IRoomRepository
 {
@@ -26,12 +25,12 @@ public class RoomRepository : IRoomRepository
     /// <summary>
     /// Gets all rooms
     /// </summary>
-    public async Task<IEnumerable<Room>> GetAllAsync()
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
+    public async Task<IEnumerable<Room>> GetAllAsync(string[]? overriddenIncludes = default)
     {
         return await _dbContext.Rooms
             .AsNoTracking()
-            .Include(nameof(Room.Owner))
-            .Include(nameof(Room.JoinedUsers))
+            .IncludeMultiple(overriddenIncludes ?? [nameof(Room.Owner), nameof(Room.JoinedUsers)])
             .ToListAsync();
     }
 
@@ -39,13 +38,13 @@ public class RoomRepository : IRoomRepository
     /// Gets a room by its id
     /// </summary>
     /// <param name="id">Id of a room</param>
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
     /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found</exception>
-    public async Task<Room> GetByIdAsync(long id)
+    public async Task<Room> GetByIdAsync(long id, string[]? overriddenIncludes = default)
     {
         return await _dbContext.Rooms
             .AsNoTracking()
-            .Include(nameof(Room.Owner))
-            .Include(nameof(Room.JoinedUsers))
+            .IncludeMultiple(overriddenIncludes ?? [nameof(Room.Owner), nameof(Room.JoinedUsers)])
             .FirstOrDefaultAsync(r => r.Id == id) ?? throw new RoomNotFoundException();
     }
 
@@ -53,13 +52,13 @@ public class RoomRepository : IRoomRepository
     /// Gets a room by its GUID
     /// </summary>
     /// <param name="guid">GUID of a room</param>
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
     /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found</exception>
-    public async Task<Room> GetByGuidAsync(string guid)
+    public async Task<Room> GetByGuidAsync(string guid, string[]? overriddenIncludes = default)
     {
         return await _dbContext.Rooms
             .AsNoTracking()
-            .Include(nameof(Room.Owner))
-            .Include(nameof(Room.JoinedUsers))
+            .IncludeMultiple(overriddenIncludes ?? [nameof(Room.Owner), nameof(Room.JoinedUsers)])
             .FirstOrDefaultAsync(r => r.Guid == guid) ?? throw new RoomNotFoundException();
     }
 
@@ -110,9 +109,9 @@ public class RoomRepository : IRoomRepository
     /// </summary>
     /// <param name="room">The room to delete</param>
     /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found in the DB</exception>
-    public void Delete(Room room)
+    public async Task DeleteAsync(Room room)
     {
-        var target = _dbContext.Rooms.FirstOrDefault(r => r.Id == room.Id) ?? throw new RoomNotFoundException();
+        var target = await _dbContext.Rooms.FindAsync(room.Id) ?? throw new RoomNotFoundException();
 
         _dbContext.UsersToRooms.RemoveRange(_dbContext.UsersToRooms.Where(userToRoom => userToRoom.RoomId == room.Id));
         _dbContext.Rooms.Remove(target);
@@ -131,7 +130,7 @@ public class RoomRepository : IRoomRepository
     /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found by the provided id in the DB</exception>
     public async Task DeleteByIdAsync(long id)
     {
-        var target = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Id == id) ?? throw new RoomNotFoundException();
+        var target = await _dbContext.Rooms.FindAsync(id) ?? throw new RoomNotFoundException();
 
         _dbContext.UsersToRooms.RemoveRange(_dbContext.UsersToRooms.Where(userToRoom => userToRoom.RoomId == id));
         _dbContext.Rooms.Remove(target);
@@ -147,18 +146,18 @@ public class RoomRepository : IRoomRepository
     /// Deletes all expired rooms
     /// </summary>
     /// <exception cref="RoomNotFoundException">Thrown when no expired rooms are found</exception>
-    public void DeleteAllExpired()
+    public async Task DeleteAllExpiredAsync()
     {
         var expiredRooms = _dbContext.Rooms.Where(r => r.ExpiryDate < DateTime.Now);
 
-        if (expiredRooms.Count() == 0)
+        if (await expiredRooms.CountAsync() == 0)
         {
             throw new RoomNotFoundException();
         }
 
         foreach (var room in expiredRooms)
         {
-            Delete(room);
+            await DeleteAsync(room);
         }
     }
 

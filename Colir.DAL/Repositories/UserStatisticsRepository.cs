@@ -1,5 +1,6 @@
 ﻿using Colir.Exceptions.NotFound;
 using DAL.Entities;
+using DAL.Extensions;
 using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,11 +18,12 @@ public class UserStatisticsRepository : IUserStatisticsRepository
     /// <summary>
     /// Gets all users' statistics
     /// </summary>
-    public async Task<IEnumerable<UserStatistics>> GetAllAsync()
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
+    public async Task<IEnumerable<UserStatistics>> GetAllAsync(string[]? overriddenIncludes = default)
     {
         return await _dbContext.UserStatistics
             .AsNoTracking()
-            .Include(nameof(UserStatistics.User))
+            .IncludeMultiple(overriddenIncludes ?? [nameof(UserStatistics.User)])
             .ToListAsync();
     }
 
@@ -29,12 +31,13 @@ public class UserStatisticsRepository : IUserStatisticsRepository
     /// Gets user statistics by their id
     /// </summary>
     /// <param name="id">Id of user statistics</param>
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
     /// <exception cref="NotFoundException">Thrown when not found by id</exception>
-    public async Task<UserStatistics> GetByIdAsync(long id)
+    public async Task<UserStatistics> GetByIdAsync(long id, string[]? overriddenIncludes = default)
     {
         return await _dbContext.UserStatistics
             .AsNoTracking()
-            .Include(nameof(UserStatistics.User))
+            .IncludeMultiple(overriddenIncludes ?? [nameof(UserStatistics.User)])
             .FirstOrDefaultAsync(s => s.Id == id) ?? throw new NotFoundException();
     }
 
@@ -42,10 +45,11 @@ public class UserStatisticsRepository : IUserStatisticsRepository
     /// Gets user statistics by user's hex id
     /// </summary>
     /// <param name="hexId">Hex Id of the user</param>
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
     /// <exception cref="ArgumentException">Thrown when an invalid Hex Id is provided</exception>
     /// <exception cref="UserNotFoundException">Thrown when the user wasn't found</exception>
     /// <exception cref="NotFoundException">Thrown when user statistics weren't found</exception>
-    public async Task<UserStatistics> GetByUserHexIdAsync(int hexId)
+    public async Task<UserStatistics> GetByUserHexIdAsync(int hexId, string[]? overriddenIncludes = default)
     {
         if (hexId < 0 || hexId > 16_777_216)
         {
@@ -59,7 +63,7 @@ public class UserStatisticsRepository : IUserStatisticsRepository
 
         return await _dbContext.UserStatistics
             .AsNoTracking()
-            .Include(nameof(UserStatistics.User))
+            .IncludeMultiple(overriddenIncludes ?? [nameof(UserStatistics.User)])
             .FirstOrDefaultAsync(s => s.User.HexId == hexId) ?? throw new NotFoundException();
     }
 
@@ -89,9 +93,9 @@ public class UserStatisticsRepository : IUserStatisticsRepository
     /// </summary>
     /// <param name="statistics">User statistics to delete</param>
     /// <exception cref="NotFoundException">Thrown when user statistics weren't found</exception>
-    public void Delete(UserStatistics statistics)
+    public async Task DeleteAsync(UserStatistics statistics)
     {
-        var target = _dbContext.UserStatistics.FirstOrDefault(s => s.Id == statistics.Id) ?? throw new NotFoundException();
+        var target = await _dbContext.UserStatistics.FindAsync(statistics.Id) ?? throw new NotFoundException();
 
         _dbContext.UserStatistics.Remove(target);
     }

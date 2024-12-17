@@ -941,7 +941,7 @@ public class MessageServiceTests : IMessageServiceTests
     }
 
     [Test]
-    public async Task Delete_DeletesMessage()
+    public async Task DeleteAsync_DeletesMessage()
     {
         // Arrange
         var request = new RequestToDeleteMessage
@@ -958,7 +958,7 @@ public class MessageServiceTests : IMessageServiceTests
     }
 
     [Test]
-    public async Task Delete_ThrowsMessageNotFoundException_WhenMessageWasNotFound()
+    public async Task DeleteAsync_ThrowsMessageNotFoundException_WhenMessageWasNotFound()
     {
         // Arrange
         var request = new RequestToDeleteMessage
@@ -975,7 +975,7 @@ public class MessageServiceTests : IMessageServiceTests
     }
 
     [Test]
-    public async Task Delete_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom()
+    public async Task DeleteAsync_ThrowsIssuerNotInRoomException_WhenIssuerIsNotInRoom()
     {
         // Arrange
         var request = new RequestToDeleteMessage
@@ -992,7 +992,7 @@ public class MessageServiceTests : IMessageServiceTests
     }
 
     [Test]
-    public async Task Delete_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotAuthorOfMessage()
+    public async Task DeleteAsync_ThrowsNotEnoughPermissionsException_WhenIssuerIsNotAuthorOfMessage()
     {
         // Arrange
         var request = new RequestToDeleteMessage
@@ -1009,7 +1009,7 @@ public class MessageServiceTests : IMessageServiceTests
     }
 
     [Test]
-    public async Task Delete_ThrowsRoomExpiredException_WhenRoomIsExpired()
+    public async Task DeleteAsync_ThrowsRoomExpiredException_WhenRoomIsExpired()
     {
         // Arrange
         var request = new RequestToDeleteMessage

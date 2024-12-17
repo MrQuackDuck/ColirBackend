@@ -183,13 +183,13 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
     }
 
     [Test]
-    public async Task Delete_DeletesUserStatistics()
+    public async Task DeleteAsync_DeletesUserStatistics()
     {
         // Arrange
         var statisticsToDelete = await _dbContext.UserStatistics.AsNoTracking().FirstAsync();
 
         // Act
-        _userStatisticsRepository.Delete(statisticsToDelete);
+        await _userStatisticsRepository.DeleteAsync(statisticsToDelete);
         await _userStatisticsRepository.SaveChangesAsync();
 
         // Assert
@@ -197,7 +197,7 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
     }
 
     [Test]
-    public async Task Delete_ThrowsNotFoundException_WhenUserStatisticsDoesNotExist()
+    public async Task DeleteAsync_ThrowsNotFoundException_WhenUserStatisticsDoesNotExist()
     {
         // Arrange
         var statisticsToAdd = new UserStatistics
@@ -212,10 +212,10 @@ public class UserStatisticsRepositoryTests : IUserStatisticsRepositoryTests
         };
 
         // Act
-        TestDelegate act = () => _userStatisticsRepository.Delete(statisticsToAdd);
+        AsyncTestDelegate act = async () => await _userStatisticsRepository.DeleteAsync(statisticsToAdd);
 
         // Assert
-        Assert.Throws<NotFoundException>(act);
+        Assert.ThrowsAsync<NotFoundException>(act);
     }
 
     [Test]

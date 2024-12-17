@@ -1,6 +1,7 @@
 ﻿using Colir.Exceptions;
 using Colir.Exceptions.NotFound;
 using DAL.Entities;
+using DAL.Extensions;
 using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,16 +19,12 @@ public class MessageRepository : IMessageRepository
     /// <summary>
     /// Gets all messages
     /// </summary>
-    public async Task<IEnumerable<Message>> GetAllAsync()
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
+    public async Task<IEnumerable<Message>> GetAllAsync(string[]? overriddenIncludes = default)
     {
         return await _dbContext.Messages
             .AsNoTracking()
-            .Include(nameof(Message.Room))
-            .Include(nameof(Message.Author))
-            .Include(nameof(Message.RepliedTo))
-            .Include(nameof(Message.Attachments))
-            .Include(nameof(Message.Reactions))
-            .Include(nameof(Message.Reactions) + "." + nameof(Reaction.Author))
+            .IncludeMultiple(overriddenIncludes ?? GetDefaultIncludes())
             .AsSplitQuery()
             .ToListAsync();
     }
@@ -36,19 +33,13 @@ public class MessageRepository : IMessageRepository
     /// Gets the message by id
     /// </summary>
     /// <param name="id">Id of the message to get</param>
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
     /// <exception cref="MessageNotFoundException">Thrown when the message wasn't found by provided id</exception>
-    public async Task<Message> GetByIdAsync(long id)
+    public async Task<Message> GetByIdAsync(long id, string[]? overriddenIncludes = default)
     {
         return await _dbContext.Messages
             .AsNoTracking()
-            .Include(nameof(Message.Room))
-            .Include(nameof(Message.Author))
-            .Include(nameof(Message.RepliedTo))
-            .Include(nameof(Message.Attachments))
-            .Include(nameof(Message.RepliedTo))
-            .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Attachments))
-            .Include(nameof(Message.Reactions))
-            .Include(nameof(Message.Reactions) + "." + nameof(Reaction.Author))
+            .IncludeMultiple(overriddenIncludes ?? GetDefaultIncludes())
             .AsSplitQuery()
             .FirstOrDefaultAsync(m => m.Id == id) ?? throw new MessageNotFoundException();
     }
@@ -59,10 +50,12 @@ public class MessageRepository : IMessageRepository
     /// <param name="roomGuid">Room GUID to get messages in</param>
     /// <param name="count">Count of messages to take</param>
     /// <param name="skip">Count of messages to skip</param>
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
     /// <exception cref="ArgumentException">Thrown when either count or skip is less than zero</exception>
     /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found by provided GUID</exception>
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
-    public async Task<List<Message>> GetLastMessagesAsync(string roomGuid, int count, int skip)
+    public async Task<List<Message>> GetLastMessagesAsync(string roomGuid, int count, int skip,
+        string[]? overriddenIncludes = default)
     {
         if (count < 0)
         {
@@ -84,13 +77,7 @@ public class MessageRepository : IMessageRepository
         return await _dbContext.Messages
             .AsNoTracking()
             .Where(m => m.RoomId == room.Id)
-            .Include(nameof(Message.Author))
-            .Include(nameof(Message.Attachments))
-            .Include(nameof(Message.RepliedTo))
-            .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Author))
-            .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Attachments))
-            .Include(nameof(Message.Reactions))
-            .Include(nameof(Message.Reactions) + "." + nameof(Reaction.Author))
+            .IncludeMultiple(overriddenIncludes ?? GetDefaultIncludes())
             .OrderByDescending(m => m.Id)
             .Skip(skip)
             .Take(count)
@@ -104,9 +91,11 @@ public class MessageRepository : IMessageRepository
     /// <param name="roomGuid">Room GUID to get messages in</param>
     /// <param name="startId">Id of the first message</param>
     /// <param name="endId">Id of the last message</param>
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
     /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found by provided GUID</exception>
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
-    public Task<List<Message>> GetMessagesRangeAsync(string roomGuid, long startId, long endId)
+    public Task<List<Message>> GetMessagesRangeAsync(string roomGuid, long startId, long endId,
+        string[]? overriddenIncludes = default)
     {
         if (startId < 0 || endId < 0)
         {
@@ -129,13 +118,7 @@ public class MessageRepository : IMessageRepository
 
         return _dbContext.Messages
             .AsNoTracking()
-            .Include(nameof(Message.Author))
-            .Include(nameof(Message.Attachments))
-            .Include(nameof(Message.RepliedTo))
-            .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Author))
-            .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Attachments))
-            .Include(nameof(Message.Reactions))
-            .Include(nameof(Message.Reactions) + "." + nameof(Reaction.Author))
+            .IncludeMultiple(overriddenIncludes ?? GetDefaultIncludes())
             .Where(m => m.Room.Guid == roomGuid && m.Id >= startId && m.Id <= endId)
             .OrderBy(m => m.Id)
             .AsSplitQuery()
@@ -148,10 +131,12 @@ public class MessageRepository : IMessageRepository
     /// <param name="roomGuid">Room GUID to get messages in</param>
     /// <param name="messageId">Id of the message to get surrounding messages of</param>
     /// <param name="count">Count of messages to take</param>
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
     /// <exception cref="ArgumentException">Thrown when count is less than zero</exception>
     /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found by provided GUID</exception>
     /// <exception cref="MessageNotFoundException">Thrown when the message wasn't found by the provided id</exception>
-    public async Task<List<Message>> GetSurroundingMessages(string roomGuid, long messageId, int count)
+    public async Task<List<Message>> GetSurroundingMessages(string roomGuid, long messageId, int count,
+        string[]? overriddenIncludes = default)
     {
         if (count < 0)
         {
@@ -167,26 +152,14 @@ public class MessageRepository : IMessageRepository
 
         var message = await _dbContext.Messages
             .AsNoTracking()
-            .Include(nameof(Message.Author))
-            .Include(nameof(Message.Attachments))
-            .Include(nameof(Message.RepliedTo))
-            .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Author))
-            .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Attachments))
-            .Include(nameof(Message.Reactions))
-            .Include(nameof(Message.Reactions) + "." + nameof(Reaction.Author))
+            .IncludeMultiple(overriddenIncludes ?? GetDefaultIncludes())
             .AsSplitQuery()
             .FirstOrDefaultAsync(m => m.Id == messageId) ?? throw new MessageNotFoundException();
 
         var messagesBefore = await _dbContext.Messages
             .AsNoTracking()
             .Where(m => m.RoomId == room.Id && m.Id < message.Id)
-            .Include(nameof(Message.Author))
-            .Include(nameof(Message.Attachments))
-            .Include(nameof(Message.RepliedTo))
-            .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Author))
-            .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Attachments))
-            .Include(nameof(Message.Reactions))
-            .Include(nameof(Message.Reactions) + "." + nameof(Reaction.Author))
+            .IncludeMultiple(overriddenIncludes ?? GetDefaultIncludes())
             .OrderByDescending(m => m.Id)
             .Take(count / 2)
             .AsSplitQuery()
@@ -195,13 +168,7 @@ public class MessageRepository : IMessageRepository
         var messagesAfter = await _dbContext.Messages
             .AsNoTracking()
             .Where(m => m.RoomId == room.Id && m.Id > message.Id)
-            .Include(nameof(Message.Author))
-            .Include(nameof(Message.Attachments))
-            .Include(nameof(Message.RepliedTo))
-            .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Author))
-            .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Attachments))
-            .Include(nameof(Message.Reactions))
-            .Include(nameof(Message.Reactions) + "." + nameof(Reaction.Author))
+            .IncludeMultiple(overriddenIncludes ?? GetDefaultIncludes())
             .OrderBy(m => m.Id)
             .Take(count / 2)
             .AsSplitQuery()
@@ -218,9 +185,11 @@ public class MessageRepository : IMessageRepository
     /// <param name="roomGuid">Room GUID to get messages in</param>
     /// <param name="userId">Id of the user to get replies to</param>
     /// <param name="date">Date to get messages after</param>
+    /// <param name="overriddenIncludes">Overridden options for eager loading</param>
     /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found by provided GUID</exception>
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
-    public async Task<List<Message>> GetAllRepliesToUserAfterDateAsync(string roomGuid, long userId, DateTime date)
+    public async Task<List<Message>> GetAllRepliesToUserAfterDateAsync(string roomGuid, long userId, DateTime date,
+        string[]? overriddenIncludes = default)
     {
         var room = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Guid == roomGuid) ?? throw new RoomNotFoundException();
 
@@ -231,13 +200,7 @@ public class MessageRepository : IMessageRepository
 
         return await _dbContext.Messages
             .AsNoTracking()
-            .Include(nameof(Message.Author))
-            .Include(nameof(Message.Attachments))
-            .Include(nameof(Message.RepliedTo))
-            .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Author))
-            .Include(nameof(Message.RepliedTo) + "." + nameof(Message.Attachments))
-            .Include(nameof(Message.Reactions))
-            .Include(nameof(Message.Reactions) + "." + nameof(Reaction.Author))
+            .IncludeMultiple(overriddenIncludes ?? GetDefaultIncludes())
             .Where(m => m.RoomId == room.Id && m.RepliedMessageId != null && m.RepliedTo!.AuthorId == userId && m.PostDate > date)
             .OrderBy(m => m.Id)
             .AsSplitQuery()
@@ -275,14 +238,9 @@ public class MessageRepository : IMessageRepository
     /// </summary>
     /// <param name="message">Message to delete</param>
     /// <exception cref="MessageNotFoundException">Thrown when the message wasn't found</exception>
-    /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
-    /// <exception cref="RoomNotFoundException">Thrown when the room wasn't found</exception>
-    public void Delete(Message message)
+    public async Task DeleteAsync(Message message)
     {
-        var target = _dbContext.Messages.FirstOrDefault(m => m.Id == message.Id) ?? throw new MessageNotFoundException();
-
-        var room = _dbContext.Rooms.First(r => r.Id == target.RoomId) ?? throw new RoomNotFoundException();
-        if (room.IsExpired()) throw new RoomExpiredException();
+        var target = await _dbContext.Messages.FindAsync(message.Id) ?? throw new MessageNotFoundException();
 
         var reliedMessages = _dbContext.Messages.Where(m => m.RepliedMessageId == target.Id);
         foreach (var reliedMessage in reliedMessages)
@@ -300,11 +258,7 @@ public class MessageRepository : IMessageRepository
     /// <exception cref="RoomExpiredException">Thrown when the room is expired</exception>
     public async Task DeleteByIdAsync(long id)
     {
-        var target = await _dbContext.Messages
-            .Include(nameof(Message.Room))
-            .FirstOrDefaultAsync(m => m.Id == id) ?? throw new MessageNotFoundException();
-
-        if (target.Room!.IsExpired()) throw new RoomExpiredException();
+        var target = await _dbContext.Messages.FindAsync(id) ?? throw new MessageNotFoundException();
 
         _dbContext.Messages.Remove(target);
         _dbContext.Attachments.RemoveRange(_dbContext.Attachments.Where(a => a.MessageId == id));
@@ -326,7 +280,7 @@ public class MessageRepository : IMessageRepository
             throw new MessageNotFoundException();
         }
 
-        if (originalEntity.Room!.IsExpired()) throw new RoomExpiredException();
+        if (originalEntity.Room.IsExpired()) throw new RoomExpiredException();
 
         _dbContext.Entry(originalEntity).State = EntityState.Detached;
         _dbContext.Entry(message).State = EntityState.Modified;
@@ -347,4 +301,15 @@ public class MessageRepository : IMessageRepository
     {
         await _dbContext.SaveChangesAsync();
     }
+
+    private static string[] GetDefaultIncludes() => new[]
+    {
+        nameof(Message.Author),
+        nameof(Message.Attachments),
+        nameof(Message.RepliedTo),
+        nameof(Message.RepliedTo) + "." + nameof(Message.Author),
+        nameof(Message.RepliedTo) + "." + nameof(Message.Attachments),
+        nameof(Message.Reactions),
+        nameof(Message.Reactions) + "." + nameof(Reaction.Author)
+    };
 }
