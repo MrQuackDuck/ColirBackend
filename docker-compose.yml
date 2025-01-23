@@ -3,10 +3,11 @@
     container_name: colir.backend
     build:
       context: .
-      network: host
       dockerfile: Dockerfile
     extra_hosts:
-      - "localhost:192.168.0.107"
+      - "host.docker.internal:host-gateway"
+    environment:
+      - DB_HOST=host.docker.internal
     ports:
       - 7700:7700
     volumes:

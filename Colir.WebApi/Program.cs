@@ -40,8 +40,7 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
 
 // Addding the DB context
-services.AddDbContext<ColirDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.AddPostgreDbContext();
 
 // Adding DAL services
 services.AddTransient<IFileSystem, FileSystem>();
