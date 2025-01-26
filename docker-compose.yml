@@ -1,14 +1,39 @@
 ﻿services:
-  web:
+  db:
+    container_name: colir.postgres
+    image: postgres:16
+    restart: always
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: colir
+    networks:
+      - colir
+  backend:
     container_name: colir.backend
     build:
       context: .
       dockerfile: Dockerfile
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     environment:
-      - DB_HOST=host.docker.internal
+      - DB_HOST=colir.postgres
+      - DB_NAME=colir
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
     ports:
       - 7700:7700
     volumes:
-      - ./attachments:/src/wwwroot/RoomFiles
+      - attachments:/src/wwwroot/RoomFiles
+    depends_on:
+      - db
+    networks:
+      - colir
+
+networks:
+  colir:
+    driver: bridge
+
+volumes:
+  db_data:
+  attachments:
