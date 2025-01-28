@@ -2,7 +2,7 @@
   db:
     container_name: colir.postgres
     image: postgres:16
-    restart: always
+    restart: unless-stopped
     volumes:
       - db_data:/var/lib/postgresql/data
     environment:
@@ -13,6 +13,7 @@
       - colir
   backend:
     container_name: colir.backend
+    restart: unless-stopped
     build:
       context: .
       dockerfile: Dockerfile
@@ -24,7 +25,7 @@
     ports:
       - 7700:7700
     volumes:
-      - attachments:/src/wwwroot/RoomFiles
+      - attachments:/app/wwwroot/RoomFiles
     depends_on:
       - db
     networks:
